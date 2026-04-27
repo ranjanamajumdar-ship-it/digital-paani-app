@@ -144,6 +144,54 @@ body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; color: var(--
 }
 
 /* ============================================================
+   Language picker (floating)
+   ============================================================ */
+.lang-picker {
+  position: fixed; top: 16px; right: 200px; z-index: 200;
+  font-size: 12px; font-weight: 600;
+}
+.lang-picker .trigger {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 12px; border: 0; cursor: pointer;
+  background: rgba(11,18,32,.92); color:#fff;
+  border-radius: 999px; box-shadow: 0 10px 30px rgba(11,18,32,.25);
+  font-weight: 600; font-size: 12px; line-height: 1;
+  backdrop-filter: blur(8px);
+}
+.lang-picker .trigger:hover { background: rgba(11,18,32,1); }
+.lang-picker .lang-menu {
+  position: absolute; top: 110%; right: 0;
+  min-width: 200px; max-height: 70vh; overflow-y: auto;
+  background:#fff; border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(11,18,32,.18), inset 0 0 0 1px #ECEEF2;
+  padding: 6px;
+  display: none;
+}
+.lang-picker.open .lang-menu { display: block; }
+.lang-picker .lang-menu a {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 9px 12px; border-radius: 8px;
+  text-decoration: none; color: var(--c-ink-900); cursor: pointer;
+  transition: background .12s ease;
+}
+.lang-picker .lang-menu a:hover { background: var(--c-ink-100); }
+.lang-picker .lang-menu a.active { background: var(--c-ink-900); color: #fff; }
+.lang-picker .lang-menu a .latin { font-size: 11px; color: var(--c-ink-500); font-weight: 500; }
+.lang-picker .lang-menu a.active .latin { color: rgba(255,255,255,.65); }
+
+@media (max-width: 720px) {
+  .lang-picker { top: 16px; right: 16px; }
+  .vm-toggle { top: 60px; right: 16px; }
+}
+@media (max-width: 480px) {
+  .lang-picker { top: 16px; right: 16px; }
+  .vm-toggle { top: auto; bottom: 88px; right: 12px; }
+}
+[dir="rtl"] .lang-picker { right: auto; left: 200px; }
+[dir="rtl"] .lang-picker .lang-menu { right: auto; left: 0; }
+[dir="rtl"] .vm-toggle { right: auto; left: 16px; }
+
+/* ============================================================
    Issue Card (status-driven)
    ============================================================ */
 .ds-issue { background: var(--c-card); border-radius: var(--r-lg); box-shadow: var(--sh-card); padding: var(--s-3) var(--s-4); }

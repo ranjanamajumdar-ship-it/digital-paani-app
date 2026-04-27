@@ -39,7 +39,7 @@
   .dx-navlink svg { width:16px; height:16px; flex:none; }
   .dx-navlink .num { margin-left:auto; font-size: 11px; padding: 2px 7px; background: var(--c-ink-100); color: var(--c-ink-700); border-radius: 999px; font-weight: 700; }
   .dx-navlink.active .num { background: rgba(255,255,255,.15); color:#fff; }
-  .dx-navlink .num.crit { background: var(--c-crit-softt); color: var(--c-crit); }
+  .dx-navlink .num.crit { background: var(--c-crit-soft); color: var(--c-crit); }
 
   /* ऑपरेटर card */
   .dx-op { margin-top: 16px; padding: 14px; background: var(--c-paper); border-radius: 14px; box-shadow: var(--sh-line); }
@@ -75,7 +75,7 @@
   /* Issue diagnostic */
   .diag { padding: 16px; }
   .diag-head { display:flex; align-items:center; gap: 10px; margin-bottom: 10px; }
-  .diag-pill { display:inline-flex; align-items:center; gap:6px; padding: 4px 10px; background: var(--c-crit-softt); color: var(--c-crit); border-radius: 999px; font-size: 11px; font-weight:700; text-transform: uppercase; letter-spacing:.04em; }
+  .diag-pill { display:inline-flex; align-items:center; gap:6px; padding: 4px 10px; background: var(--c-crit-soft); color: var(--c-crit); border-radius: 999px; font-size: 11px; font-weight:700; text-transform: uppercase; letter-spacing:.04em; }
   .threshold { background: var(--c-paper); border-radius: 12px; padding: 12px; box-shadow: var(--sh-line); }
   .threshold-bar { position: relative; height: 8px; border-radius: 999px; background: var(--c-ink-200); overflow:hidden; margin-top: 10px; }
   .threshold-bar .ok { position:absolute; inset:0 45% 0 0; background: rgba(22,163,74,.7); }
@@ -115,7 +115,7 @@
   .logb-sub { font-size: 12px; color: var(--c-ink-500); margin-top:2px; }
 
   /* Pills (mirroring shared) */
-  .pill-crit { display:inline-flex; padding:2px 8px; background: var(--c-crit-softt); color: var(--c-crit); font-size: 10px; font-weight:700; border-radius:999px; text-transform: uppercase; letter-spacing:.04em; }
+  .pill-crit { display:inline-flex; padding:2px 8px; background: var(--c-crit-soft); color: var(--c-crit); font-size: 10px; font-weight:700; border-radius:999px; text-transform: uppercase; letter-spacing:.04em; }
   .pill-warn { display:inline-flex; padding:2px 8px; background: var(--c-warn-soft); color: var(--c-warn); font-size: 10px; font-weight:700; border-radius:999px; text-transform: uppercase; letter-spacing:.04em; }
   .pill-prog { display:inline-flex; padding:2px 8px; background: var(--c-prog-soft); color: var(--c-prog); font-size: 10px; font-weight:700; border-radius:999px; text-transform: uppercase; letter-spacing:.04em; }
   .pill-ok   { display:inline-flex; padding:2px 8px; background: var(--c-ok-soft);   color: var(--c-ok);   font-size: 10px; font-weight:700; border-radius:999px; text-transform: uppercase; letter-spacing:.04em; }
@@ -455,7 +455,7 @@
   </div>
 </div>
 
-<script src="_components.js" defer></script>
+<script src="_lang.js" defer></script><script src="_components.js" defer></script>
 <script>
   document.querySelectorAll('#issueTabs .list-tab').forEach(btn => {
     btn.addEventListener('click', () => {

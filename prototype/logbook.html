@@ -98,7 +98,7 @@
         <div class="rounded-xl bg-white shadow-line px-3 py-2.5 flex items-center gap-3">
           <div class="flex-1">
             <div class="flex items-center justify-between">
-              <div class="text-[11px] font-semibold text-ink-700"><span id="भरेCount">0</span> / <span id="totalCount">8</span> भरे</div>
+              <div class="text-[11px] font-semibold text-ink-700"><span id="filledCount">0</span> / <span id="totalCount">8</span> भरे</div>
               <div class="text-[10px] text-ink-500"><span id="failCount">0</span> out of range</div>
             </div>
             <div class="mt-1 h-1.5 rounded-full bg-ink-200 overflow-hidden">
@@ -400,7 +400,7 @@
     const total = rows.length, भरे = rows.filter(r => r.dataset.state).length;
     const fails = rows.filter(r => r.dataset.state === 'fail').length;
     document.getElementById('totalCount').textContent = total;
-    document.getElementById('भरेCount').textContent = भरे;
+    document.getElementById('filledCount').textContent = भरे;
     document.getElementById('failCount').textContent = fails;
     document.getElementById('progBar').style.width = (भरे/total*100)+'%';
     document.getElementById('progBar').classList.toggle('bg-crit', fails > 0);
@@ -431,6 +431,6 @@
   }, 1000);
   updateProgress();
 </script>
-<script src="_components.js" defer></script>
+<script src="_lang.js" defer></script><script src="_components.js" defer></script>
 </body>
 </html>
