@@ -96,6 +96,27 @@
       </aside>`;
   }
 
+  // ===== View Mode Toggle =====
+  function injectViewToggle(){
+    if (document.querySelector('.vm-toggle')) return;
+    const isDesktop = /desktop\.html/i.test(location.pathname);
+    const wrap = document.createElement('div');
+    wrap.className = 'vm-toggle';
+    wrap.innerHTML = `
+      <a href="plant.html" class="${isDesktop ? '' : 'active'}" data-vm="mobile">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="4" y="1.5" width="8" height="13" rx="1.5" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="12.5" r=".7" fill="currentColor"/></svg>
+        Mobile
+      </a>
+      <a href="desktop.html" class="${isDesktop ? 'active' : ''}" data-vm="desktop">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="1.5" y="2.5" width="13" height="9" rx="1.2" stroke="currentColor" stroke-width="1.4"/><path d="M5 13.5h6M8 11.5v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Desktop
+      </a>`;
+    document.body.appendChild(wrap);
+    wrap.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      try { localStorage.setItem('dp.viewmode', a.dataset.vm); } catch(e) {}
+    }));
+  }
+
   // ===== Mount =====
   function mount(){
     document.querySelectorAll('[data-component]').forEach(el => {
@@ -105,6 +126,7 @@
       else if (c === 'bottom-nav') el.outerHTML = bottomNav(el.dataset.active || '');
       else if (c === 'launcher') el.outerHTML = launcher(el.dataset.active || '');
     });
+    injectViewToggle();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
   else mount();

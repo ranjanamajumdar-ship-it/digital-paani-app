@@ -100,11 +100,13 @@ body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; color: var(--
 /* ============================================================
    Button
    ============================================================ */
-.ds-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px;
-  font-size: var(--t-body); font-weight:600; padding: 14px 16px;
+.ds-btn { display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  font-size: var(--t-body); font-weight:600; padding: 14px 22px; min-height: 48px;
   border-radius: var(--r-md); transition: transform .15s ease, background .15s ease, opacity .15s ease;
-  border: 0; cursor: pointer; line-height:1; text-decoration:none;
+  border: 0; cursor: pointer; line-height:1.1; text-decoration:none;
+  white-space: nowrap; box-sizing: border-box;
 }
+.ds-btn svg { flex: none; }
 .ds-btn:active { transform: scale(.985); }
 .ds-btn--primary { background: var(--c-ink-900); color:#fff; }
 .ds-btn--ghost   { background: var(--c-ink-100); color: var(--c-ink-900); }
@@ -113,9 +115,33 @@ body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; color: var(--
 .ds-btn--prog    { background: var(--c-prog); color:#fff; }
 .ds-btn--ok      { background: var(--c-ok); color:#fff; }
 .ds-btn--full    { width:100%; }
-.ds-btn--sm      { padding: 8px 12px; font-size: 12px; }
+.ds-btn--sm      { padding: 10px 14px; font-size: 12px; min-height: 36px; }
 .ds-btn:disabled { background: var(--c-ink-300); color:#fff; cursor: not-allowed; }
 .ds-btn:disabled:active { transform: none; }
+
+/* ============================================================
+   View Mode Toggle (floating, top-right of every page)
+   ============================================================ */
+.vm-toggle {
+  position: fixed; top: 16px; right: 16px; z-index: 200;
+  display: inline-flex; padding: 4px;
+  background: rgba(11,18,32,.92); color: #fff;
+  border-radius: 999px; box-shadow: 0 10px 30px rgba(11,18,32,.25);
+  font-size: 12px; font-weight: 600;
+  backdrop-filter: blur(8px);
+}
+.vm-toggle a {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 999px;
+  color: rgba(255,255,255,.7); text-decoration: none;
+  transition: all .15s ease; line-height: 1;
+}
+.vm-toggle a.active { background: #fff; color: #0B1220; }
+.vm-toggle a:hover:not(.active) { color: #fff; }
+.vm-toggle svg { width: 12px; height: 12px; }
+@media (max-width: 480px) {
+  .vm-toggle { top: auto; bottom: 88px; right: 12px; }
+}
 
 /* ============================================================
    Issue Card (status-driven)
