@@ -1,0 +1,911 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Plant · Digital Paani</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Inter','ui-sans-serif','system-ui','sans-serif'] },
+        colors: {
+          ink:  { 900:'#0B1220', 700:'#2B3344', 600:'#475061', 500:'#6B7280', 400:'#9AA3B2', 300:'#D6DBE3', 200:'#EAEDF2', 100:'#F4F6F9' },
+          crit: '#E11D2E', warn: '#F59E0B', prog: '#2563EB', ok: '#16A34A',
+          paper:'#FAFAF7', card:'#FFFFFF',
+        },
+        boxShadow: {
+          card: '0 1px 0 rgba(11,18,32,.04), 0 6px 18px rgba(11,18,32,.05)',
+          line: 'inset 0 0 0 1px #ECEEF2',
+          pop:  '0 8px 24px rgba(11,18,32,.18)'
+        },
+        keyframes: {
+          softpulse: { '0%':{boxShadow:'0 0 0 0 rgba(225,29,46,.55)'},'70%':{boxShadow:'0 0 0 10px rgba(225,29,46,0)'},'100%':{boxShadow:'0 0 0 0 rgba(225,29,46,0)'} },
+          dash: { to: { strokeDashoffset: '-24' } },
+          rise: { '0%':{transform:'translateY(6px)',opacity:0}, '100%':{transform:'translateY(0)',opacity:1} },
+          fadein: { '0%':{opacity:0}, '100%':{opacity:1} }
+        },
+        animation: {
+          softpulse: 'softpulse 1.6s ease-out infinite',
+          dash: 'dash 1.4s linear infinite',
+          rise: 'rise .22s ease-out both',
+          fadein: 'fadein .2s ease-out both'
+        }
+      }
+    }
+  };
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  html,body { background:#E9ECEF; }
+  .device {
+    width: 390px; min-height: 844px; background:#FAFAF7;
+    border-radius: 44px;
+    box-shadow: 0 30px 80px rgba(11,18,32,.18), 0 2px 0 #fff inset;
+    position: relative; overflow: hidden;
+  }
+  .device.mini { transform-origin: top left; }
+  .notch {
+    position:absolute; top:10px; left:50%; transform:translateX(-50%);
+    width:120px; height:30px; background:#0B1220; border-radius:18px; z-index:60;
+  }
+  .hatch { background-image: repeating-linear-gradient(135deg,#D6DBE3 0 4px,transparent 4px 9px); }
+  .grid-faint { background-image: radial-gradient(circle, #DDE2EA 1px, transparent 1px); background-size: 14px 14px; }
+  .pipe { stroke:#C9CFD8; stroke-width:3; fill:none; stroke-linecap:round; }
+  .pipe-flow { stroke:#16A34A; stroke-width:3; fill:none; stroke-dasharray:4 8; animation: dash 1.4s linear infinite; stroke-linecap:round; }
+  .pipe-warn { stroke:#E11D2E; }
+  .tap { transition: transform .15s ease, background-color .15s ease, box-shadow .2s ease; cursor:pointer; }
+  .tap:active { transform: scale(.985); }
+  .opt { transition: all .15s ease; }
+  .opt:hover { border-color:#0B1220; }
+  .opt.selected { border-color:#0B1220; background:#0B1220; color:#fff; }
+  .step-pane { display:none; }
+  .step-pane.active { display:block; animation: rise .22s ease-out both; }
+  .stepdot { transition: all .2s ease; }
+  /* variants gallery */
+  .variant-frame {
+    width: 312px; /* 0.8 * 390 */
+    border-radius: 20px;
+    background: #FAFAF7;
+    padding: 14px 12px;
+    box-shadow: 0 1px 0 rgba(11,18,32,.04), 0 8px 22px rgba(11,18,32,.06);
+    border: 1px solid #ECEEF2;
+  }
+  details > summary { list-style:none; cursor:pointer; }
+  details > summary::-webkit-details-marker { display:none; }
+  .chev { transition: transform .2s ease; }
+  details[open] .chev { transform: rotate(180deg); }
+</style>
+</head>
+<body class="font-sans text-ink-900 antialiased">
+
+<!-- ============ TOP: Live device ============ -->
+<div class="w-full flex items-start justify-center p-6 lg:p-12 gap-10">
+
+  <aside class="hidden lg:flex flex-col w-56 sticky top-12 gap-2">
+    <div class="text-[10px] uppercase tracking-[.18em] text-ink-500 font-semibold">Digital Paani · Prototype</div>
+    <a href="plant.html" class="tap rounded-xl bg-ink-900 text-white px-3 py-2.5 text-[12px] font-semibold flex items-center justify-between">Plant <span class="opacity-60">SCADA</span></a>
+    <a href="tasks.html" class="tap rounded-xl bg-white shadow-line px-3 py-2.5 text-[12px] font-semibold flex items-center justify-between">Tasks <span class="text-ink-400">Kanban</span></a>
+    <a href="issues.html" class="tap rounded-xl bg-white shadow-line px-3 py-2.5 text-[12px] font-semibold flex items-center justify-between">Issues <span class="text-ink-400">List</span></a>
+    <a href="report.html" class="tap rounded-xl bg-white shadow-line px-3 py-2.5 text-[12px] font-semibold flex items-center justify-between">Report <span class="text-ink-400">New</span></a>
+  </aside>
+
+  <div class="device" id="device">
+    <div class="notch"></div>
+
+    <!-- Status bar -->
+    <div class="absolute top-0 left-0 right-0 h-12 z-50 flex items-center justify-between px-7 pt-3 text-[12px] font-semibold text-ink-900">
+      <span>9:41</span>
+      <span class="flex items-center gap-1.5">
+        <svg width="16" height="10" viewBox="0 0 16 10" fill="none"><rect x="0" y="6" width="3" height="4" rx="1" fill="currentColor"/><rect x="4.5" y="4" width="3" height="6" rx="1" fill="currentColor"/><rect x="9" y="2" width="3" height="8" rx="1" fill="currentColor"/><rect x="13.5" y="0" width="3" height="10" rx="1" fill="currentColor"/></svg>
+        <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M7 9.5C8.1 9.5 9 8.6 9 7.5S8.1 5.5 7 5.5 5 6.4 5 7.5 5.9 9.5 7 9.5Z" fill="currentColor"/><path d="M11.5 5.5C10.3 4.3 8.7 3.5 7 3.5S3.7 4.3 2.5 5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M13.5 3.5C11.7 1.7 9.4 .5 7 .5S2.3 1.7 .5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <svg width="22" height="10" viewBox="0 0 22 10" fill="none"><rect x=".5" y=".5" width="18" height="9" rx="2" stroke="currentColor"/><rect x="2" y="2" width="15" height="6" rx="1" fill="currentColor"/><rect x="19.5" y="3.5" width="1.5" height="3" rx=".5" fill="currentColor"/></svg>
+      </span>
+    </div>
+
+    <main class="absolute inset-0 pt-12 pb-24 overflow-y-auto" id="scroll">
+
+      <!-- Header -->
+      <div class="px-5 pt-3 pb-2 flex items-center justify-between">
+        <div>
+          <div class="text-[11px] uppercase tracking-[.16em] text-ink-500 font-semibold">Plant</div>
+          <div class="flex items-center gap-1.5 mt-0.5">
+            <h2 class="text-[20px] font-bold leading-none">Honda Manesar STP</h2>
+            <svg class="w-4 h-4 text-ink-500" viewBox="0 0 20 20" fill="none"><path d="M6 8l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="text-[11px] text-ink-500 mt-1" id="lastUpdate">Live · updated 12s ago</div>
+        </div>
+        <button class="tap w-10 h-10 rounded-full bg-white shadow-line grid place-items-center" aria-label="Profile">
+          <span class="w-7 h-7 rounded-full bg-ink-900 text-white text-[11px] font-semibold grid place-items-center">RA</span>
+        </button>
+      </div>
+
+      <!-- Alarm Bar (state changes with flow) -->
+      <div class="px-5 mt-2">
+        <button id="alarmBar" class="tap w-full text-left rounded-2xl shadow-card overflow-hidden bg-crit text-white animate-softpulse">
+          <div class="px-4 py-3 flex items-center gap-3">
+            <span class="relative grid place-items-center w-7 h-7 rounded-full bg-white/15">
+              <span id="alarmRing" class="absolute inset-0 rounded-full bg-white/30 animate-ping"></span>
+              <svg id="alarmIcon" class="w-3.5 h-3.5 relative" viewBox="0 0 24 24" fill="none"><path d="M12 3l9 16H3l9-16Z" stroke="white" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v4" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="white"/></svg>
+            </span>
+            <div class="flex-1 min-w-0">
+              <div id="alarmKicker" class="text-[11px] uppercase tracking-wider opacity-80 font-semibold">Naya Issue · Active</div>
+              <div id="alarmTitle" class="text-[14px] font-semibold truncate">Aeration Blower #2 — High vibration</div>
+            </div>
+            <div id="alarmTime" class="text-[11px] opacity-80 font-medium tabular-nums">2 min</div>
+            <svg class="w-4 h-4 opacity-80" viewBox="0 0 20 20" fill="none"><path d="M7 4l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </button>
+      </div>
+
+      <!-- SCADA visualization -->
+      <section class="px-5 mt-3">
+        <div class="bg-white rounded-2xl shadow-card overflow-hidden">
+          <div class="flex items-center justify-between px-4 pt-3.5 pb-2">
+            <div class="flex items-center gap-2">
+              <div class="text-[13px] font-semibold">Plant Overview</div>
+              <span class="text-[10px] px-1.5 py-0.5 rounded-md bg-ink-200 text-ink-700 font-semibold uppercase tracking-wider">Live</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <button class="tap text-[11px] font-medium px-2.5 py-1 rounded-lg bg-ink-900 text-white">Flow</button>
+              <button class="tap text-[11px] font-medium px-2.5 py-1 rounded-lg text-ink-500">Map</button>
+            </div>
+          </div>
+
+          <div class="relative grid-faint">
+            <svg viewBox="0 0 360 250" class="w-full h-[250px] block">
+              <path class="pipe-flow" d="M30 70 H110" />
+              <path class="pipe-flow" d="M170 70 H230" />
+              <path class="pipe pipe-warn" d="M290 70 V140 H230" stroke-dasharray="0"/>
+              <path class="pipe-flow" d="M170 140 H110" />
+              <path class="pipe-flow" d="M70 140 V200 H170" />
+              <path class="pipe-flow" d="M230 200 H310" />
+
+              <a href="equipment.html?eq=inlet" style="cursor:pointer"><g><rect x="10" y="55" width="30" height="30" rx="6" fill="#fff" stroke="#D6DBE3"/><circle cx="25" cy="70" r="4" fill="#16A34A"/><text x="25" y="100" text-anchor="middle" font-size="9" fill="#6B7280" font-weight="600">Inlet</text></g></a>
+              <a href="equipment.html?eq=barscreen" style="cursor:pointer"><g><rect x="110" y="50" width="60" height="40" rx="8" fill="#fff" stroke="#D6DBE3"/><line x1="120" y1="56" x2="120" y2="84" stroke="#D6DBE3"/><line x1="130" y1="56" x2="130" y2="84" stroke="#D6DBE3"/><line x1="140" y1="56" x2="140" y2="84" stroke="#D6DBE3"/><line x1="150" y1="56" x2="150" y2="84" stroke="#D6DBE3"/><line x1="160" y1="56" x2="160" y2="84" stroke="#D6DBE3"/><circle cx="164" cy="54" r="4" fill="#16A34A"/><text x="140" y="104" text-anchor="middle" font-size="9" fill="#6B7280" font-weight="600">Bar Screen</text></g></a>
+              <a href="equipment.html?eq=eq" style="cursor:pointer"><g><rect x="230" y="50" width="60" height="40" rx="8" fill="#fff" stroke="#D6DBE3"/><rect x="234" y="68" width="52" height="18" rx="4" fill="#EAF5FF"/><circle cx="284" cy="54" r="4" fill="#F59E0B"/><text x="260" y="104" text-anchor="middle" font-size="9" fill="#6B7280" font-weight="600">Equalization</text></g></a>
+              <a href="equipment.html?eq=aeration" style="cursor:pointer"><g><rect x="110" y="120" width="60" height="40" rx="8" fill="#fff" stroke="#D6DBE3"/><circle cx="122" cy="148" r="2" fill="#9AA3B2"/><circle cx="132" cy="146" r="2" fill="#9AA3B2"/><circle cx="142" cy="150" r="2" fill="#9AA3B2"/><circle cx="152" cy="146" r="2" fill="#9AA3B2"/><circle cx="162" cy="148" r="2" fill="#9AA3B2"/><circle cx="164" cy="124" r="4" fill="#16A34A"/><text x="140" y="174" text-anchor="middle" font-size="9" fill="#6B7280" font-weight="600">Aeration</text></g></a>
+
+              <!-- Blower (clickable) -->
+              <g id="blowerNode" style="cursor:pointer">
+                <circle id="blowerHalo" cx="290" cy="140" r="28" fill="#FDECEE"/>
+                <rect id="blowerBox" x="262" y="120" width="56" height="40" rx="10" fill="#fff" stroke="#E11D2E" stroke-width="1.5"/>
+                <circle cx="290" cy="140" r="9" fill="#FFE4E7" stroke="#E11D2E"/>
+                <path d="M290 134 v12 M284 140 h12" stroke="#E11D2E" stroke-width="1.6" stroke-linecap="round"/>
+                <circle cx="290" cy="140" r="2" fill="#E11D2E"/>
+                <circle id="blowerDot" cx="314" cy="124" r="5" fill="#E11D2E">
+                  <animate attributeName="r" values="4;6;4" dur="1.4s" repeatCount="indefinite"/>
+                  <animate attributeName="opacity" values="1;.6;1" dur="1.4s" repeatCount="indefinite"/>
+                </circle>
+                <text id="blowerLabel" x="290" y="174" text-anchor="middle" font-size="9" fill="#E11D2E" font-weight="700">Blower #2</text>
+              </g>
+
+              <a href="equipment.html?eq=clarifier" style="cursor:pointer"><g><rect x="40" y="180" width="60" height="40" rx="8" fill="#fff" stroke="#D6DBE3"/><rect x="44" y="184" width="52" height="32" rx="6" class="hatch"/><circle cx="94" cy="184" r="4" fill="#9AA3B2"/><text x="70" y="234" text-anchor="middle" font-size="9" fill="#6B7280" font-weight="600">Clarifier</text></g></a>
+              <a href="equipment.html?eq=mbbr" style="cursor:pointer"><g><rect x="170" y="180" width="60" height="40" rx="8" fill="#fff" stroke="#D6DBE3"/><circle cx="182" cy="200" r="2" fill="#CBD5E1"/><circle cx="192" cy="204" r="2" fill="#CBD5E1"/><circle cx="202" cy="198" r="2" fill="#CBD5E1"/><circle cx="212" cy="202" r="2" fill="#CBD5E1"/><circle cx="222" cy="200" r="2" fill="#CBD5E1"/><circle cx="224" cy="184" r="4" fill="#16A34A"/><text x="200" y="234" text-anchor="middle" font-size="9" fill="#6B7280" font-weight="600">MBBR</text></g></a>
+              <a href="equipment.html?eq=outlet" style="cursor:pointer"><g><rect x="310" y="185" width="30" height="30" rx="6" fill="#fff" stroke="#D6DBE3"/><path d="M318 200 h14 M328 196 l4 4 -4 4" stroke="#16A34A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><text x="325" y="234" text-anchor="middle" font-size="9" fill="#6B7280" font-weight="600">Outlet</text></g></a>
+            </svg>
+
+            <div id="tapHint" class="absolute right-3 top-3 bg-ink-900 text-white text-[10px] font-semibold rounded-md px-2 py-1 shadow-pop animate-rise">
+              Tap any equipment
+              <span class="absolute -bottom-1 right-3 w-2 h-2 bg-ink-900 rotate-45"></span>
+            </div>
+          </div>
+
+          <div id="legendStrip" class="px-4 py-2.5 border-t border-ink-200 flex items-center justify-between text-[10.5px] text-ink-500">
+            <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-crit"></span><span id="critCount">1</span> critical</span>
+            <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-warn"></span>1 warning</span>
+            <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-ok"></span><span id="okCount">5</span> healthy</span>
+            <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-ink-400"></span>1 maintenance</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================== ISSUE CARD (interactive) =================== -->
+      <section class="px-5 mt-3">
+        <div id="issueCard" class="bg-white rounded-2xl shadow-card overflow-hidden">
+
+          <!-- ===== Idle (collapsed) — title + sensors snapshot + Start ===== -->
+          <div id="paneIdle" class="step-pane active">
+            <div class="px-4 py-3.5 flex items-start gap-3">
+              <span class="mt-0.5 w-2 h-2 rounded-full bg-crit shrink-0" id="severityDot"></span>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] uppercase tracking-wider font-bold text-crit" id="severityLabel">Critical</span>
+                  <span class="text-[10px] text-ink-500">· #IS-2041</span>
+                </div>
+                <div class="text-[14px] font-semibold leading-tight mt-0.5" id="issueTitle">Aeration Blower #2 — Vibration ke ucch level</div>
+                <div class="text-[11.5px] text-ink-500 mt-0.5">Bearing temp + vibration cross threshold</div>
+              </div>
+              <button class="tap text-[11px] font-medium text-ink-500 px-2 py-1" onclick="snooze()">Snooze</button>
+            </div>
+
+            <div class="px-4 pb-3">
+              <div class="grid grid-cols-2 gap-2">
+                <div class="rounded-xl bg-paper p-3 shadow-line">
+                  <div class="text-[10.5px] text-ink-500 font-semibold uppercase tracking-wider">Bearing Temp</div>
+                  <div class="flex items-end gap-1 mt-0.5"><div class="text-[18px] font-bold tabular-nums">82°</div><div class="text-[10px] text-crit font-semibold mb-1">+12 vs avg</div></div>
+                  <svg viewBox="0 0 80 22" class="w-full h-5 mt-1"><path d="M0 16 L10 14 L20 15 L30 12 L40 13 L50 9 L60 10 L70 4 L80 2" stroke="#E11D2E" stroke-width="1.5" fill="none"/></svg>
+                </div>
+                <div class="rounded-xl bg-paper p-3 shadow-line">
+                  <div class="text-[10.5px] text-ink-500 font-semibold uppercase tracking-wider">Vibration</div>
+                  <div class="flex items-end gap-1 mt-0.5"><div class="text-[18px] font-bold tabular-nums">8.4</div><div class="text-[10px] text-crit font-semibold mb-1">mm/s</div></div>
+                  <div class="relative mt-1.5 h-1.5 rounded-full bg-ink-200 overflow-hidden">
+                    <div class="absolute inset-y-0 left-0 w-[55%] bg-ok/70"></div>
+                    <div class="absolute inset-y-0 left-[55%] w-[20%] bg-warn/80"></div>
+                    <div class="absolute inset-y-0 left-[75%] w-[25%] bg-crit/80"></div>
+                    <div class="absolute -top-0.5 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-white shadow ring-2 ring-crit" style="left:84%"></div>
+                  </div>
+                </div>
+              </div>
+              <button class="tap mt-3 w-full rounded-xl bg-crit text-white font-semibold py-3.5 text-[14px] flex items-center justify-center gap-2" onclick="goStep(0)">
+                Start Diagnostic
+                <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none"><path d="M7 4l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- ===== Common header for steps ===== -->
+          <template id="stepHeader">
+            <div class="px-4 pt-3.5 pb-2 flex items-center gap-3">
+              <button class="tap w-8 h-8 rounded-lg bg-ink-100 grid place-items-center" data-back aria-label="Back">
+                <svg class="w-4 h-4 text-ink-700" viewBox="0 0 20 20" fill="none"><path d="M13 4l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="flex-1">
+                <div class="text-[10px] uppercase tracking-wider font-bold text-ink-500" data-step-counter></div>
+                <div class="text-[13px] font-bold leading-tight" data-step-title></div>
+              </div>
+              <button class="tap text-[11px] font-medium text-ink-500" onclick="goIdle()">Close</button>
+            </div>
+            <div class="px-4">
+              <div class="flex items-center gap-1 mt-1 mb-2" data-step-bar></div>
+            </div>
+          </template>
+
+          <!-- =================== Step 0 — SV30 trend (system) =================== -->
+          <div id="paneStep0" class="step-pane">
+            <div data-header></div>
+            <div class="px-4 pb-4">
+              <div class="rounded-xl bg-ink-900 text-white p-3.5">
+                <div class="text-[10.5px] uppercase tracking-wider opacity-70 font-semibold">System detected</div>
+                <div class="text-[14px] font-semibold mt-0.5 leading-snug">SV30 trending high — bulking suspected</div>
+              </div>
+
+              <div class="mt-3 rounded-xl bg-paper shadow-line p-3">
+                <div class="flex items-center justify-between">
+                  <div class="text-[11px] text-ink-500 font-semibold uppercase tracking-wider">SV30 (last 7 days)</div>
+                  <div class="text-[10px] text-ink-500">Limit <span class="text-crit font-bold">450 ml/L</span></div>
+                </div>
+                <svg viewBox="0 0 280 110" class="w-full h-[120px] mt-2">
+                  <line x1="0" y1="40" x2="280" y2="40" stroke="#E11D2E" stroke-width="1" stroke-dasharray="4 4"/>
+                  <text x="276" y="36" text-anchor="end" font-size="9" fill="#E11D2E" font-weight="700">450</text>
+                  <line x1="0" y1="70" x2="280" y2="70" stroke="#D6DBE3" stroke-width="1" stroke-dasharray="3 5"/>
+                  <text x="276" y="66" text-anchor="end" font-size="9" fill="#9AA3B2">300</text>
+                  <path d="M0 88 L40 84 L80 78 L120 70 L160 62 L200 50 L240 38 L280 30" fill="none" stroke="#0B1220" stroke-width="2"/>
+                  <path d="M0 88 L40 84 L80 78 L120 70 L160 62 L200 50 L240 38 L280 30 L280 110 L0 110 Z" fill="#0B1220" fill-opacity=".06"/>
+                  <circle cx="280" cy="30" r="4" fill="#E11D2E"/>
+                  <circle cx="280" cy="30" r="8" fill="#E11D2E" fill-opacity=".18"/>
+                  <g font-size="8" fill="#9AA3B2">
+                    <text x="0" y="106">D-7</text><text x="80" y="106">D-5</text><text x="160" y="106">D-3</text><text x="240" y="106">Today</text>
+                  </g>
+                </svg>
+                <div class="grid grid-cols-3 gap-2 mt-2">
+                  <div class="rounded-lg bg-white p-2 shadow-line"><div class="text-[9px] text-ink-500 uppercase font-bold">Today</div><div class="text-[14px] font-bold tabular-nums text-crit">480</div></div>
+                  <div class="rounded-lg bg-white p-2 shadow-line"><div class="text-[9px] text-ink-500 uppercase font-bold">Avg 7d</div><div class="text-[14px] font-bold tabular-nums">340</div></div>
+                  <div class="rounded-lg bg-white p-2 shadow-line"><div class="text-[9px] text-ink-500 uppercase font-bold">Δ</div><div class="text-[14px] font-bold tabular-nums text-crit">+41%</div></div>
+                </div>
+              </div>
+
+              <button class="tap mt-3 w-full rounded-xl bg-ink-900 text-white font-semibold py-3.5 text-[14px] flex items-center justify-center gap-2" onclick="goStep(1)">
+                Continue
+                <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none"><path d="M7 4l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- =================== Step 1 — Water color (operator) =================== -->
+          <div id="paneStep1" class="step-pane">
+            <div data-header></div>
+            <div class="px-4 pb-4">
+              <div class="text-[13px] text-ink-700 leading-snug">Aeration tank ka <span class="font-semibold text-ink-900">paani ka rang</span> kaisa dikh raha hai?</div>
+              <div class="grid grid-cols-2 gap-2 mt-3" id="step1Options">
+                <button class="opt rounded-xl border border-ink-200 bg-white p-3 text-left" data-val="brown">
+                  <span class="block w-6 h-6 rounded-full mb-2" style="background:#8B5E3C"></span>
+                  <div class="text-[13px] font-semibold">Brown</div><div class="text-[10.5px] text-ink-500">Healthy</div>
+                </button>
+                <button class="opt rounded-xl border border-ink-200 bg-white p-3 text-left" data-val="black">
+                  <span class="block w-6 h-6 rounded-full mb-2" style="background:#1F2937"></span>
+                  <div class="text-[13px] font-semibold">Black</div><div class="text-[10.5px] text-ink-500">Anaerobic</div>
+                </button>
+                <button class="opt rounded-xl border border-ink-200 bg-white p-3 text-left" data-val="grey">
+                  <span class="block w-6 h-6 rounded-full mb-2" style="background:#9AA3B2"></span>
+                  <div class="text-[13px] font-semibold">Grey</div><div class="text-[10.5px] text-ink-500">Low MLSS</div>
+                </button>
+                <button class="opt rounded-xl border border-ink-200 bg-white p-3 text-left" data-val="foamy">
+                  <span class="block w-6 h-6 rounded-full mb-2 ring-1 ring-ink-200" style="background:#F4F6F9"></span>
+                  <div class="text-[13px] font-semibold">White / Foamy</div><div class="text-[10.5px] text-ink-500">Bulking</div>
+                </button>
+              </div>
+              <button id="step1Continue" disabled class="tap mt-3 w-full rounded-xl bg-ink-300 text-white font-semibold py-3.5 text-[14px]" onclick="goStep(2)">Continue</button>
+            </div>
+          </div>
+
+          <!-- =================== Step 2 — Sludge wasting (system) =================== -->
+          <div id="paneStep2" class="step-pane">
+            <div data-header></div>
+            <div class="px-4 pb-4">
+              <div class="rounded-xl bg-ink-900 text-white p-3.5">
+                <div class="text-[10.5px] uppercase tracking-wider opacity-70 font-semibold">System insight</div>
+                <div class="text-[14px] font-semibold mt-0.5 leading-snug">Sludge wasting overdue · SRT bahut high</div>
+              </div>
+              <div class="mt-3 grid grid-cols-2 gap-2">
+                <div class="rounded-xl bg-paper shadow-line p-3">
+                  <div class="text-[10.5px] text-ink-500 uppercase font-bold">Last wasting</div>
+                  <div class="text-[18px] font-bold tabular-nums mt-0.5">18 <span class="text-[11px] font-medium text-ink-500">hrs ago</span></div>
+                  <div class="text-[10px] text-crit font-semibold mt-0.5">Target: every 8 hrs</div>
+                </div>
+                <div class="rounded-xl bg-paper shadow-line p-3">
+                  <div class="text-[10.5px] text-ink-500 uppercase font-bold">SRT</div>
+                  <div class="text-[18px] font-bold tabular-nums mt-0.5">22 <span class="text-[11px] font-medium text-ink-500">days</span></div>
+                  <div class="text-[10px] text-warn font-semibold mt-0.5">Ideal: 8–12 days</div>
+                </div>
+              </div>
+              <div class="mt-3 rounded-xl bg-paper shadow-line p-3">
+                <div class="text-[11px] text-ink-500 font-semibold uppercase tracking-wider">Wasting timeline</div>
+                <div class="relative mt-2 h-2 rounded-full bg-ink-200 overflow-hidden">
+                  <div class="absolute inset-y-0 left-0 w-[40%] bg-ok"></div>
+                  <div class="absolute inset-y-0 left-[40%] w-[35%] bg-warn"></div>
+                  <div class="absolute inset-y-0 left-[75%] w-[25%] bg-crit"></div>
+                  <div class="absolute -top-1 -translate-x-1/2 w-3 h-3 rounded-full bg-white shadow ring-2 ring-crit" style="left:88%"></div>
+                </div>
+                <div class="flex justify-between text-[10px] text-ink-400 mt-1.5 tabular-nums"><span>0h</span><span>8h</span><span>16h</span><span>24h</span></div>
+              </div>
+              <button class="tap mt-3 w-full rounded-xl bg-ink-900 text-white font-semibold py-3.5 text-[14px]" onclick="goStep(3)">Continue</button>
+            </div>
+          </div>
+
+          <!-- =================== Step 3 — Inlet condition (operator) =================== -->
+          <div id="paneStep3" class="step-pane">
+            <div data-header></div>
+            <div class="px-4 pb-4">
+              <div class="text-[13px] text-ink-700 leading-snug"><span class="font-semibold text-ink-900">Inlet condition</span> kaisi hai? Visual check karein.</div>
+              <div class="grid grid-cols-1 gap-2 mt-3" id="step3Options">
+                <button class="opt rounded-xl border border-ink-200 bg-white p-3 flex items-center gap-3" data-val="normal">
+                  <span class="w-9 h-9 rounded-lg bg-ok/10 grid place-items-center"><svg class="w-4 h-4 text-ok" viewBox="0 0 20 20" fill="none"><path d="M5 10l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                  <div class="flex-1 text-left"><div class="text-[13px] font-semibold">Normal</div><div class="text-[11px] text-ink-500">Standard sewage flow</div></div>
+                </button>
+                <button class="opt rounded-xl border border-ink-200 bg-white p-3 flex items-center gap-3" data-val="oily">
+                  <span class="w-9 h-9 rounded-lg bg-warn/10 grid place-items-center"><svg class="w-4 h-4 text-warn" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="6" stroke="currentColor" stroke-width="1.6"/><path d="M7 10c1-1 2-1 3 0s2 1 3 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+                  <div class="flex-1 text-left"><div class="text-[13px] font-semibold">Oily / FOG</div><div class="text-[11px] text-ink-500">Surface sheen visible</div></div>
+                </button>
+                <button class="opt rounded-xl border border-ink-200 bg-white p-3 flex items-center gap-3" data-val="septic">
+                  <span class="w-9 h-9 rounded-lg bg-crit/10 grid place-items-center"><svg class="w-4 h-4 text-crit" viewBox="0 0 20 20" fill="none"><path d="M10 3v6M10 13v.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.6"/></svg></span>
+                  <div class="flex-1 text-left"><div class="text-[13px] font-semibold">Septic smell</div><div class="text-[11px] text-ink-500">H₂S, dark color</div></div>
+                </button>
+                <button class="opt rounded-xl border border-ink-200 bg-white p-3 flex items-center gap-3" data-val="highflow">
+                  <span class="w-9 h-9 rounded-lg bg-prog/10 grid place-items-center"><svg class="w-4 h-4 text-prog" viewBox="0 0 20 20" fill="none"><path d="M3 7h12M3 11h10M3 15h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+                  <div class="flex-1 text-left"><div class="text-[13px] font-semibold">High flow / Surge</div><div class="text-[11px] text-ink-500">Above design limit</div></div>
+                </button>
+              </div>
+              <button id="step3Continue" disabled class="tap mt-3 w-full rounded-xl bg-ink-300 text-white font-semibold py-3.5 text-[14px]" onclick="goStep(4)">Continue</button>
+            </div>
+          </div>
+
+          <!-- =================== Step 4 — DO value (manual input) =================== -->
+          <div id="paneStep4" class="step-pane">
+            <div data-header></div>
+            <div class="px-4 pb-4">
+              <div class="text-[13px] text-ink-700 leading-snug">DO meter ka <span class="font-semibold text-ink-900">manual reading</span> daalein.</div>
+
+              <div class="mt-3 rounded-xl bg-paper shadow-line p-4">
+                <div class="text-[10.5px] text-ink-500 uppercase font-bold tracking-wider">Dissolved Oxygen</div>
+                <div class="flex items-baseline gap-2 mt-1">
+                  <input id="doInput" type="text" inputmode="decimal" placeholder="0.0" maxlength="4"
+                    class="w-full bg-transparent text-[40px] font-bold tracking-tight tabular-nums outline-none placeholder:text-ink-300"/>
+                  <span class="text-[14px] font-semibold text-ink-500">mg/L</span>
+                </div>
+                <div class="relative mt-3 h-2 rounded-full bg-ink-200 overflow-hidden">
+                  <div class="absolute inset-y-0 left-0 w-[20%] bg-crit/80"></div>
+                  <div class="absolute inset-y-0 left-[20%] w-[20%] bg-warn/80"></div>
+                  <div class="absolute inset-y-0 left-[40%] w-[40%] bg-ok/80"></div>
+                  <div class="absolute inset-y-0 left-[80%] w-[20%] bg-warn/80"></div>
+                  <div id="doMarker" class="absolute -top-1 w-3 h-3 rounded-full bg-white shadow ring-2 ring-ink-900 transition-all" style="left:0%"></div>
+                </div>
+                <div class="flex justify-between text-[10px] text-ink-500 mt-1.5 tabular-nums"><span>0</span><span>1</span><span>2</span><span>4</span><span>5</span></div>
+                <div id="doVerdict" class="mt-2 text-[11.5px] text-ink-500">Ideal range: <span class="font-semibold text-ok">2 – 4 mg/L</span></div>
+              </div>
+
+              <!-- Quick chips -->
+              <div class="mt-2 flex gap-2">
+                <button class="tap text-[11px] font-medium px-2.5 py-1.5 rounded-lg bg-white shadow-line" onclick="setDO(0.8)">0.8</button>
+                <button class="tap text-[11px] font-medium px-2.5 py-1.5 rounded-lg bg-white shadow-line" onclick="setDO(1.5)">1.5</button>
+                <button class="tap text-[11px] font-medium px-2.5 py-1.5 rounded-lg bg-white shadow-line" onclick="setDO(3.2)">3.2</button>
+                <button class="tap text-[11px] font-medium px-2.5 py-1.5 rounded-lg bg-white shadow-line" onclick="setDO(4.6)">4.6</button>
+              </div>
+
+              <button id="step4Continue" disabled class="tap mt-3 w-full rounded-xl bg-ink-300 text-white font-semibold py-3.5 text-[14px]" onclick="goStep(5)">Continue</button>
+            </div>
+          </div>
+
+          <!-- =================== Step 5 — Final decision (system) =================== -->
+          <!-- Resolution variant -->
+          <div id="paneStep5Resolve" class="step-pane">
+            <div data-header></div>
+            <div class="px-4 pb-4">
+              <div class="rounded-xl bg-ok text-white p-4">
+                <div class="flex items-center gap-2">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="white" stroke-width="2"/><path d="M8 12l3 3 5-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <div class="text-[10.5px] uppercase tracking-wider font-bold opacity-90">Resolution Suggested</div>
+                </div>
+                <div class="text-[15px] font-semibold mt-1.5 leading-snug">Sludge wasting badhayein, aeration ko stable rakhein</div>
+              </div>
+
+              <div class="mt-3 rounded-xl bg-paper shadow-line overflow-hidden">
+                <div class="px-3 py-2.5 text-[10.5px] uppercase tracking-wider font-bold text-ink-500 border-b border-ink-200">Action plan</div>
+                <ul class="divide-y divide-ink-200">
+                  <li class="px-3 py-2.5 flex items-start gap-2.5"><span class="mt-0.5 w-5 h-5 rounded-full bg-ink-900 text-white text-[10px] font-bold grid place-items-center">1</span><div class="text-[12.5px] flex-1">RAS pump 30 min ke liye <span class="font-semibold">+15%</span> par chalayein</div></li>
+                  <li class="px-3 py-2.5 flex items-start gap-2.5"><span class="mt-0.5 w-5 h-5 rounded-full bg-ink-900 text-white text-[10px] font-bold grid place-items-center">2</span><div class="text-[12.5px] flex-1">Sludge wasting 2 hrs ke andar karein</div></li>
+                  <li class="px-3 py-2.5 flex items-start gap-2.5"><span class="mt-0.5 w-5 h-5 rounded-full bg-ink-900 text-white text-[10px] font-bold grid place-items-center">3</span><div class="text-[12.5px] flex-1">DO ko <span class="font-semibold">2.5 mg/L</span> par maintain karein, har 30 min check</div></li>
+                </ul>
+              </div>
+
+              <div class="mt-3 rounded-xl bg-white shadow-line p-3 text-[11px] text-ink-500">
+                <span class="font-semibold text-ink-700">Next check:</span> 2 ghante baad SV30 dobara measure karein.
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 mt-3">
+                <button class="tap rounded-xl bg-ink-100 text-ink-900 font-semibold py-3.5 text-[13px]" onclick="goStep('escalate')">Escalate</button>
+                <button class="tap rounded-xl bg-ok text-white font-semibold py-3.5 text-[14px] flex items-center justify-center gap-2" onclick="resolve()">
+                  Resolve
+                  <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none"><path d="M5 10l3 3 7-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Escalation variant -->
+          <div id="paneStep5Escalate" class="step-pane">
+            <div data-header></div>
+            <div class="px-4 pb-4">
+              <div class="rounded-xl bg-crit text-white p-4">
+                <div class="flex items-center gap-2">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M12 3l9 16H3l9-16Z" stroke="white" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v4" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="white"/></svg>
+                  <div class="text-[10.5px] uppercase tracking-wider font-bold opacity-90">Escalation Required</div>
+                </div>
+                <div class="text-[15px] font-semibold mt-1.5 leading-snug">Multiple parameters out of safe range — supervisor ko inform karein</div>
+              </div>
+
+              <div class="mt-3 rounded-xl bg-paper shadow-line p-3">
+                <div class="text-[10.5px] text-ink-500 uppercase tracking-wider font-bold mb-2">Reason</div>
+                <ul class="space-y-1.5 text-[12.5px]">
+                  <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-crit"></span>SV30 480 ml/L (limit 450)</li>
+                  <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-crit"></span>DO 0.8 mg/L (below 2.0)</li>
+                  <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-crit"></span>Septic inlet detected</li>
+                </ul>
+              </div>
+
+              <div class="mt-3 rounded-xl bg-white shadow-line p-3 flex items-center gap-3">
+                <span class="w-9 h-9 rounded-full bg-ink-900 text-white text-[12px] font-bold grid place-items-center">SK</span>
+                <div class="flex-1 min-w-0"><div class="text-[12.5px] font-semibold">Sandeep Kumar</div><div class="text-[10.5px] text-ink-500">Plant Supervisor · On-call</div></div>
+                <button class="tap rounded-lg bg-ink-100 px-3 py-2 text-[11px] font-semibold">Call</button>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 mt-3">
+                <button class="tap rounded-xl bg-ink-100 text-ink-900 font-semibold py-3.5 text-[13px]" onclick="goStep(5)">Back</button>
+                <button class="tap rounded-xl bg-crit text-white font-semibold py-3.5 text-[14px]" onclick="escalate()">Escalate Now</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resolved (terminal state) -->
+          <div id="paneResolved" class="step-pane">
+            <div class="px-4 pt-5 pb-5 text-center">
+              <div class="mx-auto w-14 h-14 rounded-full bg-ok/15 grid place-items-center">
+                <svg class="w-7 h-7 text-ok" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M8 12l3 3 5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div class="text-[15px] font-bold mt-3">Issue Resolved</div>
+              <div class="text-[11.5px] text-ink-500 mt-1">Action plan logged · Auto‑monitor 2 hrs</div>
+              <div class="mt-4 rounded-xl bg-paper shadow-line p-3 text-left">
+                <div class="text-[10.5px] uppercase tracking-wider font-bold text-ink-500">Summary</div>
+                <div class="text-[12.5px] mt-1 text-ink-700 leading-relaxed">Bulking suspected → wasting overdue → DO low → action: increase RAS, waste sludge, hold DO 2.5.</div>
+              </div>
+              <button class="tap mt-3 w-full rounded-xl bg-ink-900 text-white font-semibold py-3.5 text-[14px]" onclick="goIdle(true)">Done</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Transferred Issues banner (shift handover) -->
+      <section class="px-5 mt-3">
+        <a href="issues.html?tab=transferred" class="tap block rounded-2xl bg-white shadow-card p-3.5">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-warn/15 grid place-items-center shrink-0" style="background:#FEF3E0">
+              <svg class="w-4 h-4 text-warn" viewBox="0 0 20 20" fill="none"><path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="text-[10px] uppercase tracking-wider font-bold text-warn">Transferred · Shift handover</div>
+              <div class="text-[14px] font-semibold leading-tight">2 issues from Shift C</div>
+              <div class="text-[11.5px] text-ink-500 mt-0.5">Ravi V. handed over at 6:00 AM · Review needed</div>
+            </div>
+            <span class="text-[10px] font-bold px-2 py-1 rounded-full bg-warn/15 text-warn">Review</span>
+            <svg class="w-4 h-4 text-ink-400" viewBox="0 0 20 20" fill="none"><path d="M7 4l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </a>
+      </section>
+
+      <!-- Logbook Card -->
+      <section class="px-5 mt-3">
+        <details class="group bg-white rounded-2xl shadow-card overflow-hidden">
+          <summary class="px-4 py-3.5 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-paper shadow-line grid place-items-center shrink-0">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" class="text-ink-700"><path d="M5 3h8l3 3v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 9h6M7 12h6M7 15h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="text-[10px] uppercase tracking-wider font-bold text-ink-500">Smart Logbook</div>
+              <div class="text-[14px] font-semibold leading-tight">3 entries pending</div>
+              <div class="text-[11.5px] text-ink-500 mt-0.5">Shift A · 9:00 AM reading window</div>
+            </div>
+            <span class="text-[10px] font-bold px-2 py-1 rounded-full bg-warn/15 text-warn">Due</span>
+            <svg class="chev w-4 h-4 text-ink-500 ml-1" viewBox="0 0 20 20" fill="none"><path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </summary>
+          <div class="px-4 pb-4 animate-rise">
+            <ul class="divide-y divide-ink-200 rounded-xl shadow-line overflow-hidden bg-white">
+              <li class="flex items-center gap-3 px-3 py-2.5"><span class="w-1.5 h-1.5 rounded-full bg-warn"></span><span class="text-[13px] flex-1">Inlet pH & Flow</span><span class="text-[11px] text-ink-500">9:00 AM</span></li>
+              <li class="flex items-center gap-3 px-3 py-2.5"><span class="w-1.5 h-1.5 rounded-full bg-warn"></span><span class="text-[13px] flex-1">Aeration DO levels</span><span class="text-[11px] text-ink-500">9:00 AM</span></li>
+              <li class="flex items-center gap-3 px-3 py-2.5"><span class="w-1.5 h-1.5 rounded-full bg-ink-300"></span><span class="text-[13px] flex-1">Outlet TSS / Turbidity</span><span class="text-[11px] text-ink-500">12:00 PM</span></li>
+            </ul>
+            <a href="logbook.html" class="tap mt-3 w-full text-center rounded-xl bg-ink-900 text-white font-semibold py-3.5 text-[14px] block">Fill Logbook</a>
+          </div>
+        </details>
+      </section>
+
+      <div class="h-6"></div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="absolute left-0 right-0 bottom-0 z-40">
+      <div class="mx-3 mb-3 rounded-2xl bg-white shadow-card shadow-line px-2 py-2 flex items-center justify-between">
+        <a href="issues.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-500">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M12 3l9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10l9-7Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+          <span class="text-[10px] font-medium">Issues</span>
+        </a>
+        <a href="tasks.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-500">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 3v4M16 3v4M4 10h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M9 14l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="text-[10px] font-medium">Tasks</span>
+        </a>
+        <a href="plant.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-900 relative">
+          <span class="absolute -top-0.5 w-8 h-1 rounded-full bg-ink-900"></span>
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M3 12c2 0 2-3 5-3s3 3 5 3 2-3 5-3 3 3 3 3v8H3v-8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="6" r="2.2" stroke="currentColor" stroke-width="1.7"/></svg>
+          <span class="text-[10px] font-bold">Plant</span>
+        </a>
+        <a href="report.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-500">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <span class="text-[10px] font-medium">Report</span>
+        </a>
+      </div>
+      <div class="mx-auto mb-2 h-1 w-32 rounded-full bg-ink-900/80"></div>
+    </nav>
+  </div>
+</div>
+
+<script>
+  // ===== State =====
+  const state = {
+    step: 'idle',
+    waterColor: null,
+    inlet: null,
+    DO: null,
+  };
+
+  const STEP_TITLES = {
+    0: { kicker:'Step 1 of 5', title:'SV30 trend' },
+    1: { kicker:'Step 2 of 5', title:'Aeration paani ka rang' },
+    2: { kicker:'Step 3 of 5', title:'Sludge wasting status' },
+    3: { kicker:'Step 4 of 5', title:'Inlet condition' },
+    4: { kicker:'Step 5 of 5', title:'DO reading' },
+    5: { kicker:'Verdict', title:'Suggested action' },
+    'escalate': { kicker:'Verdict', title:'Escalate to supervisor' }
+  };
+
+  function injectHeader(paneId){
+    const pane = document.getElementById(paneId);
+    if (!pane) return;
+    const slot = pane.querySelector('[data-header]');
+    if (!slot || slot.dataset.injected) return;
+    slot.dataset.injected = '1';
+    const tpl = document.getElementById('stepHeader').content.cloneNode(true);
+    slot.replaceWith(tpl);
+  }
+
+  function paneFor(step){
+    if (step === 'idle') return 'paneIdle';
+    if (step === 'resolved') return 'paneResolved';
+    if (step === 'escalate') return 'paneStep5Escalate';
+    if (step === 5) return 'paneStep5Resolve';
+    return 'paneStep' + step;
+  }
+
+  function show(step){
+    state.step = step;
+    document.querySelectorAll('#issueCard .step-pane').forEach(p => p.classList.remove('active'));
+    const id = paneFor(step);
+    injectHeader(id);
+    const pane = document.getElementById(id);
+    pane.classList.add('active');
+
+    // populate header
+    const counter = pane.querySelector('[data-step-counter]');
+    const title   = pane.querySelector('[data-step-title]');
+    const bar     = pane.querySelector('[data-step-bar]');
+    const back    = pane.querySelector('[data-back]');
+
+    const meta = STEP_TITLES[step];
+    if (counter && meta) counter.textContent = meta.kicker;
+    if (title && meta)   title.textContent   = meta.title;
+    if (bar) {
+      bar.innerHTML = '';
+      const total = 5;
+      const activeIdx = (step === 'escalate') ? 4 : (step === 5 ? 4 : Number(step));
+      for (let i=0;i<total;i++){
+        const dot = document.createElement('div');
+        dot.className = 'stepdot h-1 flex-1 rounded-full ' +
+          (i < activeIdx ? 'bg-ink-900' : i === activeIdx ? (step==='escalate' ? 'bg-crit' : (step===5 ? 'bg-ok' : 'bg-ink-900')) : 'bg-ink-200');
+        bar.appendChild(dot);
+      }
+    }
+    if (back) back.onclick = () => goBack();
+
+    // alarm bar reflects state
+    updateAlarmFor(step);
+
+    // ensure pane is visible in viewport
+    const scroll = document.getElementById('scroll');
+    if (scroll) {
+      const card = document.getElementById('issueCard');
+      scroll.scrollTo({ top: card.offsetTop - 100, behavior: 'smooth' });
+    }
+  }
+
+  function goStep(s){ show(s); }
+  function goIdle(reset){
+    if (reset) { state.waterColor=null; state.inlet=null; state.DO=null;
+      document.querySelectorAll('#step1Options .opt').forEach(b=>b.classList.remove('selected'));
+      document.querySelectorAll('#step3Options .opt').forEach(b=>b.classList.remove('selected'));
+      document.getElementById('step1Continue').disabled = true;
+      document.getElementById('step1Continue').classList.replace('bg-ink-900','bg-ink-300');
+      document.getElementById('step3Continue').disabled = true;
+      document.getElementById('step3Continue').classList.replace('bg-ink-900','bg-ink-300');
+      document.getElementById('step4Continue').disabled = true;
+      document.getElementById('step4Continue').classList.replace('bg-ink-900','bg-ink-300');
+      document.getElementById('doInput').value = '';
+      setDOMarker(0);
+      document.getElementById('doVerdict').innerHTML = 'Ideal range: <span class="font-semibold text-ok">2 – 4 mg/L</span>';
+    }
+    show('idle');
+  }
+  function goBack(){
+    const order = [0,1,2,3,4,5];
+    if (state.step === 'escalate') return show(5);
+    const idx = order.indexOf(state.step);
+    if (idx <= 0) return goIdle();
+    show(order[idx-1]);
+  }
+
+  function snooze(){ /* visual only */ }
+  function resolve(){
+    state.step = 'resolved';
+    show('resolved');
+    setAlarmResolved();
+    setBlowerResolved();
+  }
+  function escalate(){
+    state.step = 'resolved';
+    show('resolved');
+    document.querySelector('#paneResolved .text-\\[15px\\]').textContent = 'Escalated to Supervisor';
+    document.querySelector('#paneResolved .text-\\[11\\.5px\\]').textContent = 'Sandeep Kumar notified · 9:43 AM';
+  }
+
+  // ===== Alarm states =====
+  function setAlarmActive(){
+    const b = document.getElementById('alarmBar');
+    b.className = 'tap w-full text-left rounded-2xl shadow-card overflow-hidden bg-crit text-white animate-softpulse';
+    document.getElementById('alarmKicker').textContent = 'Naya Issue · Active';
+    document.getElementById('alarmTitle').textContent = 'Aeration Blower #2 — High vibration';
+    document.getElementById('alarmRing').classList.add('animate-ping');
+  }
+  function setAlarmInProgress(){
+    const b = document.getElementById('alarmBar');
+    b.className = 'tap w-full text-left rounded-2xl shadow-card overflow-hidden bg-prog text-white';
+    document.getElementById('alarmKicker').textContent = 'In Progress · Diagnosing';
+    document.getElementById('alarmTitle').textContent = 'Aeration Blower #2 — Step ' + ((state.step==='escalate'?4:state.step)+1) + ' of 5';
+    document.getElementById('alarmRing').classList.remove('animate-ping');
+  }
+  function setAlarmResolved(){
+    const b = document.getElementById('alarmBar');
+    b.className = 'tap w-full text-left rounded-2xl shadow-card overflow-hidden bg-ok text-white';
+    document.getElementById('alarmKicker').textContent = 'Resolved · Just now';
+    document.getElementById('alarmTitle').textContent = 'Aeration Blower #2 — Action plan logged';
+    document.getElementById('alarmRing').classList.remove('animate-ping');
+    setTimeout(()=>{
+      const b2 = document.getElementById('alarmBar');
+      b2.className = 'tap w-full text-left rounded-2xl shadow-line overflow-hidden bg-ink-100 text-ink-700';
+    }, 4000);
+  }
+  function updateAlarmFor(step){
+    if (step === 'idle') return setAlarmActive();
+    if (step === 'resolved') return; // handled
+    setAlarmInProgress();
+  }
+
+  function setBlowerResolved(){
+    document.getElementById('blowerHalo').setAttribute('fill','#E6F7EC');
+    document.getElementById('blowerBox').setAttribute('stroke','#16A34A');
+    document.getElementById('blowerLabel').setAttribute('fill','#16A34A');
+    document.getElementById('blowerDot').setAttribute('fill','#16A34A');
+    document.getElementById('critCount').textContent = '0';
+    document.getElementById('okCount').textContent = '6';
+  }
+
+  // ===== Step 1 options =====
+  document.querySelectorAll('#step1Options .opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#step1Options .opt').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      state.waterColor = btn.dataset.val;
+      const c = document.getElementById('step1Continue');
+      c.disabled = false; c.classList.remove('bg-ink-300'); c.classList.add('bg-ink-900');
+    });
+  });
+
+  // ===== Step 3 options =====
+  document.querySelectorAll('#step3Options .opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#step3Options .opt').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      state.inlet = btn.dataset.val;
+      const c = document.getElementById('step3Continue');
+      c.disabled = false; c.classList.remove('bg-ink-300'); c.classList.add('bg-ink-900');
+    });
+  });
+
+  // ===== Step 4 DO input =====
+  function setDOMarker(val){
+    const pct = Math.max(0, Math.min(100, (val/5)*100));
+    document.getElementById('doMarker').style.left = pct + '%';
+    document.getElementById('doMarker').style.transform = 'translateX(-50%)';
+  }
+  function classifyDO(v){
+    if (v < 1.0) return { label:'Critically low', tone:'text-crit', danger:true };
+    if (v < 2.0) return { label:'Below ideal', tone:'text-warn', danger:false };
+    if (v <= 4.0) return { label:'In ideal range', tone:'text-ok', danger:false };
+    return { label:'Over‑aerated', tone:'text-warn', danger:false };
+  }
+  function setDO(v){
+    document.getElementById('doInput').value = String(v);
+    handleDO();
+  }
+  function handleDO(){
+    const raw = document.getElementById('doInput').value.replace(/[^\d.]/g,'');
+    const v = parseFloat(raw);
+    if (isNaN(v)) {
+      document.getElementById('step4Continue').disabled = true;
+      document.getElementById('step4Continue').classList.replace('bg-ink-900','bg-ink-300');
+      setDOMarker(0);
+      return;
+    }
+    state.DO = v;
+    setDOMarker(v);
+    const cls = classifyDO(v);
+    document.getElementById('doVerdict').innerHTML = `<span class="font-semibold ${cls.tone}">${cls.label}</span> · Ideal 2 – 4 mg/L`;
+    const c = document.getElementById('step4Continue');
+    c.disabled = false; c.classList.replace('bg-ink-300','bg-ink-900');
+    // branching: if low, route final to escalate; else resolve
+    c.onclick = () => {
+      const escalateConditions = (cls.danger) || (state.inlet === 'septic') || (state.waterColor === 'black');
+      if (escalateConditions) goStep('escalate'); else goStep(5);
+    };
+  }
+  document.addEventListener('input', e => { if (e.target && e.target.id === 'doInput') handleDO(); });
+
+  // ===== Triggers =====
+  document.getElementById('alarmBar').addEventListener('click', () => {
+    if (state.step === 'idle') goStep(0);
+    else if (state.step === 'resolved') goIdle(true);
+  });
+  document.getElementById('blowerNode').addEventListener('click', () => {
+    if (state.step === 'idle') goStep(0);
+  });
+  document.getElementById('blowerNode').addEventListener('mouseenter', () => {
+    document.getElementById('blowerNode').style.opacity = '.85';
+  });
+  document.getElementById('blowerNode').addEventListener('mouseleave', () => {
+    document.getElementById('blowerNode').style.opacity = '1';
+  });
+
+  // ===== Variants gallery (removed) =====
+  /*
+  const variants = [
+    { id:'idle',     label:'Idle — collapsed', tone:'crit',  desc:'Operator sees title + sensor snapshot. Single CTA: Start.' },
+    { id:0,          label:'Step 0 — SV30 trend', tone:'ink',  desc:'System context. Trendline crossing limit. Continue.' },
+    { id:1,          label:'Step 1 — Water color', tone:'ink',  desc:'Operator picks one of four swatches.' },
+    { id:'1-picked', label:'Step 1 — Selected', tone:'ink',  desc:'Selected option turns dark. Continue active.' },
+    { id:2,          label:'Step 2 — Sludge wasting', tone:'ink',  desc:'System insight: wasting overdue, SRT high.' },
+    { id:3,          label:'Step 3 — Inlet condition', tone:'ink',  desc:'Operator picks visual condition.' },
+    { id:4,          label:'Step 4 — DO input', tone:'ink',  desc:'Manual numeric entry with live range marker.' },
+    { id:'4-low',    label:'Step 4 — Low DO', tone:'crit',  desc:'Critical reading triggers escalation branch.' },
+    { id:5,          label:'Step 5 — Resolution', tone:'ok',  desc:'Action plan, Resolve CTA. Green.' },
+    { id:'escalate', label:'Step 5 — Escalation', tone:'crit',  desc:'Branch: critical params, supervisor notified.' },
+    { id:'resolved', label:'Resolved', tone:'ok',  desc:'Terminal state. Issue logged.' },
+    { id:'alarm-progress', label:'Alarm — In progress', tone:'prog',  desc:'Top bar turns blue while operator diagnoses.' },
+  ];
+
+  function variantPreview(v) {
+    // use color hints for preview headers; static, mini representation
+    const tone = {
+      crit:'#E11D2E', ok:'#16A34A', prog:'#2563EB', ink:'#0B1220'
+    }[v.tone];
+    return `
+      <div class="variant-frame">
+        <div class="rounded-xl bg-white shadow-line overflow-hidden">
+          <div class="px-3 py-2.5 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full" style="background:${tone}"></span>
+            <span class="text-[10px] uppercase tracking-wider font-bold" style="color:${tone}">${v.label.split('—')[0].trim()}</span>
+          </div>
+          <div class="px-3 pb-3 -mt-1">
+            <div class="text-[12px] font-semibold leading-snug">${v.label}</div>
+            <div class="text-[10.5px] text-ink-500 mt-1 leading-relaxed">${v.desc}</div>
+          </div>
+          ${variantBody(v, tone)}
+        </div>
+      </div>
+    `;
+  }
+
+  function variantBody(v, tone){
+    if (v.id === 'idle') {
+      return `<div class="px-3 pb-3"><div class="grid grid-cols-2 gap-1.5"><div class="rounded-lg bg-paper p-2 shadow-line text-[10px]"><div class="text-ink-500 uppercase font-bold">Temp</div><div class="text-[14px] font-bold">82°</div></div><div class="rounded-lg bg-paper p-2 shadow-line text-[10px]"><div class="text-ink-500 uppercase font-bold">Vib</div><div class="text-[14px] font-bold">8.4</div></div></div><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold text-white" style="background:${tone}">Start Diagnostic</div></div>`;
+    }
+    if (v.id === 0) {
+      return `<div class="px-3 pb-3"><div class="rounded-lg p-2 text-white text-[10px] font-semibold" style="background:#0B1220">SV30 trending high</div><svg viewBox="0 0 200 50" class="w-full h-10 mt-1"><line x1="0" y1="14" x2="200" y2="14" stroke="#E11D2E" stroke-dasharray="3 3"/><path d="M0 40 L40 36 L80 30 L120 22 L160 14 L200 10" stroke="#0B1220" fill="none" stroke-width="1.5"/><circle cx="200" cy="10" r="3" fill="#E11D2E"/></svg><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold bg-ink-900 text-white">Continue</div></div>`;
+    }
+    if (v.id === 1) {
+      return `<div class="px-3 pb-3"><div class="grid grid-cols-2 gap-1.5">${['#8B5E3C','#1F2937','#9AA3B2','#F4F6F9'].map((c,i)=>`<div class="rounded-lg border border-ink-200 p-1.5"><span class="block w-4 h-4 rounded-full" style="background:${c};${i===3?'box-shadow:inset 0 0 0 1px #D6DBE3':''}"></span><div class="text-[10px] font-semibold mt-1">${['Brown','Black','Grey','Foamy'][i]}</div></div>`).join('')}</div><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold text-white" style="background:#D6DBE3">Continue</div></div>`;
+    }
+    if (v.id === '1-picked') {
+      return `<div class="px-3 pb-3"><div class="grid grid-cols-2 gap-1.5">${[
+        ['#8B5E3C','Brown',false],['#1F2937','Black',true],['#9AA3B2','Grey',false],['#F4F6F9','Foamy',false]
+      ].map(([c,n,sel])=>`<div class="rounded-lg border ${sel?'border-ink-900 bg-ink-900 text-white':'border-ink-200'} p-1.5"><span class="block w-4 h-4 rounded-full" style="background:${c}"></span><div class="text-[10px] font-semibold mt-1">${n}</div></div>`).join('')}</div><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold bg-ink-900 text-white">Continue</div></div>`;
+    }
+    if (v.id === 2) {
+      return `<div class="px-3 pb-3"><div class="rounded-lg p-2 text-white text-[10px] font-semibold" style="background:#0B1220">Wasting overdue · SRT high</div><div class="grid grid-cols-2 gap-1.5 mt-2"><div class="rounded-lg bg-paper p-2 shadow-line"><div class="text-[9px] text-ink-500 uppercase font-bold">Last waste</div><div class="text-[14px] font-bold">18h</div></div><div class="rounded-lg bg-paper p-2 shadow-line"><div class="text-[9px] text-ink-500 uppercase font-bold">SRT</div><div class="text-[14px] font-bold">22d</div></div></div><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold bg-ink-900 text-white">Continue</div></div>`;
+    }
+    if (v.id === 3) {
+      return `<div class="px-3 pb-3 space-y-1.5">${['Normal','Oily','Septic','High flow'].map(t=>`<div class="rounded-lg border border-ink-200 px-2 py-1.5 text-[11px] font-semibold">${t}</div>`).join('')}<div class="rounded-lg py-2 text-center text-[11px] font-bold text-white" style="background:#D6DBE3">Continue</div></div>`;
+    }
+    if (v.id === 4) {
+      return `<div class="px-3 pb-3"><div class="rounded-lg bg-paper shadow-line p-2"><div class="text-[9px] text-ink-500 uppercase font-bold">DO mg/L</div><div class="text-[24px] font-bold">3.2</div><div class="relative h-1.5 rounded-full bg-ink-200 mt-1 overflow-hidden"><div class="absolute inset-y-0 left-0 w-[20%]" style="background:#E11D2E80"></div><div class="absolute inset-y-0 left-[20%] w-[20%]" style="background:#F59E0B80"></div><div class="absolute inset-y-0 left-[40%] w-[40%]" style="background:#16A34A80"></div><div class="absolute -top-0.5 w-2 h-2 rounded-full bg-white ring-2 ring-ink-900" style="left:64%"></div></div></div><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold bg-ink-900 text-white">Continue</div></div>`;
+    }
+    if (v.id === '4-low') {
+      return `<div class="px-3 pb-3"><div class="rounded-lg bg-paper shadow-line p-2"><div class="text-[9px] text-ink-500 uppercase font-bold">DO mg/L</div><div class="text-[24px] font-bold" style="color:#E11D2E">0.8</div><div class="relative h-1.5 rounded-full bg-ink-200 mt-1 overflow-hidden"><div class="absolute inset-y-0 left-0 w-[20%]" style="background:#E11D2E"></div><div class="absolute -top-0.5 w-2 h-2 rounded-full bg-white ring-2" style="left:16%;--tw-ring-color:#E11D2E;box-shadow:0 0 0 2px #E11D2E"></div></div><div class="text-[10px] mt-1 font-semibold" style="color:#E11D2E">Critically low</div></div><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold text-white" style="background:#E11D2E">Continue → Escalate</div></div>`;
+    }
+    if (v.id === 5) {
+      return `<div class="px-3 pb-3"><div class="rounded-lg p-2 text-white text-[10px] font-semibold" style="background:#16A34A">Resolution suggested</div><div class="mt-2 rounded-lg bg-paper shadow-line text-[10px] divide-y divide-ink-200"><div class="px-2 py-1.5">1 · RAS pump +15%</div><div class="px-2 py-1.5">2 · Waste sludge in 2h</div><div class="px-2 py-1.5">3 · Hold DO 2.5</div></div><div class="grid grid-cols-2 gap-1.5 mt-2"><div class="rounded-lg py-2 text-center text-[11px] font-bold bg-ink-100">Escalate</div><div class="rounded-lg py-2 text-center text-[11px] font-bold text-white" style="background:#16A34A">Resolve</div></div></div>`;
+    }
+    if (v.id === 'escalate') {
+      return `<div class="px-3 pb-3"><div class="rounded-lg p-2 text-white text-[10px] font-semibold" style="background:#E11D2E">Escalation required</div><div class="mt-2 rounded-lg bg-paper shadow-line p-2 text-[10px] space-y-1"><div>• SV30 480 (limit 450)</div><div>• DO 0.8 (below 2.0)</div><div>• Septic inlet</div></div><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold text-white" style="background:#E11D2E">Escalate Now</div></div>`;
+    }
+    if (v.id === 'resolved') {
+      return `<div class="px-3 pb-4 text-center"><div class="mx-auto w-10 h-10 rounded-full grid place-items-center" style="background:#E6F7EC"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#16A34A" stroke-width="2"/><path d="M8 12l3 3 5-6" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="text-[12px] font-bold mt-2">Issue Resolved</div><div class="text-[10px] text-ink-500 mt-0.5">Logged · Auto‑monitor 2 hrs</div></div>`;
+    }
+    if (v.id === 'alarm-progress') {
+      return `<div class="px-3 pb-3"><div class="rounded-lg p-2.5 text-white" style="background:#2563EB"><div class="text-[9px] uppercase tracking-wider font-bold opacity-80">In Progress</div><div class="text-[12px] font-semibold mt-0.5">Blower #2 — Step 3 of 5</div></div><div class="mt-2 text-[10.5px] text-ink-500">Alarm bar turns blue when operator is diagnosing.</div></div>`;
+    }
+    return '';
+  }
+
+  */
+</script>
+</body>
+</html>

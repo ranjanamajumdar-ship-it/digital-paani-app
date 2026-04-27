@@ -1,0 +1,1016 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Tasks · Digital Paani</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Inter','ui-sans-serif','system-ui','sans-serif'] },
+        colors: {
+          ink:  { 900:'#0B1220', 700:'#2B3344', 600:'#475061', 500:'#6B7280', 400:'#9AA3B2', 300:'#D6DBE3', 200:'#EAEDF2', 100:'#F4F6F9' },
+          crit: '#E11D2E', warn: '#F59E0B', prog: '#2563EB', ok: '#16A34A',
+          paper:'#FAFAF7', card:'#FFFFFF',
+        },
+        boxShadow: {
+          card: '0 1px 0 rgba(11,18,32,.04), 0 6px 18px rgba(11,18,32,.05)',
+          line: 'inset 0 0 0 1px #ECEEF2',
+          pop:  '0 8px 24px rgba(11,18,32,.18)'
+        },
+        keyframes: {
+          softpulse: { '0%':{boxShadow:'0 0 0 0 rgba(225,29,46,.55)'},'70%':{boxShadow:'0 0 0 10px rgba(225,29,46,0)'},'100%':{boxShadow:'0 0 0 0 rgba(225,29,46,0)'} },
+          rise: { '0%':{transform:'translateY(8px)',opacity:0}, '100%':{transform:'translateY(0)',opacity:1} },
+          slideup: { '0%':{transform:'translateY(100%)'}, '100%':{transform:'translateY(0)'} },
+          fadein: { '0%':{opacity:0}, '100%':{opacity:1} }
+        },
+        animation: {
+          softpulse: 'softpulse 1.6s ease-out infinite',
+          rise: 'rise .22s ease-out both',
+          slideup: 'slideup .25s cubic-bezier(.2,.8,.2,1) both',
+          fadein: 'fadein .2s ease-out both'
+        }
+      }
+    }
+  };
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  html,body { background:#E9ECEF; }
+  .device {
+    width: 390px; min-height: 844px; background:#FAFAF7;
+    border-radius: 44px;
+    box-shadow: 0 30px 80px rgba(11,18,32,.18), 0 2px 0 #fff inset;
+    position: relative; overflow: hidden;
+  }
+  .notch { position:absolute; top:10px; left:50%; transform:translateX(-50%); width:120px; height:30px; background:#0B1220; border-radius:18px; z-index:60; }
+  .tap { transition: transform .15s ease, background-color .15s ease, box-shadow .2s ease; cursor:pointer; }
+  .tap:active { transform: scale(.985); }
+  /* Kanban scroller */
+  .kanban {
+    display: flex;
+    gap: 12px;
+    padding: 0 16px 8px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .kanban::-webkit-scrollbar { display:none; }
+  .col {
+    flex: 0 0 308px; /* peek the next ~30px */
+    scroll-snap-align: start;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: inset 0 0 0 1px #ECEEF2;
+    display: flex; flex-direction: column;
+    min-height: 380px;
+  }
+  .pill { transition: all .18s ease; }
+  .pill.active { background:#0B1220; color:#fff; }
+  .scrim { position:absolute; inset:0; background:rgba(11,18,32,.45); z-index:70; opacity:0; pointer-events:none; transition:opacity .2s ease; }
+  .scrim.show { opacity:1; pointer-events:auto; }
+  .sheet { position:absolute; left:0; right:0; bottom:0; z-index:80; background:#fff; border-radius:24px 24px 0 0; transform:translateY(100%); transition:transform .25s cubic-bezier(.2,.8,.2,1); }
+  .sheet.show { transform:translateY(0); }
+  details > summary { list-style:none; cursor:pointer; }
+  details > summary::-webkit-details-marker { display:none; }
+  .chev { transition: transform .2s ease; }
+  details[open] .chev { transform: rotate(180deg); }
+  .filter-chip { transition: all .15s ease; }
+  .filter-chip.active { background:#0B1220; color:#fff; border-color:#0B1220; }
+  /* Pass/Fail toggle */
+  .pf-btn[data-pf="pass"].selected { background:#16A34A; color:#fff; border-color:#16A34A; }
+  .pf-btn[data-pf="fail"].selected { background:#E11D2E; color:#fff; border-color:#E11D2E; }
+  .pf-btn { transition: all .15s ease; }
+  .check-item[data-result="pass"] .step-num { background:#E6F7EC; color:#16A34A; }
+  .check-item[data-result="fail"] .step-num { background:#FDECEE; color:#E11D2E; }
+  .check-item[data-result="pass"] { box-shadow: inset 0 0 0 1px #BFE6CC; }
+  .check-item[data-result="fail"] { box-shadow: inset 0 0 0 1px #F8C8CD; }
+  .pf-pill[data-tone="pass"] { background:#E6F7EC; color:#16A34A; }
+  .pf-pill[data-tone="fail"] { background:#FDECEE; color:#E11D2E; }
+</style>
+</head>
+<body class="font-sans text-ink-900 antialiased">
+
+<div class="w-full flex items-start justify-center p-6 lg:p-12 gap-10">
+
+  <aside class="hidden lg:flex flex-col w-56 sticky top-12 gap-2">
+    <div class="text-[10px] uppercase tracking-[.18em] text-ink-500 font-semibold">Digital Paani · Prototype</div>
+    <a href="plant.html" class="tap rounded-xl bg-white shadow-line px-3 py-2.5 text-[12px] font-semibold flex items-center justify-between">Plant <span class="text-ink-400">SCADA</span></a>
+    <a href="tasks.html" class="tap rounded-xl bg-ink-900 text-white px-3 py-2.5 text-[12px] font-semibold flex items-center justify-between">Tasks <span class="opacity-60">Kanban</span></a>
+    <a href="issues.html" class="tap rounded-xl bg-white shadow-line px-3 py-2.5 text-[12px] font-semibold flex items-center justify-between">Issues <span class="text-ink-400">List</span></a>
+    <a href="report.html" class="tap rounded-xl bg-white shadow-line px-3 py-2.5 text-[12px] font-semibold flex items-center justify-between">Report <span class="text-ink-400">New</span></a>
+  </aside>
+
+  <div class="device" id="device">
+    <div class="notch"></div>
+    <div class="scrim" id="scrim" onclick="closeSheet()"></div>
+
+    <!-- Status bar -->
+    <div class="absolute top-0 left-0 right-0 h-12 z-50 flex items-center justify-between px-7 pt-3 text-[12px] font-semibold text-ink-900">
+      <span>9:41</span>
+      <span class="flex items-center gap-1.5">
+        <svg width="16" height="10" viewBox="0 0 16 10" fill="none"><rect x="0" y="6" width="3" height="4" rx="1" fill="currentColor"/><rect x="4.5" y="4" width="3" height="6" rx="1" fill="currentColor"/><rect x="9" y="2" width="3" height="8" rx="1" fill="currentColor"/><rect x="13.5" y="0" width="3" height="10" rx="1" fill="currentColor"/></svg>
+        <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M7 9.5C8.1 9.5 9 8.6 9 7.5S8.1 5.5 7 5.5 5 6.4 5 7.5 5.9 9.5 7 9.5Z" fill="currentColor"/><path d="M11.5 5.5C10.3 4.3 8.7 3.5 7 3.5S3.7 4.3 2.5 5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M13.5 3.5C11.7 1.7 9.4 .5 7 .5S2.3 1.7 .5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <svg width="22" height="10" viewBox="0 0 22 10" fill="none"><rect x=".5" y=".5" width="18" height="9" rx="2" stroke="currentColor"/><rect x="2" y="2" width="15" height="6" rx="1" fill="currentColor"/><rect x="19.5" y="3.5" width="1.5" height="3" rx=".5" fill="currentColor"/></svg>
+      </span>
+    </div>
+
+    <main class="absolute inset-0 pt-12 pb-24 overflow-y-auto" id="scroll">
+
+      <!-- Header -->
+      <div class="px-5 pt-3 pb-2 flex items-center justify-between">
+        <div>
+          <div class="text-[11px] uppercase tracking-[.16em] text-ink-500 font-semibold">Tasks</div>
+          <h2 class="text-[20px] font-bold leading-none mt-0.5">Aaj ka kaam</h2>
+          <div class="text-[11px] text-ink-500 mt-1">Shift A · 9:00 AM – 5:00 PM</div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="tap w-10 h-10 rounded-full bg-white shadow-line grid place-items-center" onclick="document.getElementById('filters').open = !document.getElementById('filters').open" aria-label="Filters">
+            <svg class="w-4 h-4 text-ink-700" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M5 10h10M8 15h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+          <button class="tap w-10 h-10 rounded-full bg-ink-900 text-white grid place-items-center" aria-label="Add task">
+            <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Alarm Bar (in-progress state, since plant has active issue) -->
+      <div class="px-5 mt-2">
+        <a href="plant.html" class="tap block w-full text-left rounded-2xl shadow-card overflow-hidden bg-prog text-white">
+          <div class="px-4 py-3 flex items-center gap-3">
+            <span class="grid place-items-center w-7 h-7 rounded-full bg-white/15">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"><path d="M3 12c2-2 4-2 6 0s4 2 6 0 4-2 6 0" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <div class="flex-1 min-w-0">
+              <div class="text-[11px] uppercase tracking-wider opacity-80 font-semibold">In Progress · Diagnosing</div>
+              <div class="text-[14px] font-semibold truncate">Aeration Blower #2 — Step 3 of 5</div>
+            </div>
+            <div class="text-[11px] opacity-80 font-medium tabular-nums">5 min</div>
+            <svg class="w-4 h-4 opacity-80" viewBox="0 0 20 20" fill="none"><path d="M7 4l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </a>
+      </div>
+
+      <!-- Filters (collapsible) -->
+      <details id="filters" class="px-5 mt-3">
+        <summary class="rounded-xl bg-white shadow-line px-3 py-2.5 flex items-center gap-2">
+          <svg class="w-4 h-4 text-ink-700" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M5 10h10M8 15h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <span class="text-[12.5px] font-semibold flex-1">Filters</span>
+          <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-ink-100 text-ink-700" id="filterCount">0</span>
+          <svg class="chev w-4 h-4 text-ink-500" viewBox="0 0 20 20" fill="none"><path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+
+        <div class="mt-2 rounded-xl bg-white shadow-line p-3 space-y-3 animate-rise">
+          <!-- Equipment -->
+          <div>
+            <div class="text-[10px] uppercase tracking-wider font-bold text-ink-500 mb-1.5">Equipment</div>
+            <div class="flex flex-wrap gap-1.5" data-filter-group="equipment">
+              <button class="filter-chip text-[11px] font-medium px-2.5 py-1.5 rounded-full border border-ink-200 bg-white">All</button>
+              <button class="filter-chip text-[11px] font-medium px-2.5 py-1.5 rounded-full border border-ink-200 bg-white">Inlet</button>
+              <button class="filter-chip text-[11px] font-medium px-2.5 py-1.5 rounded-full border border-ink-200 bg-white">Aeration</button>
+              <button class="filter-chip text-[11px] font-medium px-2.5 py-1.5 rounded-full border border-ink-200 bg-white">Clarifier</button>
+              <button class="filter-chip text-[11px] font-medium px-2.5 py-1.5 rounded-full border border-ink-200 bg-white">MBBR</button>
+              <button class="filter-chip text-[11px] font-medium px-2.5 py-1.5 rounded-full border border-ink-200 bg-white">Outlet</button>
+            </div>
+          </div>
+          <!-- Priority -->
+          <div>
+            <div class="text-[10px] uppercase tracking-wider font-bold text-ink-500 mb-1.5">Priority</div>
+            <div class="flex flex-wrap gap-1.5" data-filter-group="priority">
+              <button class="filter-chip text-[11px] font-medium px-2.5 py-1.5 rounded-full border border-ink-200 bg-white"><span class="inline-block w-1.5 h-1.5 rounded-full bg-crit mr-1 align-middle"></span>High</button>
+              <button class="filter-chip text-[11px] font-medium px-2.5 py-1.5 rounded-full border border-ink-200 bg-white"><span class="inline-block w-1.5 h-1.5 rounded-full bg-warn mr-1 align-middle"></span>Medium</button>
+              <button class="filter-chip text-[11px] font-medium px-2.5 py-1.5 rounded-full border border-ink-200 bg-white"><span class="inline-block w-1.5 h-1.5 rounded-full bg-ink-400 mr-1 align-middle"></span>Low</button>
+            </div>
+          </div>
+          <!-- Task type -->
+          <div>
+            <div class="text-[10px] uppercase tracking-wider font-bold text-ink-500 mb-1.5">Task type</div>
+            <div class="flex flex-wrap gap-1.5" data-filter-group="type">
+              <button class="filter-chip text-[11px] font-medium px-2.5 py-1.5 rounded-full border border-ink-200 bg-white">Reading</button>
+              <button class="filter-chip text-[11px] font-medium px-2.5 py-1.5 rounded-full border border-ink-200 bg-white">Cleaning</button>
+              <button class="filter-chip text-[11px] font-medium px-2.5 py-1.5 rounded-full border border-ink-200 bg-white">Sample</button>
+              <button class="filter-chip text-[11px] font-medium px-2.5 py-1.5 rounded-full border border-ink-200 bg-white">Maintenance</button>
+              <button class="filter-chip text-[11px] font-medium px-2.5 py-1.5 rounded-full border border-ink-200 bg-white">Logbook</button>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- Column tabs (synced with kanban scroll) -->
+      <div class="mt-3 px-5">
+        <div class="flex gap-1.5 overflow-x-auto" id="tabs" style="scrollbar-width:none">
+          <button class="pill tap active text-[12px] font-semibold px-3 py-1.5 rounded-full bg-ink-100 text-ink-700 whitespace-nowrap" data-col="0">
+            Today <span class="ml-1 opacity-70 tabular-nums">3</span>
+          </button>
+          <button class="pill tap text-[12px] font-semibold px-3 py-1.5 rounded-full bg-ink-100 text-ink-700 whitespace-nowrap" data-col="1">
+            Upcoming <span class="ml-1 opacity-70 tabular-nums">4</span>
+          </button>
+          <button class="pill tap text-[12px] font-semibold px-3 py-1.5 rounded-full bg-ink-100 text-ink-700 whitespace-nowrap" data-col="2">
+            Overdue <span class="ml-1 text-crit font-bold tabular-nums">2</span>
+          </button>
+          <button class="pill tap text-[12px] font-semibold px-3 py-1.5 rounded-full bg-ink-100 text-ink-700 whitespace-nowrap" data-col="3">
+            Done <span class="ml-1 opacity-70 tabular-nums">5</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Kanban -->
+      <div class="kanban mt-3" id="kanban">
+
+        <!-- ===== TODAY ===== -->
+        <div class="col" data-col-id="today">
+          <div class="px-3.5 pt-3 pb-2 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-prog"></span>
+              <span class="text-[12px] font-bold uppercase tracking-wider">Today</span>
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-ink-100 text-ink-700 tabular-nums">3</span>
+            </div>
+            <span class="text-[10.5px] text-ink-500">Shift A</span>
+          </div>
+          <div class="px-3 pb-3 space-y-2.5 flex-1 overflow-y-auto" data-drop="today">
+            <!-- Card: In Progress -->
+            <article class="task-card rounded-xl bg-white shadow-line p-3" data-state="progress" data-priority="high">
+              <div class="flex items-start gap-2.5">
+                <span class="mt-0.5 w-1 h-9 rounded-full bg-prog shrink-0"></span>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-prog">In Progress</span>
+                    <span class="text-[10px] text-ink-400">·</span>
+                    <span class="text-[10px] text-ink-500 font-medium">Reading</span>
+                  </div>
+                  <div class="text-[13.5px] font-semibold leading-tight mt-0.5">DO levels reading</div>
+                  <div class="text-[11.5px] text-ink-500 mt-1 flex items-center gap-2">
+                    <span class="flex items-center gap-1"><svg class="w-3 h-3" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.2"/></svg>Aeration Tank</span>
+                    <span class="text-ink-300">·</span>
+                    <span class="font-medium tabular-nums">10:30 AM</span>
+                  </div>
+                </div>
+                <button class="tap w-7 h-7 rounded-md grid place-items-center text-ink-500 hover:bg-ink-100" onclick="openMove(event,'DO levels reading','today')" aria-label="Move">
+                  <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="4" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="10" cy="16" r="1.5"/></svg>
+                </button>
+              </div>
+              <div class="mt-2 flex items-center gap-2">
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-crit/10 text-crit">High</span>
+                <button class="tap ml-auto rounded-lg bg-prog text-white text-[12px] font-semibold px-3 py-1.5">Continue</button>
+              </div>
+            </article>
+
+            <!-- Card: Pending -->
+            <article class="task-card rounded-xl bg-white shadow-line p-3" data-state="pending" data-priority="med">
+              <div class="flex items-start gap-2.5">
+                <span class="mt-0.5 w-1 h-9 rounded-full bg-ink-300 shrink-0"></span>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-ink-500">Pending</span>
+                    <span class="text-[10px] text-ink-400">·</span>
+                    <span class="text-[10px] text-ink-500 font-medium">Cleaning</span>
+                  </div>
+                  <div class="text-[13.5px] font-semibold leading-tight mt-0.5">Bar screen cleaning</div>
+                  <div class="text-[11.5px] text-ink-500 mt-1 flex items-center gap-2">
+                    <span class="flex items-center gap-1">Inlet</span>
+                    <span class="text-ink-300">·</span>
+                    <span class="font-medium tabular-nums">11:00 AM</span>
+                  </div>
+                </div>
+                <button class="tap w-7 h-7 rounded-md grid place-items-center text-ink-500 hover:bg-ink-100" onclick="openMove(event,'Bar screen cleaning','today')" aria-label="Move">
+                  <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="4" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="10" cy="16" r="1.5"/></svg>
+                </button>
+              </div>
+              <div class="mt-2 flex items-center gap-2">
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-warn/10 text-warn">Medium</span>
+                <button class="tap ml-auto rounded-lg bg-ink-900 text-white text-[12px] font-semibold px-3 py-1.5">Start</button>
+              </div>
+            </article>
+
+            <!-- Card: Completed (awaiting submit) - abnormal -->
+            <article class="task-card rounded-xl bg-white shadow-line p-3" data-state="completed" data-priority="high">
+              <div class="flex items-start gap-2.5">
+                <span class="mt-0.5 w-1 h-9 rounded-full bg-warn shrink-0"></span>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-warn">Completed</span>
+                    <span class="text-[10px] text-ink-400">·</span>
+                    <span class="text-[10px] text-ink-500 font-medium">Reading</span>
+                  </div>
+                  <div class="text-[13.5px] font-semibold leading-tight mt-0.5">Inlet pH & Flow check</div>
+                  <div class="text-[11.5px] text-ink-500 mt-1 flex items-center gap-2">
+                    <span>Inlet</span>
+                    <span class="text-ink-300">·</span>
+                    <span class="font-medium tabular-nums">9:00 AM</span>
+                  </div>
+                </div>
+                <button class="tap w-7 h-7 rounded-md grid place-items-center text-ink-500 hover:bg-ink-100" onclick="openMove(event,'Inlet pH & Flow check','today')" aria-label="Move">
+                  <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="4" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="10" cy="16" r="1.5"/></svg>
+                </button>
+              </div>
+              <!-- abnormal banner -->
+              <div class="mt-2 rounded-lg bg-crit/8 px-2.5 py-2 flex items-center gap-2" style="background:#FDECEE">
+                <svg class="w-3.5 h-3.5 text-crit shrink-0" viewBox="0 0 20 20" fill="none"><path d="M10 3l8 14H2L10 3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 9v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="10" cy="14" r=".8" fill="currentColor"/></svg>
+                <span class="text-[11px] text-crit font-semibold flex-1">pH 9.2 — out of range (6.5–8.5)</span>
+              </div>
+              <div class="mt-2 flex items-center gap-2">
+                <button class="tap rounded-lg bg-white shadow-line text-ink-900 text-[12px] font-semibold px-3 py-1.5">Submit</button>
+                <button class="tap rounded-lg bg-crit text-white text-[12px] font-semibold px-3 py-1.5 ml-auto">
+                  Create Issue
+                </button>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <!-- ===== UPCOMING ===== -->
+        <div class="col" data-col-id="upcoming">
+          <div class="px-3.5 pt-3 pb-2 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-ink-400"></span>
+              <span class="text-[12px] font-bold uppercase tracking-wider">Upcoming</span>
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-ink-100 text-ink-700 tabular-nums">4</span>
+            </div>
+            <span class="text-[10.5px] text-ink-500">Next 48h</span>
+          </div>
+          <div class="px-3 pb-3 space-y-2.5 flex-1 overflow-y-auto" data-drop="upcoming">
+
+            <article class="task-card rounded-xl bg-white shadow-line p-3" data-state="pending">
+              <div class="flex items-start gap-2.5">
+                <span class="mt-0.5 w-1 h-9 rounded-full bg-ink-300 shrink-0"></span>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-ink-500">Pending</span>
+                    <span class="text-[10px] text-ink-400">·</span>
+                    <span class="text-[10px] text-ink-500 font-medium">Sample</span>
+                  </div>
+                  <div class="text-[13.5px] font-semibold leading-tight mt-0.5">Outlet TSS sample collection</div>
+                  <div class="text-[11.5px] text-ink-500 mt-1 flex items-center gap-2"><span>Outlet</span><span class="text-ink-300">·</span><span class="font-medium">12:00 PM</span></div>
+                </div>
+                <button class="tap w-7 h-7 rounded-md grid place-items-center text-ink-500" onclick="openMove(event,'Outlet TSS sample collection','upcoming')"><svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="4" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="10" cy="16" r="1.5"/></svg></button>
+              </div>
+              <div class="mt-2 flex items-center gap-2">
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-warn/10 text-warn">Medium</span>
+                <button class="tap ml-auto rounded-lg bg-ink-900 text-white text-[12px] font-semibold px-3 py-1.5">Start</button>
+              </div>
+            </article>
+
+            <article class="task-card rounded-xl bg-white shadow-line p-3" data-state="pending">
+              <div class="flex items-start gap-2.5">
+                <span class="mt-0.5 w-1 h-9 rounded-full bg-ink-300 shrink-0"></span>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-ink-500">Pending</span>
+                    <span class="text-[10px] text-ink-400">·</span>
+                    <span class="text-[10px] text-ink-500 font-medium">Maintenance</span>
+                  </div>
+                  <div class="text-[13.5px] font-semibold leading-tight mt-0.5">Filter backwash</div>
+                  <div class="text-[11.5px] text-ink-500 mt-1 flex items-center gap-2"><span>MBBR</span><span class="text-ink-300">·</span><span class="font-medium">Tomorrow · 6:00 AM</span></div>
+                </div>
+                <button class="tap w-7 h-7 rounded-md grid place-items-center text-ink-500" onclick="openMove(event,'Filter backwash','upcoming')"><svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="4" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="10" cy="16" r="1.5"/></svg></button>
+              </div>
+              <div class="mt-2 flex items-center gap-2">
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-ink-200 text-ink-600">Low</span>
+                <button class="tap ml-auto rounded-lg bg-ink-100 text-ink-900 text-[12px] font-semibold px-3 py-1.5">Schedule</button>
+              </div>
+            </article>
+
+            <article class="task-card rounded-xl bg-white shadow-line p-3" data-state="pending">
+              <div class="flex items-start gap-2.5">
+                <span class="mt-0.5 w-1 h-9 rounded-full bg-ink-300 shrink-0"></span>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-ink-500">Pending</span>
+                    <span class="text-[10px] text-ink-400">·</span>
+                    <span class="text-[10px] text-ink-500 font-medium">Logbook</span>
+                  </div>
+                  <div class="text-[13.5px] font-semibold leading-tight mt-0.5">Shift handover entry</div>
+                  <div class="text-[11.5px] text-ink-500 mt-1 flex items-center gap-2"><span>All zones</span><span class="text-ink-300">·</span><span class="font-medium">5:00 PM</span></div>
+                </div>
+                <button class="tap w-7 h-7 rounded-md grid place-items-center text-ink-500" onclick="openMove(event,'Shift handover entry','upcoming')"><svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="4" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="10" cy="16" r="1.5"/></svg></button>
+                </div>
+              <div class="mt-2 flex items-center gap-2">
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-warn/10 text-warn">Medium</span>
+                <button class="tap ml-auto rounded-lg bg-ink-100 text-ink-900 text-[12px] font-semibold px-3 py-1.5">Schedule</button>
+              </div>
+            </article>
+
+            <article class="task-card rounded-xl bg-white shadow-line p-3" data-state="pending">
+              <div class="flex items-start gap-2.5">
+                <span class="mt-0.5 w-1 h-9 rounded-full bg-ink-300 shrink-0"></span>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-ink-500">Pending</span>
+                    <span class="text-[10px] text-ink-400">·</span>
+                    <span class="text-[10px] text-ink-500 font-medium">Reading</span>
+                  </div>
+                  <div class="text-[13.5px] font-semibold leading-tight mt-0.5">Chlorine dosing check</div>
+                  <div class="text-[11.5px] text-ink-500 mt-1 flex items-center gap-2"><span>Outlet</span><span class="text-ink-300">·</span><span class="font-medium">Tomorrow · 9:00 AM</span></div>
+                </div>
+                <button class="tap w-7 h-7 rounded-md grid place-items-center text-ink-500" onclick="openMove(event,'Chlorine dosing check','upcoming')"><svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="4" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="10" cy="16" r="1.5"/></svg></button>
+              </div>
+              <div class="mt-2 flex items-center gap-2">
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-ink-200 text-ink-600">Low</span>
+                <button class="tap ml-auto rounded-lg bg-ink-100 text-ink-900 text-[12px] font-semibold px-3 py-1.5">Schedule</button>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <!-- ===== OVERDUE ===== -->
+        <div class="col" data-col-id="overdue" style="box-shadow: inset 0 0 0 1px #F8C8CD">
+          <div class="px-3.5 pt-3 pb-2 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-crit"></span>
+              <span class="text-[12px] font-bold uppercase tracking-wider text-crit">Overdue</span>
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-crit/10 text-crit tabular-nums">2</span>
+            </div>
+            <span class="text-[10.5px] text-crit font-semibold">Action needed</span>
+          </div>
+          <div class="px-3 pb-3 space-y-2.5 flex-1 overflow-y-auto" data-drop="overdue">
+
+            <article class="task-card rounded-xl bg-white p-3" style="box-shadow: inset 0 0 0 1px #F8C8CD" data-state="pending">
+              <div class="flex items-start gap-2.5">
+                <span class="mt-0.5 w-1 h-9 rounded-full bg-crit shrink-0"></span>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-crit">Overdue · 1d</span>
+                    <span class="text-[10px] text-ink-400">·</span>
+                    <span class="text-[10px] text-ink-500 font-medium">Maintenance</span>
+                  </div>
+                  <div class="text-[13.5px] font-semibold leading-tight mt-0.5">pH probe calibration</div>
+                  <div class="text-[11.5px] text-ink-500 mt-1 flex items-center gap-2"><span>Inlet</span><span class="text-ink-300">·</span><span class="font-medium">Was due Yesterday · 4:00 PM</span></div>
+                </div>
+                <button class="tap w-7 h-7 rounded-md grid place-items-center text-ink-500" onclick="openMove(event,'pH probe calibration','overdue')"><svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="4" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="10" cy="16" r="1.5"/></svg></button>
+              </div>
+              <div class="mt-2 flex items-center gap-2">
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-crit/10 text-crit">High</span>
+                <button class="tap ml-auto rounded-lg bg-crit text-white text-[12px] font-semibold px-3 py-1.5">Start Now</button>
+              </div>
+            </article>
+
+            <article class="task-card rounded-xl bg-white p-3" style="box-shadow: inset 0 0 0 1px #F8C8CD" data-state="pending">
+              <div class="flex items-start gap-2.5">
+                <span class="mt-0.5 w-1 h-9 rounded-full bg-crit shrink-0"></span>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-crit">Overdue · 4h</span>
+                    <span class="text-[10px] text-ink-400">·</span>
+                    <span class="text-[10px] text-ink-500 font-medium">Cleaning</span>
+                  </div>
+                  <div class="text-[13.5px] font-semibold leading-tight mt-0.5">Sludge wasting</div>
+                  <div class="text-[11.5px] text-ink-500 mt-1 flex items-center gap-2"><span>Clarifier</span><span class="text-ink-300">·</span><span class="font-medium">Was due 5:00 AM</span></div>
+                </div>
+                <button class="tap w-7 h-7 rounded-md grid place-items-center text-ink-500" onclick="openMove(event,'Sludge wasting','overdue')"><svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="4" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="10" cy="16" r="1.5"/></svg></button>
+              </div>
+              <div class="mt-2 flex items-center gap-2">
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-crit/10 text-crit">High</span>
+                <button class="tap ml-auto rounded-lg bg-crit text-white text-[12px] font-semibold px-3 py-1.5">Start Now</button>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <!-- ===== DONE ===== -->
+        <div class="col" data-col-id="done">
+          <div class="px-3.5 pt-3 pb-2 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-ok"></span>
+              <span class="text-[12px] font-bold uppercase tracking-wider">Done</span>
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-ok/10 text-ok tabular-nums">5</span>
+            </div>
+            <span class="text-[10.5px] text-ink-500">Today</span>
+          </div>
+          <div class="px-3 pb-3 space-y-2.5 flex-1 overflow-y-auto" data-drop="done">
+
+            <article class="task-card rounded-xl bg-white shadow-line p-3 opacity-90" data-state="done">
+              <div class="flex items-start gap-2.5">
+                <span class="mt-0.5 w-5 h-5 rounded-full bg-ok grid place-items-center shrink-0">
+                  <svg class="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M3 6l2 2 4-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <div class="flex-1 min-w-0">
+                  <div class="text-[13.5px] font-semibold leading-tight line-through decoration-ink-300">Bar screen visual check</div>
+                  <div class="text-[11.5px] text-ink-500 mt-1 flex items-center gap-2"><span>Bar Screen</span><span class="text-ink-300">·</span><span class="font-medium">7:30 AM ✓</span></div>
+                </div>
+                <button class="tap w-7 h-7 rounded-md grid place-items-center text-ink-400" onclick="openMove(event,'Bar screen visual check','done')"><svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="4" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="10" cy="16" r="1.5"/></svg></button>
+              </div>
+            </article>
+
+            <article class="task-card rounded-xl bg-white shadow-line p-3 opacity-90" data-state="done">
+              <div class="flex items-start gap-2.5">
+                <span class="mt-0.5 w-5 h-5 rounded-full bg-ok grid place-items-center shrink-0"><svg class="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M3 6l2 2 4-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <div class="flex-1 min-w-0">
+                  <div class="text-[13.5px] font-semibold leading-tight line-through decoration-ink-300">Equalization tank flow check</div>
+                  <div class="text-[11.5px] text-ink-500 mt-1 flex items-center gap-2"><span>Equalization</span><span class="text-ink-300">·</span><span class="font-medium">8:00 AM ✓</span></div>
+                </div>
+                <button class="tap w-7 h-7 rounded-md grid place-items-center text-ink-400" onclick="openMove(event,'Equalization tank flow check','done')"><svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="4" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="10" cy="16" r="1.5"/></svg></button>
+              </div>
+            </article>
+
+            <article class="task-card rounded-xl bg-white shadow-line p-3 opacity-90" data-state="done">
+              <div class="flex items-start gap-2.5">
+                <span class="mt-0.5 w-5 h-5 rounded-full bg-ok grid place-items-center shrink-0"><svg class="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M3 6l2 2 4-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <div class="flex-1 min-w-0">
+                  <div class="text-[13.5px] font-semibold leading-tight line-through decoration-ink-300">RAS pump status</div>
+                  <div class="text-[11.5px] text-ink-500 mt-1 flex items-center gap-2"><span>Aeration</span><span class="text-ink-300">·</span><span class="font-medium">8:15 AM ✓</span></div>
+                </div>
+                <button class="tap w-7 h-7 rounded-md grid place-items-center text-ink-400" onclick="openMove(event,'RAS pump status','done')"><svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="4" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="10" cy="16" r="1.5"/></svg></button>
+              </div>
+            </article>
+
+            <article class="task-card rounded-xl bg-white shadow-line p-3 opacity-90" data-state="done">
+              <div class="flex items-start gap-2.5">
+                <span class="mt-0.5 w-5 h-5 rounded-full bg-ok grid place-items-center shrink-0"><svg class="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M3 6l2 2 4-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <div class="flex-1 min-w-0">
+                  <div class="text-[13.5px] font-semibold leading-tight line-through decoration-ink-300">Outlet turbidity reading</div>
+                  <div class="text-[11.5px] text-ink-500 mt-1 flex items-center gap-2"><span>Outlet</span><span class="text-ink-300">·</span><span class="font-medium">8:45 AM ✓</span></div>
+                </div>
+                <button class="tap w-7 h-7 rounded-md grid place-items-center text-ink-400" onclick="openMove(event,'Outlet turbidity reading','done')"><svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="4" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="10" cy="16" r="1.5"/></svg></button>
+              </div>
+            </article>
+
+            <article class="task-card rounded-xl bg-white shadow-line p-3 opacity-90" data-state="done">
+              <div class="flex items-start gap-2.5">
+                <span class="mt-0.5 w-5 h-5 rounded-full bg-ok grid place-items-center shrink-0"><svg class="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M3 6l2 2 4-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <div class="flex-1 min-w-0">
+                  <div class="text-[13.5px] font-semibold leading-tight line-through decoration-ink-300">Morning logbook entry</div>
+                  <div class="text-[11.5px] text-ink-500 mt-1 flex items-center gap-2"><span>All zones</span><span class="text-ink-300">·</span><span class="font-medium">9:00 AM ✓</span></div>
+                </div>
+                <button class="tap w-7 h-7 rounded-md grid place-items-center text-ink-400" onclick="openMove(event,'Morning logbook entry','done')"><svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="4" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="10" cy="16" r="1.5"/></svg></button>
+              </div>
+            </article>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- helper hint -->
+      <div class="px-5 mt-3">
+        <div class="rounded-xl bg-white shadow-line px-3 py-2.5 text-[11px] text-ink-500 flex items-center gap-2">
+          <svg class="w-3.5 h-3.5 text-ink-400" viewBox="0 0 20 20" fill="none"><path d="M5 10h10M11 6l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Swipe ke through columns · Tap <span class="font-bold text-ink-700">⋮</span> to move task
+        </div>
+      </div>
+
+      <div class="h-6"></div>
+    </main>
+
+    <!-- ===== Expanded Task Card (sheet) ===== -->
+    <div class="sheet" id="taskSheet" style="height: 88%; display:flex; flex-direction:column;">
+      <!-- Sticky header -->
+      <div class="px-5 pt-3 pb-3 border-b border-ink-200 bg-white rounded-t-3xl">
+        <div class="mx-auto h-1 w-10 rounded-full bg-ink-200"></div>
+        <div class="flex items-start gap-3 mt-3">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] uppercase tracking-wider font-bold text-prog" id="taskState">In Progress</span>
+              <span class="text-[10px] text-ink-400">·</span>
+              <span class="text-[10px] text-ink-500 font-medium" id="taskType">Reading</span>
+            </div>
+            <div class="text-[16px] font-bold leading-tight mt-0.5" id="taskTitle">DO levels reading</div>
+            <div class="text-[11.5px] text-ink-500 mt-1 flex items-center gap-2">
+              <span id="taskEquipment">Aeration Tank</span>
+              <span class="text-ink-300">·</span>
+              <span class="font-medium tabular-nums" id="taskDue">Due 10:30 AM</span>
+            </div>
+          </div>
+          <button class="tap w-9 h-9 rounded-full bg-ink-100 grid place-items-center" onclick="closeTaskSheet()" aria-label="Close">
+            <svg class="w-4 h-4 text-ink-700" viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <!-- progress bar -->
+        <div class="mt-3 flex items-center gap-2">
+          <div class="flex-1 h-1.5 rounded-full bg-ink-200 overflow-hidden">
+            <div id="taskProgress" class="h-full bg-ink-900 transition-all" style="width:0%"></div>
+          </div>
+          <span class="text-[11px] font-bold tabular-nums text-ink-700"><span id="taskProgressCount">0</span>/<span id="taskProgressTotal">5</span></span>
+        </div>
+      </div>
+
+      <!-- Scrollable body -->
+      <div class="flex-1 overflow-y-auto px-5 pt-3 pb-3 bg-paper">
+        <div class="text-[10px] uppercase tracking-wider font-bold text-ink-500 mb-2">Checklist</div>
+        <div class="space-y-2" id="checklist">
+
+          <!-- Step 1: simple pass/fail -->
+          <div class="check-item rounded-xl bg-white shadow-line p-3" data-item="1" data-result="">
+            <div class="flex items-start gap-3">
+              <span class="step-num mt-0.5 w-6 h-6 rounded-full bg-ink-100 text-ink-700 text-[11px] font-bold grid place-items-center shrink-0">1</span>
+              <div class="flex-1 min-w-0">
+                <div class="text-[13.5px] font-semibold leading-tight">Probe ko clean kiya hai?</div>
+                <div class="text-[11px] text-ink-500 mt-0.5">DO sensor surface should be free of biofilm</div>
+              </div>
+            </div>
+            <div class="mt-2.5 grid grid-cols-2 gap-2">
+              <button class="pf-btn tap rounded-lg border border-ink-200 bg-white py-2 text-[12.5px] font-semibold flex items-center justify-center gap-1.5" data-pf="pass" onclick="setPF(this,1,'pass')">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="none"><path d="M5 10l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Pass
+              </button>
+              <button class="pf-btn tap rounded-lg border border-ink-200 bg-white py-2 text-[12.5px] font-semibold flex items-center justify-center gap-1.5" data-pf="fail" onclick="setPF(this,1,'fail')">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                Fail
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: calibration with timestamp note -->
+          <div class="check-item rounded-xl bg-white shadow-line p-3" data-item="2" data-result="">
+            <div class="flex items-start gap-3">
+              <span class="step-num mt-0.5 w-6 h-6 rounded-full bg-ink-100 text-ink-700 text-[11px] font-bold grid place-items-center shrink-0">2</span>
+              <div class="flex-1 min-w-0">
+                <div class="text-[13.5px] font-semibold leading-tight">Calibration valid hai?</div>
+                <div class="text-[11px] text-ink-500 mt-0.5">Last calibrated: <span class="font-semibold text-ink-700">2 days ago</span></div>
+              </div>
+            </div>
+            <div class="mt-2.5 grid grid-cols-2 gap-2">
+              <button class="pf-btn tap rounded-lg border border-ink-200 bg-white py-2 text-[12.5px] font-semibold flex items-center justify-center gap-1.5" data-pf="pass" onclick="setPF(this,2,'pass')">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="none"><path d="M5 10l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Pass
+              </button>
+              <button class="pf-btn tap rounded-lg border border-ink-200 bg-white py-2 text-[12.5px] font-semibold flex items-center justify-center gap-1.5" data-pf="fail" onclick="setPF(this,2,'fail')">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Fail
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: numeric reading + auto Pass/Fail -->
+          <div class="check-item rounded-xl bg-white shadow-line p-3" data-item="3" data-result="">
+            <div class="flex items-start gap-3">
+              <span class="step-num mt-0.5 w-6 h-6 rounded-full bg-ink-100 text-ink-700 text-[11px] font-bold grid place-items-center shrink-0">3</span>
+              <div class="flex-1 min-w-0">
+                <div class="text-[13.5px] font-semibold leading-tight">Zone A reading (mg/L)</div>
+                <div class="text-[11px] text-ink-500 mt-0.5">Ideal range <span class="font-semibold text-ok">2.0 – 4.0</span></div>
+              </div>
+            </div>
+            <div class="mt-2.5 flex items-center gap-2">
+              <input type="text" inputmode="decimal" placeholder="0.0" maxlength="4"
+                class="num-input flex-1 rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-[16px] font-bold tabular-nums outline-none focus:border-ink-900"
+                oninput="evalNumeric(this,3,2,4)"/>
+              <span class="text-[12px] font-semibold text-ink-500">mg/L</span>
+              <span class="pf-pill text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-ink-100 text-ink-500">—</span>
+            </div>
+          </div>
+
+          <!-- Step 4: numeric — likely fail -->
+          <div class="check-item rounded-xl bg-white shadow-line p-3" data-item="4" data-result="">
+            <div class="flex items-start gap-3">
+              <span class="step-num mt-0.5 w-6 h-6 rounded-full bg-ink-100 text-ink-700 text-[11px] font-bold grid place-items-center shrink-0">4</span>
+              <div class="flex-1 min-w-0">
+                <div class="text-[13.5px] font-semibold leading-tight">Zone B reading (mg/L)</div>
+                <div class="text-[11px] text-ink-500 mt-0.5">Ideal range <span class="font-semibold text-ok">2.0 – 4.0</span></div>
+              </div>
+            </div>
+            <div class="mt-2.5 flex items-center gap-2">
+              <input type="text" inputmode="decimal" placeholder="0.0" maxlength="4"
+                class="num-input flex-1 rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-[16px] font-bold tabular-nums outline-none focus:border-ink-900"
+                oninput="evalNumeric(this,4,2,4)"/>
+              <span class="text-[12px] font-semibold text-ink-500">mg/L</span>
+              <span class="pf-pill text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-ink-100 text-ink-500">—</span>
+            </div>
+          </div>
+
+          <!-- Step 5: Photo capture -->
+          <div class="check-item rounded-xl bg-white shadow-line p-3" data-item="5" data-result="">
+            <div class="flex items-start gap-3">
+              <span class="step-num mt-0.5 w-6 h-6 rounded-full bg-ink-100 text-ink-700 text-[11px] font-bold grid place-items-center shrink-0">5</span>
+              <div class="flex-1 min-w-0">
+                <div class="text-[13.5px] font-semibold leading-tight">Meter ka photo lein</div>
+                <div class="text-[11px] text-ink-500 mt-0.5">Reading visible ho proof ke liye</div>
+              </div>
+            </div>
+            <div class="mt-2.5">
+              <input type="file" accept="image/*" capture="environment" id="photoInput" class="hidden" onchange="onPhoto(event)"/>
+              <div id="photoEmpty">
+                <button class="tap w-full rounded-xl border border-dashed border-ink-300 bg-paper py-5 flex flex-col items-center gap-1.5" onclick="document.getElementById('photoInput').click()">
+                  <span class="w-10 h-10 rounded-full bg-white shadow-line grid place-items-center">
+                    <svg class="w-5 h-5 text-ink-700" viewBox="0 0 24 24" fill="none"><path d="M4 8a2 2 0 0 1 2-2h2l1.5-2h5L16 6h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12.5" r="3.5" stroke="currentColor" stroke-width="1.6"/></svg>
+                  </span>
+                  <span class="text-[12.5px] font-semibold">Open Camera</span>
+                  <span class="text-[10.5px] text-ink-500">or tap to upload</span>
+                </button>
+              </div>
+              <div id="photoPreview" class="hidden">
+                <div class="relative rounded-xl overflow-hidden bg-ink-200">
+                  <img id="photoImg" alt="" class="w-full h-44 object-cover"/>
+                  <button class="tap absolute top-2 right-2 w-8 h-8 rounded-full bg-ink-900/85 text-white grid place-items-center" onclick="clearPhoto()" aria-label="Remove photo">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                  </button>
+                  <div class="absolute left-2 bottom-2 text-[10px] font-semibold text-white bg-black/60 rounded-md px-2 py-1">Photo captured · 9:42 AM</div>
+                </div>
+                <button class="tap w-full mt-2 rounded-lg bg-white shadow-line py-2 text-[12px] font-semibold" onclick="document.getElementById('photoInput').click()">Retake</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notes (optional) -->
+        <details class="mt-3 rounded-xl bg-white shadow-line">
+          <summary class="px-3 py-3 flex items-center gap-2">
+            <svg class="w-4 h-4 text-ink-700" viewBox="0 0 20 20" fill="none"><path d="M5 4h10a1 1 0 0 1 1 1v11l-3-2H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            <span class="text-[12.5px] font-semibold flex-1">Notes (optional)</span>
+            <svg class="chev w-4 h-4 text-ink-500" viewBox="0 0 20 20" fill="none"><path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </summary>
+          <div class="px-3 pb-3">
+            <textarea rows="2" placeholder="Koi observation likhein..." class="w-full rounded-lg border border-ink-200 bg-paper px-3 py-2 text-[13px] outline-none focus:border-ink-900 resize-none"></textarea>
+          </div>
+        </details>
+      </div>
+
+      <!-- Sticky footer / CTAs -->
+      <div class="px-5 pt-3 pb-4 border-t border-ink-200 bg-white" id="taskFooter">
+        <!-- Failed banner appears when any fail -->
+        <div id="failBanner" class="hidden rounded-xl bg-crit/10 px-3 py-2.5 mb-2.5 flex items-center gap-2" style="background:#FDECEE">
+          <svg class="w-4 h-4 text-crit shrink-0" viewBox="0 0 20 20" fill="none"><path d="M10 3l8 14H2L10 3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 9v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="10" cy="14" r=".8" fill="currentColor"/></svg>
+          <span class="text-[11.5px] text-crit font-semibold flex-1"><span id="failCount">0</span> check failed — issue raise karna zaroori</span>
+        </div>
+
+        <!-- Default: just Submit. With fail: dual buttons. -->
+        <div id="submitSingle" class="block">
+          <button id="submitBtn" disabled class="tap w-full rounded-xl bg-ink-300 text-white font-semibold py-3.5 text-[14px] flex items-center justify-center gap-2" onclick="submitTask()">
+            Submit
+            <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none"><path d="M5 10l3 3 7-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div id="submitDual" class="hidden grid-cols-2 gap-2">
+          <button class="tap rounded-xl bg-white shadow-line text-ink-900 font-semibold py-3.5 text-[13px]" onclick="submitTask()">Submit</button>
+          <button class="tap rounded-xl bg-crit text-white font-semibold py-3.5 text-[14px] flex items-center justify-center gap-1.5" onclick="createIssueFromTask()">
+            <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none"><path d="M10 3l8 14H2L10 3Z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/></svg>
+            Create Issue
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Move Sheet ===== -->
+    <div class="sheet" id="moveSheet">
+      <div class="px-5 pt-3 pb-5">
+        <div class="mx-auto h-1 w-10 rounded-full bg-ink-200"></div>
+        <div class="mt-3">
+          <div class="text-[10.5px] uppercase tracking-wider text-ink-500 font-bold">Move task</div>
+          <div class="text-[15px] font-bold mt-0.5" id="moveTitle">—</div>
+        </div>
+        <div class="mt-3 space-y-1.5" id="moveOptions"></div>
+        <div class="mt-3 grid grid-cols-2 gap-2">
+          <button class="tap rounded-xl bg-ink-100 text-ink-900 font-semibold py-3 text-[13px]" onclick="closeSheet()">Cancel</button>
+          <button class="tap rounded-xl bg-crit text-white font-semibold py-3 text-[13px]">Create Issue</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="absolute left-0 right-0 bottom-0 z-40">
+      <div class="mx-3 mb-3 rounded-2xl bg-white shadow-card shadow-line px-2 py-2 flex items-center justify-between">
+        <a href="issues.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-500">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M12 3l9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10l9-7Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+          <span class="text-[10px] font-medium">Issues</span>
+        </a>
+        <a href="tasks.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-900 relative">
+          <span class="absolute -top-0.5 w-8 h-1 rounded-full bg-ink-900"></span>
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 3v4M16 3v4M4 10h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M9 14l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="text-[10px] font-bold">Tasks</span>
+        </a>
+        <a href="plant.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-500">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M3 12c2 0 2-3 5-3s3 3 5 3 2-3 5-3 3 3 3 3v8H3v-8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="6" r="2.2" stroke="currentColor" stroke-width="1.7"/></svg>
+          <span class="text-[10px] font-medium">Plant</span>
+        </a>
+        <a href="report.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-500">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <span class="text-[10px] font-medium">Report</span>
+        </a>
+      </div>
+      <div class="mx-auto mb-2 h-1 w-32 rounded-full bg-ink-900/80"></div>
+    </nav>
+  </div>
+</div>
+
+<script>
+  // ===== Tabs <-> Kanban scroll sync =====
+  const kanban = document.getElementById('kanban');
+  const tabs = document.querySelectorAll('#tabs .pill');
+
+  function setActiveTab(idx){
+    tabs.forEach((t,i) => t.classList.toggle('active', i===idx));
+  }
+  tabs.forEach((t,i) => t.addEventListener('click', () => {
+    const cols = kanban.querySelectorAll('.col');
+    cols[i].scrollIntoView({behavior:'smooth', inline:'start', block:'nearest'});
+    setActiveTab(i);
+  }));
+  kanban.addEventListener('scroll', () => {
+    const cols = [...kanban.querySelectorAll('.col')];
+    const x = kanban.scrollLeft;
+    let best = 0, bestDist = Infinity;
+    cols.forEach((c,i) => {
+      const d = Math.abs(c.offsetLeft - kanban.offsetLeft - x);
+      if (d < bestDist) { bestDist = d; best = i; }
+    });
+    setActiveTab(best);
+  });
+
+  // ===== Filter chips toggle =====
+  document.querySelectorAll('[data-filter-group]').forEach(group => {
+    group.querySelectorAll('.filter-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        chip.classList.toggle('active');
+        updateFilterCount();
+      });
+    });
+  });
+  function updateFilterCount(){
+    const n = document.querySelectorAll('.filter-chip.active').length;
+    document.getElementById('filterCount').textContent = n;
+  }
+
+  // ===== Move sheet =====
+  const COLS = [
+    { id:'today',    label:'Today',    dot:'bg-prog' },
+    { id:'upcoming', label:'Upcoming', dot:'bg-ink-400' },
+    { id:'overdue',  label:'Overdue',  dot:'bg-crit' },
+    { id:'done',     label:'Done',     dot:'bg-ok' },
+  ];
+  let moveContext = null;
+
+  function openMove(e, taskTitle, fromColId){
+    e.stopPropagation();
+    moveContext = { card: e.currentTarget.closest('.task-card'), from: fromColId };
+    document.getElementById('moveTitle').textContent = taskTitle;
+    const opts = document.getElementById('moveOptions');
+    opts.innerHTML = '';
+    COLS.forEach(c => {
+      if (c.id === fromColId) return;
+      const b = document.createElement('button');
+      b.className = 'tap w-full text-left rounded-xl bg-white shadow-line px-3 py-3 flex items-center gap-3';
+      b.innerHTML = `<span class="w-2 h-2 rounded-full ${c.dot}"></span>
+        <span class="text-[13px] font-semibold flex-1">Move to ${c.label}</span>
+        <svg class="w-4 h-4 text-ink-500" viewBox="0 0 20 20" fill="none"><path d="M7 4l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+      b.onclick = () => moveTask(c.id);
+      opts.appendChild(b);
+    });
+    document.getElementById('scrim').classList.add('show');
+    document.getElementById('moveSheet').classList.add('show');
+  }
+  function closeSheet(){
+    document.getElementById('scrim').classList.remove('show');
+    document.getElementById('moveSheet').classList.remove('show');
+  }
+  // ===== Expanded Task Card =====
+  const TASKS = {
+    'DO levels reading': { state:'In Progress', stateTone:'prog', type:'Reading', equipment:'Aeration Tank', due:'Due 10:30 AM' },
+    'Bar screen cleaning': { state:'Pending', stateTone:'ink-500', type:'Cleaning', equipment:'Inlet', due:'Due 11:00 AM' },
+    'Inlet pH & Flow check': { state:'Completed', stateTone:'warn', type:'Reading', equipment:'Inlet', due:'9:00 AM' },
+    'Outlet TSS sample collection': { state:'Pending', stateTone:'ink-500', type:'Sample', equipment:'Outlet', due:'Due 12:00 PM' },
+    'pH probe calibration': { state:'Overdue · 1d', stateTone:'crit', type:'Maintenance', equipment:'Inlet', due:'Was due Yesterday 4:00 PM' },
+    'Sludge wasting': { state:'Overdue · 4h', stateTone:'crit', type:'Cleaning', equipment:'Clarifier', due:'Was due 5:00 AM' },
+  };
+
+  function openTaskSheet(title){
+    const t = TASKS[title] || TASKS['DO levels reading'];
+    document.getElementById('taskTitle').textContent = title;
+    document.getElementById('taskState').textContent = t.state;
+    document.getElementById('taskState').className = 'text-[10px] uppercase tracking-wider font-bold text-' + t.stateTone;
+    document.getElementById('taskType').textContent = t.type;
+    document.getElementById('taskEquipment').textContent = t.equipment;
+    document.getElementById('taskDue').textContent = t.due;
+    resetChecklist();
+    document.getElementById('scrim').classList.add('show');
+    document.getElementById('taskSheet').classList.add('show');
+  }
+  function closeTaskSheet(){
+    document.getElementById('scrim').classList.remove('show');
+    document.getElementById('taskSheet').classList.remove('show');
+  }
+  function resetChecklist(){
+    document.querySelectorAll('.check-item').forEach(el => {
+      el.dataset.result = '';
+      el.querySelectorAll('.pf-btn').forEach(b => b.classList.remove('selected'));
+      const pill = el.querySelector('.pf-pill');
+      if (pill) { pill.textContent = '—'; pill.removeAttribute('data-tone'); pill.className = 'pf-pill text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-ink-100 text-ink-500'; }
+      const inp = el.querySelector('.num-input'); if (inp) inp.value = '';
+    });
+    clearPhoto();
+    updateProgress();
+  }
+
+  function setPF(btn, item, result){
+    const card = btn.closest('.check-item');
+    card.querySelectorAll('.pf-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    card.dataset.result = result;
+    updateProgress();
+  }
+
+  function evalNumeric(input, item, lo, hi){
+    const card = input.closest('.check-item');
+    const pill = card.querySelector('.pf-pill');
+    const v = parseFloat(input.value.replace(/[^\d.]/g,''));
+    if (isNaN(v)) {
+      card.dataset.result = '';
+      pill.textContent = '—'; pill.removeAttribute('data-tone');
+      pill.className = 'pf-pill text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-ink-100 text-ink-500';
+    } else if (v >= lo && v <= hi) {
+      card.dataset.result = 'pass';
+      pill.textContent = 'Pass'; pill.dataset.tone = 'pass';
+      pill.className = 'pf-pill text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md';
+    } else {
+      card.dataset.result = 'fail';
+      pill.textContent = 'Fail'; pill.dataset.tone = 'fail';
+      pill.className = 'pf-pill text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md';
+    }
+    updateProgress();
+  }
+
+  function onPhoto(e){
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const url = URL.createObjectURL(f);
+    document.getElementById('photoImg').src = url;
+    document.getElementById('photoEmpty').classList.add('hidden');
+    document.getElementById('photoPreview').classList.remove('hidden');
+    const card = document.querySelector('.check-item[data-item="5"]');
+    card.dataset.result = 'pass';
+    updateProgress();
+  }
+  function clearPhoto(){
+    document.getElementById('photoImg').src = '';
+    document.getElementById('photoInput').value = '';
+    document.getElementById('photoEmpty').classList.remove('hidden');
+    document.getElementById('photoPreview').classList.add('hidden');
+    const card = document.querySelector('.check-item[data-item="5"]');
+    if (card) card.dataset.result = '';
+    updateProgress();
+  }
+
+  function updateProgress(){
+    const items = [...document.querySelectorAll('.check-item')];
+    const total = items.length;
+    const done = items.filter(i => i.dataset.result).length;
+    const fails = items.filter(i => i.dataset.result === 'fail').length;
+
+    document.getElementById('taskProgressCount').textContent = done;
+    document.getElementById('taskProgressTotal').textContent = total;
+    document.getElementById('taskProgress').style.width = (done/total*100) + '%';
+    document.getElementById('taskProgress').classList.toggle('bg-crit', fails > 0);
+    document.getElementById('taskProgress').classList.toggle('bg-ink-900', fails === 0);
+
+    const banner = document.getElementById('failBanner');
+    const single = document.getElementById('submitSingle');
+    const dual   = document.getElementById('submitDual');
+    if (fails > 0) {
+      banner.classList.remove('hidden');
+      document.getElementById('failCount').textContent = fails;
+      single.classList.add('hidden');
+      dual.classList.remove('hidden'); dual.classList.add('grid');
+    } else {
+      banner.classList.add('hidden');
+      single.classList.remove('hidden');
+      dual.classList.add('hidden'); dual.classList.remove('grid');
+    }
+
+    const submit = document.getElementById('submitBtn');
+    if (done === total && fails === 0) {
+      submit.disabled = false;
+      submit.classList.replace('bg-ink-300','bg-ink-900');
+    } else {
+      submit.disabled = true;
+      submit.classList.replace('bg-ink-900','bg-ink-300');
+    }
+  }
+
+  function submitTask(){
+    if (document.getElementById('submitBtn').disabled && document.getElementById('submitSingle').classList.contains('block') !== false) {
+      // disabled and visible: noop
+      if (!document.getElementById('submitSingle').classList.contains('hidden')) return;
+    }
+    closeTaskSheet();
+    setTimeout(()=>alert('Task submitted ✓'), 250);
+  }
+  function createIssueFromTask(){
+    closeTaskSheet();
+    setTimeout(()=>alert('Issue created — supervisor notified'), 250);
+  }
+
+  // Wire Start / Continue / Submit on cards to open the sheet
+  document.querySelectorAll('.task-card').forEach(card => {
+    card.querySelectorAll('button').forEach(btn => {
+      const txt = (btn.textContent || '').trim();
+      if (['Start','Continue','Start Now','Submit','Schedule'].includes(txt)) {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const title = card.querySelector('.text-\\[13\\.5px\\]')?.textContent?.trim();
+          openTaskSheet(title);
+        });
+      }
+    });
+  });
+
+  function moveTask(toColId){
+    if (!moveContext) return closeSheet();
+    const targetCol = document.querySelector(`[data-drop="${toColId}"]`);
+    if (targetCol && moveContext.card) {
+      targetCol.prepend(moveContext.card);
+      moveContext.card.classList.add('animate-rise');
+      setTimeout(()=>moveContext.card.classList.remove('animate-rise'), 300);
+    }
+    closeSheet();
+  }
+</script>
+</body>
+</html>
