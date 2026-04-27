@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMFS Diagnostic Flow — Honda Manesar</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f7f8fa;
+    --white: #ffffff;
+    --navy: #1a2340;
+    --teal: #2d8fa4;
+    --teal-light: #e8f6f9;
+    --teal-mid: #a8dce7;
+    --amber: #e8973a;
+    --amber-light: #fef6ec;
+    --red: #c0392b;
+    --red-light: #fdecea;
+    --green: #1e8449;
+    --green-light: #e9f7ef;
+    --grey: #6b7280;
+    --grey-light: #e5e7eb;
+    --border: #dde1e9;
+    --text: #1a2340;
+    --text-soft: #6b7280;
+    --shadow: 0 2px 12px rgba(26,35,64,0.08);
+    --shadow-hover: 0 6px 24px rgba(26,35,64,0.14);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: auto;
+  }
+
+  /* ── HEADER ─────────────────────────────────────────────── */
+  .header {
+    padding: 28px 40px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--white);
+  }
+  .header h1 { font-size: 17px; font-weight: 600; color: var(--navy); }
+  .header p  { font-size: 13px; color: var(--text-soft); margin-top: 3px; }
+  .badges    { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .badge {
+    font-size: 11px; font-weight: 500; padding: 3px 10px;
+    border-radius: 20px; border: 1px solid var(--border);
+    color: var(--text-soft); background: var(--white);
+  }
+  .badge.red   { background: var(--red-light);   color: var(--red);   border-color: #f5c6c2; }
+  .badge.teal  { background: var(--teal-light);  color: var(--teal);  border-color: var(--teal-mid); }
+  .badge.amber { background: var(--amber-light); color: var(--amber); border-color: #f5d9b5; }
+
+  /* ── CANVAS ─────────────────────────────────────────────── */
+  .canvas {
+    padding: 40px 60px 60px;
+    min-width: 1100px;
+  }
+
+  /* ── SVG CONNECTOR LAYER ──────────────────────────────── */
+  .flow-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  /* ── LAYOUT ROWS ─────────────────────────────────────── */
+  .flow-wrapper {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  /* columns */
+  .col-trigger  { width: 180px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .col-questions{ width: 230px; flex-shrink: 0; display: flex; flex-direction: column; gap: 14px; justify-content: center; }
+  .col-branches { flex: 1; display: flex; flex-direction: column; gap: 14px; }
+
+  /* ── TRIGGER NODE ────────────────────────────────────── */
+  .trigger-node {
+    width: 130px;
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 14px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    cursor: default;
+    transition: box-shadow 0.2s;
+  }
+  .trigger-node:hover { box-shadow: var(--shadow-hover); }
+  .trigger-icon {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, #7c5cfc, #a78bfa);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 10px;
+    font-size: 20px;
+  }
+  .trigger-node .label { font-size: 12px; font-weight: 600; color: var(--navy); line-height: 1.3; }
+  .trigger-node .sub   { font-size: 10px; color: var(--text-soft); margin-top: 4px; line-height: 1.4; }
+
+  /* ── QUESTION CARD ───────────────────────────────────── */
+  .q-card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    cursor: pointer;
+    transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+  .q-card:hover { box-shadow: var(--shadow-hover); transform: translateX(2px); }
+  .q-card.active { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(45,143,164,0.12), var(--shadow-hover); }
+  .q-card.visual { border-left: 3px solid var(--amber); }
+  .q-card.system { border-left: 3px solid #a78bfa; }
+  .q-card.manual { border-left: 3px solid var(--teal); }
+
+  .q-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .q-badge {
+    font-size: 10px; font-weight: 600; font-family: 'DM Mono', monospace;
+    background: var(--teal-light); color: var(--teal);
+    padding: 2px 7px; border-radius: 4px; flex-shrink: 0;
+  }
+  .q-badge.sys   { background: #f0edff; color: #7c5cfc; }
+  .q-badge.vis   { background: var(--amber-light); color: var(--amber); }
+  .q-badge.man   { background: var(--teal-light); color: var(--teal); }
+  .q-type-icon   { font-size: 13px; }
+  .q-title       { font-size: 11.5px; font-weight: 600; color: var(--navy); }
+  .q-hindi       { font-size: 10.5px; color: var(--text-soft); line-height: 1.45; }
+  .q-count       { font-size: 10px; color: var(--text-soft); margin-top: 3px; }
+
+  /* ── BRANCH PANEL ────────────────────────────────────── */
+  .branch-panel {
+    display: none;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .branch-panel.visible { display: flex; }
+
+  .branch-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 11px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    transition: box-shadow 0.2s;
+  }
+  .branch-row:hover { box-shadow: var(--shadow); }
+  .branch-row.green  { border-left: 3px solid var(--green); }
+  .branch-row.amber  { border-left: 3px solid var(--amber); }
+  .branch-row.red    { border-left: 3px solid var(--red); }
+  .branch-row.teal   { border-left: 3px solid var(--teal); }
+  .branch-row.purple { border-left: 3px solid #7c5cfc; }
+
+  .branch-dot {
+    width: 20px; height: 20px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; flex-shrink: 0; margin-top: 1px;
+  }
+  .branch-dot.green  { background: var(--green-light); }
+  .branch-dot.amber  { background: var(--amber-light); }
+  .branch-dot.red    { background: var(--red-light); }
+  .branch-dot.teal   { background: var(--teal-light); }
+  .branch-dot.purple { background: #f0edff; }
+
+  .branch-body { flex: 1; }
+  .branch-cond { font-weight: 500; color: var(--navy); margin-bottom: 3px; line-height: 1.4; }
+  .branch-outcome { color: var(--text-soft); line-height: 1.4; }
+  .branch-action {
+    display: inline-flex; align-items: center; gap: 4px;
+    margin-top: 4px; font-size: 10.5px; font-weight: 500;
+    padding: 2px 8px; border-radius: 4px;
+  }
+  .branch-action.green  { background: var(--green-light); color: var(--green); }
+  .branch-action.red    { background: var(--red-light);   color: var(--red); }
+  .branch-action.teal   { background: var(--teal-light);  color: var(--teal); }
+  .branch-action.amber  { background: var(--amber-light); color: var(--amber); }
+  .branch-action.purple { background: #f0edff; color: #7c5cfc; }
+
+  /* ── CONNECTOR LINES (SVG) ────────────────────────────── */
+  .connector { stroke: var(--border); stroke-width: 1.5; fill: none; }
+  .connector.active { stroke: var(--teal); stroke-width: 2; }
+
+  /* ── EXPAND HINT ─────────────────────────────────────── */
+  .expand-hint {
+    font-size: 10px; color: var(--teal); margin-top: 5px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .expand-hint svg { transition: transform 0.2s; }
+  .q-card.active .expand-hint svg { transform: rotate(90deg); }
+
+  /* ── Q-ROW (question + branches side by side) ─────── */
+  .q-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    position: relative;
+  }
+  .q-col { width: 230px; flex-shrink: 0; }
+  .branch-col { flex: 1; padding-left: 40px; }
+
+  /* ── INSTRUCTION ─────────────────────────────────────── */
+  .instruction {
+    font-size: 11px; color: var(--text-soft);
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 6px; padding: 7px 12px;
+    margin-bottom: 20px; display: inline-flex; align-items: center; gap: 6px;
+  }
+
+  /* ── LEGEND ──────────────────────────────────────────── */
+  .legend {
+    display: flex; gap: 16px; flex-wrap: wrap;
+    margin-top: 32px; padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--text-soft);
+  }
+  .legend-bar { width: 18px; height: 3px; border-radius: 2px; }
+
+  /* ── FLOW TITLE AREA ─────────────────────────────────── */
+  .section-label {
+    font-size: 10.5px; font-weight: 600; color: var(--text-soft);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 16px;
+  }
+
+  /* ── MAIN LAYOUT ─────────────────────────────────────── */
+  .flow-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    position: relative;
+  }
+  .left-col {
+    width: 160px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 10px;
+  }
+  .mid-col {
+    width: 240px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 0 0 0 30px;
+  }
+  .right-col {
+    flex: 1;
+    padding-left: 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* SVG canvas for bezier curves */
+  #curve-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  .flow-outer {
+    position: relative;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>CMFS — Diagnostic Flow</h1>
+  <p>Biological Process · Aeration Tank · Honda Manesar Plant</p>
+  <div class="badges">
+    <span class="badge red">⚠ Urgency: HIGH</span>
+    <span class="badge teal">DT-006 &amp; SV30 — Low Biomass</span>
+    <span class="badge amber">SLA: 1 Day → Escalate</span>
+    <span class="badge">Alert Source: Row 7</span>
+    <span class="badge">Issue: एरेशन टैंक में जीवाणु हैं।</span>
+  </div>
+</div>
+
+<!-- CANVAS -->
+<div class="canvas">
+
+  <div class="instruction">
+    💡 Click any step card to reveal its decision branches
+  </div>
+
+  <div class="flow-outer" id="flowOuter">
+    <svg id="curve-svg"></svg>
+
+    <div class="flow-layout" id="flowLayout">
+
+      <!-- LEFT: Root node -->
+      <div class="left-col" id="rootCol">
+        <div class="trigger-node" id="rootNode">
+          <div class="trigger-icon">🏭</div>
+          <div class="label">Aeration Tank</div>
+          <div class="sub">DT-006 + SV30<br>Low Biomass Alert</div>
+        </div>
+      </div>
+
+      <!-- MID: Step cards -->
+      <div class="mid-col" id="midCol">
+
+        <div class="q-card system" id="card-0" onclick="toggle(0)">
+          <div class="q-header">
+            <span class="q-badge sys">Step 0</span>
+            <span class="q-type-icon">🤖</span>
+          </div>
+          <div class="q-title">SV30 Trend Analysis</div>
+          <div class="q-hindi">Auto-loaded — last 7 days</div>
+          <div class="q-count">System record · non-decisive</div>
+          <div class="expand-hint">
+            <svg width="10" height="10" viewBox="0 0 10 10"><path d="M3 2l4 3-4 3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+            View details
+          </div>
+        </div>
+
+        <div class="q-card visual" id="card-1" onclick="toggle(1)">
+          <div class="q-header">
+            <span class="q-badge vis">Q1</span>
+            <span class="q-type-icon">👁️</span>
+          </div>
+          <div class="q-title">Water Colour Check</div>
+          <div class="q-hindi">Aeration Tank में पानी का रंग कैसा है?</div>
+          <div class="q-count">Visual · 3 branches</div>
+          <div class="expand-hint">
+            <svg width="10" height="10" viewBox="0 0 10 10"><path d="M3 2l4 3-4 3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+            View branches
+          </div>
+        </div>
+
+        <div class="q-card system" id="card-2" onclick="toggle(2)">
+          <div class="q-header">
+            <span class="q-badge sys">Q2</span>
+            <span class="q-type-icon">🤖</span>
+          </div>
+          <div class="q-title">Sludge Wasting Events</div>
+          <div class="q-hindi">Last 3 days auto-pulled from records</div>
+          <div class="q-count">System record · 2 branches</div>
+          <div class="expand-hint">
+            <svg width="10" height="10" viewBox="0 0 10 10"><path d="M3 2l4 3-4 3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+            View branches
+          </div>
+        </div>
+
+        <div class="q-card visual" id="card-3" onclick="toggle(3)">
+          <div class="q-header">
+            <span class="q-badge vis">Q3</span>
+            <span class="q-type-icon">👁️</span>
+          </div>
+          <div class="q-title">Inlet Appearance Check</div>
+          <div class="q-hindi">Inlet का पानी आज सामान्य दिख रहा है?</div>
+          <div class="q-count">Visual · 2 branches</div>
+          <div class="expand-hint">
+            <svg width="10" height="10" viewBox="0 0 10 10"><path d="M3 2l4 3-4 3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+            View branches
+          </div>
+        </div>
+
+        <div class="q-card manual" id="card-4" onclick="toggle(4)">
+          <div class="q-header">
+            <span class="q-badge man">Q4</span>
+            <span class="q-type-icon">📏</span>
+          </div>
+          <div class="q-title">DO Entry (Manual)</div>
+          <div class="q-hindi">DO क्या है? — No live sensor</div>
+          <div class="q-count">Manual entry · 2 branches</div>
+          <div class="expand-hint">
+            <svg width="10" height="10" viewBox="0 0 10 10"><path d="M3 2l4 3-4 3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+            View branches
+          </div>
+        </div>
+
+        <div class="q-card system" id="card-5" onclick="toggle(5)">
+          <div class="q-header">
+            <span class="q-badge sys">Q5</span>
+            <span class="q-type-icon">🤖</span>
+          </div>
+          <div class="q-title">SV30 Decision Point</div>
+          <div class="q-hindi">7-day trend re-surfaced for final call</div>
+          <div class="q-count">System record · decisive · 2 outcomes</div>
+          <div class="expand-hint">
+            <svg width="10" height="10" viewBox="0 0 10 10"><path d="M3 2l4 3-4 3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+            View outcomes
+          </div>
+        </div>
+
+      </div><!-- /mid-col -->
+
+      <!-- RIGHT: Branch panels -->
+      <div class="right-col" id="rightCol">
+
+        <!-- Step 0 branches -->
+        <div class="branch-panel" id="branch-0">
+          <div class="branch-row purple">
+            <div class="branch-dot purple">📊</div>
+            <div class="branch-body">
+              <div class="branch-cond">SV30 — last 7 readings displayed</div>
+              <div class="branch-outcome">Operator reviews trend. Sudden drop flagged YES / NO.</div>
+              <span class="branch-action purple">⏱ Auto-advances after 5s → Q1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q1 branches -->
+        <div class="branch-panel" id="branch-1">
+          <div class="branch-row green">
+            <div class="branch-dot green">🟤</div>
+            <div class="branch-body">
+              <div class="branch-cond">Brown / Tea-coloured</div>
+              <div class="branch-outcome">Healthy biomass. Proceed normally.</div>
+              <span class="branch-action teal">→ Continue to Q2</span>
+            </div>
+          </div>
+          <div class="branch-row amber">
+            <div class="branch-dot amber">🟡</div>
+            <div class="branch-body">
+              <div class="branch-cond">Very light / Yellow</div>
+              <div class="branch-outcome">Washout risk detected.</div>
+              <span class="branch-action amber">→ Skip to Q3</span>
+            </div>
+          </div>
+          <div class="branch-row red">
+            <div class="branch-dot red">⚫</div>
+            <div class="branch-body">
+              <div class="branch-cond">Black / Foul-smelling</div>
+              <div class="branch-outcome">Septic conditions suspected.</div>
+              <span class="branch-action red">🚨 ESCALATE IMMEDIATELY · Log: SEPTIC_CONDITIONS_SUSPECTED</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q2 branches -->
+        <div class="branch-panel" id="branch-2">
+          <div class="branch-row green">
+            <div class="branch-dot green">📅</div>
+            <div class="branch-body">
+              <div class="branch-cond">Wasting every day or more</div>
+              <div class="branch-outcome">Over-wasting identified.</div>
+              <span class="branch-action green">✅ Stop wasting for 2 days</span>
+              <span class="branch-action teal" style="margin-left:6px">📋 Monitor SV30 every 12h</span>
+            </div>
+          </div>
+          <div class="branch-row amber">
+            <div class="branch-dot amber">❓</div>
+            <div class="branch-body">
+              <div class="branch-cond">No recent wasting events</div>
+              <div class="branch-outcome">Unexplained decline.</div>
+              <span class="branch-action amber">→ Continue to Q3</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q3 branches -->
+        <div class="branch-panel" id="branch-3">
+          <div class="branch-row red">
+            <div class="branch-dot red">⚗️</div>
+            <div class="branch-body">
+              <div class="branch-cond">Unusual colour or chemical smell</div>
+              <div class="branch-outcome">Toxic shock suspected.</div>
+              <span class="branch-action red">🚨 ESCALATE · Open Inlet Bypass · Log: TOXIC_SHOCK_SUSPECTED</span>
+            </div>
+          </div>
+          <div class="branch-row green">
+            <div class="branch-dot green">✅</div>
+            <div class="branch-body">
+              <div class="branch-cond">Looks and smells normal</div>
+              <div class="branch-outcome">Inlet is not the cause.</div>
+              <span class="branch-action teal">→ Continue to Q4</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q4 branches -->
+        <div class="branch-panel" id="branch-4">
+          <div class="branch-row red">
+            <div class="branch-dot red">📉</div>
+            <div class="branch-body">
+              <div class="branch-cond">DO &lt; 1 mg/L</div>
+              <div class="branch-outcome">Low dissolved oxygen is primary cause.</div>
+              <span class="branch-action red">⚡ Link issues → DT-008 (Low DO) · Resolve DO first</span>
+            </div>
+          </div>
+          <div class="branch-row green">
+            <div class="branch-dot green">✅</div>
+            <div class="branch-body">
+              <div class="branch-cond">DO = 1–4 mg/L (Normal)</div>
+              <div class="branch-outcome">DO is not the cause.</div>
+              <span class="branch-action teal">→ Continue to Q5</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q5 branches -->
+        <div class="branch-panel" id="branch-5">
+          <div class="branch-row green">
+            <div class="branch-dot green">📈</div>
+            <div class="branch-body">
+              <div class="branch-cond">Gradual SV30 decline over 7+ days</div>
+              <div class="branch-outcome">Normal inlet and DO confirmed. Natural decline.</div>
+              <span class="branch-action green">✅ Stop wasting for 48 hours</span>
+              <span class="branch-action teal" style="margin-left:6px">📋 Record SV30 every 8h</span>
+              <div style="margin-top:6px; font-size:10.5px; color: var(--text-soft);">
+                → SV30 &gt;30% in 48h = <strong style="color:var(--green)">RESOLVED</strong>
+              </div>
+            </div>
+          </div>
+          <div class="branch-row red">
+            <div class="branch-dot red">📉</div>
+            <div class="branch-body">
+              <div class="branch-cond">SV30 still declining after 48h</div>
+              <div class="branch-outcome">Actions have not worked.</div>
+              <span class="branch-action red">🚨 ESCALATE — Engineer review required</span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /right-col -->
+
+    </div><!-- /flow-layout -->
+  </div><!-- /flow-outer -->
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-bar" style="background:#a78bfa"></div> System / Auto</div>
+    <div class="legend-item"><div class="legend-bar" style="background:var(--amber)"></div> Visual Check</div>
+    <div class="legend-item"><div class="legend-bar" style="background:var(--teal)"></div> Manual Entry</div>
+    <div class="legend-item"><div class="legend-bar" style="background:var(--green)"></div> Safe / Proceed</div>
+    <div class="legend-item"><div class="legend-bar" style="background:var(--red)"></div> Escalate / Alert</div>
+  </div>
+
+</div><!-- /canvas -->
+
+<script>
+  const activeSet = new Set();
+
+  function toggle(idx) {
+    const card   = document.getElementById('card-'   + idx);
+    const branch = document.getElementById('branch-' + idx);
+    const isOpen = activeSet.has(idx);
+
+    if (isOpen) {
+      activeSet.delete(idx);
+      card.classList.remove('active');
+      branch.classList.remove('visible');
+    } else {
+      activeSet.add(idx);
+      card.classList.add('active');
+      branch.classList.add('visible');
+    }
+    drawCurves();
+  }
+
+  // ── Draw bezier curves from root → each card, and card → branch panel ──
+  function drawCurves() {
+    const svg = document.getElementById('curve-svg');
+    const outer = document.getElementById('flowOuter');
+    const outerRect = outer.getBoundingClientRect();
+
+    // size svg to outer
+    svg.setAttribute('width',  outer.offsetWidth);
+    svg.setAttribute('height', outer.scrollHeight);
+
+    svg.innerHTML = '';
+
+    const root = document.getElementById('rootNode');
+    const rootR = root.getBoundingClientRect();
+    const rootX = rootR.right - outerRect.left;
+    const rootCY = rootR.top + rootR.height / 2 - outerRect.top;
+
+    for (let i = 0; i <= 5; i++) {
+      const card = document.getElementById('card-' + i);
+      const cardR = card.getBoundingClientRect();
+      const cardX  = cardR.left - outerRect.left;
+      const cardCY = cardR.top + cardR.height / 2 - outerRect.top;
+
+      const isActive = activeSet.has(i);
+
+      // root → card
+      const cx1 = rootX + (cardX - rootX) * 0.5;
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', `M${rootX},${rootCY} C${cx1},${rootCY} ${cx1},${cardCY} ${cardX},${cardCY}`);
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', isActive ? '#2d8fa4' : '#dde1e9');
+      path.setAttribute('stroke-width', isActive ? '2' : '1.5');
+      svg.appendChild(path);
+
+      // card → branch panel (when active)
+      if (isActive) {
+        const branch = document.getElementById('branch-' + i);
+        const branchR = branch.getBoundingClientRect();
+        const bX  = branchR.left - outerRect.left;
+        const bCY = branchR.top + branchR.height / 2 - outerRect.top;
+
+        const rows = branch.querySelectorAll('.branch-row');
+        rows.forEach(row => {
+          const rR  = row.getBoundingClientRect();
+          const rX  = rR.left - outerRect.left;
+          const rCY = rR.top + rR.height / 2 - outerRect.top;
+          const cardRight = cardR.right - outerRect.left;
+          const midX = cardRight + (rX - cardRight) * 0.45;
+
+          const p2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          p2.setAttribute('d', `M${cardRight},${cardCY} C${midX},${cardCY} ${midX},${rCY} ${rX},${rCY}`);
+          p2.setAttribute('fill', 'none');
+          p2.setAttribute('stroke', '#2d8fa4');
+          p2.setAttribute('stroke-width', '1.5');
+          p2.setAttribute('stroke-dasharray', '4 3');
+          p2.setAttribute('opacity', '0.7');
+          svg.appendChild(p2);
+        });
+      }
+    }
+  }
+
+  // Initial draw + redraw on resize
+  window.addEventListener('load',   () => setTimeout(drawCurves, 100));
+  window.addEventListener('resize', drawCurves);
+</script>
+</body>
+</html>

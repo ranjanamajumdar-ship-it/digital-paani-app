@@ -1,0 +1,1417 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#0F172A" />
+<title>Digital Paani — Operator PWA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#EEF2F6;
+    --frame:#F7F8FA;
+    --card:#FFFFFF;
+    --ink:#0F172A;
+    --ink-2:#334155;
+    --ink-3:#64748B;
+    --ink-4:#94A3B8;
+    --line:#E5E9F0;
+    --line-2:#EEF1F6;
+    --crit:#DC2626;
+    --crit-bg:#FEE2E2;
+    --warn:#D97706;
+    --warn-bg:#FEF3C7;
+    --prog:#2563EB;
+    --prog-bg:#DBEAFE;
+    --ok:#15803D;
+    --ok-bg:#DCFCE7;
+    --violet:#7C3AED;
+    --violet-bg:#EDE9FE;
+    --teal:#0E7490;
+    --teal-bg:#CFFAFE;
+  }
+  html,body{
+    font-family:'DM Sans',system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  /* page header for the gallery view */
+  .page-head{
+    max-width:1280px;margin:0 auto;padding:28px 24px 12px;
+  }
+  .page-head h1{font-size:18px;font-weight:600;color:var(--ink)}
+  .page-head p{font-size:13px;color:var(--ink-3);margin-top:4px}
+  .gallery{
+    max-width:1280px;margin:0 auto;padding:8px 16px 80px;
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(390px,1fr));gap:24px;
+    justify-items:center;
+  }
+  .frame-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
+  .frame-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+  /* phone frame */
+  .phone{
+    width:390px;height:844px;background:var(--frame);
+    border-radius:36px;overflow:hidden;position:relative;
+    box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 40px rgba(15,23,42,.10);
+    border:1px solid #DDE2EA;
+    display:flex;flex-direction:column;
+  }
+  .phone .status{
+    height:36px;flex:0 0 36px;display:flex;align-items:flex-end;justify-content:space-between;
+    padding:0 24px 6px;font-size:13px;font-weight:600;color:var(--ink);
+  }
+  .phone .status .right{display:flex;gap:5px;align-items:center;font-size:11px}
+  .scroll{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+  .scroll::-webkit-scrollbar{display:none}
+  /* topbar */
+  .topbar{
+    padding:8px 18px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:var(--frame);
+  }
+  .topbar .ttl{font-size:20px;font-weight:700;letter-spacing:-.01em}
+  .topbar .sub{font-size:12px;color:var(--ink-3);margin-top:1px}
+  .icon-btn{
+    width:38px;height:38px;border-radius:50%;background:#fff;border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;color:var(--ink-2);
+  }
+  .avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#0F172A,#334155);
+    color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center}
+
+  /* alarm bar */
+  .alarm{
+    margin:0 14px;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:11px;
+    background:#fff;border:1px solid var(--line);position:relative;overflow:hidden;
+  }
+  .alarm .pill{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px}
+  .alarm .body{flex:1;min-width:0}
+  .alarm .lbl{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+  .alarm .msg{font-size:13.5px;font-weight:600;color:var(--ink);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .alarm .meta{font-size:11.5px;color:var(--ink-3);margin-top:1px}
+  .alarm .chev{color:var(--ink-3)}
+  .alarm.state-new{background:#FEF2F2;border-color:#FCA5A5}
+  .alarm.state-new .pill{background:var(--crit-bg);color:var(--crit)}
+  .alarm.state-new .lbl{color:var(--crit)}
+  .alarm.state-new::after{
+    content:"";position:absolute;inset:0;border-radius:14px;border:2px solid var(--crit);
+    opacity:0;animation:pulse 2s ease-out infinite;pointer-events:none;
+  }
+  .alarm.state-active{background:#fff;border-color:#FCA5A5}
+  .alarm.state-active .pill{background:var(--crit-bg);color:var(--crit)}
+  .alarm.state-active .lbl{color:var(--crit)}
+  .alarm.state-progress{background:#fff;border-color:#BFDBFE}
+  .alarm.state-progress .pill{background:var(--prog-bg);color:var(--prog)}
+  .alarm.state-progress .lbl{color:var(--prog)}
+  .alarm.state-resolved{background:#fff;border-color:#BBF7D0}
+  .alarm.state-resolved .pill{background:var(--ok-bg);color:var(--ok)}
+  .alarm.state-resolved .lbl{color:var(--ok)}
+  .alarm.state-idle{background:#fff;border-color:var(--line)}
+  .alarm.state-idle .pill{background:#F1F5F9;color:var(--ink-3)}
+  @keyframes pulse{
+    0%{opacity:.7;transform:scale(1)}
+    100%{opacity:0;transform:scale(1.04)}
+  }
+
+  /* generic card */
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px}
+  .card-pad{padding:0}
+  .row{display:flex;align-items:center}
+  .gap-2{gap:8px}.gap-3{gap:12px}.gap-1{gap:4px}
+  .between{justify-content:space-between}
+  .col{display:flex;flex-direction:column}
+  .stack{display:flex;flex-direction:column;gap:10px}
+  .px{padding-left:14px;padding-right:14px}
+  .py{padding-top:12px;padding-bottom:12px}
+  .mt-2{margin-top:8px}.mt-3{margin-top:12px}.mt-4{margin-top:16px}
+  .mb-2{margin-bottom:8px}.mb-3{margin-bottom:12px}
+  .h-12{height:12px}.h-20{height:20px}.h-32{height:32px}
+
+  .h-section{
+    font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);
+    padding:18px 18px 8px;display:flex;align-items:center;justify-content:space-between;
+  }
+  .h-section .ct{background:#fff;border:1px solid var(--line);font-size:11px;color:var(--ink-2);padding:1px 8px;border-radius:999px;letter-spacing:0;text-transform:none;font-weight:600}
+
+  .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;line-height:1.4}
+  .chip.crit{background:var(--crit-bg);color:var(--crit)}
+  .chip.warn{background:var(--warn-bg);color:var(--warn)}
+  .chip.prog{background:var(--prog-bg);color:var(--prog)}
+  .chip.ok{background:var(--ok-bg);color:var(--ok)}
+  .chip.idle{background:#F1F5F9;color:var(--ink-3)}
+  .chip.violet{background:var(--violet-bg);color:var(--violet)}
+  .chip.dot::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    border-radius:12px;padding:11px 14px;font-size:14px;font-weight:600;cursor:pointer;
+    border:none;width:100%;transition:transform .12s, background .15s;
+  }
+  .btn:active{transform:scale(.985)}
+  .btn-primary{background:var(--ink);color:#fff}
+  .btn-danger{background:var(--crit);color:#fff}
+  .btn-success{background:var(--ok);color:#fff}
+  .btn-ghost{background:#F1F5F9;color:var(--ink)}
+  .btn-outline{background:#fff;border:1px solid var(--line);color:var(--ink)}
+  .btn-sm{padding:8px 12px;font-size:13px;border-radius:10px;width:auto}
+
+  /* issue card */
+  .issue-card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .issue-card .head{padding:14px;display:flex;gap:11px;align-items:flex-start}
+  .issue-card .icon{
+    width:42px;height:42px;border-radius:12px;background:var(--crit-bg);color:var(--crit);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;
+  }
+  .issue-card .icon.warn{background:var(--warn-bg);color:var(--warn)}
+  .issue-card .icon.prog{background:var(--prog-bg);color:var(--prog)}
+  .issue-card .icon.ok{background:var(--ok-bg);color:var(--ok)}
+  .issue-card .ttl{font-size:14.5px;font-weight:600;color:var(--ink);line-height:1.3}
+  .issue-card .eq{font-size:12px;color:var(--ink-3);margin-top:2px}
+  .issue-card .meta{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+  .issue-card .foot{padding:0 14px 14px;display:flex;gap:8px;align-items:center}
+  .issue-card .foot .timer{font-size:11.5px;color:var(--ink-3);margin-right:auto}
+
+  /* progressive steps */
+  .step{
+    background:#fff;border:1px solid var(--line);border-radius:14px;margin:0 14px 10px;
+    overflow:hidden;
+  }
+  .step .step-head{
+    padding:13px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;
+  }
+  .step-num{
+    width:26px;height:26px;border-radius:50%;background:#F1F5F9;color:var(--ink-3);
+    font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    font-family:'DM Mono',monospace;
+  }
+  .step.done .step-num{background:var(--ok-bg);color:var(--ok)}
+  .step.active .step-num{background:var(--ink);color:#fff}
+  .step .step-ttl{font-size:13.5px;font-weight:600;color:var(--ink)}
+  .step .step-sub{font-size:11.5px;color:var(--ink-3);margin-top:1px}
+  .step .step-meta{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .step .chev{transition:transform .2s;color:var(--ink-3)}
+  .step.active .chev{transform:rotate(90deg)}
+  .step .step-body{
+    display:none;padding:0 14px 14px;border-top:1px solid var(--line-2);padding-top:12px;
+  }
+  .step.active .step-body{display:block}
+
+  .branch{
+    display:flex;gap:10px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);
+    margin-top:8px;cursor:pointer;background:#fff;align-items:flex-start;
+  }
+  .branch:hover{border-color:var(--ink-4)}
+  .branch .b-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;margin-top:1px}
+  .branch.ok .b-dot{background:var(--ok-bg);color:var(--ok)}
+  .branch.warn .b-dot{background:var(--warn-bg);color:var(--warn)}
+  .branch.crit .b-dot{background:var(--crit-bg);color:var(--crit)}
+  .branch .b-cond{font-size:12.5px;font-weight:600;color:var(--ink)}
+  .branch .b-out{font-size:11.5px;color:var(--ink-3);margin-top:2px;line-height:1.4}
+  .branch.ok{border-left:3px solid var(--ok)}
+  .branch.warn{border-left:3px solid var(--warn)}
+  .branch.crit{border-left:3px solid var(--crit)}
+
+  /* trend mini */
+  .trend{display:flex;align-items:flex-end;gap:3px;height:46px;margin:6px 0}
+  .trend i{display:block;width:9px;background:#CBD5E1;border-radius:3px 3px 0 0}
+  .trend i.cur{background:var(--crit)}
+  .trend i.warn{background:var(--warn)}
+
+  /* SLA bar */
+  .sla{height:5px;border-radius:999px;background:#F1F5F9;overflow:hidden;margin-top:8px}
+  .sla i{display:block;height:100%;background:var(--crit)}
+
+  /* SCADA plant */
+  .scada{
+    margin:0 14px;background:linear-gradient(180deg,#F8FAFC,#EEF2F6);
+    border:1px solid var(--line);border-radius:18px;padding:18px 14px;position:relative;height:280px;overflow:hidden;
+  }
+  .scada::before{
+    content:"";position:absolute;inset:0;
+    background-image:linear-gradient(rgba(15,23,42,.04) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(15,23,42,.04) 1px,transparent 1px);
+    background-size:14px 14px;
+  }
+  .node{
+    position:absolute;background:#fff;border:1px solid var(--line);border-radius:12px;
+    padding:8px 10px;min-width:78px;text-align:center;box-shadow:0 1px 2px rgba(15,23,42,.04);
+  }
+  .node .nm{font-size:10.5px;font-weight:600;color:var(--ink)}
+  .node .vl{font-size:10px;color:var(--ink-3);margin-top:1px;font-family:'DM Mono',monospace}
+  .node .dot-st{width:8px;height:8px;border-radius:50%;position:absolute;top:7px;right:8px}
+  .node.ok .dot-st{background:var(--ok)}
+  .node.warn{border-color:#FCD34D}.node.warn .dot-st{background:var(--warn)}
+  .node.crit{border-color:#FCA5A5;box-shadow:0 0 0 3px rgba(220,38,38,.08)}
+  .node.crit .dot-st{background:var(--crit);animation:blink 1.6s infinite}
+  .node.maint{background:repeating-linear-gradient(45deg,#fff 0 5px,#F1F5F9 5px 10px)}
+  .node.maint .dot-st{background:var(--ink-3)}
+  @keyframes blink{50%{opacity:.4}}
+  .pipe{position:absolute;background:#CBD5E1;height:2px}
+  .pipe.v{width:2px;height:auto}
+
+  /* logbook row */
+  .lb-row{
+    background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;margin:0 14px 8px;
+  }
+  .lb-row .lb-h{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .lb-row .lb-name{font-size:13.5px;font-weight:600;color:var(--ink)}
+  .lb-row .lb-eq{font-size:11.5px;color:var(--ink-3);margin-top:1px}
+  .lb-row .lb-rng{font-size:11px;color:var(--ink-3);margin-top:6px;font-family:'DM Mono',monospace}
+  .lb-row .lb-rng b{color:var(--ink)}
+  .lb-input{
+    margin-top:10px;display:flex;align-items:center;gap:8px;
+    background:#F8FAFC;border:1px solid var(--line);border-radius:10px;padding:8px 10px;
+  }
+  .lb-input input{
+    border:none;background:transparent;outline:none;font-size:14px;font-weight:600;
+    color:var(--ink);font-family:'DM Mono',monospace;width:90px;
+  }
+  .lb-input.bad{background:#FEF2F2;border-color:#FCA5A5}
+  .lb-input.bad input{color:var(--crit)}
+  .lb-input .unit{font-size:12px;color:var(--ink-3);font-family:'DM Mono',monospace}
+  .lb-input .last{margin-left:auto;font-size:11px;color:var(--ink-3)}
+  .lb-actions{display:flex;gap:6px;margin-top:8px}
+  .lb-actions .btn-sm{font-size:11.5px;padding:5px 9px}
+
+  /* tasks kanban */
+  .kanban{display:flex;gap:12px;overflow-x:auto;padding:4px 14px 6px;scroll-snap-type:x mandatory;scrollbar-width:none}
+  .kanban::-webkit-scrollbar{display:none}
+  .kcol{flex:0 0 270px;scroll-snap-align:start;background:#F1F5F9;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;max-height:calc(844px - 220px)}
+  .kcol .kh{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600;color:var(--ink-2);text-transform:uppercase;letter-spacing:.05em;padding:0 2px 4px}
+  .kcol .kh .ct{background:#fff;color:var(--ink-2);font-size:11px;padding:1px 7px;border-radius:999px;text-transform:none;letter-spacing:0}
+  .kcard{background:#fff;border-radius:12px;padding:11px 12px;border:1px solid var(--line)}
+  .kcard.overdue{border-left:3px solid var(--crit)}
+  .kcard.today{border-left:3px solid var(--warn)}
+  .kcard.up{border-left:3px solid var(--prog)}
+  .kcard.done{border-left:3px solid var(--ok);opacity:.85}
+  .kcard .kt{font-size:13px;font-weight:600;color:var(--ink);line-height:1.3}
+  .kcard .ke{font-size:11px;color:var(--ink-3);margin-top:2px}
+  .kcard .kf{display:flex;align-items:center;justify-content:space-between;margin-top:9px}
+  .kcard .due{font-size:11px;color:var(--ink-3);font-family:'DM Mono',monospace}
+  .kcard .due.late{color:var(--crit)}
+  .kcard .btn-mini{font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:8px;background:var(--ink);color:#fff;border:none;cursor:pointer}
+  .kcard .btn-mini.ghost{background:#F1F5F9;color:var(--ink-2)}
+
+  /* equipment card */
+  .eq-card{margin:0 14px;background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden}
+  .eq-head{padding:16px;display:flex;gap:12px;align-items:center;border-bottom:1px solid var(--line-2)}
+  .eq-vis{width:54px;height:54px;border-radius:14px;background:#F1F5F9;display:flex;align-items:center;justify-content:center;font-size:24px}
+  .eq-name{font-size:16px;font-weight:600}
+  .eq-asset{font-size:12px;color:var(--ink-3);margin-top:1px}
+  .sensor-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line-2)}
+  .sensor{background:#fff;padding:12px 14px}
+  .sensor .sn{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+  .sensor .sv{font-size:18px;font-weight:600;margin-top:3px;font-family:'DM Mono',monospace}
+  .sensor .sv .u{font-size:11px;color:var(--ink-3);font-family:'DM Sans';font-weight:500;margin-left:4px}
+  .sensor .st{font-size:11px;color:var(--ok);margin-top:3px;font-weight:600}
+  .sensor.bad .sv{color:var(--crit)}
+  .sensor.bad .st{color:var(--crit)}
+  .sensor.warn .sv{color:var(--warn)}
+  .sensor.warn .st{color:var(--warn)}
+
+  /* bottom nav */
+  .navbar{
+    flex-shrink:0;background:rgba(255,255,255,.92);backdrop-filter:blur(18px);
+    border-top:1px solid var(--line);
+    display:flex;padding:10px 8px 18px;gap:2px;
+  }
+  .navitem{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:3px;padding:6px 2px;border-radius:12px;color:var(--ink-3);cursor:pointer;font-size:10.5px;font-weight:600;
+  }
+  .navitem.active{color:var(--ink)}
+  .navitem.active .navi{background:var(--ink);color:#fff}
+  .navitem .navi{width:38px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:transparent;color:var(--ink-3)}
+  .navitem.active .navi{background:var(--ink);color:#fff}
+
+  /* states gallery (alarm bar / task / issue states) */
+  .state-grid{
+    display:grid;grid-template-columns:1fr;gap:10px;padding:14px;
+  }
+  .state-grid .lab{font-size:11px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
+
+  /* progress dots */
+  .pdots{display:flex;gap:4px;margin-top:6px}
+  .pdots i{width:6px;height:6px;border-radius:50%;background:#E2E8F0;display:block}
+  .pdots i.on{background:var(--ink)}
+  .pdots i.now{background:var(--ink);box-shadow:0 0 0 3px rgba(15,23,42,.12)}
+
+  /* tabs (issues sub) */
+  .seg{
+    margin:6px 14px 4px;background:#E2E8F0;border-radius:12px;padding:3px;display:flex;gap:2px;
+  }
+  .seg button{
+    flex:1;border:none;background:transparent;padding:7px 6px;border-radius:9px;font-size:12px;font-weight:600;color:var(--ink-3);cursor:pointer;
+  }
+  .seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(15,23,42,.06)}
+
+  /* search */
+  .search{
+    margin:0 14px;background:#fff;border:1px solid var(--line);border-radius:12px;
+    padding:10px 12px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-3);
+  }
+
+  /* notes */
+  .hint{font-size:11.5px;color:var(--ink-3);padding:0 18px}
+
+  svg.ic{width:18px;height:18px;display:block}
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <h1>Digital Paani — Operator PWA</h1>
+  <p>Mobile-first decision system. 390×844 frames. Tap any frame to interact — Issue card steps, Kanban scroll, alarm bar states, and bottom nav are live.</p>
+</div>
+
+<div class="gallery">
+
+  <!-- ============================================================ -->
+  <!-- FRAME 1 · PLANT (SCADA) — landing -->
+  <!-- ============================================================ -->
+  <div class="frame-wrap">
+    <div class="frame-label">1 · Plant (SCADA)</div>
+    <div class="phone" id="phone-plant">
+      <div class="status"><span>9:41</span><span class="right">●●● 5G ▮</span></div>
+
+      <div class="topbar">
+        <div>
+          <div class="ttl">Plant</div>
+          <div class="sub">Honda Manesar · Shift A</div>
+        </div>
+        <div class="row gap-2">
+          <div class="icon-btn">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 21l-4.3-4.3"/><circle cx="11" cy="11" r="7"/></svg>
+          </div>
+          <div class="avatar">RM</div>
+        </div>
+      </div>
+
+      <div class="scroll">
+        <!-- Active alarm -->
+        <div class="alarm state-active" onclick="goto('issue')">
+          <div class="pill">⚠</div>
+          <div class="body">
+            <div class="lbl">Active Issue · 18 min</div>
+            <div class="msg">Aeration Tank — Low Biomass (SV30↓)</div>
+            <div class="meta">Auto-triggered by DT-006 breach</div>
+          </div>
+          <svg class="ic chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+
+        <div class="h-section" style="padding-top:14px">Plant Overview</div>
+
+        <!-- SCADA -->
+        <div class="scada">
+          <!-- pipes -->
+          <div class="pipe" style="left:78px;top:54px;width:62px"></div>
+          <div class="pipe" style="left:200px;top:54px;width:60px"></div>
+          <div class="pipe v" style="left:170px;top:90px;height:50px"></div>
+          <div class="pipe" style="left:78px;top:172px;width:160px"></div>
+          <div class="pipe v" style="left:280px;top:54px;height:118px"></div>
+
+          <div class="node ok" style="left:14px;top:36px"><span class="dot-st"></span><div class="nm">Inlet</div><div class="vl">120 m³/h</div></div>
+          <div class="node ok" style="left:130px;top:36px"><span class="dot-st"></span><div class="nm">Eq. Tank</div><div class="vl">OK</div></div>
+          <div class="node crit" style="left:130px;top:140px"><span class="dot-st"></span><div class="nm">Aeration</div><div class="vl">SV30 14%</div></div>
+          <div class="node warn" style="left:14px;top:155px"><span class="dot-st"></span><div class="nm">Blower-2</div><div class="vl">DO 1.2</div></div>
+          <div class="node ok" style="left:248px;top:36px"><span class="dot-st"></span><div class="nm">Clarifier</div><div class="vl">OK</div></div>
+          <div class="node maint" style="left:248px;top:155px"><span class="dot-st"></span><div class="nm">Filter-A</div><div class="vl">Maint.</div></div>
+        </div>
+
+        <!-- legend -->
+        <div class="row gap-3" style="padding:10px 18px 4px;flex-wrap:wrap">
+          <span class="chip ok dot">Healthy</span>
+          <span class="chip warn dot">Warning</span>
+          <span class="chip crit dot">Critical</span>
+          <span class="chip idle dot">Maintenance</span>
+        </div>
+
+        <div class="h-section">Issue Highlight</div>
+        <div style="margin:0 14px">
+          <div class="issue-card">
+            <div class="head">
+              <div class="icon">⚠</div>
+              <div style="flex:1">
+                <div class="ttl">Low biomass — Aeration Tank</div>
+                <div class="eq">CMFS · DT-006 + SV30</div>
+                <div class="meta">
+                  <span class="chip crit">Critical</span>
+                  <span class="chip idle">SLA 1d</span>
+                  <span class="chip violet">Auto-detected</span>
+                </div>
+              </div>
+            </div>
+            <div style="padding:0 14px 8px">
+              <div class="row between" style="font-size:11.5px;color:var(--ink-3)">
+                <span>SV30 — last 7 days</span>
+                <span style="font-family:'DM Mono';color:var(--crit);font-weight:600">14% ↓</span>
+              </div>
+              <div class="trend">
+                <i style="height:62%"></i><i style="height:58%"></i><i style="height:54%"></i>
+                <i class="warn" style="height:42%"></i><i class="warn" style="height:34%"></i>
+                <i class="cur" style="height:22%"></i><i class="cur" style="height:14%"></i>
+              </div>
+              <div style="background:#F8FAFC;border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:12px;color:var(--ink-2);margin-top:4px">
+                <b style="color:var(--ink)">Suggested fix · </b>Stop sludge wasting for 48h, monitor SV30 every 8h.
+              </div>
+            </div>
+            <div class="foot">
+              <span class="timer">Triggered 18m ago</span>
+              <button class="btn btn-primary btn-sm" onclick="goto('issue')">View Issue</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="h-section">Logbook · 2:30 PM <span class="ct">3 pending</span></div>
+        <div style="margin:0 14px 14px">
+          <div class="card">
+            <div class="row between">
+              <div>
+                <div style="font-size:13.5px;font-weight:600">Shift A bulk entry</div>
+                <div style="font-size:11.5px;color:var(--ink-3);margin-top:2px">10 sensors · 7 done · 3 pending</div>
+              </div>
+              <div class="chip warn">3 left</div>
+            </div>
+            <div class="sla" style="margin-top:10px"><i style="width:70%;background:var(--warn)"></i></div>
+            <button class="btn btn-primary mt-3" onclick="goto('logbook')">Fill Logbook</button>
+          </div>
+        </div>
+
+        <div style="height:8px"></div>
+      </div>
+
+      <!-- bottom nav -->
+      <div class="navbar">
+        <div class="navitem" onclick="goto('issues')">
+          <div class="navi"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.7 3.86a2 2 0 00-3.4 0z"/></svg></div>
+          Issues
+        </div>
+        <div class="navitem" onclick="goto('tasks')">
+          <div class="navi"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+          Tasks
+        </div>
+        <div class="navitem active">
+          <div class="navi"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21V12h6v9"/></svg></div>
+          Plant
+        </div>
+        <div class="navitem">
+          <div class="navi"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M5 12h14"/></svg></div>
+          Report
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- FRAME 2 · ISSUES list -->
+  <!-- ============================================================ -->
+  <div class="frame-wrap">
+    <div class="frame-label">2 · Issues (Primary)</div>
+    <div class="phone" id="phone-issues">
+      <div class="status"><span>9:41</span><span class="right">●●● 5G ▮</span></div>
+      <div class="topbar">
+        <div>
+          <div class="ttl">Issues</div>
+          <div class="sub">3 active · 1 monitoring</div>
+        </div>
+        <div class="row gap-2">
+          <div class="icon-btn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg></div>
+          <div class="avatar">RM</div>
+        </div>
+      </div>
+
+      <div class="alarm state-new">
+        <div class="pill">⚠</div>
+        <div class="body">
+          <div class="lbl">New · 32 sec ago</div>
+          <div class="msg">Blower-2 — DO dropped to 0.8 mg/L</div>
+          <div class="meta">Tap to acknowledge & open</div>
+        </div>
+        <svg class="ic chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+
+      <div class="seg" style="margin-top:12px">
+        <button class="on">Unresolved (3)</button>
+        <button>Open (5)</button>
+        <button>Monitoring (1)</button>
+        <button>Done</button>
+      </div>
+
+      <div class="scroll" style="padding-bottom:12px">
+        <div class="h-section" style="padding-top:10px">Unresolved</div>
+
+        <div style="margin:0 14px 10px">
+          <div class="issue-card">
+            <div class="head">
+              <div class="icon">⚠</div>
+              <div style="flex:1">
+                <div class="ttl">Low biomass — Aeration Tank</div>
+                <div class="eq">CMFS · DT-006 + SV30</div>
+                <div class="meta">
+                  <span class="chip crit">Open</span>
+                  <span class="chip violet">Auto</span>
+                </div>
+              </div>
+            </div>
+            <div class="foot">
+              <span class="timer">18m ago · SLA 1d</span>
+              <button class="btn btn-primary btn-sm" onclick="goto('issue')">Start Investigation</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin:0 14px 10px">
+          <div class="issue-card">
+            <div class="head">
+              <div class="icon prog">⏵</div>
+              <div style="flex:1">
+                <div class="ttl">Filter-A backwash incomplete</div>
+                <div class="eq">Filter House · Manual report</div>
+                <div class="meta">
+                  <span class="chip prog">In progress</span>
+                  <span class="chip idle">Step 3 / 5</span>
+                </div>
+                <div class="pdots"><i class="on"></i><i class="on"></i><i class="now"></i><i></i><i></i></div>
+              </div>
+            </div>
+            <div class="foot">
+              <span class="timer">2h ago · SLA 4h left</span>
+              <button class="btn btn-primary btn-sm">Continue</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin:0 14px 10px">
+          <div class="issue-card">
+            <div class="head">
+              <div class="icon warn">!</div>
+              <div style="flex:1">
+                <div class="ttl">pH out-of-range — Equalisation</div>
+                <div class="eq">Logbook flag · Row 4</div>
+                <div class="meta">
+                  <span class="chip warn">Open</span>
+                  <span class="chip idle">Logbook</span>
+                </div>
+              </div>
+            </div>
+            <div class="foot">
+              <span class="timer">42m ago</span>
+              <button class="btn btn-primary btn-sm">Start</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="h-section">Monitoring</div>
+        <div style="margin:0 14px 10px">
+          <div class="issue-card">
+            <div class="head">
+              <div class="icon ok">✓</div>
+              <div style="flex:1">
+                <div class="ttl">High turbidity — Clarifier</div>
+                <div class="eq">SV30 stabilising</div>
+                <div class="meta">
+                  <span class="chip ok">Verifying</span>
+                </div>
+              </div>
+            </div>
+            <div class="foot">
+              <span class="timer">Auto-resolves in 6h</span>
+              <button class="btn btn-outline btn-sm">Monitoring</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="h-section">Resolved · Today</div>
+        <div style="margin:0 14px 14px">
+          <div class="issue-card" style="opacity:.85">
+            <div class="head">
+              <div class="icon ok">✓</div>
+              <div style="flex:1">
+                <div class="ttl">Low DO — Aeration (recovered)</div>
+                <div class="eq">DT-008 · 4h to resolution</div>
+                <div class="meta"><span class="chip ok">Resolved</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="navbar">
+        <div class="navitem active">
+          <div class="navi"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.7 3.86a2 2 0 00-3.4 0z"/></svg></div>
+          Issues
+        </div>
+        <div class="navitem" onclick="goto('tasks')">
+          <div class="navi"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+          Tasks
+        </div>
+        <div class="navitem" onclick="goto('plant')">
+          <div class="navi"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21V12h6v9"/></svg></div>
+          Plant
+        </div>
+        <div class="navitem">
+          <div class="navi"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M5 12h14"/></svg></div>
+          Report
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- FRAME 3 · ISSUE detail (progressive diagnostic flow) -->
+  <!-- ============================================================ -->
+  <div class="frame-wrap">
+    <div class="frame-label">3 · Issue Card · Diagnostic Flow</div>
+    <div class="phone" id="phone-issue">
+      <div class="status"><span>9:41</span><span class="right">●●● 5G ▮</span></div>
+
+      <div class="topbar">
+        <div class="row gap-2" style="flex:1">
+          <div class="icon-btn" onclick="goto('issues')">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          </div>
+          <div>
+            <div class="ttl" style="font-size:16px">Issue · CMFS-014</div>
+            <div class="sub">Aeration Tank · 18m ago</div>
+          </div>
+        </div>
+        <div class="icon-btn">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+        </div>
+      </div>
+
+      <div class="scroll">
+        <!-- header card -->
+        <div style="margin:0 14px 12px">
+          <div class="issue-card">
+            <div class="head">
+              <div class="icon">⚠</div>
+              <div style="flex:1">
+                <div class="ttl">Low biomass — एरेशन टैंक में जीवाणु</div>
+                <div class="eq">DT-006 + SV30 · Honda Manesar</div>
+                <div class="meta">
+                  <span class="chip crit">Critical</span>
+                  <span class="chip prog">Step 3 / 6</span>
+                  <span class="chip violet">Auto</span>
+                </div>
+                <div class="pdots"><i class="on"></i><i class="on"></i><i class="now"></i><i></i><i></i><i></i></div>
+              </div>
+            </div>
+            <div style="padding:0 14px 12px">
+              <div class="row between" style="font-size:11.5px;color:var(--ink-3)">
+                <span>SLA · 1 day</span><span>22h 12m left</span>
+              </div>
+              <div class="sla"><i style="width:8%"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="h-section" style="padding-top:0">Diagnostic Flow</div>
+
+        <!-- Step 0 done -->
+        <div class="step done" data-idx="0">
+          <div class="step-head" onclick="toggleStep(0)">
+            <div class="step-num">✓</div>
+            <div>
+              <div class="step-ttl">SV30 trend reviewed</div>
+              <div class="step-sub">7-day decline confirmed · auto</div>
+            </div>
+            <div class="step-meta">
+              <span class="chip violet">System</span>
+              <svg class="ic chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+          </div>
+          <div class="step-body">
+            <div class="trend" style="height:56px">
+              <i style="height:74%"></i><i style="height:64%"></i><i style="height:58%"></i>
+              <i class="warn" style="height:46%"></i><i class="warn" style="height:34%"></i>
+              <i class="cur" style="height:24%"></i><i class="cur" style="height:14%"></i>
+            </div>
+            <div style="font-size:12px;color:var(--ink-3)">Sudden drop flagged on Day 5. Auto-advanced to Q1.</div>
+          </div>
+        </div>
+
+        <!-- Step 1 done -->
+        <div class="step done" data-idx="1">
+          <div class="step-head" onclick="toggleStep(1)">
+            <div class="step-num">✓</div>
+            <div>
+              <div class="step-ttl">Water colour — Brown</div>
+              <div class="step-sub">Healthy biomass · operator confirmed</div>
+            </div>
+            <div class="step-meta">
+              <span class="chip warn">Visual</span>
+              <svg class="ic chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+          </div>
+          <div class="step-body">
+            <div style="font-size:12.5px;color:var(--ink-2)">Aeration Tank में पानी का रंग कैसा है?</div>
+            <div class="branch ok"><div class="b-dot">✓</div><div><div class="b-cond">Brown / Tea-coloured</div><div class="b-out">Selected · proceeding to Q2</div></div></div>
+          </div>
+        </div>
+
+        <!-- Step 2 active -->
+        <div class="step active" data-idx="2">
+          <div class="step-head" onclick="toggleStep(2)">
+            <div class="step-num">3</div>
+            <div>
+              <div class="step-ttl">Sludge wasting — last 3 days</div>
+              <div class="step-sub">Choose what records show</div>
+            </div>
+            <div class="step-meta">
+              <span class="chip violet">System</span>
+              <svg class="ic chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+          </div>
+          <div class="step-body">
+            <div style="font-size:12.5px;color:var(--ink-2);margin-bottom:4px">Auto-pulled from logbook records (last 72h)</div>
+            <div class="branch ok" onclick="resolveBranch(this,'over-wasting')">
+              <div class="b-dot">📅</div>
+              <div>
+                <div class="b-cond">Wasting daily or more</div>
+                <div class="b-out">Over-wasting → stop wasting 48h, monitor SV30 every 12h</div>
+              </div>
+            </div>
+            <div class="branch warn" onclick="resolveBranch(this,'no-wasting')">
+              <div class="b-dot">?</div>
+              <div>
+                <div class="b-cond">No recent wasting</div>
+                <div class="b-out">Unexplained decline → continue to inlet check</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3 locked -->
+        <div class="step" data-idx="3">
+          <div class="step-head" onclick="toggleStep(3)">
+            <div class="step-num">4</div>
+            <div>
+              <div class="step-ttl">Inlet appearance check</div>
+              <div class="step-sub">Visual · 2 branches</div>
+            </div>
+            <div class="step-meta">
+              <span class="chip idle">Locked</span>
+              <svg class="ic chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+          </div>
+          <div class="step-body">
+            <div style="font-size:12.5px;color:var(--ink-2)">Inlet का पानी आज सामान्य दिख रहा है?</div>
+            <div class="branch crit"><div class="b-dot">⚗</div><div><div class="b-cond">Unusual colour / smell</div><div class="b-out">🚨 Escalate · open inlet bypass</div></div></div>
+            <div class="branch ok"><div class="b-dot">✓</div><div><div class="b-cond">Looks normal</div><div class="b-out">Inlet not the cause → DO entry</div></div></div>
+          </div>
+        </div>
+
+        <!-- Step 4 locked -->
+        <div class="step" data-idx="4">
+          <div class="step-head" onclick="toggleStep(4)">
+            <div class="step-num">5</div>
+            <div>
+              <div class="step-ttl">DO manual entry</div>
+              <div class="step-sub">No live sensor</div>
+            </div>
+            <div class="step-meta">
+              <span class="chip idle">Locked</span>
+              <svg class="ic chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+          </div>
+          <div class="step-body">
+            <div class="lb-input"><input value="" placeholder="—" /><span class="unit">mg/L</span><span class="last">Range 1–4</span></div>
+          </div>
+        </div>
+
+        <!-- Step 5 locked -->
+        <div class="step" data-idx="5">
+          <div class="step-head" onclick="toggleStep(5)">
+            <div class="step-num">6</div>
+            <div>
+              <div class="step-ttl">Final decision</div>
+              <div class="step-sub">System re-checks SV30</div>
+            </div>
+            <div class="step-meta">
+              <span class="chip idle">Locked</span>
+              <svg class="ic chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+          </div>
+          <div class="step-body">
+            <div style="font-size:12px;color:var(--ink-3)">Resolves automatically when SV30 &gt; 30% within 48h, otherwise escalates to engineer.</div>
+          </div>
+        </div>
+
+        <div style="height:80px"></div>
+      </div>
+
+      <!-- sticky CTA -->
+      <div style="position:absolute;left:0;right:0;bottom:0;padding:12px 14px 22px;background:linear-gradient(180deg,rgba(247,248,250,0),rgba(247,248,250,1) 30%);">
+        <div class="row gap-2">
+          <button class="btn btn-outline" style="flex:0 0 110px">Add Note</button>
+          <button class="btn btn-primary" style="flex:1">Continue Step 3</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- FRAME 4 · TASKS Kanban -->
+  <!-- ============================================================ -->
+  <div class="frame-wrap">
+    <div class="frame-label">4 · Tasks · Kanban</div>
+    <div class="phone" id="phone-tasks">
+      <div class="status"><span>9:41</span><span class="right">●●● 5G ▮</span></div>
+      <div class="topbar">
+        <div>
+          <div class="ttl">Tasks</div>
+          <div class="sub">Shift A · 8 today · 1 overdue</div>
+        </div>
+        <div class="row gap-2">
+          <div class="icon-btn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg></div>
+          <div class="avatar">RM</div>
+        </div>
+      </div>
+
+      <!-- filters -->
+      <div class="row gap-2" style="padding:0 14px;overflow-x:auto;scrollbar-width:none">
+        <span class="chip idle">All Equipment</span>
+        <span class="chip idle">All Priority</span>
+        <span class="chip idle">All Types</span>
+      </div>
+
+      <div class="hint" style="padding:8px 18px 4px">Swipe columns →</div>
+
+      <div class="scroll">
+        <div class="kanban">
+          <!-- Today -->
+          <div class="kcol">
+            <div class="kh"><span>Today</span><span class="ct">3</span></div>
+            <div class="kcard today">
+              <div class="kt">Backwash Filter-A</div>
+              <div class="ke">Filter House · Maintenance</div>
+              <div class="kf"><span class="due">Due 11:00</span><button class="btn-mini">Start</button></div>
+            </div>
+            <div class="kcard today">
+              <div class="kt">DO &amp; pH check — Aeration</div>
+              <div class="ke">Logbook · Manual</div>
+              <div class="kf"><span class="due">Due 14:30</span><button class="btn-mini ghost">Pending</button></div>
+            </div>
+            <div class="kcard today">
+              <div class="kt">Inspect Blower-2 vibration</div>
+              <div class="ke">Equipment · Inspection</div>
+              <div class="kf"><span class="due">Due 16:00</span><button class="btn-mini ghost">Pending</button></div>
+            </div>
+          </div>
+
+          <!-- Upcoming -->
+          <div class="kcol">
+            <div class="kh"><span>Upcoming</span><span class="ct">2</span></div>
+            <div class="kcard up">
+              <div class="kt">Calibrate pH probe</div>
+              <div class="ke">Equipment · Maintenance</div>
+              <div class="kf"><span class="due">Tomorrow 09:00</span><button class="btn-mini ghost">Pending</button></div>
+            </div>
+            <div class="kcard up">
+              <div class="kt">Sludge wasting log review</div>
+              <div class="ke">CMFS · Data entry</div>
+              <div class="kf"><span class="due">Apr 27 · 15:00</span><button class="btn-mini ghost">Pending</button></div>
+            </div>
+          </div>
+
+          <!-- Overdue -->
+          <div class="kcol">
+            <div class="kh"><span>Overdue</span><span class="ct" style="background:var(--crit-bg);color:var(--crit)">1</span></div>
+            <div class="kcard overdue">
+              <div class="kt">Replace UV lamp #3</div>
+              <div class="ke">Disinfection · Maintenance</div>
+              <div class="kf"><span class="due late">Overdue 1d 4h</span><button class="btn-mini">Start</button></div>
+            </div>
+            <div class="kcard overdue" style="opacity:.95">
+              <div class="kt">Abnormal SV30 — open issue?</div>
+              <div class="ke">Aeration · Finding</div>
+              <div class="kf"><span class="due late">Found 18m</span><button class="btn-mini" style="background:var(--crit)">Create Issue</button></div>
+            </div>
+          </div>
+
+          <!-- Done -->
+          <div class="kcol">
+            <div class="kh"><span>Done</span><span class="ct">4</span></div>
+            <div class="kcard done">
+              <div class="kt">Morning DO entry</div>
+              <div class="ke">Logbook · 08:30</div>
+              <div class="kf"><span class="due">Submitted 08:34</span><button class="btn-mini ghost">View</button></div>
+            </div>
+            <div class="kcard done">
+              <div class="kt">Inlet flow inspection</div>
+              <div class="ke">Inlet · 09:00</div>
+              <div class="kf"><span class="due">Submitted 09:12</span><button class="btn-mini ghost">View</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="navbar">
+        <div class="navitem" onclick="goto('issues')">
+          <div class="navi"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.7 3.86a2 2 0 00-3.4 0z"/></svg></div>
+          Issues
+        </div>
+        <div class="navitem active">
+          <div class="navi"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+          Tasks
+        </div>
+        <div class="navitem" onclick="goto('plant')">
+          <div class="navi"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21V12h6v9"/></svg></div>
+          Plant
+        </div>
+        <div class="navitem">
+          <div class="navi"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M5 12h14"/></svg></div>
+          Report
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- FRAME 5 · LOGBOOK -->
+  <!-- ============================================================ -->
+  <div class="frame-wrap">
+    <div class="frame-label">5 · Logbook · Bulk entry</div>
+    <div class="phone" id="phone-logbook">
+      <div class="status"><span>9:41</span><span class="right">●●● 5G ▮</span></div>
+      <div class="topbar">
+        <div class="row gap-2" style="flex:1">
+          <div class="icon-btn" onclick="goto('plant')">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          </div>
+          <div>
+            <div class="ttl" style="font-size:18px">Logbook</div>
+            <div class="sub">Apr 26 · 2:30 PM · 7 of 10</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm">Template</button>
+      </div>
+
+      <div class="search" style="margin-bottom:10px">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 21l-4.3-4.3"/><circle cx="11" cy="11" r="7"/></svg>
+        Search sensor or equipment…
+      </div>
+
+      <div style="padding:0 14px 8px">
+        <div class="sla"><i style="width:70%;background:var(--ok)"></i></div>
+        <div class="row between" style="font-size:11.5px;color:var(--ink-3);margin-top:4px"><span>Progress</span><span>3 left · ~2 min</span></div>
+      </div>
+
+      <div class="scroll">
+        <div class="h-section" style="padding-top:6px">Aeration Tank · Clarifier</div>
+
+        <!-- ok row -->
+        <div class="lb-row">
+          <div class="lb-h">
+            <div>
+              <div class="lb-name">Methyl orange alkalinity</div>
+              <div class="lb-eq">Clarifier · Water Quality</div>
+            </div>
+            <span class="chip ok">Safe</span>
+          </div>
+          <div class="lb-rng">Valid <b>50–150</b> · Safe <b>80–120</b> mg/L</div>
+          <div class="lb-input"><input value="98" /><span class="unit">mg/L</span><span class="last">Last 310 · 13 Apr</span></div>
+        </div>
+
+        <!-- bad row -->
+        <div class="lb-row">
+          <div class="lb-h">
+            <div>
+              <div class="lb-name">BOT — Filter House</div>
+              <div class="lb-eq">Water Quality · 8</div>
+            </div>
+            <span class="chip crit">Out of range</span>
+          </div>
+          <div class="lb-rng">Valid <b>10–90</b> · Safe <b>30–70</b> mg/L</div>
+          <div class="lb-input bad"><input value="125" /><span class="unit">mg/L</span><span class="last">Last 15 · 11 Mar</span></div>
+          <div class="lb-actions">
+            <button class="btn btn-outline btn-sm">Add note</button>
+            <button class="btn btn-danger btn-sm" onclick="goto('issues')">Create Issue</button>
+          </div>
+        </div>
+
+        <!-- pending -->
+        <div class="lb-row">
+          <div class="lb-h">
+            <div>
+              <div class="lb-name">COD — Filter House</div>
+              <div class="lb-eq">Water Quality · 9</div>
+            </div>
+            <span class="chip warn">Pending</span>
+          </div>
+          <div class="lb-rng">Valid <b>50–100</b> · Safe <b>80–120</b> mg/L</div>
+          <div class="lb-input"><input value="" placeholder="Enter value" /><span class="unit">mg/L</span><span class="last">Last 77 · 11 Mar</span></div>
+        </div>
+
+        <!-- yes/no -->
+        <div class="lb-row">
+          <div class="lb-h">
+            <div>
+              <div class="lb-name">Pressure Test — Tank 1</div>
+              <div class="lb-eq">STP · IOP</div>
+            </div>
+            <span class="chip warn">Pending</span>
+          </div>
+          <div class="row gap-2 mt-2">
+            <button class="btn btn-outline btn-sm" style="flex:1">Yes</button>
+            <button class="btn btn-outline btn-sm" style="flex:1">No</button>
+          </div>
+        </div>
+
+        <!-- media only -->
+        <div class="lb-row">
+          <div class="lb-h">
+            <div>
+              <div class="lb-name">Lab test photo — Tank 1</div>
+              <div class="lb-eq">STP · Verification</div>
+            </div>
+            <span class="chip warn">Pending</span>
+          </div>
+          <button class="btn btn-outline btn-sm mt-2" style="width:100%;justify-content:flex-start">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h4l2-3h6l2 3h4v13H3z"/><circle cx="12" cy="13" r="4"/></svg>
+            Take photo / upload
+          </button>
+        </div>
+
+        <div style="height:90px"></div>
+      </div>
+
+      <!-- submit -->
+      <div style="position:absolute;left:0;right:0;bottom:0;padding:12px 14px 22px;background:linear-gradient(180deg,rgba(247,248,250,0),rgba(247,248,250,1) 30%)">
+        <button class="btn btn-primary">Submit Logbook · 7 of 10</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- FRAME 6 · EQUIPMENT card detail -->
+  <!-- ============================================================ -->
+  <div class="frame-wrap">
+    <div class="frame-label">6 · Equipment Card</div>
+    <div class="phone" id="phone-eq">
+      <div class="status"><span>9:41</span><span class="right">●●● 5G ▮</span></div>
+      <div class="topbar">
+        <div class="row gap-2" style="flex:1">
+          <div class="icon-btn" onclick="goto('plant')">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          </div>
+          <div>
+            <div class="ttl" style="font-size:18px">Aeration Tank</div>
+            <div class="sub">CMFS · DT-006</div>
+          </div>
+        </div>
+        <div class="icon-btn">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+        </div>
+      </div>
+
+      <div class="scroll">
+        <div class="alarm state-active" onclick="goto('issue')">
+          <div class="pill">⚠</div>
+          <div class="body">
+            <div class="lbl">1 active issue</div>
+            <div class="msg">Low biomass — investigation in progress</div>
+            <div class="meta">CMFS-014 · Step 3 of 6</div>
+          </div>
+          <svg class="ic chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+
+        <div class="h-section">Status</div>
+        <div class="eq-card">
+          <div class="eq-head">
+            <div class="eq-vis">🏭</div>
+            <div style="flex:1">
+              <div class="eq-name">Aeration Tank</div>
+              <div class="eq-asset">Asset #DT-006 · Biological process</div>
+            </div>
+            <span class="chip crit dot">Critical</span>
+          </div>
+          <div class="sensor-grid">
+            <div class="sensor bad">
+              <div class="sn">SV30</div>
+              <div class="sv">14<span class="u">%</span></div>
+              <div class="st">Below safe range</div>
+            </div>
+            <div class="sensor warn">
+              <div class="sn">DO</div>
+              <div class="sv">1.2<span class="u">mg/L</span></div>
+              <div class="st">Watch</div>
+            </div>
+            <div class="sensor">
+              <div class="sn">pH</div>
+              <div class="sv">7.2<span class="u"></span></div>
+              <div class="st">Safe</div>
+            </div>
+            <div class="sensor">
+              <div class="sn">Temp</div>
+              <div class="sv">28.4<span class="u">°C</span></div>
+              <div class="st">Safe</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="h-section">Active Issues <span class="ct">1</span></div>
+        <div style="margin:0 14px 4px">
+          <div class="issue-card">
+            <div class="head">
+              <div class="icon">⚠</div>
+              <div style="flex:1">
+                <div class="ttl">Low biomass — Aeration Tank</div>
+                <div class="eq">CMFS-014 · 18m ago</div>
+                <div class="meta"><span class="chip crit">Open</span><span class="chip prog">Step 3/6</span></div>
+              </div>
+            </div>
+            <div class="foot">
+              <span class="timer">SLA 22h left</span>
+              <button class="btn btn-primary btn-sm" onclick="goto('issue')">Continue</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="h-section">Tasks · Today <span class="ct">2</span></div>
+        <div style="margin:0 14px">
+          <div class="card mb-2">
+            <div class="row between">
+              <div>
+                <div style="font-size:13.5px;font-weight:600">DO &amp; pH check</div>
+                <div style="font-size:11.5px;color:var(--ink-3);margin-top:2px">Logbook · Due 14:30</div>
+              </div>
+              <button class="btn btn-primary btn-sm">Start</button>
+            </div>
+          </div>
+          <div class="card mb-2">
+            <div class="row between">
+              <div>
+                <div style="font-size:13.5px;font-weight:600">Sludge wasting log</div>
+                <div style="font-size:11.5px;color:var(--ink-3);margin-top:2px">CMFS · Due 16:00</div>
+              </div>
+              <button class="btn btn-ghost btn-sm">Pending</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:96px"></div>
+      </div>
+
+      <div style="position:absolute;left:0;right:0;bottom:0;padding:12px 14px 22px;background:linear-gradient(180deg,rgba(247,248,250,0),rgba(247,248,250,1) 30%)">
+        <div class="row gap-2">
+          <button class="btn btn-outline" style="flex:1">Maintenance Mode</button>
+          <button class="btn btn-danger" style="flex:1">Report Issue</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- FRAME 7 · STATES gallery (alarm + cards) -->
+  <!-- ============================================================ -->
+  <div class="frame-wrap">
+    <div class="frame-label">7 · States Gallery</div>
+    <div class="phone" id="phone-states">
+      <div class="status"><span>9:41</span><span class="right">●●● 5G ▮</span></div>
+      <div class="topbar">
+        <div>
+          <div class="ttl">States</div>
+          <div class="sub">Alarm bar · Issue · Task</div>
+        </div>
+      </div>
+
+      <div class="scroll">
+        <div class="h-section" style="padding-top:6px">Alarm Bar</div>
+
+        <div class="state-grid" style="padding-top:0">
+          <div class="alarm state-new">
+            <div class="pill">⚠</div>
+            <div class="body">
+              <div class="lbl">New · 12 sec</div>
+              <div class="msg">Blower-2 — DO 0.8 mg/L</div>
+              <div class="meta">Pulses for 60 seconds</div>
+            </div>
+            <svg class="ic chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+          <div class="lab">New · pulsing 0–60s</div>
+
+          <div class="alarm state-active">
+            <div class="pill">⚠</div>
+            <div class="body">
+              <div class="lbl">Active · 18 min</div>
+              <div class="msg">Aeration — Low biomass</div>
+              <div class="meta">Solid red · calm but serious</div>
+            </div>
+            <svg class="ic chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+          <div class="lab">Active · acknowledged</div>
+
+          <div class="alarm state-progress">
+            <div class="pill">⏵</div>
+            <div class="body">
+              <div class="lbl">In progress · Step 3/6</div>
+              <div class="msg">Diagnostic flow running</div>
+              <div class="meta">Operator working</div>
+            </div>
+            <svg class="ic chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+          <div class="lab">In progress · blue</div>
+
+          <div class="alarm state-resolved">
+            <div class="pill">✓</div>
+            <div class="body">
+              <div class="lbl">Resolved · just now</div>
+              <div class="msg">DO recovered to 2.4 mg/L</div>
+              <div class="meta">Fades to neutral after 60s</div>
+            </div>
+            <svg class="ic chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+          <div class="lab">Resolved · green → fade</div>
+
+          <div class="alarm state-idle">
+            <div class="pill">·</div>
+            <div class="body">
+              <div class="lbl">All systems</div>
+              <div class="msg">No active alarms</div>
+              <div class="meta">Plant nominal</div>
+            </div>
+          </div>
+          <div class="lab">Idle · neutral</div>
+        </div>
+
+        <div class="h-section">Issue Card</div>
+        <div style="padding:0 14px;display:flex;flex-direction:column;gap:10px">
+          <div class="issue-card">
+            <div class="head">
+              <div class="icon">⚠</div>
+              <div style="flex:1">
+                <div class="ttl">Open</div>
+                <div class="eq">Not started · Start Investigation</div>
+                <div class="meta"><span class="chip crit">Open</span></div>
+              </div>
+            </div>
+            <div class="foot"><span class="timer">3m ago</span><button class="btn btn-primary btn-sm">Start</button></div>
+          </div>
+          <div class="issue-card">
+            <div class="head">
+              <div class="icon prog">⏵</div>
+              <div style="flex:1">
+                <div class="ttl">In progress</div>
+                <div class="eq">Step 3 / 6 · Continue</div>
+                <div class="meta"><span class="chip prog">In progress</span></div>
+                <div class="pdots"><i class="on"></i><i class="on"></i><i class="now"></i><i></i><i></i><i></i></div>
+              </div>
+            </div>
+            <div class="foot"><span class="timer">SLA 22h</span><button class="btn btn-primary btn-sm">Continue</button></div>
+          </div>
+          <div class="issue-card">
+            <div class="head">
+              <div class="icon ok">✓</div>
+              <div style="flex:1">
+                <div class="ttl">Verifying</div>
+                <div class="eq">Auto-resolves on stable readings</div>
+                <div class="meta"><span class="chip ok">Verifying</span></div>
+              </div>
+            </div>
+            <div class="foot"><span class="timer">6h to clear</span><button class="btn btn-outline btn-sm">Monitoring</button></div>
+          </div>
+          <div class="issue-card" style="opacity:.85">
+            <div class="head">
+              <div class="icon ok">✓</div>
+              <div style="flex:1">
+                <div class="ttl">Resolved</div>
+                <div class="eq">View / Dismiss</div>
+                <div class="meta"><span class="chip ok">Resolved</span></div>
+              </div>
+            </div>
+            <div class="foot"><span class="timer">2h ago</span><button class="btn btn-outline btn-sm">View</button></div>
+          </div>
+        </div>
+
+        <div class="h-section">Task Card</div>
+        <div style="padding:0 14px;display:flex;flex-direction:column;gap:8px">
+          <div class="kcard today">
+            <div class="kt">Pending — Backwash Filter-A</div>
+            <div class="ke">Filter House · Due 11:00</div>
+            <div class="kf"><span class="due">Due in 1h 20m</span><button class="btn-mini">Start</button></div>
+          </div>
+          <div class="kcard up">
+            <div class="kt">In progress — DO check</div>
+            <div class="ke">Aeration · 2 of 4 steps</div>
+            <div class="kf"><span class="due">Started 14:02</span><button class="btn-mini">Continue</button></div>
+          </div>
+          <div class="kcard overdue">
+            <div class="kt">Overdue — UV lamp #3</div>
+            <div class="ke">Disinfection</div>
+            <div class="kf"><span class="due late">Overdue 1d 4h</span><button class="btn-mini">Start</button></div>
+          </div>
+          <div class="kcard done">
+            <div class="kt">Completed — Morning DO entry</div>
+            <div class="ke">Logbook</div>
+            <div class="kf"><span class="due">Submitted 08:34</span><button class="btn-mini ghost">View</button></div>
+          </div>
+          <div class="kcard overdue">
+            <div class="kt">Abnormal finding</div>
+            <div class="ke">SV30 below range during inspection</div>
+            <div class="kf"><span class="due late">Found 18m ago</span><button class="btn-mini" style="background:var(--crit)">Create Issue</button></div>
+          </div>
+        </div>
+
+        <div style="height:24px"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Phone-to-phone navigation: scrolls the gallery to the chosen frame
+  function goto(name){
+    const map = {
+      plant:'phone-plant',
+      issues:'phone-issues',
+      issue:'phone-issue',
+      tasks:'phone-tasks',
+      logbook:'phone-logbook',
+      eq:'phone-eq',
+      states:'phone-states'
+    };
+    const el = document.getElementById(map[name]);
+    if(el) el.scrollIntoView({behavior:'smooth',block:'center',inline:'center'});
+  }
+
+  // Progressive Issue card: only one step open at a time, locked steps still open to preview
+  function toggleStep(idx){
+    const phone = document.getElementById('phone-issue');
+    const steps = phone.querySelectorAll('.step');
+    steps.forEach(s=>{
+      const i = +s.dataset.idx;
+      if(i===idx){ s.classList.toggle('active'); }
+      else{ s.classList.remove('active'); }
+    });
+  }
+
+  // Branch click: simulate selection by marking step done and advancing to next
+  function resolveBranch(el, key){
+    const step = el.closest('.step');
+    if(!step) return;
+    // mark current done
+    step.classList.remove('active');
+    step.classList.add('done');
+    step.querySelector('.step-num').textContent = '✓';
+    // open next step
+    const idx = +step.dataset.idx;
+    const next = document.querySelector(`#phone-issue .step[data-idx="${idx+1}"]`);
+    if(next){
+      next.classList.add('active');
+      const meta = next.querySelector('.step-meta .chip.idle');
+      if(meta) meta.remove();
+    }
+  }
+
+  // Cycle alarm states demo on the states phone (subtle: every 6s the resolved one fades and re-greens)
+  // (kept as a no-op to avoid distraction; uncomment to animate)
+</script>
+
+</body>
+</html>
