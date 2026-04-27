@@ -53,9 +53,9 @@
     <main class="absolute inset-0 pt-12 pb-32 overflow-y-auto">
       <div class="px-5 pt-3 pb-2 flex items-center justify-between">
         <div>
-          <div class="text-[11px] uppercase tracking-[.16em] text-ink-500 font-semibold">Issues</div>
-          <h2 class="text-[20px] font-bold leading-none mt-0.5">Saare issues</h2>
-          <div class="text-[11px] text-ink-500 mt-1">Shift A · 9:00 AM – 5:00 PM</div>
+          <div class="text-[11px] uppercase tracking-[.16em] text-ink-500 font-semibold">समस्याएँ</div>
+          <h2 class="text-[20px] font-bold leading-none mt-0.5">सभी समस्याएँ</h2>
+          <div class="text-[11px] text-ink-500 mt-1">शिफ्ट A · 9 बजे – 5 बजे</div>
         </div>
         <a href="report.html" class="tap w-10 h-10 rounded-full bg-ink-900 text-white grid place-items-center" aria-label="Report new">
           <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -70,10 +70,10 @@
               <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"><path d="M12 3l9 16H3l9-16Z" stroke="white" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v4" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="white"/></svg>
             </span>
             <div class="flex-1 min-w-0">
-              <div class="text-[11px] uppercase tracking-wider opacity-80 font-semibold">Naya Issue · Active</div>
-              <div class="text-[14px] font-semibold truncate">Aeration Blower #2 — High vibration</div>
+              <div class="text-[11px] uppercase tracking-wider opacity-80 font-semibold">नई समस्या · सक्रिय</div>
+              <div class="text-[14px] font-semibold truncate">एयरेशन ब्लोअर #2 — कंपन ज़्यादा</div>
             </div>
-            <span class="text-[11px] opacity-80 tabular-nums">2 min</span>
+            <span class="text-[11px] opacity-80 tabular-nums">2 मि.</span>
             <svg class="w-4 h-4 opacity-80" viewBox="0 0 20 20" fill="none"><path d="M7 4l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
         </a>
@@ -82,10 +82,10 @@
       <!-- Tabs (4 segments, scrollable) -->
       <div class="mt-3 px-5">
         <div class="flex gap-1.5 overflow-x-auto" id="issueTabs" style="scrollbar-width:none">
-          <button class="tab-pill active text-[12px] font-semibold px-3 py-1.5 rounded-full bg-ink-100 text-ink-700" data-tab="unresolved">Unresolved <span class="count ml-1 tabular-nums text-crit font-bold">3</span></button>
-          <button class="tab-pill text-[12px] font-semibold px-3 py-1.5 rounded-full bg-ink-100 text-ink-700" data-tab="open">Open <span class="count ml-1 tabular-nums">5</span></button>
-          <button class="tab-pill text-[12px] font-semibold px-3 py-1.5 rounded-full bg-ink-100 text-ink-700" data-tab="transferred">Transferred <span class="count ml-1 tabular-nums">2</span></button>
-          <button class="tab-pill text-[12px] font-semibold px-3 py-1.5 rounded-full bg-ink-100 text-ink-700" data-tab="resolved">Resolved <span class="count ml-1 tabular-nums">12</span></button>
+          <button class="tab-pill active text-[12px] font-semibold px-3 py-1.5 rounded-full bg-ink-100 text-ink-700" data-tab="unresolved">हल नहीं हुए <span class="count ml-1 tabular-nums text-crit font-bold">3</span></button>
+          <button class="tab-pill text-[12px] font-semibold px-3 py-1.5 rounded-full bg-ink-100 text-ink-700" data-tab="open">खुले <span class="count ml-1 tabular-nums">5</span></button>
+          <button class="tab-pill text-[12px] font-semibold px-3 py-1.5 rounded-full bg-ink-100 text-ink-700" data-tab="transferred">पुरानी शिफ्ट <span class="count ml-1 tabular-nums">2</span></button>
+          <button class="tab-pill text-[12px] font-semibold px-3 py-1.5 rounded-full bg-ink-100 text-ink-700" data-tab="resolved">हल हुए <span class="count ml-1 tabular-nums">12</span></button>
         </div>
       </div>
 
@@ -93,7 +93,7 @@
       <section id="pane-unresolved" class="pane active px-5 mt-3 space-y-2.5">
         <div class="text-[10.5px] uppercase tracking-wider font-bold text-ink-500 px-1 flex items-center gap-2">
           <span class="w-1.5 h-1.5 rounded-full bg-crit"></span>
-          Unresolved · need attention
+          हल नहीं हुए · ध्यान दें
         </div>
 
         <a href="plant.html" class="tap block rounded-2xl bg-white shadow-card p-3.5">
@@ -101,16 +101,16 @@
             <span class="mt-0.5 w-2 h-2 rounded-full bg-crit shrink-0 animate-pulse"></span>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="text-[10px] uppercase tracking-wider font-bold text-crit">Critical</span>
+                <span class="text-[10px] uppercase tracking-wider font-bold text-crit">गंभीर</span>
                 <span class="text-[10px] text-ink-400">·</span>
                 <span class="text-[10px] text-ink-500">#IS-2041</span>
                 <span class="text-[10px] text-ink-400">·</span>
-                <span class="text-[10px] text-ink-500">2 min ago</span>
+                <span class="text-[10px] text-ink-500">2 मिनट पहले</span>
               </div>
-              <div class="text-[14px] font-semibold leading-tight mt-0.5">Aeration Blower #2 — Vibration high</div>
+              <div class="text-[14px] font-semibold leading-tight mt-0.5">एयरेशन ब्लोअर #2 — कंपन ज़्यादा</div>
               <div class="text-[11.5px] text-ink-500 mt-1">Bearing temp 82° · Vibration 8.4 mm/s</div>
               <div class="mt-2 flex items-center gap-1.5">
-                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-crit/10 text-crit">Unassigned</span>
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-crit/10 text-crit">किसी को नहीं दिया</span>
                 <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-ink-100 text-ink-700">Aeration</span>
               </div>
             </div>
@@ -123,16 +123,16 @@
             <span class="mt-0.5 w-2 h-2 rounded-full bg-crit shrink-0"></span>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="text-[10px] uppercase tracking-wider font-bold text-crit">Critical</span>
+                <span class="text-[10px] uppercase tracking-wider font-bold text-crit">गंभीर</span>
                 <span class="text-[10px] text-ink-400">·</span>
                 <span class="text-[10px] text-ink-500">#IS-2038</span>
                 <span class="text-[10px] text-ink-400">·</span>
-                <span class="text-[10px] text-ink-500">1 hr ago</span>
+                <span class="text-[10px] text-ink-500">1 घंटे पहले</span>
               </div>
               <div class="text-[14px] font-semibold leading-tight mt-0.5">Inlet pH 9.2 — out of range</div>
               <div class="text-[11.5px] text-ink-500 mt-1">From completed task · Reading abnormal</div>
               <div class="mt-2 flex items-center gap-1.5">
-                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-crit/10 text-crit">Unassigned</span>
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-crit/10 text-crit">किसी को नहीं दिया</span>
                 <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-ink-100 text-ink-700">Inlet</span>
               </div>
             </div>
@@ -144,16 +144,16 @@
             <span class="mt-0.5 w-2 h-2 rounded-full bg-warn shrink-0"></span>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="text-[10px] uppercase tracking-wider font-bold text-warn">Warning</span>
+                <span class="text-[10px] uppercase tracking-wider font-bold text-warn">चेतावनी</span>
                 <span class="text-[10px] text-ink-400">·</span>
                 <span class="text-[10px] text-ink-500">#IS-2039</span>
                 <span class="text-[10px] text-ink-400">·</span>
-                <span class="text-[10px] text-ink-500">26 min ago</span>
+                <span class="text-[10px] text-ink-500">26 मिनट पहले</span>
               </div>
               <div class="text-[14px] font-semibold leading-tight mt-0.5">Equalization tank — Level 88%</div>
-              <div class="text-[11.5px] text-ink-500 mt-1">Inlet surge above design flow</div>
+              <div class="text-[11.5px] text-ink-500 mt-1">इनलेट प्रवाह सीमा से ज़्यादा</div>
               <div class="mt-2 flex items-center gap-1.5">
-                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-warn/15 text-warn">Monitor</span>
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-warn/15 text-warn">देखते रहें</span>
                 <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-ink-100 text-ink-700">Equalization</span>
               </div>
             </div>
@@ -165,7 +165,7 @@
       <section id="pane-open" class="pane px-5 mt-3 space-y-2.5">
         <div class="text-[10.5px] uppercase tracking-wider font-bold text-ink-500 px-1 flex items-center gap-2">
           <span class="w-1.5 h-1.5 rounded-full bg-prog"></span>
-          Open · in progress
+          खुले · चल रहे हैं
         </div>
 
         <a href="plant.html" class="tap block rounded-2xl bg-white shadow-card p-3.5">
@@ -173,11 +173,11 @@
             <span class="mt-0.5 w-2 h-2 rounded-full bg-prog shrink-0"></span>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="text-[10px] uppercase tracking-wider font-bold text-prog">In Progress</span>
+                <span class="text-[10px] uppercase tracking-wider font-bold text-prog">चल रहा है</span>
                 <span class="text-[10px] text-ink-400">·</span>
                 <span class="text-[10px] text-ink-500">#IS-2040</span>
                 <span class="text-[10px] text-ink-400">·</span>
-                <span class="text-[10px] text-ink-500">Step 3 of 5</span>
+                <span class="text-[10px] text-ink-500">Step 3 / 5</span>
               </div>
               <div class="text-[14px] font-semibold leading-tight mt-0.5">Blower #2 diagnostic flow</div>
               <div class="text-[11.5px] text-ink-500 mt-1">DO sample collected · awaiting result</div>
@@ -185,7 +185,7 @@
                 <span class="w-5 h-5 rounded-full bg-ink-900 text-white text-[9px] font-bold grid place-items-center">RA</span>
                 <span class="text-[10.5px] text-ink-700 font-medium">Ranjana A.</span>
                 <span class="text-[10px] text-ink-400">·</span>
-                <span class="text-[10px] text-ink-500">5 min</span>
+                <span class="text-[10px] text-ink-500">5 मि.</span>
               </div>
             </div>
             <svg class="w-4 h-4 text-ink-400 mt-1" viewBox="0 0 20 20" fill="none"><path d="M7 4l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -197,12 +197,12 @@
             <span class="mt-0.5 w-2 h-2 rounded-full bg-prog shrink-0"></span>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="text-[10px] uppercase tracking-wider font-bold text-prog">In Progress</span>
+                <span class="text-[10px] uppercase tracking-wider font-bold text-prog">चल रहा है</span>
                 <span class="text-[10px] text-ink-400">·</span>
                 <span class="text-[10px] text-ink-500">#IS-2034</span>
               </div>
               <div class="text-[14px] font-semibold leading-tight mt-0.5">Clarifier scraper jammed</div>
-              <div class="text-[11.5px] text-ink-500 mt-1">Maintenance team on site · ETA 30 min</div>
+              <div class="text-[11.5px] text-ink-500 mt-1">मेन्टेनेंस टीम मौजूद · अनुमान 30 मि.</div>
               <div class="mt-2 flex items-center gap-1.5">
                 <span class="w-5 h-5 rounded-full bg-ink-900 text-white text-[9px] font-bold grid place-items-center">SK</span>
                 <span class="text-[10.5px] text-ink-700 font-medium">Sandeep K.</span>
@@ -216,12 +216,12 @@
             <span class="mt-0.5 w-2 h-2 rounded-full bg-prog shrink-0"></span>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="text-[10px] uppercase tracking-wider font-bold text-prog">In Progress</span>
+                <span class="text-[10px] uppercase tracking-wider font-bold text-prog">चल रहा है</span>
                 <span class="text-[10px] text-ink-400">·</span>
                 <span class="text-[10px] text-ink-500">#IS-2031</span>
               </div>
               <div class="text-[14px] font-semibold leading-tight mt-0.5">RAS pump — pressure low</div>
-              <div class="text-[11.5px] text-ink-500 mt-1">Spare part ordered · awaiting delivery</div>
+              <div class="text-[11.5px] text-ink-500 mt-1">स्पेयर ऑर्डर हो गया · आने का इंतज़ार</div>
             </div>
           </div>
         </div>
@@ -231,12 +231,12 @@
       <section id="pane-transferred" class="pane px-5 mt-3 space-y-2.5">
         <div class="rounded-xl bg-warn/10 px-3 py-2.5 flex items-center gap-2" style="background:#FEF3E0">
           <svg class="w-4 h-4 text-warn shrink-0" viewBox="0 0 20 20" fill="none"><path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span class="text-[11.5px] text-ink-700 font-semibold flex-1">Last shift se 2 issues handover hue hain</span>
+          <span class="text-[11.5px] text-ink-700 font-semibold flex-1">पिछली शिफ्ट से 2 समस्याएँ आई हैं</span>
         </div>
 
         <div class="text-[10.5px] uppercase tracking-wider font-bold text-ink-500 px-1 mt-3 flex items-center gap-2">
           <span class="w-1.5 h-1.5 rounded-full bg-warn"></span>
-          From Shift C · 6:00 AM handover
+          शिफ्ट C से · 6:00 AM हैंडओवर
         </div>
 
         <div class="rounded-2xl bg-white shadow-card p-3.5">
@@ -244,14 +244,14 @@
             <span class="mt-0.5 w-2 h-2 rounded-full bg-warn shrink-0"></span>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="text-[10px] uppercase tracking-wider font-bold text-warn">Transferred</span>
+                <span class="text-[10px] uppercase tracking-wider font-bold text-warn">पुरानी शिफ्ट</span>
                 <span class="text-[10px] text-ink-400">·</span>
                 <span class="text-[10px] text-ink-500">#IS-2027</span>
                 <span class="text-[10px] text-ink-400">·</span>
-                <span class="text-[10px] text-ink-500">8 hrs old</span>
+                <span class="text-[10px] text-ink-500">8 घंटे पुराना</span>
               </div>
               <div class="text-[14px] font-semibold leading-tight mt-0.5">MBBR media — uneven distribution</div>
-              <div class="text-[11.5px] text-ink-500 mt-1">Visual check needed · low priority handover</div>
+              <div class="text-[11.5px] text-ink-500 mt-1">देखकर जांच ज़रूरी · कम प्राथमिकता वाला हैंडओवर</div>
 
               <!-- Handover note -->
               <div class="mt-2 rounded-lg bg-paper p-2.5 shadow-line">
@@ -264,8 +264,8 @@
               </div>
 
               <div class="mt-2 flex items-center gap-1.5">
-                <button class="tap rounded-lg bg-ink-900 text-white text-[11px] font-semibold px-2.5 py-1.5">Accept</button>
-                <button class="tap rounded-lg bg-white shadow-line text-ink-700 text-[11px] font-semibold px-2.5 py-1.5">Decline</button>
+                <button class="tap rounded-lg bg-ink-900 text-white text-[11px] font-semibold px-2.5 py-1.5">स्वीकार</button>
+                <button class="tap rounded-lg bg-white shadow-line text-ink-700 text-[11px] font-semibold px-2.5 py-1.5">अस्वीकार</button>
                 <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-ink-100 text-ink-700 ml-auto">MBBR</span>
               </div>
             </div>
@@ -277,14 +277,14 @@
             <span class="mt-0.5 w-2 h-2 rounded-full bg-crit shrink-0"></span>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="text-[10px] uppercase tracking-wider font-bold text-warn">Transferred</span>
+                <span class="text-[10px] uppercase tracking-wider font-bold text-warn">पुरानी शिफ्ट</span>
                 <span class="text-[10px] text-ink-400">·</span>
                 <span class="text-[10px] text-ink-500">#IS-2024</span>
                 <span class="text-[10px] text-ink-400">·</span>
-                <span class="text-[10px] text-crit font-bold">12 hrs old</span>
+                <span class="text-[10px] text-crit font-bold">12 घंटे पुराना</span>
               </div>
               <div class="text-[14px] font-semibold leading-tight mt-0.5">Outlet chlorinator — leak from valve</div>
-              <div class="text-[11.5px] text-ink-500 mt-1">Temporary clamp applied · permanent fix pending</div>
+              <div class="text-[11.5px] text-ink-500 mt-1">अस्थायी क्लैम्प लगाया · पक्की मरम्मत बाकी</div>
 
               <div class="mt-2 rounded-lg bg-paper p-2.5 shadow-line">
                 <div class="flex items-center gap-2">
@@ -292,12 +292,12 @@
                   <span class="text-[11px] text-ink-700 font-semibold">Ravi V. · Shift C</span>
                   <span class="text-[10px] text-ink-400 ml-auto">5:55 AM</span>
                 </div>
-                <div class="text-[11.5px] text-ink-700 mt-1.5 leading-snug">"Valve leak hai, abhi clamp lagaya hai. Spare valve store mein hai — ASAP replace karna."</div>
+                <div class="text-[11.5px] text-ink-700 mt-1.5 leading-snug">"Valve leak hai, abhi clamp lagaya hai. स्पेयर वाल्व स्टोर में है — ASAP replace karna."</div>
               </div>
 
               <div class="mt-2 flex items-center gap-1.5">
-                <button class="tap rounded-lg bg-crit text-white text-[11px] font-semibold px-2.5 py-1.5">Accept · High</button>
-                <button class="tap rounded-lg bg-white shadow-line text-ink-700 text-[11px] font-semibold px-2.5 py-1.5">Decline</button>
+                <button class="tap rounded-lg bg-crit text-white text-[11px] font-semibold px-2.5 py-1.5">स्वीकार · ज़रूरी</button>
+                <button class="tap rounded-lg bg-white shadow-line text-ink-700 text-[11px] font-semibold px-2.5 py-1.5">अस्वीकार</button>
                 <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-ink-100 text-ink-700 ml-auto">Outlet</span>
               </div>
             </div>
@@ -305,11 +305,11 @@
         </div>
       </section>
 
-      <!-- ===== Resolved ===== -->
+      <!-- ===== हल हुए ===== -->
       <section id="pane-resolved" class="pane px-5 mt-3 space-y-2.5">
         <div class="text-[10.5px] uppercase tracking-wider font-bold text-ink-500 px-1 flex items-center gap-2">
           <span class="w-1.5 h-1.5 rounded-full bg-ok"></span>
-          Resolved · today
+          हल हुए · आज
         </div>
 
         <div class="rounded-2xl bg-white shadow-line p-3.5 opacity-95">
@@ -319,7 +319,7 @@
             </span>
             <div class="flex-1 min-w-0">
               <div class="text-[14px] font-semibold leading-tight">MBBR DO drop — recovered</div>
-              <div class="text-[11.5px] text-ink-500 mt-1">Resolved at 8:12 AM · Action: aerator restart</div>
+              <div class="text-[11.5px] text-ink-500 mt-1">हल हुए at 8:12 AM · Action: aerator restart</div>
               <div class="mt-1.5 flex items-center gap-1.5">
                 <span class="w-4 h-4 rounded-full bg-ink-900 text-white text-[8px] font-bold grid place-items-center">RA</span>
                 <span class="text-[10px] text-ink-500">Ranjana A.</span>
@@ -335,7 +335,7 @@
             </span>
             <div class="flex-1 min-w-0">
               <div class="text-[14px] font-semibold leading-tight">Bar screen — debris cleared</div>
-              <div class="text-[11.5px] text-ink-500 mt-1">Resolved at 7:40 AM · Manual cleaning done</div>
+              <div class="text-[11.5px] text-ink-500 mt-1">हल हुए at 7:40 AM · हाथ से सफाई हो गई</div>
             </div>
           </div>
         </div>
@@ -347,13 +347,13 @@
             </span>
             <div class="flex-1 min-w-0">
               <div class="text-[14px] font-semibold leading-tight">Inlet flow surge — normalized</div>
-              <div class="text-[11.5px] text-ink-500 mt-1">Resolved at 7:05 AM · Auto‑recovered</div>
+              <div class="text-[11.5px] text-ink-500 mt-1">हल हुए at 7:05 AM · अपने आप ठीक हुआ</div>
             </div>
           </div>
         </div>
 
         <div class="text-center pt-2 pb-1">
-          <button class="tap text-[11.5px] text-ink-700 font-semibold">Show 9 more</button>
+          <button class="tap text-[11.5px] text-ink-700 font-semibold">और 9 दिखाएं</button>
         </div>
       </section>
 
@@ -366,19 +366,19 @@
         <a href="issues.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-900 relative">
           <span class="absolute -top-0.5 w-8 h-1 rounded-full bg-ink-900"></span>
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M12 3l9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10l9-7Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
-          <span class="text-[10px] font-bold">Issues</span>
+          <span class="text-[10px] font-bold">समस्याएँ</span>
         </a>
         <a href="tasks.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-500">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 3v4M16 3v4M4 10h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M9 14l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span class="text-[10px] font-medium">Tasks</span>
+          <span class="text-[10px] font-medium">काम</span>
         </a>
         <a href="plant.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-500">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M3 12c2 0 2-3 5-3s3 3 5 3 2-3 5-3 3 3 3 3v8H3v-8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="6" r="2.2" stroke="currentColor" stroke-width="1.7"/></svg>
-          <span class="text-[10px] font-medium">Plant</span>
+          <span class="text-[10px] font-medium">प्लांट</span>
         </a>
         <a href="report.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-500">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-          <span class="text-[10px] font-medium">Report</span>
+          <span class="text-[10px] font-medium">रिपोर्ट</span>
         </a>
       </div>
       <div class="mx-auto mb-2 h-1 w-32 rounded-full bg-ink-900/80"></div>

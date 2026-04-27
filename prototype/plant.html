@@ -110,12 +110,12 @@
       <!-- Header -->
       <div class="px-5 pt-3 pb-2 flex items-center justify-between">
         <div>
-          <div class="text-[11px] uppercase tracking-[.16em] text-ink-500 font-semibold">Plant</div>
+          <div class="text-[11px] uppercase tracking-[.16em] text-ink-500 font-semibold">प्लांट</div>
           <div class="flex items-center gap-1.5 mt-0.5">
             <h2 class="text-[20px] font-bold leading-none">Honda Manesar STP</h2>
             <svg class="w-4 h-4 text-ink-500" viewBox="0 0 20 20" fill="none"><path d="M6 8l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
-          <div class="text-[11px] text-ink-500 mt-1" id="lastUpdate">Live · updated 12s ago</div>
+          <div class="text-[11px] text-ink-500 mt-1" id="lastUpdate">लाइव · 12 सेक. पहले अपडेट</div>
         </div>
         <button class="tap w-10 h-10 rounded-full bg-white shadow-line grid place-items-center" aria-label="Profile">
           <span class="w-7 h-7 rounded-full bg-ink-900 text-white text-[11px] font-semibold grid place-items-center">RA</span>
@@ -131,8 +131,8 @@
               <svg id="alarmIcon" class="w-3.5 h-3.5 relative" viewBox="0 0 24 24" fill="none"><path d="M12 3l9 16H3l9-16Z" stroke="white" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v4" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="white"/></svg>
             </span>
             <div class="flex-1 min-w-0">
-              <div id="alarmKicker" class="text-[11px] uppercase tracking-wider opacity-80 font-semibold">Naya Issue · Active</div>
-              <div id="alarmTitle" class="text-[14px] font-semibold truncate">Aeration Blower #2 — High vibration</div>
+              <div id="alarmKicker" class="text-[11px] uppercase tracking-wider opacity-80 font-semibold">नई समस्या · सक्रिय</div>
+              <div id="alarmTitle" class="text-[14px] font-semibold truncate">एयरेशन ब्लोअर #2 — कंपन ज़्यादा</div>
             </div>
             <div id="alarmTime" class="text-[11px] opacity-80 font-medium tabular-nums">2 min</div>
             <svg class="w-4 h-4 opacity-80" viewBox="0 0 20 20" fill="none"><path d="M7 4l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -145,8 +145,8 @@
         <div class="bg-white rounded-2xl shadow-card overflow-hidden">
           <div class="flex items-center justify-between px-4 pt-3.5 pb-2">
             <div class="flex items-center gap-2">
-              <div class="text-[13px] font-semibold">Plant Overview</div>
-              <span class="text-[10px] px-1.5 py-0.5 rounded-md bg-ink-200 text-ink-700 font-semibold uppercase tracking-wider">Live</span>
+              <div class="text-[13px] font-semibold">प्लांट का दृश्य</div>
+              <span class="text-[10px] px-1.5 py-0.5 rounded-md bg-ink-200 text-ink-700 font-semibold uppercase tracking-wider">लाइव</span>
             </div>
             <div class="flex items-center gap-1">
               <button class="tap text-[11px] font-medium px-2.5 py-1 rounded-lg bg-ink-900 text-white">Flow</button>
@@ -188,7 +188,7 @@
             </svg>
 
             <div id="tapHint" class="absolute right-3 top-3 bg-ink-900 text-white text-[10px] font-semibold rounded-md px-2 py-1 shadow-pop animate-rise">
-              Tap any equipment
+              किसी भी मशीन पर टैप करें
               <span class="absolute -bottom-1 right-3 w-2 h-2 bg-ink-900 rotate-45"></span>
             </div>
           </div>
@@ -212,13 +212,13 @@
               <span class="mt-0.5 w-2 h-2 rounded-full bg-crit shrink-0" id="severityDot"></span>
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2">
-                  <span class="text-[10px] uppercase tracking-wider font-bold text-crit" id="severityLabel">Critical</span>
+                  <span class="text-[10px] uppercase tracking-wider font-bold text-crit" id="severityLabel">गंभीर</span>
                   <span class="text-[10px] text-ink-500">· #IS-2041</span>
                 </div>
-                <div class="text-[14px] font-semibold leading-tight mt-0.5" id="issueTitle">Aeration Blower #2 — Vibration ke ucch level</div>
-                <div class="text-[11.5px] text-ink-500 mt-0.5">Bearing temp + vibration cross threshold</div>
+                <div class="text-[14px] font-semibold leading-tight mt-0.5" id="issueTitle">एयरेशन ब्लोअर #2 — कंपन ज़्यादा</div>
+                <div class="text-[11.5px] text-ink-500 mt-0.5">बेयरिंग तापमान + कंपन सीमा से ऊपर</div>
               </div>
-              <button class="tap text-[11px] font-medium text-ink-500 px-2 py-1" onclick="snooze()">Snooze</button>
+              <button class="tap text-[11px] font-medium text-ink-500 px-2 py-1" onclick="snooze()">बाद में</button>
             </div>
 
             <div class="px-4 pb-3">
@@ -240,7 +240,7 @@
                 </div>
               </div>
               <button class="tap mt-3 w-full rounded-xl bg-crit text-white font-semibold py-3.5 text-[14px] flex items-center justify-center gap-2" onclick="goStep(0)">
-                Start Diagnostic
+                जांच शुरू करें
                 <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none"><path d="M7 4l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </button>
             </div>
@@ -256,7 +256,7 @@
                 <div class="text-[10px] uppercase tracking-wider font-bold text-ink-500" data-step-counter></div>
                 <div class="text-[13px] font-bold leading-tight" data-step-title></div>
               </div>
-              <button class="tap text-[11px] font-medium text-ink-500" onclick="goIdle()">Close</button>
+              <button class="tap text-[11px] font-medium text-ink-500" onclick="goIdle()">बंद</button>
             </div>
             <div class="px-4">
               <div class="flex items-center gap-1 mt-1 mb-2" data-step-bar></div>
@@ -268,8 +268,8 @@
             <div data-header></div>
             <div class="px-4 pb-4">
               <div class="rounded-xl bg-ink-900 text-white p-3.5">
-                <div class="text-[10.5px] uppercase tracking-wider opacity-70 font-semibold">System detected</div>
-                <div class="text-[14px] font-semibold mt-0.5 leading-snug">SV30 trending high — bulking suspected</div>
+                <div class="text-[10.5px] uppercase tracking-wider opacity-70 font-semibold">सिस्टम ने पाया</div>
+                <div class="text-[14px] font-semibold mt-0.5 leading-snug">SV30 बढ़ रहा है — बल्किंग संभव</div>
               </div>
 
               <div class="mt-3 rounded-xl bg-paper shadow-line p-3">
@@ -287,11 +287,11 @@
                   <circle cx="280" cy="30" r="4" fill="#E11D2E"/>
                   <circle cx="280" cy="30" r="8" fill="#E11D2E" fill-opacity=".18"/>
                   <g font-size="8" fill="#9AA3B2">
-                    <text x="0" y="106">D-7</text><text x="80" y="106">D-5</text><text x="160" y="106">D-3</text><text x="240" y="106">Today</text>
+                    <text x="0" y="106">D-7</text><text x="80" y="106">D-5</text><text x="160" y="106">D-3</text><text x="240" y="106">आज</text>
                   </g>
                 </svg>
                 <div class="grid grid-cols-3 gap-2 mt-2">
-                  <div class="rounded-lg bg-white p-2 shadow-line"><div class="text-[9px] text-ink-500 uppercase font-bold">Today</div><div class="text-[14px] font-bold tabular-nums text-crit">480</div></div>
+                  <div class="rounded-lg bg-white p-2 shadow-line"><div class="text-[9px] text-ink-500 uppercase font-bold">आज</div><div class="text-[14px] font-bold tabular-nums text-crit">480</div></div>
                   <div class="rounded-lg bg-white p-2 shadow-line"><div class="text-[9px] text-ink-500 uppercase font-bold">Avg 7d</div><div class="text-[14px] font-bold tabular-nums">340</div></div>
                   <div class="rounded-lg bg-white p-2 shadow-line"><div class="text-[9px] text-ink-500 uppercase font-bold">Δ</div><div class="text-[14px] font-bold tabular-nums text-crit">+41%</div></div>
                 </div>
@@ -308,11 +308,11 @@
           <div id="paneStep1" class="step-pane">
             <div data-header></div>
             <div class="px-4 pb-4">
-              <div class="text-[13px] text-ink-700 leading-snug">Aeration tank ka <span class="font-semibold text-ink-900">paani ka rang</span> kaisa dikh raha hai?</div>
+              <div class="text-[13px] text-ink-700 leading-snug">एयरेशन टैंक का <span class="font-semibold text-ink-900">पानी का रंग</span> कैसा दिख रहा है?</div>
               <div class="grid grid-cols-2 gap-2 mt-3" id="step1Options">
                 <button class="opt rounded-xl border border-ink-200 bg-white p-3 text-left" data-val="brown">
                   <span class="block w-6 h-6 rounded-full mb-2" style="background:#8B5E3C"></span>
-                  <div class="text-[13px] font-semibold">Brown</div><div class="text-[10.5px] text-ink-500">Healthy</div>
+                  <div class="text-[13px] font-semibold">Brown</div><div class="text-[10.5px] text-ink-500">ठीक</div>
                 </button>
                 <button class="opt rounded-xl border border-ink-200 bg-white p-3 text-left" data-val="black">
                   <span class="block w-6 h-6 rounded-full mb-2" style="background:#1F2937"></span>
@@ -327,7 +327,7 @@
                   <div class="text-[13px] font-semibold">White / Foamy</div><div class="text-[10.5px] text-ink-500">Bulking</div>
                 </button>
               </div>
-              <button id="step1Continue" disabled class="tap mt-3 w-full rounded-xl bg-ink-300 text-white font-semibold py-3.5 text-[14px]" onclick="goStep(2)">Continue</button>
+              <button id="step1Continue" disabled class="tap mt-3 w-full rounded-xl bg-ink-300 text-white font-semibold py-3.5 text-[14px]" onclick="goStep(2)">आगे बढ़ें</button>
             </div>
           </div>
 
@@ -336,14 +336,14 @@
             <div data-header></div>
             <div class="px-4 pb-4">
               <div class="rounded-xl bg-ink-900 text-white p-3.5">
-                <div class="text-[10.5px] uppercase tracking-wider opacity-70 font-semibold">System insight</div>
-                <div class="text-[14px] font-semibold mt-0.5 leading-snug">Sludge wasting overdue · SRT bahut high</div>
+                <div class="text-[10.5px] uppercase tracking-wider opacity-70 font-semibold">सिस्टम सुझाव</div>
+                <div class="text-[14px] font-semibold mt-0.5 leading-snug">स्लज वेस्टिंग देर से · SRT बहुत ज़्यादा</div>
               </div>
               <div class="mt-3 grid grid-cols-2 gap-2">
                 <div class="rounded-xl bg-paper shadow-line p-3">
-                  <div class="text-[10.5px] text-ink-500 uppercase font-bold">Last wasting</div>
+                  <div class="text-[10.5px] text-ink-500 uppercase font-bold">पिछली वेस्टिंग</div>
                   <div class="text-[18px] font-bold tabular-nums mt-0.5">18 <span class="text-[11px] font-medium text-ink-500">hrs ago</span></div>
-                  <div class="text-[10px] text-crit font-semibold mt-0.5">Target: every 8 hrs</div>
+                  <div class="text-[10px] text-crit font-semibold mt-0.5">Target: every 8 घंटे</div>
                 </div>
                 <div class="rounded-xl bg-paper shadow-line p-3">
                   <div class="text-[10.5px] text-ink-500 uppercase font-bold">SRT</div>
@@ -352,7 +352,7 @@
                 </div>
               </div>
               <div class="mt-3 rounded-xl bg-paper shadow-line p-3">
-                <div class="text-[11px] text-ink-500 font-semibold uppercase tracking-wider">Wasting timeline</div>
+                <div class="text-[11px] text-ink-500 font-semibold uppercase tracking-wider">वेस्टिंग समयरेखा</div>
                 <div class="relative mt-2 h-2 rounded-full bg-ink-200 overflow-hidden">
                   <div class="absolute inset-y-0 left-0 w-[40%] bg-ok"></div>
                   <div class="absolute inset-y-0 left-[40%] w-[35%] bg-warn"></div>
@@ -361,15 +361,15 @@
                 </div>
                 <div class="flex justify-between text-[10px] text-ink-400 mt-1.5 tabular-nums"><span>0h</span><span>8h</span><span>16h</span><span>24h</span></div>
               </div>
-              <button class="tap mt-3 w-full rounded-xl bg-ink-900 text-white font-semibold py-3.5 text-[14px]" onclick="goStep(3)">Continue</button>
+              <button class="tap mt-3 w-full rounded-xl bg-ink-900 text-white font-semibold py-3.5 text-[14px]" onclick="goStep(3)">आगे बढ़ें</button>
             </div>
           </div>
 
-          <!-- =================== Step 3 — Inlet condition (operator) =================== -->
+          <!-- =================== Step 3 — इनलेट की स्थिति (operator) =================== -->
           <div id="paneStep3" class="step-pane">
             <div data-header></div>
             <div class="px-4 pb-4">
-              <div class="text-[13px] text-ink-700 leading-snug"><span class="font-semibold text-ink-900">Inlet condition</span> kaisi hai? Visual check karein.</div>
+              <div class="text-[13px] text-ink-700 leading-snug"><span class="font-semibold text-ink-900">इनलेट की स्थिति</span> कैसी है? देखकर जांचें।</div>
               <div class="grid grid-cols-1 gap-2 mt-3" id="step3Options">
                 <button class="opt rounded-xl border border-ink-200 bg-white p-3 flex items-center gap-3" data-val="normal">
                   <span class="w-9 h-9 rounded-lg bg-ok/10 grid place-items-center"><svg class="w-4 h-4 text-ok" viewBox="0 0 20 20" fill="none"><path d="M5 10l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -388,7 +388,7 @@
                   <div class="flex-1 text-left"><div class="text-[13px] font-semibold">High flow / Surge</div><div class="text-[11px] text-ink-500">Above design limit</div></div>
                 </button>
               </div>
-              <button id="step3Continue" disabled class="tap mt-3 w-full rounded-xl bg-ink-300 text-white font-semibold py-3.5 text-[14px]" onclick="goStep(4)">Continue</button>
+              <button id="step3Continue" disabled class="tap mt-3 w-full rounded-xl bg-ink-300 text-white font-semibold py-3.5 text-[14px]" onclick="goStep(4)">आगे बढ़ें</button>
             </div>
           </div>
 
@@ -396,7 +396,7 @@
           <div id="paneStep4" class="step-pane">
             <div data-header></div>
             <div class="px-4 pb-4">
-              <div class="text-[13px] text-ink-700 leading-snug">DO meter ka <span class="font-semibold text-ink-900">manual reading</span> daalein.</div>
+              <div class="text-[13px] text-ink-700 leading-snug">DO मीटर की <span class="font-semibold text-ink-900">मैन्युअल रीडिंग</span> डालें।</div>
 
               <div class="mt-3 rounded-xl bg-paper shadow-line p-4">
                 <div class="text-[10.5px] text-ink-500 uppercase font-bold tracking-wider">Dissolved Oxygen</div>
@@ -413,7 +413,7 @@
                   <div id="doMarker" class="absolute -top-1 w-3 h-3 rounded-full bg-white shadow ring-2 ring-ink-900 transition-all" style="left:0%"></div>
                 </div>
                 <div class="flex justify-between text-[10px] text-ink-500 mt-1.5 tabular-nums"><span>0</span><span>1</span><span>2</span><span>4</span><span>5</span></div>
-                <div id="doVerdict" class="mt-2 text-[11.5px] text-ink-500">Ideal range: <span class="font-semibold text-ok">2 – 4 mg/L</span></div>
+                <div id="doVerdict" class="mt-2 text-[11.5px] text-ink-500">सही सीमा: <span class="font-semibold text-ok">2 – 4 mg/L</span></div>
               </div>
 
               <!-- Quick chips -->
@@ -424,7 +424,7 @@
                 <button class="tap text-[11px] font-medium px-2.5 py-1.5 rounded-lg bg-white shadow-line" onclick="setDO(4.6)">4.6</button>
               </div>
 
-              <button id="step4Continue" disabled class="tap mt-3 w-full rounded-xl bg-ink-300 text-white font-semibold py-3.5 text-[14px]" onclick="goStep(5)">Continue</button>
+              <button id="step4Continue" disabled class="tap mt-3 w-full rounded-xl bg-ink-300 text-white font-semibold py-3.5 text-[14px]" onclick="goStep(5)">आगे बढ़ें</button>
             </div>
           </div>
 
@@ -436,26 +436,26 @@
               <div class="rounded-xl bg-ok text-white p-4">
                 <div class="flex items-center gap-2">
                   <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="white" stroke-width="2"/><path d="M8 12l3 3 5-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  <div class="text-[10.5px] uppercase tracking-wider font-bold opacity-90">Resolution Suggested</div>
+                  <div class="text-[10.5px] uppercase tracking-wider font-bold opacity-90">हल का सुझाव</div>
                 </div>
-                <div class="text-[15px] font-semibold mt-1.5 leading-snug">Sludge wasting badhayein, aeration ko stable rakhein</div>
+                <div class="text-[15px] font-semibold mt-1.5 leading-snug">स्लज वेस्टिंग बढ़ाएं, एयरेशन स्थिर रखें</div>
               </div>
 
               <div class="mt-3 rounded-xl bg-paper shadow-line overflow-hidden">
-                <div class="px-3 py-2.5 text-[10.5px] uppercase tracking-wider font-bold text-ink-500 border-b border-ink-200">Action plan</div>
+                <div class="px-3 py-2.5 text-[10.5px] uppercase tracking-wider font-bold text-ink-500 border-b border-ink-200">कार्य योजना</div>
                 <ul class="divide-y divide-ink-200">
-                  <li class="px-3 py-2.5 flex items-start gap-2.5"><span class="mt-0.5 w-5 h-5 rounded-full bg-ink-900 text-white text-[10px] font-bold grid place-items-center">1</span><div class="text-[12.5px] flex-1">RAS pump 30 min ke liye <span class="font-semibold">+15%</span> par chalayein</div></li>
-                  <li class="px-3 py-2.5 flex items-start gap-2.5"><span class="mt-0.5 w-5 h-5 rounded-full bg-ink-900 text-white text-[10px] font-bold grid place-items-center">2</span><div class="text-[12.5px] flex-1">Sludge wasting 2 hrs ke andar karein</div></li>
-                  <li class="px-3 py-2.5 flex items-start gap-2.5"><span class="mt-0.5 w-5 h-5 rounded-full bg-ink-900 text-white text-[10px] font-bold grid place-items-center">3</span><div class="text-[12.5px] flex-1">DO ko <span class="font-semibold">2.5 mg/L</span> par maintain karein, har 30 min check</div></li>
+                  <li class="px-3 py-2.5 flex items-start gap-2.5"><span class="mt-0.5 w-5 h-5 rounded-full bg-ink-900 text-white text-[10px] font-bold grid place-items-center">1</span><div class="text-[12.5px] flex-1">RAS पंप 30 मिनट के लिए <span class="font-semibold">+15%</span> पर चलाएं</div></li>
+                  <li class="px-3 py-2.5 flex items-start gap-2.5"><span class="mt-0.5 w-5 h-5 rounded-full bg-ink-900 text-white text-[10px] font-bold grid place-items-center">2</span><div class="text-[12.5px] flex-1">Sludge wasting 2 घंटे ke andar karein</div></li>
+                  <li class="px-3 py-2.5 flex items-start gap-2.5"><span class="mt-0.5 w-5 h-5 rounded-full bg-ink-900 text-white text-[10px] font-bold grid place-items-center">3</span><div class="text-[12.5px] flex-1">DO को <span class="font-semibold">2.5 mg/L</span> पर रखें, हर 30 मिनट जांचें</div></li>
                 </ul>
               </div>
 
               <div class="mt-3 rounded-xl bg-white shadow-line p-3 text-[11px] text-ink-500">
-                <span class="font-semibold text-ink-700">Next check:</span> 2 ghante baad SV30 dobara measure karein.
+                <span class="font-semibold text-ink-700">अगली जांच:</span> 2 घंटे बाद SV30 दोबारा मापें।
               </div>
 
               <div class="grid grid-cols-2 gap-2 mt-3">
-                <button class="tap rounded-xl bg-ink-100 text-ink-900 font-semibold py-3.5 text-[13px]" onclick="goStep('escalate')">Escalate</button>
+                <button class="tap rounded-xl bg-ink-100 text-ink-900 font-semibold py-3.5 text-[13px]" onclick="goStep('escalate')">आगे बढ़ाएं</button>
                 <button class="tap rounded-xl bg-ok text-white font-semibold py-3.5 text-[14px] flex items-center justify-center gap-2" onclick="resolve()">
                   Resolve
                   <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none"><path d="M5 10l3 3 7-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -471,13 +471,13 @@
               <div class="rounded-xl bg-crit text-white p-4">
                 <div class="flex items-center gap-2">
                   <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M12 3l9 16H3l9-16Z" stroke="white" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v4" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="white"/></svg>
-                  <div class="text-[10.5px] uppercase tracking-wider font-bold opacity-90">Escalation Required</div>
+                  <div class="text-[10.5px] uppercase tracking-wider font-bold opacity-90">आगे बढ़ाना ज़रूरी</div>
                 </div>
-                <div class="text-[15px] font-semibold mt-1.5 leading-snug">Multiple parameters out of safe range — supervisor ko inform karein</div>
+                <div class="text-[15px] font-semibold mt-1.5 leading-snug">कई रीडिंग सीमा से बाहर — सुपरवाइज़र को बताएं</div>
               </div>
 
               <div class="mt-3 rounded-xl bg-paper shadow-line p-3">
-                <div class="text-[10.5px] text-ink-500 uppercase tracking-wider font-bold mb-2">Reason</div>
+                <div class="text-[10.5px] text-ink-500 uppercase tracking-wider font-bold mb-2">कारण</div>
                 <ul class="space-y-1.5 text-[12.5px]">
                   <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-crit"></span>SV30 480 ml/L (limit 450)</li>
                   <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-crit"></span>DO 0.8 mg/L (below 2.0)</li>
@@ -487,30 +487,30 @@
 
               <div class="mt-3 rounded-xl bg-white shadow-line p-3 flex items-center gap-3">
                 <span class="w-9 h-9 rounded-full bg-ink-900 text-white text-[12px] font-bold grid place-items-center">SK</span>
-                <div class="flex-1 min-w-0"><div class="text-[12.5px] font-semibold">Sandeep Kumar</div><div class="text-[10.5px] text-ink-500">Plant Supervisor · On-call</div></div>
-                <button class="tap rounded-lg bg-ink-100 px-3 py-2 text-[11px] font-semibold">Call</button>
+                <div class="flex-1 min-w-0"><div class="text-[12.5px] font-semibold">Sandeep Kumar</div><div class="text-[10.5px] text-ink-500">प्लांट सुपरवाइज़र · ऑन-कॉल</div></div>
+                <button class="tap rounded-lg bg-ink-100 px-3 py-2 text-[11px] font-semibold">कॉल</button>
               </div>
 
               <div class="grid grid-cols-2 gap-2 mt-3">
-                <button class="tap rounded-xl bg-ink-100 text-ink-900 font-semibold py-3.5 text-[13px]" onclick="goStep(5)">Back</button>
-                <button class="tap rounded-xl bg-crit text-white font-semibold py-3.5 text-[14px]" onclick="escalate()">Escalate Now</button>
+                <button class="tap rounded-xl bg-ink-100 text-ink-900 font-semibold py-3.5 text-[13px]" onclick="goStep(5)">पीछे</button>
+                <button class="tap rounded-xl bg-crit text-white font-semibold py-3.5 text-[14px]" onclick="escalate()">अभी आगे बढ़ाएं</button>
               </div>
             </div>
           </div>
 
-          <!-- Resolved (terminal state) -->
-          <div id="paneResolved" class="step-pane">
+          <!-- हल हुए (terminal state) -->
+          <div id="paneहल हुए" class="step-pane">
             <div class="px-4 pt-5 pb-5 text-center">
               <div class="mx-auto w-14 h-14 rounded-full bg-ok/15 grid place-items-center">
                 <svg class="w-7 h-7 text-ok" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M8 12l3 3 5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </div>
-              <div class="text-[15px] font-bold mt-3">Issue Resolved</div>
-              <div class="text-[11.5px] text-ink-500 mt-1">Action plan logged · Auto‑monitor 2 hrs</div>
+              <div class="text-[15px] font-bold mt-3">समस्या हल हुई</div>
+              <div class="text-[11.5px] text-ink-500 mt-1">कार्य योजना logged · 2 घं. ऑटो-मॉनिटर</div>
               <div class="mt-4 rounded-xl bg-paper shadow-line p-3 text-left">
-                <div class="text-[10.5px] uppercase tracking-wider font-bold text-ink-500">Summary</div>
-                <div class="text-[12.5px] mt-1 text-ink-700 leading-relaxed">Bulking suspected → wasting overdue → DO low → action: increase RAS, waste sludge, hold DO 2.5.</div>
+                <div class="text-[10.5px] uppercase tracking-wider font-bold text-ink-500">सारांश</div>
+                <div class="text-[12.5px] mt-1 text-ink-700 leading-relaxed">बल्किंग संभव → वेस्टिंग में देरी → DO कम → कार्य: RAS बढ़ाएं, स्लज वेस्ट करें, DO 2.5 पर रखें।</div>
               </div>
-              <button class="tap mt-3 w-full rounded-xl bg-ink-900 text-white font-semibold py-3.5 text-[14px]" onclick="goIdle(true)">Done</button>
+              <button class="tap mt-3 w-full rounded-xl bg-ink-900 text-white font-semibold py-3.5 text-[14px]" onclick="goIdle(true)">पूरा</button>
             </div>
           </div>
 
@@ -529,7 +529,7 @@
               <div class="text-[14px] font-semibold leading-tight">2 issues from Shift C</div>
               <div class="text-[11.5px] text-ink-500 mt-0.5">Ravi V. handed over at 6:00 AM · Review needed</div>
             </div>
-            <span class="text-[10px] font-bold px-2 py-1 rounded-full bg-warn/15 text-warn">Review</span>
+            <span class="text-[10px] font-bold px-2 py-1 rounded-full bg-warn/15 text-warn">देखें</span>
             <svg class="w-4 h-4 text-ink-400" viewBox="0 0 20 20" fill="none"><path d="M7 4l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
         </a>
@@ -543,11 +543,11 @@
               <svg width="18" height="18" viewBox="0 0 20 20" fill="none" class="text-ink-700"><path d="M5 3h8l3 3v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 9h6M7 12h6M7 15h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
             </div>
             <div class="flex-1 min-w-0">
-              <div class="text-[10px] uppercase tracking-wider font-bold text-ink-500">Smart Logbook</div>
+              <div class="text-[10px] uppercase tracking-wider font-bold text-ink-500">स्मार्ट लॉगबुक</div>
               <div class="text-[14px] font-semibold leading-tight">3 entries pending</div>
-              <div class="text-[11.5px] text-ink-500 mt-0.5">Shift A · 9:00 AM reading window</div>
+              <div class="text-[11.5px] text-ink-500 mt-0.5">शिफ्ट A · 9 बजे रीडिंग का समय</div>
             </div>
-            <span class="text-[10px] font-bold px-2 py-1 rounded-full bg-warn/15 text-warn">Due</span>
+            <span class="text-[10px] font-bold px-2 py-1 rounded-full bg-warn/15 text-warn">अभी करें</span>
             <svg class="chev w-4 h-4 text-ink-500 ml-1" viewBox="0 0 20 20" fill="none"><path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </summary>
           <div class="px-4 pb-4 animate-rise">
@@ -556,7 +556,7 @@
               <li class="flex items-center gap-3 px-3 py-2.5"><span class="w-1.5 h-1.5 rounded-full bg-warn"></span><span class="text-[13px] flex-1">Aeration DO levels</span><span class="text-[11px] text-ink-500">9:00 AM</span></li>
               <li class="flex items-center gap-3 px-3 py-2.5"><span class="w-1.5 h-1.5 rounded-full bg-ink-300"></span><span class="text-[13px] flex-1">Outlet TSS / Turbidity</span><span class="text-[11px] text-ink-500">12:00 PM</span></li>
             </ul>
-            <a href="logbook.html" class="tap mt-3 w-full text-center rounded-xl bg-ink-900 text-white font-semibold py-3.5 text-[14px] block">Fill Logbook</a>
+            <a href="logbook.html" class="tap mt-3 w-full text-center rounded-xl bg-ink-900 text-white font-semibold py-3.5 text-[14px] block">लॉगबुक भरें</a>
           </div>
         </details>
       </section>
@@ -569,20 +569,20 @@
       <div class="mx-3 mb-3 rounded-2xl bg-white shadow-card shadow-line px-2 py-2 flex items-center justify-between">
         <a href="issues.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-500">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M12 3l9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10l9-7Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
-          <span class="text-[10px] font-medium">Issues</span>
+          <span class="text-[10px] font-medium">समस्याएँ</span>
         </a>
         <a href="tasks.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-500">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 3v4M16 3v4M4 10h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M9 14l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span class="text-[10px] font-medium">Tasks</span>
+          <span class="text-[10px] font-medium">काम</span>
         </a>
         <a href="plant.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-900 relative">
           <span class="absolute -top-0.5 w-8 h-1 rounded-full bg-ink-900"></span>
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M3 12c2 0 2-3 5-3s3 3 5 3 2-3 5-3 3 3 3 3v8H3v-8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="6" r="2.2" stroke="currentColor" stroke-width="1.7"/></svg>
-          <span class="text-[10px] font-bold">Plant</span>
+          <span class="text-[10px] font-bold">प्लांट</span>
         </a>
         <a href="report.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-500">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-          <span class="text-[10px] font-medium">Report</span>
+          <span class="text-[10px] font-medium">रिपोर्ट</span>
         </a>
       </div>
       <div class="mx-auto mb-2 h-1 w-32 rounded-full bg-ink-900/80"></div>
@@ -600,12 +600,12 @@
   };
 
   const STEP_TITLES = {
-    0: { kicker:'Step 1 of 5', title:'SV30 trend' },
-    1: { kicker:'Step 2 of 5', title:'Aeration paani ka rang' },
-    2: { kicker:'Step 3 of 5', title:'Sludge wasting status' },
-    3: { kicker:'Step 4 of 5', title:'Inlet condition' },
-    4: { kicker:'Step 5 of 5', title:'DO reading' },
-    5: { kicker:'Verdict', title:'Suggested action' },
+    0: { kicker:'Step 1 / 5', title:'SV30 trend' },
+    1: { kicker:'Step 2 / 5', title:'Aeration पानी का रंग' },
+    2: { kicker:'Step 3 / 5', title:'Sludge wasting status' },
+    3: { kicker:'Step 4 / 5', title:'इनलेट की स्थिति' },
+    4: { kicker:'Step 5 / 5', title:'DO reading' },
+    5: { kicker:'Verdict', title:'सुझाई गई कार्रवाई' },
     'escalate': { kicker:'Verdict', title:'Escalate to supervisor' }
   };
 
@@ -621,7 +621,7 @@
 
   function paneFor(step){
     if (step === 'idle') return 'paneIdle';
-    if (step === 'resolved') return 'paneResolved';
+    if (step === 'resolved') return 'paneहल हुए';
     if (step === 'escalate') return 'paneStep5Escalate';
     if (step === 5) return 'paneStep5Resolve';
     return 'paneStep' + step;
@@ -681,7 +681,7 @@
       document.getElementById('step4Continue').classList.replace('bg-ink-900','bg-ink-300');
       document.getElementById('doInput').value = '';
       setDOMarker(0);
-      document.getElementById('doVerdict').innerHTML = 'Ideal range: <span class="font-semibold text-ok">2 – 4 mg/L</span>';
+      document.getElementById('doVerdict').innerHTML = 'सही सीमा: <span class="font-semibold text-ok">2 – 4 mg/L</span>';
     }
     show('idle');
   }
@@ -697,36 +697,36 @@
   function resolve(){
     state.step = 'resolved';
     show('resolved');
-    setAlarmResolved();
-    setBlowerResolved();
+    setAlarmहल हुए();
+    setBlowerहल हुए();
   }
   function escalate(){
     state.step = 'resolved';
     show('resolved');
-    document.querySelector('#paneResolved .text-\\[15px\\]').textContent = 'Escalated to Supervisor';
-    document.querySelector('#paneResolved .text-\\[11\\.5px\\]').textContent = 'Sandeep Kumar notified · 9:43 AM';
+    document.querySelector('#paneहल हुए .text-\\[15px\\]').textContent = 'Escalated to Supervisor';
+    document.querySelector('#paneहल हुए .text-\\[11\\.5px\\]').textContent = 'Sandeep Kumar notified · 9:43 AM';
   }
 
   // ===== Alarm states =====
   function setAlarmActive(){
     const b = document.getElementById('alarmBar');
     b.className = 'tap w-full text-left rounded-2xl shadow-card overflow-hidden bg-crit text-white animate-softpulse';
-    document.getElementById('alarmKicker').textContent = 'Naya Issue · Active';
-    document.getElementById('alarmTitle').textContent = 'Aeration Blower #2 — High vibration';
+    document.getElementById('alarmKicker').textContent = 'नई समस्या · सक्रिय';
+    document.getElementById('alarmTitle').textContent = 'एयरेशन ब्लोअर #2 — कंपन ज़्यादा';
     document.getElementById('alarmRing').classList.add('animate-ping');
   }
   function setAlarmInProgress(){
     const b = document.getElementById('alarmBar');
     b.className = 'tap w-full text-left rounded-2xl shadow-card overflow-hidden bg-prog text-white';
-    document.getElementById('alarmKicker').textContent = 'In Progress · Diagnosing';
-    document.getElementById('alarmTitle').textContent = 'Aeration Blower #2 — Step ' + ((state.step==='escalate'?4:state.step)+1) + ' of 5';
+    document.getElementById('alarmKicker').textContent = 'चल रहा है · जांच जारी';
+    document.getElementById('alarmTitle').textContent = 'एयरेशन ब्लोअर #2 — चरण ' + ((state.step==='escalate'?4:state.step)+1) + ' / 5';
     document.getElementById('alarmRing').classList.remove('animate-ping');
   }
-  function setAlarmResolved(){
+  function setAlarmहल हुए(){
     const b = document.getElementById('alarmBar');
     b.className = 'tap w-full text-left rounded-2xl shadow-card overflow-hidden bg-ok text-white';
-    document.getElementById('alarmKicker').textContent = 'Resolved · Just now';
-    document.getElementById('alarmTitle').textContent = 'Aeration Blower #2 — Action plan logged';
+    document.getElementById('alarmKicker').textContent = 'हल हुआ · अभी';
+    document.getElementById('alarmTitle').textContent = 'एयरेशन ब्लोअर #2 — कार्य योजना दर्ज';
     document.getElementById('alarmRing').classList.remove('animate-ping');
     setTimeout(()=>{
       const b2 = document.getElementById('alarmBar');
@@ -739,7 +739,7 @@
     setAlarmInProgress();
   }
 
-  function setBlowerResolved(){
+  function setBlowerहल हुए(){
     document.getElementById('blowerHalo').setAttribute('fill','#E6F7EC');
     document.getElementById('blowerBox').setAttribute('stroke','#16A34A');
     document.getElementById('blowerLabel').setAttribute('fill','#16A34A');
@@ -777,10 +777,10 @@
     document.getElementById('doMarker').style.transform = 'translateX(-50%)';
   }
   function classifyDO(v){
-    if (v < 1.0) return { label:'Critically low', tone:'text-crit', danger:true };
-    if (v < 2.0) return { label:'Below ideal', tone:'text-warn', danger:false };
-    if (v <= 4.0) return { label:'In ideal range', tone:'text-ok', danger:false };
-    return { label:'Over‑aerated', tone:'text-warn', danger:false };
+    if (v < 1.0) return { label:'बहुत कम', tone:'text-crit', danger:true };
+    if (v < 2.0) return { label:'सीमा से कम', tone:'text-warn', danger:false };
+    if (v <= 4.0) return { label:'सही सीमा में', tone:'text-ok', danger:false };
+    return { label:'ज़्यादा एयरेट', tone:'text-warn', danger:false };
   }
   function setDO(v){
     document.getElementById('doInput').value = String(v);
@@ -827,17 +827,17 @@
   // ===== Variants gallery (removed) =====
   /*
   const variants = [
-    { id:'idle',     label:'Idle — collapsed', tone:'crit',  desc:'Operator sees title + sensor snapshot. Single CTA: Start.' },
+    { id:'idle',     label:'Idle — collapsed', tone:'crit',  desc:'ऑपरेटर sees title + sensor snapshot. Single CTA: Start.' },
     { id:0,          label:'Step 0 — SV30 trend', tone:'ink',  desc:'System context. Trendline crossing limit. Continue.' },
-    { id:1,          label:'Step 1 — Water color', tone:'ink',  desc:'Operator picks one of four swatches.' },
+    { id:1,          label:'Step 1 — Water color', tone:'ink',  desc:'ऑपरेटर picks one / four swatches.' },
     { id:'1-picked', label:'Step 1 — Selected', tone:'ink',  desc:'Selected option turns dark. Continue active.' },
-    { id:2,          label:'Step 2 — Sludge wasting', tone:'ink',  desc:'System insight: wasting overdue, SRT high.' },
-    { id:3,          label:'Step 3 — Inlet condition', tone:'ink',  desc:'Operator picks visual condition.' },
+    { id:2,          label:'Step 2 — Sludge wasting', tone:'ink',  desc:'सिस्टम सुझाव: wasting overdue, SRT high.' },
+    { id:3,          label:'Step 3 — इनलेट की स्थिति', tone:'ink',  desc:'ऑपरेटर picks visual condition.' },
     { id:4,          label:'Step 4 — DO input', tone:'ink',  desc:'Manual numeric entry with live range marker.' },
     { id:'4-low',    label:'Step 4 — Low DO', tone:'crit',  desc:'Critical reading triggers escalation branch.' },
-    { id:5,          label:'Step 5 — Resolution', tone:'ok',  desc:'Action plan, Resolve CTA. Green.' },
+    { id:5,          label:'Step 5 — Resolution', tone:'ok',  desc:'कार्य योजना, Resolve CTA. Green.' },
     { id:'escalate', label:'Step 5 — Escalation', tone:'crit',  desc:'Branch: critical params, supervisor notified.' },
-    { id:'resolved', label:'Resolved', tone:'ok',  desc:'Terminal state. Issue logged.' },
+    { id:'resolved', label:'हल हुए', tone:'ok',  desc:'Terminal state. Issue logged.' },
     { id:'alarm-progress', label:'Alarm — In progress', tone:'prog',  desc:'Top bar turns blue while operator diagnoses.' },
   ];
 
@@ -865,42 +865,42 @@
 
   function variantBody(v, tone){
     if (v.id === 'idle') {
-      return `<div class="px-3 pb-3"><div class="grid grid-cols-2 gap-1.5"><div class="rounded-lg bg-paper p-2 shadow-line text-[10px]"><div class="text-ink-500 uppercase font-bold">Temp</div><div class="text-[14px] font-bold">82°</div></div><div class="rounded-lg bg-paper p-2 shadow-line text-[10px]"><div class="text-ink-500 uppercase font-bold">Vib</div><div class="text-[14px] font-bold">8.4</div></div></div><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold text-white" style="background:${tone}">Start Diagnostic</div></div>`;
+      return `<div class="px-3 pb-3"><div class="grid grid-cols-2 gap-1.5"><div class="rounded-lg bg-paper p-2 shadow-line text-[10px]"><div class="text-ink-500 uppercase font-bold">Temp</div><div class="text-[14px] font-bold">82°</div></div><div class="rounded-lg bg-paper p-2 shadow-line text-[10px]"><div class="text-ink-500 uppercase font-bold">Vib</div><div class="text-[14px] font-bold">8.4</div></div></div><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold text-white" style="background:${tone}">जांच शुरू करें</div></div>`;
     }
     if (v.id === 0) {
-      return `<div class="px-3 pb-3"><div class="rounded-lg p-2 text-white text-[10px] font-semibold" style="background:#0B1220">SV30 trending high</div><svg viewBox="0 0 200 50" class="w-full h-10 mt-1"><line x1="0" y1="14" x2="200" y2="14" stroke="#E11D2E" stroke-dasharray="3 3"/><path d="M0 40 L40 36 L80 30 L120 22 L160 14 L200 10" stroke="#0B1220" fill="none" stroke-width="1.5"/><circle cx="200" cy="10" r="3" fill="#E11D2E"/></svg><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold bg-ink-900 text-white">Continue</div></div>`;
+      return `<div class="px-3 pb-3"><div class="rounded-lg p-2 text-white text-[10px] font-semibold" style="background:#0B1220">SV30 trending high</div><svg viewBox="0 0 200 50" class="w-full h-10 mt-1"><line x1="0" y1="14" x2="200" y2="14" stroke="#E11D2E" stroke-dasharray="3 3"/><path d="M0 40 L40 36 L80 30 L120 22 L160 14 L200 10" stroke="#0B1220" fill="none" stroke-width="1.5"/><circle cx="200" cy="10" r="3" fill="#E11D2E"/></svg><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold bg-ink-900 text-white">आगे बढ़ें</div></div>`;
     }
     if (v.id === 1) {
-      return `<div class="px-3 pb-3"><div class="grid grid-cols-2 gap-1.5">${['#8B5E3C','#1F2937','#9AA3B2','#F4F6F9'].map((c,i)=>`<div class="rounded-lg border border-ink-200 p-1.5"><span class="block w-4 h-4 rounded-full" style="background:${c};${i===3?'box-shadow:inset 0 0 0 1px #D6DBE3':''}"></span><div class="text-[10px] font-semibold mt-1">${['Brown','Black','Grey','Foamy'][i]}</div></div>`).join('')}</div><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold text-white" style="background:#D6DBE3">Continue</div></div>`;
+      return `<div class="px-3 pb-3"><div class="grid grid-cols-2 gap-1.5">${['#8B5E3C','#1F2937','#9AA3B2','#F4F6F9'].map((c,i)=>`<div class="rounded-lg border border-ink-200 p-1.5"><span class="block w-4 h-4 rounded-full" style="background:${c};${i===3?'box-shadow:inset 0 0 0 1px #D6DBE3':''}"></span><div class="text-[10px] font-semibold mt-1">${['Brown','Black','Grey','Foamy'][i]}</div></div>`).join('')}</div><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold text-white" style="background:#D6DBE3">आगे बढ़ें</div></div>`;
     }
     if (v.id === '1-picked') {
       return `<div class="px-3 pb-3"><div class="grid grid-cols-2 gap-1.5">${[
         ['#8B5E3C','Brown',false],['#1F2937','Black',true],['#9AA3B2','Grey',false],['#F4F6F9','Foamy',false]
-      ].map(([c,n,sel])=>`<div class="rounded-lg border ${sel?'border-ink-900 bg-ink-900 text-white':'border-ink-200'} p-1.5"><span class="block w-4 h-4 rounded-full" style="background:${c}"></span><div class="text-[10px] font-semibold mt-1">${n}</div></div>`).join('')}</div><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold bg-ink-900 text-white">Continue</div></div>`;
+      ].map(([c,n,sel])=>`<div class="rounded-lg border ${sel?'border-ink-900 bg-ink-900 text-white':'border-ink-200'} p-1.5"><span class="block w-4 h-4 rounded-full" style="background:${c}"></span><div class="text-[10px] font-semibold mt-1">${n}</div></div>`).join('')}</div><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold bg-ink-900 text-white">आगे बढ़ें</div></div>`;
     }
     if (v.id === 2) {
-      return `<div class="px-3 pb-3"><div class="rounded-lg p-2 text-white text-[10px] font-semibold" style="background:#0B1220">Wasting overdue · SRT high</div><div class="grid grid-cols-2 gap-1.5 mt-2"><div class="rounded-lg bg-paper p-2 shadow-line"><div class="text-[9px] text-ink-500 uppercase font-bold">Last waste</div><div class="text-[14px] font-bold">18h</div></div><div class="rounded-lg bg-paper p-2 shadow-line"><div class="text-[9px] text-ink-500 uppercase font-bold">SRT</div><div class="text-[14px] font-bold">22d</div></div></div><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold bg-ink-900 text-white">Continue</div></div>`;
+      return `<div class="px-3 pb-3"><div class="rounded-lg p-2 text-white text-[10px] font-semibold" style="background:#0B1220">Wasting overdue · SRT high</div><div class="grid grid-cols-2 gap-1.5 mt-2"><div class="rounded-lg bg-paper p-2 shadow-line"><div class="text-[9px] text-ink-500 uppercase font-bold">Last waste</div><div class="text-[14px] font-bold">18h</div></div><div class="rounded-lg bg-paper p-2 shadow-line"><div class="text-[9px] text-ink-500 uppercase font-bold">SRT</div><div class="text-[14px] font-bold">22d</div></div></div><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold bg-ink-900 text-white">आगे बढ़ें</div></div>`;
     }
     if (v.id === 3) {
-      return `<div class="px-3 pb-3 space-y-1.5">${['Normal','Oily','Septic','High flow'].map(t=>`<div class="rounded-lg border border-ink-200 px-2 py-1.5 text-[11px] font-semibold">${t}</div>`).join('')}<div class="rounded-lg py-2 text-center text-[11px] font-bold text-white" style="background:#D6DBE3">Continue</div></div>`;
+      return `<div class="px-3 pb-3 space-y-1.5">${['Normal','Oily','Septic','High flow'].map(t=>`<div class="rounded-lg border border-ink-200 px-2 py-1.5 text-[11px] font-semibold">${t}</div>`).join('')}<div class="rounded-lg py-2 text-center text-[11px] font-bold text-white" style="background:#D6DBE3">आगे बढ़ें</div></div>`;
     }
     if (v.id === 4) {
-      return `<div class="px-3 pb-3"><div class="rounded-lg bg-paper shadow-line p-2"><div class="text-[9px] text-ink-500 uppercase font-bold">DO mg/L</div><div class="text-[24px] font-bold">3.2</div><div class="relative h-1.5 rounded-full bg-ink-200 mt-1 overflow-hidden"><div class="absolute inset-y-0 left-0 w-[20%]" style="background:#E11D2E80"></div><div class="absolute inset-y-0 left-[20%] w-[20%]" style="background:#F59E0B80"></div><div class="absolute inset-y-0 left-[40%] w-[40%]" style="background:#16A34A80"></div><div class="absolute -top-0.5 w-2 h-2 rounded-full bg-white ring-2 ring-ink-900" style="left:64%"></div></div></div><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold bg-ink-900 text-white">Continue</div></div>`;
+      return `<div class="px-3 pb-3"><div class="rounded-lg bg-paper shadow-line p-2"><div class="text-[9px] text-ink-500 uppercase font-bold">DO mg/L</div><div class="text-[24px] font-bold">3.2</div><div class="relative h-1.5 rounded-full bg-ink-200 mt-1 overflow-hidden"><div class="absolute inset-y-0 left-0 w-[20%]" style="background:#E11D2E80"></div><div class="absolute inset-y-0 left-[20%] w-[20%]" style="background:#F59E0B80"></div><div class="absolute inset-y-0 left-[40%] w-[40%]" style="background:#16A34A80"></div><div class="absolute -top-0.5 w-2 h-2 rounded-full bg-white ring-2 ring-ink-900" style="left:64%"></div></div></div><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold bg-ink-900 text-white">आगे बढ़ें</div></div>`;
     }
     if (v.id === '4-low') {
-      return `<div class="px-3 pb-3"><div class="rounded-lg bg-paper shadow-line p-2"><div class="text-[9px] text-ink-500 uppercase font-bold">DO mg/L</div><div class="text-[24px] font-bold" style="color:#E11D2E">0.8</div><div class="relative h-1.5 rounded-full bg-ink-200 mt-1 overflow-hidden"><div class="absolute inset-y-0 left-0 w-[20%]" style="background:#E11D2E"></div><div class="absolute -top-0.5 w-2 h-2 rounded-full bg-white ring-2" style="left:16%;--tw-ring-color:#E11D2E;box-shadow:0 0 0 2px #E11D2E"></div></div><div class="text-[10px] mt-1 font-semibold" style="color:#E11D2E">Critically low</div></div><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold text-white" style="background:#E11D2E">Continue → Escalate</div></div>`;
+      return `<div class="px-3 pb-3"><div class="rounded-lg bg-paper shadow-line p-2"><div class="text-[9px] text-ink-500 uppercase font-bold">DO mg/L</div><div class="text-[24px] font-bold" style="color:#E11D2E">0.8</div><div class="relative h-1.5 rounded-full bg-ink-200 mt-1 overflow-hidden"><div class="absolute inset-y-0 left-0 w-[20%]" style="background:#E11D2E"></div><div class="absolute -top-0.5 w-2 h-2 rounded-full bg-white ring-2" style="left:16%;--tw-ring-color:#E11D2E;box-shadow:0 0 0 2px #E11D2E"></div></div><div class="text-[10px] mt-1 font-semibold" style="color:#E11D2E">बहुत कम</div></div><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold text-white" style="background:#E11D2E">आगे → सुपरवाइज़र</div></div>`;
     }
     if (v.id === 5) {
-      return `<div class="px-3 pb-3"><div class="rounded-lg p-2 text-white text-[10px] font-semibold" style="background:#16A34A">Resolution suggested</div><div class="mt-2 rounded-lg bg-paper shadow-line text-[10px] divide-y divide-ink-200"><div class="px-2 py-1.5">1 · RAS pump +15%</div><div class="px-2 py-1.5">2 · Waste sludge in 2h</div><div class="px-2 py-1.5">3 · Hold DO 2.5</div></div><div class="grid grid-cols-2 gap-1.5 mt-2"><div class="rounded-lg py-2 text-center text-[11px] font-bold bg-ink-100">Escalate</div><div class="rounded-lg py-2 text-center text-[11px] font-bold text-white" style="background:#16A34A">Resolve</div></div></div>`;
+      return `<div class="px-3 pb-3"><div class="rounded-lg p-2 text-white text-[10px] font-semibold" style="background:#16A34A">हल का सुझाव</div><div class="mt-2 rounded-lg bg-paper shadow-line text-[10px] divide-y divide-ink-200"><div class="px-2 py-1.5">1 · RAS pump +15%</div><div class="px-2 py-1.5">2 · Waste sludge in 2h</div><div class="px-2 py-1.5">3 · Hold DO 2.5</div></div><div class="grid grid-cols-2 gap-1.5 mt-2"><div class="rounded-lg py-2 text-center text-[11px] font-bold bg-ink-100">आगे बढ़ाएं</div><div class="rounded-lg py-2 text-center text-[11px] font-bold text-white" style="background:#16A34A">हल करें</div></div></div>`;
     }
     if (v.id === 'escalate') {
-      return `<div class="px-3 pb-3"><div class="rounded-lg p-2 text-white text-[10px] font-semibold" style="background:#E11D2E">Escalation required</div><div class="mt-2 rounded-lg bg-paper shadow-line p-2 text-[10px] space-y-1"><div>• SV30 480 (limit 450)</div><div>• DO 0.8 (below 2.0)</div><div>• Septic inlet</div></div><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold text-white" style="background:#E11D2E">Escalate Now</div></div>`;
+      return `<div class="px-3 pb-3"><div class="rounded-lg p-2 text-white text-[10px] font-semibold" style="background:#E11D2E">आगे बढ़ाना ज़रूरी</div><div class="mt-2 rounded-lg bg-paper shadow-line p-2 text-[10px] space-y-1"><div>• SV30 480 (limit 450)</div><div>• DO 0.8 (below 2.0)</div><div>• Septic inlet</div></div><div class="mt-2 rounded-lg py-2 text-center text-[11px] font-bold text-white" style="background:#E11D2E">अभी आगे बढ़ाएं</div></div>`;
     }
     if (v.id === 'resolved') {
-      return `<div class="px-3 pb-4 text-center"><div class="mx-auto w-10 h-10 rounded-full grid place-items-center" style="background:#E6F7EC"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#16A34A" stroke-width="2"/><path d="M8 12l3 3 5-6" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="text-[12px] font-bold mt-2">Issue Resolved</div><div class="text-[10px] text-ink-500 mt-0.5">Logged · Auto‑monitor 2 hrs</div></div>`;
+      return `<div class="px-3 pb-4 text-center"><div class="mx-auto w-10 h-10 rounded-full grid place-items-center" style="background:#E6F7EC"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#16A34A" stroke-width="2"/><path d="M8 12l3 3 5-6" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="text-[12px] font-bold mt-2">समस्या हल हुई</div><div class="text-[10px] text-ink-500 mt-0.5">Logged · 2 घं. ऑटो-मॉनिटर</div></div>`;
     }
     if (v.id === 'alarm-progress') {
-      return `<div class="px-3 pb-3"><div class="rounded-lg p-2.5 text-white" style="background:#2563EB"><div class="text-[9px] uppercase tracking-wider font-bold opacity-80">In Progress</div><div class="text-[12px] font-semibold mt-0.5">Blower #2 — Step 3 of 5</div></div><div class="mt-2 text-[10.5px] text-ink-500">Alarm bar turns blue when operator is diagnosing.</div></div>`;
+      return `<div class="px-3 pb-3"><div class="rounded-lg p-2.5 text-white" style="background:#2563EB"><div class="text-[9px] uppercase tracking-wider font-bold opacity-80">चल रहा है</div><div class="text-[12px] font-semibold mt-0.5">Blower #2 — Step 3 / 5</div></div><div class="mt-2 text-[10.5px] text-ink-500">Alarm bar turns blue when operator is diagnosing.</div></div>`;
     }
     return '';
   }
