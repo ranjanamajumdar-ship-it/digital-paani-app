@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Plant SCADA · Desktop · Digital Paani</title>
+<title>प्लांट SCADA · Desktop · Digital Paani</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="_shared.css"/>
@@ -39,9 +39,9 @@
   .dx-navlink svg { width:16px; height:16px; flex:none; }
   .dx-navlink .num { margin-left:auto; font-size: 11px; padding: 2px 7px; background: var(--c-ink-100); color: var(--c-ink-700); border-radius: 999px; font-weight: 700; }
   .dx-navlink.active .num { background: rgba(255,255,255,.15); color:#fff; }
-  .dx-navlink .num.crit { background: var(--c-crit-soft); color: var(--c-crit); }
+  .dx-navlink .num.crit { background: var(--c-crit-softt); color: var(--c-crit); }
 
-  /* Operator card */
+  /* ऑपरेटर card */
   .dx-op { margin-top: 16px; padding: 14px; background: var(--c-paper); border-radius: 14px; box-shadow: var(--sh-line); }
   .dx-op-row { display:flex; align-items:center; gap:10px; }
   .dx-op-avatar { width:36px; height:36px; border-radius:999px; background: var(--c-ink-900); color:#fff; display:grid; place-items:center; font-size:12px; font-weight:700; flex:none; }
@@ -75,7 +75,7 @@
   /* Issue diagnostic */
   .diag { padding: 16px; }
   .diag-head { display:flex; align-items:center; gap: 10px; margin-bottom: 10px; }
-  .diag-pill { display:inline-flex; align-items:center; gap:6px; padding: 4px 10px; background: var(--c-crit-soft); color: var(--c-crit); border-radius: 999px; font-size: 11px; font-weight:700; text-transform: uppercase; letter-spacing:.04em; }
+  .diag-pill { display:inline-flex; align-items:center; gap:6px; padding: 4px 10px; background: var(--c-crit-softt); color: var(--c-crit); border-radius: 999px; font-size: 11px; font-weight:700; text-transform: uppercase; letter-spacing:.04em; }
   .threshold { background: var(--c-paper); border-radius: 12px; padding: 12px; box-shadow: var(--sh-line); }
   .threshold-bar { position: relative; height: 8px; border-radius: 999px; background: var(--c-ink-200); overflow:hidden; margin-top: 10px; }
   .threshold-bar .ok { position:absolute; inset:0 45% 0 0; background: rgba(22,163,74,.7); }
@@ -115,7 +115,7 @@
   .logb-sub { font-size: 12px; color: var(--c-ink-500); margin-top:2px; }
 
   /* Pills (mirroring shared) */
-  .pill-crit { display:inline-flex; padding:2px 8px; background: var(--c-crit-soft); color: var(--c-crit); font-size: 10px; font-weight:700; border-radius:999px; text-transform: uppercase; letter-spacing:.04em; }
+  .pill-crit { display:inline-flex; padding:2px 8px; background: var(--c-crit-softt); color: var(--c-crit); font-size: 10px; font-weight:700; border-radius:999px; text-transform: uppercase; letter-spacing:.04em; }
   .pill-warn { display:inline-flex; padding:2px 8px; background: var(--c-warn-soft); color: var(--c-warn); font-size: 10px; font-weight:700; border-radius:999px; text-transform: uppercase; letter-spacing:.04em; }
   .pill-prog { display:inline-flex; padding:2px 8px; background: var(--c-prog-soft); color: var(--c-prog); font-size: 10px; font-weight:700; border-radius:999px; text-transform: uppercase; letter-spacing:.04em; }
   .pill-ok   { display:inline-flex; padding:2px 8px; background: var(--c-ok-soft);   color: var(--c-ok);   font-size: 10px; font-weight:700; border-radius:999px; text-transform: uppercase; letter-spacing:.04em; }
@@ -133,7 +133,7 @@
       <span>Digital Paani</span>
       <span class="meta">·  Honda Manesar STP</span>
     </div>
-    <span class="live">Live · updated 12s ago</span>
+    <span class="live">लाइव · 12 सेक. पहले अपडेट</span>
     <span class="dx-user">RA</span>
   </header>
 
@@ -141,15 +141,15 @@
 
     <!-- Left aside -->
     <aside class="dx-aside">
-      <div class="dx-eyebrow">Workspace</div>
+      <div class="dx-eyebrow">वर्कस्पेस</div>
       <nav style="display:flex; flex-direction:column; gap:2px;">
-        <a class="dx-navlink active" href="#"><svg viewBox="0 0 20 20" fill="none"><path d="M3 10c1 0 1-2 4-2s2 2 4 2 1-2 4-2 2 2 2 2v6H3v-6Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="10" cy="5" r="1.6" stroke="currentColor" stroke-width="1.5"/></svg>Plant SCADA</a>
-        <a class="dx-navlink" href="issues.html"><svg viewBox="0 0 20 20" fill="none"><path d="M10 3l7 5v8a1 1 0 0 1-1 1h-3v-5H7v5H4a1 1 0 0 1-1-1V8l7-5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Issues<span class="num crit">3</span></a>
-        <a class="dx-navlink" href="tasks.html"><svg viewBox="0 0 20 20" fill="none"><rect x="3.5" y="4.5" width="13" height="12" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 3v3M13 3v3M3.5 8.5h13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Tasks<span class="num">8</span></a>
-        <a class="dx-navlink" href="equipment.html"><svg viewBox="0 0 20 20" fill="none"><path d="M3 11a3 3 0 1 1 4 2.8M13 6.2A3 3 0 1 1 17 9M7 13.8A3 3 0 1 0 10.5 17M13 6.2A3 3 0 1 0 9.5 3M7 14a3 3 0 1 0 3 3" stroke="currentColor" stroke-width="1.4"/></svg>Equipment</a>
-        <a class="dx-navlink" href="logbook.html"><svg viewBox="0 0 20 20" fill="none"><path d="M5 3h8l3 3v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M7 9h6M7 12h6M7 15h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Logbook<span class="num">3</span></a>
+        <a class="dx-navlink active" href="#"><svg viewBox="0 0 20 20" fill="none"><path d="M3 10c1 0 1-2 4-2s2 2 4 2 1-2 4-2 2 2 2 2v6H3v-6Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="10" cy="5" r="1.6" stroke="currentColor" stroke-width="1.5"/></svg>प्लांट SCADA</a>
+        <a class="dx-navlink" href="issues.html"><svg viewBox="0 0 20 20" fill="none"><path d="M10 3l7 5v8a1 1 0 0 1-1 1h-3v-5H7v5H4a1 1 0 0 1-1-1V8l7-5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>समस्याएँ<span class="num crit">3</span></a>
+        <a class="dx-navlink" href="tasks.html"><svg viewBox="0 0 20 20" fill="none"><rect x="3.5" y="4.5" width="13" height="12" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 3v3M13 3v3M3.5 8.5h13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>काम<span class="num">8</span></a>
+        <a class="dx-navlink" href="equipment.html"><svg viewBox="0 0 20 20" fill="none"><path d="M3 11a3 3 0 1 1 4 2.8M13 6.2A3 3 0 1 1 17 9M7 13.8A3 3 0 1 0 10.5 17M13 6.2A3 3 0 1 0 9.5 3M7 14a3 3 0 1 0 3 3" stroke="currentColor" stroke-width="1.4"/></svg>मशीनें</a>
+        <a class="dx-navlink" href="logbook.html"><svg viewBox="0 0 20 20" fill="none"><path d="M5 3h8l3 3v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M7 9h6M7 12h6M7 15h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>लॉगबुक<span class="num">3</span></a>
         <a class="dx-navlink" href="report.html"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v6M7 10h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Report Issue</a>
-        <a class="dx-navlink" href="styleguide.html"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M7 10h6M10 7v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Design system</a>
+        <a class="dx-navlink" href="styleguide.html"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M7 10h6M10 7v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>डिज़ाइन सिस्टम</a>
       </nav>
 
       <div class="dx-op">
@@ -157,12 +157,12 @@
           <div class="dx-op-avatar">RA</div>
           <div>
             <div class="dx-op-name">Ranjana A.</div>
-            <div class="dx-op-shift">Shift A · 9 AM – 5 PM</div>
+            <div class="dx-op-shift">शिफ्ट A · 9 बजे – 5 बजे</div>
           </div>
         </div>
         <div class="dx-op-stats">
-          <div class="dx-op-stat"><div class="v ds-num">3</div><div class="l">Tasks today</div></div>
-          <div class="dx-op-stat"><div class="v ds-num">5</div><div class="l">Resolved</div></div>
+          <div class="dx-op-stat"><div class="v ds-num">3</div><div class="l">आज के काम</div></div>
+          <div class="dx-op-stat"><div class="v ds-num">5</div><div class="l">हल हुआ</div></div>
         </div>
       </div>
     </aside>
@@ -176,10 +176,10 @@
           <div class="ds-alarm-inner">
             <span class="ds-alarm-icon"><span style="position:relative"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3l9 16H3l9-16Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor"/></svg></span></span>
             <div class="ds-alarm-body">
-              <div class="ds-alarm-kicker">Naya Issue · Active</div>
-              <div class="ds-alarm-title">Aeration Blower #2 — High vibration</div>
+              <div class="ds-alarm-kicker">नई समस्या · सक्रिय</div>
+              <div class="ds-alarm-title">एयरेशन ब्लोअर #2 — कंपन ज़्यादा</div>
             </div>
-            <span class="ds-alarm-time">2 min</span>
+            <span class="ds-alarm-time">2 मि.</span>
             <svg class="ds-alarm-chev" viewBox="0 0 20 20" fill="none"><path d="M7 4l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
         </a>
@@ -190,11 +190,11 @@
         <div class="dx-card">
           <div class="dx-section-head" style="padding: 14px 16px 8px;">
             <div>
-              <div class="dx-h2">Plant overview</div>
-              <div class="dx-h2-sub">Click any equipment for details</div>
+              <div class="dx-h2">प्लांट का दृश्य</div>
+              <div class="dx-h2-sub">मशीन की जानकारी के लिए क्लिक करें</div>
             </div>
             <div class="right">
-              <span class="pill-idle">Live</span>
+              <span class="pill-idle">लाइव</span>
             </div>
           </div>
           <svg viewBox="0 0 360 250" class="scada-svg">
@@ -240,10 +240,10 @@
         <div id="diagnostic" class="dx-card diag">
           <div class="diag-head">
             <span class="diag-pill"><span class="ds-dot ds-dot--crit"></span>Critical · #IS-2041</span>
-            <span class="ds-caption ds-num">2 min ago</span>
+            <span class="ds-caption ds-num">2 मिनट पहले</span>
           </div>
           <div class="dx-h2" style="margin-bottom: 4px;">Aeration Blower #2 — Vibration</div>
-          <div class="dx-h2-sub" style="margin-bottom: 14px;">Bearing temp + vibration cross threshold</div>
+          <div class="dx-h2-sub" style="margin-bottom: 14px;">बेयरिंग तापमान + कंपन सीमा से ऊपर</div>
 
           <div class="threshold">
             <div style="display:flex; align-items:center; justify-content:space-between;">
@@ -268,20 +268,20 @@
             <div class="stat-tile">
               <div class="label">Current draw</div>
               <div class="value">14.2A</div>
-              <div class="delta" style="color: var(--c-warn);">High</div>
+              <div class="delta" style="color: var(--c-warn);">ज़्यादा</div>
             </div>
           </div>
 
           <div style="margin-top: 14px; padding: 14px; background: var(--c-ink-900); color: #fff; border-radius: 12px;">
-            <div class="ds-micro" style="color: rgba(255,255,255,.7);">Suggested fix</div>
+            <div class="ds-micro" style="color: rgba(255,255,255,.7);">सुझाव</div>
             <div style="font-size: 13.5px; font-weight: 600; line-height: 1.4; margin-top: 4px;">
-              Blower band‑load kam karein, bearing housing temp check karein. Standby blower par switch karein.
+              ब्लोअर का लोड कम करें, बेयरिंग हाउसिंग का तापमान देखें। स्टैंडबाय ब्लोअर पर स्विच करें।
             </div>
           </div>
 
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px;">
-            <a href="plant.html" class="ds-btn ds-btn--white">Open mobile flow</a>
-            <a href="plant.html" class="ds-btn ds-btn--danger">View Issue</a>
+            <a href="plant.html" class="ds-btn ds-btn--white">मोबाइल पर खोलें</a>
+            <a href="plant.html" class="ds-btn ds-btn--danger">समस्या देखें</a>
           </div>
         </div>
       </section>
@@ -293,10 +293,10 @@
             <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M5 3h8l3 3v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 9h6M7 12h6M7 15h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
           </div>
           <div class="logb-info">
-            <div class="logb-title">Smart Logbook · 3 entries pending</div>
-            <div class="logb-sub">Shift A · 9:00 AM reading window · ETA ~3 min</div>
+            <div class="logb-title">स्मार्ट लॉगबुक · 3 entries pending</div>
+            <div class="logb-sub">शिफ्ट A · 9 बजे रीडिंग का समय · अनुमान ~3 min</div>
           </div>
-          <a href="logbook.html" class="ds-btn ds-btn--primary">Fill Logbook</a>
+          <a href="logbook.html" class="ds-btn ds-btn--primary">लॉगबुक भरें</a>
         </div>
       </div>
 
@@ -308,7 +308,7 @@
           <a href="equipment.html?eq=eq" class="dx-card" style="padding:12px; text-decoration:none; color:inherit; box-shadow: inset 0 0 0 1px #FDE0B0;"><div style="display:flex; align-items:center; gap:8px;"><span class="ds-dot ds-dot--warn"></span><div><div style="font-size:13px; font-weight:700;">Equalization</div><div class="ds-caption">Level 88%</div></div></div></a>
           <a href="equipment.html?eq=aeration" class="dx-card" style="padding:12px; text-decoration:none; color:inherit;"><div style="display:flex; align-items:center; gap:8px;"><span class="ds-dot ds-dot--ok"></span><div><div style="font-size:13px; font-weight:700;">Aeration</div><div class="ds-caption">DO 2.8 mg/L</div></div></div></a>
           <a href="equipment.html?eq=blower" class="dx-card" style="padding:12px; text-decoration:none; color:inherit; box-shadow: inset 0 0 0 1px #F8C8CD;"><div style="display:flex; align-items:center; gap:8px;"><span class="ds-dot ds-dot--crit"></span><div><div style="font-size:13px; font-weight:700;">Blower #2</div><div class="ds-caption">Vibration high</div></div></div></a>
-          <a href="equipment.html?eq=clarifier" class="dx-card" style="padding:12px; text-decoration:none; color:inherit;"><div style="display:flex; align-items:center; gap:8px;"><span class="ds-dot ds-dot--idle"></span><div><div style="font-size:13px; font-weight:700;">Clarifier</div><div class="ds-caption">Maintenance</div></div></div></a>
+          <a href="equipment.html?eq=clarifier" class="dx-card" style="padding:12px; text-decoration:none; color:inherit;"><div style="display:flex; align-items:center; gap:8px;"><span class="ds-dot ds-dot--idle"></span><div><div style="font-size:13px; font-weight:700;">Clarifier</div><div class="ds-caption">मरम्मत</div></div></div></a>
           <a href="equipment.html?eq=mbbr" class="dx-card" style="padding:12px; text-decoration:none; color:inherit;"><div style="display:flex; align-items:center; gap:8px;"><span class="ds-dot ds-dot--ok"></span><div><div style="font-size:13px; font-weight:700;">MBBR</div><div class="ds-caption">Stable</div></div></div></a>
           <a href="equipment.html?eq=outlet" class="dx-card" style="padding:12px; text-decoration:none; color:inherit;"><div style="display:flex; align-items:center; gap:8px;"><span class="ds-dot ds-dot--ok"></span><div><div style="font-size:13px; font-weight:700;">Outlet</div><div class="ds-caption">TSS 6 mg/L</div></div></div></a>
           <a href="equipment.html?eq=barscreen" class="dx-card" style="padding:12px; text-decoration:none; color:inherit;"><div style="display:flex; align-items:center; gap:8px;"><span class="ds-dot ds-dot--ok"></span><div><div style="font-size:13px; font-weight:700;">Bar Screen</div><div class="ds-caption">Clean</div></div></div></a>
@@ -323,21 +323,21 @@
 
       <!-- Issues panel with tabs -->
       <div class="dx-section-head" style="padding: 0 4px 8px;">
-        <div><div class="dx-h2">Issues</div></div>
-        <a href="report.html" class="ds-btn ds-btn--primary ds-btn--sm">+ Report</a>
+        <div><div class="dx-h2">समस्याएँ</div></div>
+        <a href="report.html" class="ds-btn ds-btn--primary ds-btn--sm">+ रिपोर्ट</a>
       </div>
       <div class="list-tabs" id="issueTabs">
-        <button class="list-tab active" data-tab="unresolved">Unresolved <strong style="color: var(--c-crit);">3</strong></button>
+        <button class="list-tab active" data-tab="unresolved">हल नहीं हुए <strong style="color: var(--c-crit);">3</strong></button>
         <button class="list-tab" data-tab="open">Open 5</button>
         <button class="list-tab" data-tab="transferred">Transferred 2</button>
-        <button class="list-tab" data-tab="resolved">Resolved 12</button>
+        <button class="list-tab" data-tab="resolved">हल हुए 12</button>
       </div>
       <div class="list-card" style="padding-top: 0;">
         <div id="pane-unresolved" class="pane active">
           <a href="plant.html" class="list-row" style="text-decoration:none; color:inherit;">
             <div class="rail rail-crit"></div>
             <div style="flex:1; min-width:0;">
-              <div style="display:flex; gap:6px; align-items:center;"><span class="pill-crit">Critical</span><span class="ds-caption">2 min ago</span></div>
+              <div style="display:flex; gap:6px; align-items:center;"><span class="pill-crit">गंभीर</span><span class="ds-caption">2 मिनट पहले</span></div>
               <div class="list-title" style="margin-top:4px;">Blower #2 — Vibration high</div>
               <div class="list-meta">Bearing 82° · 8.4 mm/s · Aeration</div>
             </div>
@@ -345,7 +345,7 @@
           <a href="plant.html" class="list-row" style="text-decoration:none; color:inherit;">
             <div class="rail rail-crit"></div>
             <div style="flex:1; min-width:0;">
-              <div style="display:flex; gap:6px; align-items:center;"><span class="pill-crit">Critical</span><span class="ds-caption">1 hr ago</span></div>
+              <div style="display:flex; gap:6px; align-items:center;"><span class="pill-crit">गंभीर</span><span class="ds-caption">1 घंटे पहले</span></div>
               <div class="list-title" style="margin-top:4px;">Inlet pH 9.2 — out of range</div>
               <div class="list-meta">From completed task · Inlet</div>
             </div>
@@ -353,9 +353,9 @@
           <a href="plant.html" class="list-row" style="text-decoration:none; color:inherit;">
             <div class="rail rail-warn"></div>
             <div style="flex:1; min-width:0;">
-              <div style="display:flex; gap:6px; align-items:center;"><span class="pill-warn">Warning</span><span class="ds-caption">26 min ago</span></div>
+              <div style="display:flex; gap:6px; align-items:center;"><span class="pill-warn">चेतावनी</span><span class="ds-caption">26 मिनट पहले</span></div>
               <div class="list-title" style="margin-top:4px;">Equalization — Level 88%</div>
-              <div class="list-meta">Inlet surge above design flow</div>
+              <div class="list-meta">इनलेट प्रवाह सीमा से ज़्यादा</div>
             </div>
           </a>
         </div>
@@ -363,7 +363,7 @@
           <div class="list-row">
             <div class="rail rail-prog"></div>
             <div style="flex:1; min-width:0;">
-              <div style="display:flex; gap:6px; align-items:center;"><span class="pill-prog">In progress</span><span class="ds-caption">Step 3 of 5</span></div>
+              <div style="display:flex; gap:6px; align-items:center;"><span class="pill-prog">चल रहा है</span><span class="ds-caption">Step 3 / 5</span></div>
               <div class="list-title" style="margin-top:4px;">Blower #2 diagnostic flow</div>
               <div class="list-meta">Ranjana A. · 5 min</div>
             </div>
@@ -371,20 +371,20 @@
           <div class="list-row">
             <div class="rail rail-prog"></div>
             <div style="flex:1; min-width:0;">
-              <div style="display:flex; gap:6px; align-items:center;"><span class="pill-prog">In progress</span></div>
+              <div style="display:flex; gap:6px; align-items:center;"><span class="pill-prog">चल रहा है</span></div>
               <div class="list-title" style="margin-top:4px;">Clarifier scraper jammed</div>
-              <div class="list-meta">Sandeep K. · ETA 30 min</div>
+              <div class="list-meta">Sandeep K. · अनुमान 30 min</div>
             </div>
           </div>
         </div>
         <div id="pane-transferred" class="pane">
           <div style="background: var(--c-warn-soft); padding: 10px 12px; border-radius: 10px; font-size: 12px; color: var(--c-ink-700); margin-bottom: 8px; font-weight: 600;">
-            From Shift C · 6:00 AM handover
+            शिफ्ट C से · 6:00 AM हैंडओवर
           </div>
           <div class="list-row">
             <div class="rail rail-warn"></div>
             <div style="flex:1; min-width:0;">
-              <div style="display:flex; gap:6px; align-items:center;"><span class="pill-warn">8 hrs old</span></div>
+              <div style="display:flex; gap:6px; align-items:center;"><span class="pill-warn">8 घंटे पुराना</span></div>
               <div class="list-title" style="margin-top:4px;">MBBR media — uneven</div>
               <div class="list-meta">Ravi V. · "Aerator check karna"</div>
             </div>
@@ -392,7 +392,7 @@
           <div class="list-row">
             <div class="rail rail-crit"></div>
             <div style="flex:1; min-width:0;">
-              <div style="display:flex; gap:6px; align-items:center;"><span class="pill-crit">12 hrs old</span></div>
+              <div style="display:flex; gap:6px; align-items:center;"><span class="pill-crit">12 घंटे पुराना</span></div>
               <div class="list-title" style="margin-top:4px;">Outlet chlorinator leak</div>
               <div class="list-meta">Ravi V. · Spare in store</div>
             </div>
@@ -402,17 +402,17 @@
           <div class="list-row">
             <div class="rail rail-ok"></div>
             <div style="flex:1; min-width:0;">
-              <div style="display:flex; gap:6px; align-items:center;"><span class="pill-ok">Resolved</span><span class="ds-caption">8:12 AM</span></div>
+              <div style="display:flex; gap:6px; align-items:center;"><span class="pill-ok">हल हुआ</span><span class="ds-caption">8:12 AM</span></div>
               <div class="list-title" style="margin-top:4px;">MBBR DO drop — recovered</div>
-              <div class="list-meta">Aerator restart</div>
+              <div class="list-meta">एयरेटर रीस्टार्ट</div>
             </div>
           </div>
           <div class="list-row">
             <div class="rail rail-ok"></div>
             <div style="flex:1; min-width:0;">
-              <div style="display:flex; gap:6px; align-items:center;"><span class="pill-ok">Resolved</span><span class="ds-caption">7:40 AM</span></div>
+              <div style="display:flex; gap:6px; align-items:center;"><span class="pill-ok">हल हुआ</span><span class="ds-caption">7:40 AM</span></div>
               <div class="list-title" style="margin-top:4px;">Bar screen debris cleared</div>
-              <div class="list-meta">Manual cleaning done</div>
+              <div class="list-meta">हाथ से सफाई हो गई</div>
             </div>
           </div>
         </div>
@@ -420,14 +420,14 @@
 
       <!-- Tasks panel -->
       <div class="dx-section-head" style="padding: 12px 4px 8px;">
-        <div><div class="dx-h2">Tasks</div></div>
-        <a href="tasks.html" class="ds-btn ds-btn--white ds-btn--sm">Open Kanban</a>
+        <div><div class="dx-h2">काम</div></div>
+        <a href="tasks.html" class="ds-btn ds-btn--white ds-btn--sm">कानबन खोलें</a>
       </div>
       <div class="dx-card list-card" style="padding-bottom: 8px;">
         <div class="list-row">
           <div class="rail rail-prog"></div>
           <div style="flex:1; min-width:0;">
-            <div style="display:flex; gap:6px; align-items:center;"><span class="pill-prog">In progress</span><span class="ds-caption ds-num">10:30 AM</span></div>
+            <div style="display:flex; gap:6px; align-items:center;"><span class="pill-prog">चल रहा है</span><span class="ds-caption ds-num">10:30 AM</span></div>
             <div class="list-title" style="margin-top:4px;">DO levels reading</div>
             <div class="list-meta">Aeration · Ranjana A.</div>
           </div>
@@ -435,7 +435,7 @@
         <div class="list-row">
           <div class="rail rail-idle"></div>
           <div style="flex:1; min-width:0;">
-            <div style="display:flex; gap:6px; align-items:center;"><span class="pill-idle">Pending</span><span class="ds-caption ds-num">11:00 AM</span></div>
+            <div style="display:flex; gap:6px; align-items:center;"><span class="pill-idle">बाकी</span><span class="ds-caption ds-num">11:00 AM</span></div>
             <div class="list-title" style="margin-top:4px;">Bar screen cleaning</div>
             <div class="list-meta">Inlet</div>
           </div>
@@ -445,7 +445,7 @@
           <div style="flex:1; min-width:0;">
             <div style="display:flex; gap:6px; align-items:center;"><span class="pill-crit">Overdue 1d</span></div>
             <div class="list-title" style="margin-top:4px;">pH probe calibration</div>
-            <div class="list-meta">Inlet · Was due 4:00 PM</div>
+            <div class="list-meta">Inlet · 4:00 PM को था</div>
           </div>
         </div>
       </div>

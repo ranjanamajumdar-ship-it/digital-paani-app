@@ -42,7 +42,7 @@
 <div class="sg-page">
   <nav class="sg-side">
     <a href="plant.html" class="sg-back">← Back to prototype</a>
-    <div class="sg-eyebrow" style="padding:8px 12px;">Design system</div>
+    <div class="sg-eyebrow" style="padding:8px 12px;">डिज़ाइन सिस्टम</div>
     <a href="#tokens">Tokens</a>
     <a href="#typography">Typography</a>
     <a href="#status">Status</a>
@@ -58,7 +58,7 @@
     <header style="padding-bottom: 12px;">
       <div class="sg-eyebrow">Digital Paani · v1</div>
       <h1 style="font-size: 36px; font-weight: 800; letter-spacing: -.02em; margin: 6px 0 8px;">Design System</h1>
-      <p style="font-size: 15px; color: var(--c-ink-500); max-width: 720px; line-height: 1.5;">A small, opinionated set of tokens and components shared across every screen. Built for clarity in field conditions: large touch targets, high contrast, minimal cognitive load. Hindi/Hinglish copy throughout.</p>
+      <p style="font-size: 15px; color: var(--c-ink-500); max-width: 720px; line-height: 1.5;">A small, opinionated set of tokens and components shared across every screen. Built for clarity in field conditions: large touch targets, high contrast, minimal cognitive load. Hindi/हिंदी-पहले throughout.</p>
     </header>
 
     <!-- ============ Tokens ============ -->
@@ -135,21 +135,21 @@
         <div class="sg-tile">
           <h4>Dots</h4>
           <div style="display:flex; gap:16px; align-items:center;">
-            <span><span class="ds-dot ds-dot--crit"></span> <span class="ds-caption">Critical</span></span>
-            <span><span class="ds-dot ds-dot--warn"></span> <span class="ds-caption">Warning</span></span>
+            <span><span class="ds-dot ds-dot--crit"></span> <span class="ds-caption">गंभीर</span></span>
+            <span><span class="ds-dot ds-dot--warn"></span> <span class="ds-caption">चेतावनी</span></span>
             <span><span class="ds-dot ds-dot--prog"></span> <span class="ds-caption">Progress</span></span>
-            <span><span class="ds-dot ds-dot--ok"></span> <span class="ds-caption">Healthy</span></span>
+            <span><span class="ds-dot ds-dot--ok"></span> <span class="ds-caption">ठीक</span></span>
             <span><span class="ds-dot ds-dot--idle"></span> <span class="ds-caption">Idle</span></span>
           </div>
         </div>
         <div class="sg-tile">
           <h4>Pills</h4>
           <div style="display:flex; flex-wrap:wrap; gap:8px;">
-            <span class="ds-pill ds-pill--crit">Critical</span>
-            <span class="ds-pill ds-pill--warn">Warning</span>
-            <span class="ds-pill ds-pill--prog">In progress</span>
-            <span class="ds-pill ds-pill--ok">Resolved</span>
-            <span class="ds-pill ds-pill--idle">Pending</span>
+            <span class="ds-pill ds-pill--crit">गंभीर</span>
+            <span class="ds-pill ds-pill--warn">चेतावनी</span>
+            <span class="ds-pill ds-pill--prog">चल रहा है</span>
+            <span class="ds-pill ds-pill--ok">हल हुआ</span>
+            <span class="ds-pill ds-pill--idle">बाकी</span>
           </div>
         </div>
       </div>
@@ -158,23 +158,23 @@
     <!-- ============ Buttons ============ -->
     <section id="buttons" class="sg-section">
       <h2>Buttons</h2>
-      <p class="lead">One primary CTA per surface. Verbs only — Start, Continue, Submit, Resolve, Escalate, Create Issue.</p>
+      <p class="lead">One primary CTA per surface. Verbs only — Start, Continue, Submit, Resolve, Escalate, समस्या दर्ज करें.</p>
       <div class="sg-grid sg-grid-3">
-        <div class="sg-tile"><h4>Primary</h4><button class="ds-btn ds-btn--primary ds-btn--full">Continue</button></div>
-        <div class="sg-tile"><h4>Danger</h4><button class="ds-btn ds-btn--danger ds-btn--full">Create Issue</button></div>
-        <div class="sg-tile"><h4>Progress</h4><button class="ds-btn ds-btn--prog ds-btn--full">Continue</button></div>
-        <div class="sg-tile"><h4>OK</h4><button class="ds-btn ds-btn--ok ds-btn--full">Resolve</button></div>
-        <div class="sg-tile"><h4>White / line</h4><button class="ds-btn ds-btn--white ds-btn--full">Submit</button></div>
-        <div class="sg-tile"><h4>Ghost</h4><button class="ds-btn ds-btn--ghost ds-btn--full">Snooze</button></div>
-        <div class="sg-tile"><h4>Disabled</h4><button class="ds-btn ds-btn--primary ds-btn--full" disabled>Submit</button></div>
-        <div class="sg-tile"><h4>Small</h4><button class="ds-btn ds-btn--primary ds-btn--sm">Start</button></div>
+        <div class="sg-tile"><h4>Primary</h4><button class="ds-btn ds-btn--primary ds-btn--full">आगे बढ़ें</button></div>
+        <div class="sg-tile"><h4>Danger</h4><button class="ds-btn ds-btn--danger ds-btn--full">समस्या दर्ज करें</button></div>
+        <div class="sg-tile"><h4>Progress</h4><button class="ds-btn ds-btn--prog ds-btn--full">आगे बढ़ें</button></div>
+        <div class="sg-tile"><h4>OK</h4><button class="ds-btn ds-btn--ok ds-btn--full">हल करें</button></div>
+        <div class="sg-tile"><h4>White / line</h4><button class="ds-btn ds-btn--white ds-btn--full">जमा करें</button></div>
+        <div class="sg-tile"><h4>Ghost</h4><button class="ds-btn ds-btn--ghost ds-btn--full">बाद में</button></div>
+        <div class="sg-tile"><h4>Disabled</h4><button class="ds-btn ds-btn--primary ds-btn--full" disabled>जमा करें</button></div>
+        <div class="sg-tile"><h4>Small</h4><button class="ds-btn ds-btn--primary ds-btn--sm">शुरू करें</button></div>
       </div>
     </section>
 
     <!-- ============ Alarm Bar ============ -->
     <section id="alarm" class="sg-section">
       <h2>Alarm Bar</h2>
-      <p class="lead">Always at the top of every operator screen. Four states transition automatically as the operator moves through the issue flow. Inject with <code>&lt;div data-component="alarm-bar" data-state="active"&gt;&lt;/div&gt;</code>.</p>
+      <p class="lead">Always at the top / every operator screen. Four states transition automatically as the operator moves through the issue flow. Inject with <code>&lt;div data-component="alarm-bar" data-state="active"&gt;&lt;/div&gt;</code>.</p>
 
       <div class="sg-grid sg-grid-2">
         <div class="sg-mini-frame">
@@ -186,7 +186,7 @@
           <div data-component="alarm-bar" data-state="progress"></div>
         </div>
         <div class="sg-mini-frame">
-          <h4 class="ds-micro" style="margin: 4px 0 8px;">Resolved · green, fades</h4>
+          <h4 class="ds-micro" style="margin: 4px 0 8px;">हल हुए · green, fades</h4>
           <div data-component="alarm-bar" data-state="resolved"></div>
         </div>
         <div class="sg-mini-frame">
@@ -206,21 +206,21 @@
           <div class="ds-issue-row">
             <span class="ds-issue-rail ds-issue-rail--crit"></span>
             <div style="flex:1; min-width:0;">
-              <div class="ds-issue-meta"><span class="ds-pill ds-pill--crit">Critical</span><span class="sep">·</span><span class="id">#IS-2041</span><span class="sep">·</span><span class="id">2 min ago</span></div>
-              <div class="ds-issue-title">Aeration Blower #2 — Vibration ke ucch level</div>
-              <div class="ds-issue-sub">Bearing temp + vibration cross threshold</div>
+              <div class="ds-issue-meta"><span class="ds-pill ds-pill--crit">गंभीर</span><span class="sep">·</span><span class="id">#IS-2041</span><span class="sep">·</span><span class="id">2 मिनट पहले</span></div>
+              <div class="ds-issue-title">एयरेशन ब्लोअर #2 — कंपन ज़्यादा</div>
+              <div class="ds-issue-sub">बेयरिंग तापमान + कंपन सीमा से ऊपर</div>
             </div>
           </div>
-          <button class="ds-btn ds-btn--danger ds-btn--full" style="margin-top:12px">Start Diagnostic</button>
+          <button class="ds-btn ds-btn--danger ds-btn--full" style="margin-top:12px">जांच शुरू करें</button>
         </div>
 
         <div class="ds-issue">
           <div class="ds-issue-row">
             <span class="ds-issue-rail ds-issue-rail--warn"></span>
             <div style="flex:1; min-width:0;">
-              <div class="ds-issue-meta"><span class="ds-pill ds-pill--warn">Warning</span><span class="sep">·</span><span class="id">#IS-2039</span></div>
+              <div class="ds-issue-meta"><span class="ds-pill ds-pill--warn">चेतावनी</span><span class="sep">·</span><span class="id">#IS-2039</span></div>
               <div class="ds-issue-title">Equalization tank — Level 88%</div>
-              <div class="ds-issue-sub">Inlet surge above design flow</div>
+              <div class="ds-issue-sub">इनलेट प्रवाह सीमा से ज़्यादा</div>
             </div>
           </div>
         </div>
@@ -229,7 +229,7 @@
           <div class="ds-issue-row">
             <span class="ds-issue-rail ds-issue-rail--prog"></span>
             <div style="flex:1; min-width:0;">
-              <div class="ds-issue-meta"><span class="ds-pill ds-pill--prog">In progress</span><span class="sep">·</span><span class="id">#IS-2040 · Step 3 of 5</span></div>
+              <div class="ds-issue-meta"><span class="ds-pill ds-pill--prog">चल रहा है</span><span class="sep">·</span><span class="id">#IS-2040 · Step 3 / 5</span></div>
               <div class="ds-issue-title">Blower #2 diagnostic flow</div>
               <div class="ds-issue-sub">DO sample collected — awaiting result</div>
             </div>
@@ -240,9 +240,9 @@
           <div class="ds-issue-row">
             <span class="ds-issue-rail ds-issue-rail--ok"></span>
             <div style="flex:1; min-width:0;">
-              <div class="ds-issue-meta"><span class="ds-pill ds-pill--ok">Resolved</span><span class="sep">·</span><span class="id">8:12 AM</span></div>
+              <div class="ds-issue-meta"><span class="ds-pill ds-pill--ok">हल हुआ</span><span class="sep">·</span><span class="id">8:12 AM</span></div>
               <div class="ds-issue-title">MBBR DO drop — recovered</div>
-              <div class="ds-issue-sub">Aerator restart · Auto‑monitor 2 hrs</div>
+              <div class="ds-issue-sub">एयरेटर रीस्टार्ट · 2 घं. ऑटो-मॉनिटर</div>
             </div>
           </div>
         </div>
@@ -259,24 +259,24 @@
           <div class="ds-task-row">
             <span class="ds-task-rail ds-task-rail--pending"></span>
             <div style="flex:1; min-width:0;">
-              <div class="ds-pill ds-pill--idle" style="margin-bottom:2px;">Pending</div>
+              <div class="ds-pill ds-pill--idle" style="margin-bottom:2px;">बाकी</div>
               <div class="ds-task-title">Bar screen cleaning</div>
               <div class="ds-task-meta"><span>Inlet</span><span class="sep">·</span><span class="ds-num">11:00 AM</span></div>
             </div>
           </div>
-          <button class="ds-btn ds-btn--primary ds-btn--sm" style="margin-top:8px;">Start</button>
+          <button class="ds-btn ds-btn--primary ds-btn--sm" style="margin-top:8px;">शुरू करें</button>
         </div>
 
         <div class="ds-task">
           <div class="ds-task-row">
             <span class="ds-task-rail ds-task-rail--progress"></span>
             <div style="flex:1; min-width:0;">
-              <div class="ds-pill ds-pill--prog" style="margin-bottom:2px;">In progress</div>
+              <div class="ds-pill ds-pill--prog" style="margin-bottom:2px;">चल रहा है</div>
               <div class="ds-task-title">DO levels reading</div>
               <div class="ds-task-meta"><span>Aeration</span><span class="sep">·</span><span class="ds-num">10:30 AM</span></div>
             </div>
           </div>
-          <button class="ds-btn ds-btn--prog ds-btn--sm" style="margin-top:8px;">Continue</button>
+          <button class="ds-btn ds-btn--prog ds-btn--sm" style="margin-top:8px;">आगे बढ़ें</button>
         </div>
 
         <div class="ds-task ds-task-overdue-frame">
@@ -285,10 +285,10 @@
             <div style="flex:1; min-width:0;">
               <div class="ds-pill ds-pill--crit" style="margin-bottom:2px;">Overdue · 1d</div>
               <div class="ds-task-title">pH probe calibration</div>
-              <div class="ds-task-meta"><span>Inlet</span><span class="sep">·</span><span>Was due 4:00 PM</span></div>
+              <div class="ds-task-meta"><span>Inlet</span><span class="sep">·</span><span>4:00 PM को था</span></div>
             </div>
           </div>
-          <button class="ds-btn ds-btn--danger ds-btn--sm" style="margin-top:8px;">Start Now</button>
+          <button class="ds-btn ds-btn--danger ds-btn--sm" style="margin-top:8px;">अभी शुरू करें</button>
         </div>
 
         <div class="ds-task ds-task--done">
@@ -308,28 +308,28 @@
     <!-- ============ Equipment Card ============ -->
     <section id="equipment" class="sg-section">
       <h2>Equipment Card hero</h2>
-      <p class="lead">One status hero, four states. Body sections (active issues, tasks, specs) follow the same vertical stack regardless of state.</p>
+      <p class="lead">One status hero, four states. Body sections (active issues, tasks, specs) follow the same vertical stack regardless / state.</p>
 
       <div class="sg-grid sg-grid-2">
         <div class="ds-eq ds-eq--crit">
-          <div class="ds-micro" style="color: rgba(255,255,255,.85)">Critical · Action needed</div>
-          <div class="ds-h3" style="margin-top:4px">High vibration · Bearing temp 82°</div>
-          <div class="ds-caption" style="color: rgba(255,255,255,.85); margin-top:2px;">Detected 2 min ago · Blower house</div>
+          <div class="ds-micro" style="color: rgba(255,255,255,.85)">गंभीर · कार्रवाई ज़रूरी</div>
+          <div class="ds-h3" style="margin-top:4px">कंपन ज़्यादा · बेयरिंग तापमान 82°</div>
+          <div class="ds-caption" style="color: rgba(255,255,255,.85); margin-top:2px;">पाया गया 2 मिनट पहले · Blower house</div>
         </div>
         <div class="ds-eq ds-eq--warn">
-          <div class="ds-micro" style="color: rgba(255,255,255,.85)">Warning · Monitor</div>
+          <div class="ds-micro" style="color: rgba(255,255,255,.85)">चेतावनी · देखते रहें</div>
           <div class="ds-h3" style="margin-top:4px">Level 88% · Surge above design</div>
-          <div class="ds-caption" style="color: rgba(255,255,255,.85); margin-top:2px;">Started 26 min ago</div>
+          <div class="ds-caption" style="color: rgba(255,255,255,.85); margin-top:2px;">Started 26 मिनट पहले</div>
         </div>
         <div class="ds-eq ds-eq--ok">
-          <div class="ds-micro" style="color: rgba(255,255,255,.85)">Healthy · All in range</div>
+          <div class="ds-micro" style="color: rgba(255,255,255,.85)">ठीक · सब सीमा में</div>
           <div class="ds-h3" style="margin-top:4px">DO 2.8 mg/L · MLSS stable</div>
-          <div class="ds-caption" style="color: rgba(255,255,255,.85); margin-top:2px;">Last reading 8 min ago</div>
+          <div class="ds-caption" style="color: rgba(255,255,255,.85); margin-top:2px;">आख़िरी रीडिंग 8 मिनट पहले</div>
         </div>
         <div class="ds-eq ds-eq--maint">
-          <div class="ds-micro">Maintenance · Offline</div>
+          <div class="ds-micro">मरम्मत · बंद है</div>
           <div class="ds-h3" style="margin-top:4px">Scraper jammed — under repair</div>
-          <div class="ds-caption" style="margin-top:2px;">ETA 30 min · Sandeep K. on site</div>
+          <div class="ds-caption" style="margin-top:2px;">अनुमान 30 min · Sandeep K. on site</div>
         </div>
       </div>
     </section>
@@ -337,7 +337,7 @@
     <!-- ============ Bottom Nav ============ -->
     <section id="nav" class="sg-section">
       <h2>Bottom Navigation</h2>
-      <p class="lead">Fixed at the bottom of every screen. Same four destinations everywhere; the active tab changes per page. Inject with <code>&lt;div data-component="bottom-nav" data-active="plant"&gt;&lt;/div&gt;</code>.</p>
+      <p class="lead">Fixed at the bottom / every screen. Same four destinations everywhere; the active tab changes per page. Inject with <code>&lt;div data-component="bottom-nav" data-active="plant"&gt;&lt;/div&gt;</code>.</p>
 
       <div class="sg-grid sg-grid-2">
         <div class="sg-mini-frame">
