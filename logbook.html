@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Smart Logbook · Digital Paani</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: {
+    fontFamily: { sans: ['Inter','ui-sans-serif','system-ui','sans-serif'] },
+    colors: { ink:{900:'#0B1220',700:'#2B3344',500:'#6B7280',400:'#9AA3B2',300:'#D6DBE3',200:'#EAEDF2',100:'#F4F6F9'}, crit:'#E11D2E', warn:'#F59E0B', prog:'#2563EB', ok:'#16A34A', paper:'#FAFAF7' },
+    boxShadow: { card:'0 1px 0 rgba(11,18,32,.04), 0 6px 18px rgba(11,18,32,.05)', line:'inset 0 0 0 1px #ECEEF2' },
+    keyframes: {
+      softpulse:{'0%':{boxShadow:'0 0 0 0 rgba(225,29,46,.55)'},'70%':{boxShadow:'0 0 0 10px rgba(225,29,46,0)'},'100%':{boxShadow:'0 0 0 0 rgba(225,29,46,0)'}},
+      rise: { '0%':{transform:'translateY(6px)',opacity:0}, '100%':{transform:'translateY(0)',opacity:1} }
+    },
+    animation: { softpulse:'softpulse 1.6s ease-out infinite', rise:'rise .22s ease-out both' }
+  } } };
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_shared.css"/>
+<style>
+  .row { transition: all .15s ease; }
+  .row[data-state="ok"]    { box-shadow: inset 0 0 0 1px #BFE6CC; background:#F2FBF5; }
+  .row[data-state="warn"]  { box-shadow: inset 0 0 0 1px #FDE0B0; background:#FFFAEE; }
+  .row[data-state="fail"]  { box-shadow: inset 0 0 0 1px #F8C8CD; background:#FDF2F4; }
+  .num { font-variant-numeric: tabular-nums; }
+  .row .pf { display:none; }
+  .row[data-state="warn"] .pf-warn { display:inline-flex; }
+  .row[data-state="fail"] .pf-fail { display:inline-flex; }
+  .row[data-state="ok"] .pf-ok { display:inline-flex; }
+  .row .actions { display:none; }
+  .row[data-state="warn"] .actions, .row[data-state="fail"] .actions { display:flex; }
+  details > summary { list-style:none; cursor:pointer; }
+  details > summary::-webkit-details-marker { display:none; }
+  .chev { transition: transform .2s ease; }
+  details[open] .chev { transform: rotate(180deg); }
+</style>
+</head>
+<body class="font-sans text-ink-900 antialiased">
+<div class="w-full flex items-start justify-center p-6 lg:p-12 gap-10">
+
+  <aside class="hidden lg:flex flex-col w-56 sticky top-12 gap-2">
+    <div class="text-[10px] uppercase tracking-[.18em] text-ink-500 font-semibold">Digital Paani · Prototype</div>
+    <a href="plant.html" class="tap rounded-xl bg-white shadow-line px-3 py-2.5 text-[12px] font-semibold flex items-center justify-between">Plant <span class="text-ink-400">SCADA</span></a>
+    <a href="tasks.html" class="tap rounded-xl bg-white shadow-line px-3 py-2.5 text-[12px] font-semibold flex items-center justify-between">Tasks <span class="text-ink-400">Kanban</span></a>
+    <a href="issues.html" class="tap rounded-xl bg-white shadow-line px-3 py-2.5 text-[12px] font-semibold flex items-center justify-between">Issues <span class="text-ink-400">List</span></a>
+    <a href="logbook.html" class="tap rounded-xl bg-ink-900 text-white px-3 py-2.5 text-[12px] font-semibold flex items-center justify-between">Logbook <span class="opacity-60">Bulk entry</span></a>
+    <a href="report.html" class="tap rounded-xl bg-white shadow-line px-3 py-2.5 text-[12px] font-semibold flex items-center justify-between">Report <span class="text-ink-400">New</span></a>
+  </aside>
+
+  <div class="device">
+    <div class="notch"></div>
+    <div class="absolute top-0 left-0 right-0 h-12 z-50 flex items-center justify-between px-7 pt-3 text-[12px] font-semibold">
+      <span>9:41</span>
+      <span class="flex items-center gap-1.5">
+        <svg width="16" height="10" viewBox="0 0 16 10" fill="currentColor"><rect x="0" y="6" width="3" height="4" rx="1"/><rect x="4.5" y="4" width="3" height="6" rx="1"/><rect x="9" y="2" width="3" height="8" rx="1"/><rect x="13.5" y="0" width="3" height="10" rx="1"/></svg>
+        <svg width="22" height="10" viewBox="0 0 22 10" fill="none"><rect x=".5" y=".5" width="18" height="9" rx="2" stroke="currentColor"/><rect x="2" y="2" width="15" height="6" rx="1" fill="currentColor"/><rect x="19.5" y="3.5" width="1.5" height="3" rx=".5" fill="currentColor"/></svg>
+      </span>
+    </div>
+
+    <main class="absolute inset-0 pt-12 pb-32 overflow-y-auto">
+      <!-- Header -->
+      <div class="px-5 pt-3 pb-2 flex items-center gap-3">
+        <a href="plant.html" class="tap w-9 h-9 rounded-full bg-white shadow-line grid place-items-center">
+          <svg class="w-4 h-4 text-ink-700" viewBox="0 0 20 20" fill="none"><path d="M13 4l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <div class="flex-1 min-w-0">
+          <div class="text-[11px] uppercase tracking-[.16em] text-ink-500 font-semibold">Smart Logbook</div>
+          <h2 class="text-[18px] font-bold leading-tight mt-0.5">9:00 AM Reading</h2>
+          <div class="text-[11px] text-ink-500 mt-0.5">Shift A · Ranjana A.</div>
+        </div>
+        <div class="text-right">
+          <div class="text-[10px] uppercase font-bold text-ink-500 tracking-wider">ETA</div>
+          <div class="text-[14px] font-bold tabular-nums" id="etaTimer">2:48</div>
+        </div>
+      </div>
+
+      <!-- Alarm Bar -->
+      <div class="px-5 mt-2">
+        <a href="plant.html" class="tap block w-full text-left rounded-2xl shadow-card overflow-hidden bg-crit text-white animate-softpulse">
+          <div class="px-4 py-3 flex items-center gap-3">
+            <span class="grid place-items-center w-7 h-7 rounded-full bg-white/15">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"><path d="M12 3l9 16H3l9-16Z" stroke="white" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v4" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="white"/></svg>
+            </span>
+            <div class="flex-1 min-w-0">
+              <div class="text-[11px] uppercase tracking-wider opacity-80 font-semibold">Active · Blower #2</div>
+              <div class="text-[14px] font-semibold truncate">High vibration — diagnosing</div>
+            </div>
+            <svg class="w-4 h-4 opacity-80" viewBox="0 0 20 20" fill="none"><path d="M7 4l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </a>
+      </div>
+
+      <!-- Progress strip -->
+      <div class="px-5 mt-3">
+        <div class="rounded-xl bg-white shadow-line px-3 py-2.5 flex items-center gap-3">
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <div class="text-[11px] font-semibold text-ink-700"><span id="filledCount">0</span> of <span id="totalCount">8</span> filled</div>
+              <div class="text-[10px] text-ink-500"><span id="failCount">0</span> out of range</div>
+            </div>
+            <div class="mt-1 h-1.5 rounded-full bg-ink-200 overflow-hidden">
+              <div id="progBar" class="h-full bg-ink-900 transition-all" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Inlet group ===== -->
+      <div class="px-5 mt-4">
+        <div class="text-[10.5px] uppercase tracking-wider font-bold text-ink-500 mb-2 flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-ink-700"></span>Inlet
+        </div>
+        <div class="space-y-2">
+
+          <!-- Row template: pH -->
+          <div class="row rounded-xl bg-white shadow-line p-3" data-state="" data-lo="6.5" data-hi="8.5">
+            <div class="flex items-start gap-3">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <div class="text-[13px] font-semibold leading-none">Inlet pH</div>
+                  <span class="pf pf-ok text-[9px] font-bold px-1.5 py-0.5 rounded bg-ok/15 text-ok uppercase">Ok</span>
+                  <span class="pf pf-warn text-[9px] font-bold px-1.5 py-0.5 rounded bg-warn/15 text-warn uppercase">Watch</span>
+                  <span class="pf pf-fail text-[9px] font-bold px-1.5 py-0.5 rounded bg-crit/15 text-crit uppercase">Out</span>
+                </div>
+                <div class="text-[10.5px] text-ink-500 mt-0.5">Range <span class="num font-semibold">6.5 – 8.5</span> · Prev <span class="num">7.4</span></div>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="text" inputmode="decimal" placeholder="—" maxlength="5"
+                  class="num w-16 rounded-lg border border-ink-200 bg-white px-2 py-2 text-[15px] font-bold text-right outline-none focus:border-ink-900"
+                  oninput="evalRow(this)"/>
+                <button class="tap w-8 h-8 rounded-lg bg-ink-100 grid place-items-center" onclick="openCam(this)" aria-label="Photo">
+                  <svg class="w-3.5 h-3.5 text-ink-700" viewBox="0 0 20 20" fill="none"><path d="M3 7a1 1 0 0 1 1-1h2l1-1.5h6L14 6h2a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="10" cy="10.5" r="2.8" stroke="currentColor" stroke-width="1.5"/></svg>
+                </button>
+              </div>
+            </div>
+            <input type="file" accept="image/*" capture="environment" class="row-photo hidden"/>
+            <!-- inline actions if out-of-range -->
+            <div class="actions mt-2 gap-2 flex">
+              <button class="tap flex-1 rounded-lg bg-white shadow-line text-ink-900 text-[11.5px] font-semibold py-1.5" onclick="toggleNote(this)">+ Add Note</button>
+              <a href="report.html" class="tap flex-1 text-center rounded-lg bg-crit text-white text-[11.5px] font-semibold py-1.5">Create Issue</a>
+            </div>
+            <textarea class="note-input hidden mt-2 w-full rounded-lg border border-ink-200 bg-paper px-2.5 py-1.5 text-[12px] outline-none focus:border-ink-900 resize-none" rows="2" placeholder="Note likhein..."></textarea>
+          </div>
+
+          <!-- Inlet flow -->
+          <div class="row rounded-xl bg-white shadow-line p-3" data-state="" data-lo="40" data-hi="120">
+            <div class="flex items-start gap-3">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <div class="text-[13px] font-semibold leading-none">Inlet flow</div>
+                  <span class="pf pf-ok text-[9px] font-bold px-1.5 py-0.5 rounded bg-ok/15 text-ok uppercase">Ok</span>
+                  <span class="pf pf-fail text-[9px] font-bold px-1.5 py-0.5 rounded bg-crit/15 text-crit uppercase">Out</span>
+                </div>
+                <div class="text-[10.5px] text-ink-500 mt-0.5">Range <span class="num font-semibold">40 – 120</span> m³/h · Prev <span class="num">88</span></div>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="text" inputmode="decimal" placeholder="—" maxlength="5"
+                  class="num w-16 rounded-lg border border-ink-200 bg-white px-2 py-2 text-[15px] font-bold text-right outline-none focus:border-ink-900"
+                  oninput="evalRow(this)"/>
+                <button class="tap w-8 h-8 rounded-lg bg-ink-100 grid place-items-center" onclick="openCam(this)"><svg class="w-3.5 h-3.5 text-ink-700" viewBox="0 0 20 20" fill="none"><path d="M3 7a1 1 0 0 1 1-1h2l1-1.5h6L14 6h2a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="10" cy="10.5" r="2.8" stroke="currentColor" stroke-width="1.5"/></svg></button>
+              </div>
+            </div>
+            <input type="file" accept="image/*" capture="environment" class="row-photo hidden"/>
+            <div class="actions mt-2 gap-2 flex">
+              <button class="tap flex-1 rounded-lg bg-white shadow-line text-ink-900 text-[11.5px] font-semibold py-1.5" onclick="toggleNote(this)">+ Add Note</button>
+              <a href="report.html" class="tap flex-1 text-center rounded-lg bg-crit text-white text-[11.5px] font-semibold py-1.5">Create Issue</a>
+            </div>
+            <textarea class="note-input hidden mt-2 w-full rounded-lg border border-ink-200 bg-paper px-2.5 py-1.5 text-[12px] outline-none focus:border-ink-900 resize-none" rows="2" placeholder="Note likhein..."></textarea>
+          </div>
+
+          <!-- BOD (estimate) -->
+          <div class="row rounded-xl bg-white shadow-line p-3" data-state="" data-lo="100" data-hi="350">
+            <div class="flex items-start gap-3">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <div class="text-[13px] font-semibold leading-none">Inlet BOD</div>
+                  <span class="pf pf-ok text-[9px] font-bold px-1.5 py-0.5 rounded bg-ok/15 text-ok uppercase">Ok</span>
+                  <span class="pf pf-fail text-[9px] font-bold px-1.5 py-0.5 rounded bg-crit/15 text-crit uppercase">Out</span>
+                </div>
+                <div class="text-[10.5px] text-ink-500 mt-0.5">Range <span class="num font-semibold">100 – 350</span> mg/L · Prev <span class="num">240</span></div>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="text" inputmode="decimal" placeholder="—" maxlength="5"
+                  class="num w-16 rounded-lg border border-ink-200 bg-white px-2 py-2 text-[15px] font-bold text-right outline-none focus:border-ink-900"
+                  oninput="evalRow(this)"/>
+                <button class="tap w-8 h-8 rounded-lg bg-ink-100 grid place-items-center" onclick="openCam(this)"><svg class="w-3.5 h-3.5 text-ink-700" viewBox="0 0 20 20" fill="none"><path d="M3 7a1 1 0 0 1 1-1h2l1-1.5h6L14 6h2a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="10" cy="10.5" r="2.8" stroke="currentColor" stroke-width="1.5"/></svg></button>
+              </div>
+            </div>
+            <input type="file" accept="image/*" capture="environment" class="row-photo hidden"/>
+            <div class="actions mt-2 gap-2 flex">
+              <button class="tap flex-1 rounded-lg bg-white shadow-line text-ink-900 text-[11.5px] font-semibold py-1.5" onclick="toggleNote(this)">+ Add Note</button>
+              <a href="report.html" class="tap flex-1 text-center rounded-lg bg-crit text-white text-[11.5px] font-semibold py-1.5">Create Issue</a>
+            </div>
+            <textarea class="note-input hidden mt-2 w-full rounded-lg border border-ink-200 bg-paper px-2.5 py-1.5 text-[12px] outline-none focus:border-ink-900 resize-none" rows="2" placeholder="Note likhein..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Aeration group ===== -->
+      <div class="px-5 mt-4">
+        <div class="text-[10.5px] uppercase tracking-wider font-bold text-ink-500 mb-2 flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-ink-700"></span>Aeration
+        </div>
+        <div class="space-y-2">
+
+          <div class="row rounded-xl bg-white shadow-line p-3" data-state="" data-lo="2" data-hi="4">
+            <div class="flex items-start gap-3">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <div class="text-[13px] font-semibold leading-none">DO — Zone A</div>
+                  <span class="pf pf-ok text-[9px] font-bold px-1.5 py-0.5 rounded bg-ok/15 text-ok uppercase">Ok</span>
+                  <span class="pf pf-fail text-[9px] font-bold px-1.5 py-0.5 rounded bg-crit/15 text-crit uppercase">Out</span>
+                </div>
+                <div class="text-[10.5px] text-ink-500 mt-0.5">Range <span class="num font-semibold">2.0 – 4.0</span> mg/L · Prev <span class="num">2.8</span></div>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="text" inputmode="decimal" placeholder="—" maxlength="5" class="num w-16 rounded-lg border border-ink-200 bg-white px-2 py-2 text-[15px] font-bold text-right outline-none focus:border-ink-900" oninput="evalRow(this)"/>
+                <button class="tap w-8 h-8 rounded-lg bg-ink-100 grid place-items-center" onclick="openCam(this)"><svg class="w-3.5 h-3.5 text-ink-700" viewBox="0 0 20 20" fill="none"><path d="M3 7a1 1 0 0 1 1-1h2l1-1.5h6L14 6h2a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="10" cy="10.5" r="2.8" stroke="currentColor" stroke-width="1.5"/></svg></button>
+              </div>
+            </div>
+            <input type="file" accept="image/*" capture="environment" class="row-photo hidden"/>
+            <div class="actions mt-2 gap-2 flex">
+              <button class="tap flex-1 rounded-lg bg-white shadow-line text-ink-900 text-[11.5px] font-semibold py-1.5" onclick="toggleNote(this)">+ Add Note</button>
+              <a href="report.html" class="tap flex-1 text-center rounded-lg bg-crit text-white text-[11.5px] font-semibold py-1.5">Create Issue</a>
+            </div>
+            <textarea class="note-input hidden mt-2 w-full rounded-lg border border-ink-200 bg-paper px-2.5 py-1.5 text-[12px] outline-none focus:border-ink-900 resize-none" rows="2" placeholder="Note likhein..."></textarea>
+          </div>
+
+          <div class="row rounded-xl bg-white shadow-line p-3" data-state="" data-lo="2" data-hi="4">
+            <div class="flex items-start gap-3">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <div class="text-[13px] font-semibold leading-none">DO — Zone B</div>
+                  <span class="pf pf-ok text-[9px] font-bold px-1.5 py-0.5 rounded bg-ok/15 text-ok uppercase">Ok</span>
+                  <span class="pf pf-fail text-[9px] font-bold px-1.5 py-0.5 rounded bg-crit/15 text-crit uppercase">Out</span>
+                </div>
+                <div class="text-[10.5px] text-ink-500 mt-0.5">Range <span class="num font-semibold">2.0 – 4.0</span> mg/L · Prev <span class="num">3.1</span></div>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="text" inputmode="decimal" placeholder="—" maxlength="5" class="num w-16 rounded-lg border border-ink-200 bg-white px-2 py-2 text-[15px] font-bold text-right outline-none focus:border-ink-900" oninput="evalRow(this)"/>
+                <button class="tap w-8 h-8 rounded-lg bg-ink-100 grid place-items-center" onclick="openCam(this)"><svg class="w-3.5 h-3.5 text-ink-700" viewBox="0 0 20 20" fill="none"><path d="M3 7a1 1 0 0 1 1-1h2l1-1.5h6L14 6h2a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="10" cy="10.5" r="2.8" stroke="currentColor" stroke-width="1.5"/></svg></button>
+              </div>
+            </div>
+            <input type="file" accept="image/*" capture="environment" class="row-photo hidden"/>
+            <div class="actions mt-2 gap-2 flex">
+              <button class="tap flex-1 rounded-lg bg-white shadow-line text-ink-900 text-[11.5px] font-semibold py-1.5" onclick="toggleNote(this)">+ Add Note</button>
+              <a href="report.html" class="tap flex-1 text-center rounded-lg bg-crit text-white text-[11.5px] font-semibold py-1.5">Create Issue</a>
+            </div>
+            <textarea class="note-input hidden mt-2 w-full rounded-lg border border-ink-200 bg-paper px-2.5 py-1.5 text-[12px] outline-none focus:border-ink-900 resize-none" rows="2" placeholder="Note likhein..."></textarea>
+          </div>
+
+          <div class="row rounded-xl bg-white shadow-line p-3" data-state="" data-lo="200" data-hi="450">
+            <div class="flex items-start gap-3">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <div class="text-[13px] font-semibold leading-none">SV30</div>
+                  <span class="pf pf-ok text-[9px] font-bold px-1.5 py-0.5 rounded bg-ok/15 text-ok uppercase">Ok</span>
+                  <span class="pf pf-fail text-[9px] font-bold px-1.5 py-0.5 rounded bg-crit/15 text-crit uppercase">Out</span>
+                </div>
+                <div class="text-[10.5px] text-ink-500 mt-0.5">Range <span class="num font-semibold">200 – 450</span> ml/L · Prev <span class="num">340</span></div>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="text" inputmode="decimal" placeholder="—" maxlength="5" class="num w-16 rounded-lg border border-ink-200 bg-white px-2 py-2 text-[15px] font-bold text-right outline-none focus:border-ink-900" oninput="evalRow(this)"/>
+                <button class="tap w-8 h-8 rounded-lg bg-ink-100 grid place-items-center" onclick="openCam(this)"><svg class="w-3.5 h-3.5 text-ink-700" viewBox="0 0 20 20" fill="none"><path d="M3 7a1 1 0 0 1 1-1h2l1-1.5h6L14 6h2a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="10" cy="10.5" r="2.8" stroke="currentColor" stroke-width="1.5"/></svg></button>
+              </div>
+            </div>
+            <input type="file" accept="image/*" capture="environment" class="row-photo hidden"/>
+            <div class="actions mt-2 gap-2 flex">
+              <button class="tap flex-1 rounded-lg bg-white shadow-line text-ink-900 text-[11.5px] font-semibold py-1.5" onclick="toggleNote(this)">+ Add Note</button>
+              <a href="report.html" class="tap flex-1 text-center rounded-lg bg-crit text-white text-[11.5px] font-semibold py-1.5">Create Issue</a>
+            </div>
+            <textarea class="note-input hidden mt-2 w-full rounded-lg border border-ink-200 bg-paper px-2.5 py-1.5 text-[12px] outline-none focus:border-ink-900 resize-none" rows="2" placeholder="Note likhein..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Outlet group ===== -->
+      <div class="px-5 mt-4">
+        <div class="text-[10.5px] uppercase tracking-wider font-bold text-ink-500 mb-2 flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-ink-700"></span>Outlet
+        </div>
+        <div class="space-y-2">
+
+          <div class="row rounded-xl bg-white shadow-line p-3" data-state="" data-lo="0" data-hi="10">
+            <div class="flex items-start gap-3">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <div class="text-[13px] font-semibold leading-none">Outlet TSS</div>
+                  <span class="pf pf-ok text-[9px] font-bold px-1.5 py-0.5 rounded bg-ok/15 text-ok uppercase">Ok</span>
+                  <span class="pf pf-fail text-[9px] font-bold px-1.5 py-0.5 rounded bg-crit/15 text-crit uppercase">Out</span>
+                </div>
+                <div class="text-[10.5px] text-ink-500 mt-0.5">Limit <span class="num font-semibold">≤ 10</span> mg/L · Prev <span class="num">6</span></div>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="text" inputmode="decimal" placeholder="—" maxlength="5" class="num w-16 rounded-lg border border-ink-200 bg-white px-2 py-2 text-[15px] font-bold text-right outline-none focus:border-ink-900" oninput="evalRow(this)"/>
+                <button class="tap w-8 h-8 rounded-lg bg-ink-100 grid place-items-center" onclick="openCam(this)"><svg class="w-3.5 h-3.5 text-ink-700" viewBox="0 0 20 20" fill="none"><path d="M3 7a1 1 0 0 1 1-1h2l1-1.5h6L14 6h2a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="10" cy="10.5" r="2.8" stroke="currentColor" stroke-width="1.5"/></svg></button>
+              </div>
+            </div>
+            <input type="file" accept="image/*" capture="environment" class="row-photo hidden"/>
+            <div class="actions mt-2 gap-2 flex">
+              <button class="tap flex-1 rounded-lg bg-white shadow-line text-ink-900 text-[11.5px] font-semibold py-1.5" onclick="toggleNote(this)">+ Add Note</button>
+              <a href="report.html" class="tap flex-1 text-center rounded-lg bg-crit text-white text-[11.5px] font-semibold py-1.5">Create Issue</a>
+            </div>
+            <textarea class="note-input hidden mt-2 w-full rounded-lg border border-ink-200 bg-paper px-2.5 py-1.5 text-[12px] outline-none focus:border-ink-900 resize-none" rows="2" placeholder="Note likhein..."></textarea>
+          </div>
+
+          <div class="row rounded-xl bg-white shadow-line p-3" data-state="" data-lo="0" data-hi="2">
+            <div class="flex items-start gap-3">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <div class="text-[13px] font-semibold leading-none">Outlet Turbidity</div>
+                  <span class="pf pf-ok text-[9px] font-bold px-1.5 py-0.5 rounded bg-ok/15 text-ok uppercase">Ok</span>
+                  <span class="pf pf-fail text-[9px] font-bold px-1.5 py-0.5 rounded bg-crit/15 text-crit uppercase">Out</span>
+                </div>
+                <div class="text-[10.5px] text-ink-500 mt-0.5">Limit <span class="num font-semibold">≤ 2</span> NTU · Prev <span class="num">1.2</span></div>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="text" inputmode="decimal" placeholder="—" maxlength="5" class="num w-16 rounded-lg border border-ink-200 bg-white px-2 py-2 text-[15px] font-bold text-right outline-none focus:border-ink-900" oninput="evalRow(this)"/>
+                <button class="tap w-8 h-8 rounded-lg bg-ink-100 grid place-items-center" onclick="openCam(this)"><svg class="w-3.5 h-3.5 text-ink-700" viewBox="0 0 20 20" fill="none"><path d="M3 7a1 1 0 0 1 1-1h2l1-1.5h6L14 6h2a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="10" cy="10.5" r="2.8" stroke="currentColor" stroke-width="1.5"/></svg></button>
+              </div>
+            </div>
+            <input type="file" accept="image/*" capture="environment" class="row-photo hidden"/>
+            <div class="actions mt-2 gap-2 flex">
+              <button class="tap flex-1 rounded-lg bg-white shadow-line text-ink-900 text-[11.5px] font-semibold py-1.5" onclick="toggleNote(this)">+ Add Note</button>
+              <a href="report.html" class="tap flex-1 text-center rounded-lg bg-crit text-white text-[11.5px] font-semibold py-1.5">Create Issue</a>
+            </div>
+            <textarea class="note-input hidden mt-2 w-full rounded-lg border border-ink-200 bg-paper px-2.5 py-1.5 text-[12px] outline-none focus:border-ink-900 resize-none" rows="2" placeholder="Note likhein..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="h-3"></div>
+    </main>
+
+    <!-- Sticky Submit footer above bottom nav -->
+    <div class="absolute left-0 right-0 bottom-[68px] z-30 px-3">
+      <button id="submitLog" class="tap w-full rounded-2xl bg-ink-300 text-white font-semibold py-3.5 text-[14px] shadow-pop flex items-center justify-center gap-2" disabled onclick="submitLog()">
+        Submit Logbook
+        <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none"><path d="M5 10l3 3 7-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="absolute left-0 right-0 bottom-0 z-40">
+      <div class="mx-3 mb-3 rounded-2xl bg-white shadow-card shadow-line px-2 py-2 flex items-center justify-between">
+        <a href="issues.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-500">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M12 3l9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10l9-7Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+          <span class="text-[10px] font-medium">Issues</span>
+        </a>
+        <a href="tasks.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-500">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 3v4M16 3v4M4 10h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M9 14l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="text-[10px] font-medium">Tasks</span>
+        </a>
+        <a href="plant.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-500">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M3 12c2 0 2-3 5-3s3 3 5 3 2-3 5-3 3 3 3 3v8H3v-8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="6" r="2.2" stroke="currentColor" stroke-width="1.7"/></svg>
+          <span class="text-[10px] font-medium">Plant</span>
+        </a>
+        <a href="report.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-500">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <span class="text-[10px] font-medium">Report</span>
+        </a>
+      </div>
+      <div class="mx-auto mb-2 h-1 w-32 rounded-full bg-ink-900/80"></div>
+    </nav>
+  </div>
+</div>
+
+<script>
+  function evalRow(input){
+    const row = input.closest('.row');
+    const lo = parseFloat(row.dataset.lo), hi = parseFloat(row.dataset.hi);
+    const v = parseFloat((input.value||'').replace(/[^\d.]/g,''));
+    if (isNaN(v)) row.dataset.state = '';
+    else if (v < lo || v > hi) row.dataset.state = 'fail';
+    else if ((v-lo)/(hi-lo) < .1 || (hi-v)/(hi-lo) < .1) row.dataset.state = 'warn';
+    else row.dataset.state = 'ok';
+    updateProgress();
+  }
+  function toggleNote(btn){
+    const ta = btn.closest('.row').querySelector('.note-input');
+    ta.classList.toggle('hidden');
+    if (!ta.classList.contains('hidden')) ta.focus();
+  }
+  function openCam(btn){
+    btn.closest('.row').querySelector('.row-photo').click();
+  }
+  document.querySelectorAll('.row-photo').forEach(inp => {
+    inp.addEventListener('change', e => {
+      if (!e.target.files || !e.target.files[0]) return;
+      const btn = inp.closest('.row').querySelector('button[onclick^="openCam"]');
+      btn.classList.remove('bg-ink-100'); btn.classList.add('bg-ok','text-white');
+      btn.innerHTML = '<svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="none"><path d="M5 10l3 3 7-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    });
+  });
+  function updateProgress(){
+    const rows = [...document.querySelectorAll('.row')];
+    const total = rows.length, filled = rows.filter(r => r.dataset.state).length;
+    const fails = rows.filter(r => r.dataset.state === 'fail').length;
+    document.getElementById('totalCount').textContent = total;
+    document.getElementById('filledCount').textContent = filled;
+    document.getElementById('failCount').textContent = fails;
+    document.getElementById('progBar').style.width = (filled/total*100)+'%';
+    document.getElementById('progBar').classList.toggle('bg-crit', fails > 0);
+    document.getElementById('progBar').classList.toggle('bg-ink-900', fails === 0);
+    const submit = document.getElementById('submitLog');
+    if (filled === total) {
+      submit.disabled = false;
+      submit.classList.remove('bg-ink-300');
+      submit.classList.add(fails > 0 ? 'bg-crit' : 'bg-ink-900');
+    } else {
+      submit.disabled = true;
+      submit.classList.remove('bg-crit','bg-ink-900');
+      submit.classList.add('bg-ink-300');
+    }
+  }
+  function submitLog(){
+    alert('Logbook submitted ✓');
+    location.href = 'plant.html';
+  }
+  // Countdown timer (just for show)
+  let secs = 168;
+  const t = document.getElementById('etaTimer');
+  setInterval(() => {
+    if (secs <= 0) return;
+    secs--;
+    const m = Math.floor(secs/60), s = String(secs%60).padStart(2,'0');
+    t.textContent = m + ':' + s;
+  }, 1000);
+  updateProgress();
+</script>
+</body>
+</html>
