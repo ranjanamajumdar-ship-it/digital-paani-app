@@ -181,7 +181,9 @@
       <div class="lang-menu" role="menu">
         ${LANGS.map(l => `<a data-lang="${l.code}" class="${l.code===cur?'active':''}"><span class="native">${l.name}</span><span class="latin">${l.en}</span></a>`).join('')}
       </div>`;
-    document.body.appendChild(wrap);
+    // Mount inside the device frame when present so the picker lives ON the prototype itself.
+    const host = document.querySelector('.device') || document.body;
+    host.appendChild(wrap);
     const trigger = wrap.querySelector('.trigger');
     const menu = wrap.querySelector('.lang-menu');
     trigger.addEventListener('click', (e) => {

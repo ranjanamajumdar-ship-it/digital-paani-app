@@ -192,6 +192,38 @@ body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; color: var(--
 [dir="rtl"] .vm-toggle { right: auto; left: 16px; }
 
 /* ============================================================
+   When the picker / toggle live inside the device frame
+   (mobile prototype) — anchor them to the device, not the viewport.
+   ============================================================ */
+.device .vm-toggle,
+.device .lang-picker {
+  position: absolute;
+  top: auto;
+  right: 12px;
+  z-index: 70;
+  bottom: auto;
+  font-size: 11px;
+}
+.device .vm-toggle { top: 56px; padding: 3px; }
+.device .vm-toggle a { padding: 5px 10px; font-size: 11px; }
+.device .vm-toggle svg { width: 11px; height: 11px; }
+
+.device .lang-picker { top: 100px; }
+.device .lang-picker .trigger { padding: 6px 10px; font-size: 11px; }
+.device .lang-picker .trigger svg { width: 12px; height: 12px; }
+.device .lang-picker .lang-menu {
+  min-width: 180px;
+  max-height: 360px;
+  font-size: 12px;
+}
+.device .lang-picker .lang-menu a { padding: 7px 10px; font-size: 12px; }
+.device .lang-picker .lang-menu a .latin { font-size: 10px; }
+
+[dir="rtl"] .device .vm-toggle,
+[dir="rtl"] .device .lang-picker { right: auto; left: 12px; }
+[dir="rtl"] .device .lang-picker .lang-menu { right: auto; left: 0; }
+
+/* ============================================================
    Issue Card (status-driven)
    ============================================================ */
 .ds-issue { background: var(--c-card); border-radius: var(--r-lg); box-shadow: var(--sh-card); padding: var(--s-3) var(--s-4); }

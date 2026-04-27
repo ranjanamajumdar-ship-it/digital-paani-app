@@ -111,7 +111,8 @@
         <svg viewBox="0 0 16 16" fill="none"><rect x="1.5" y="2.5" width="13" height="9" rx="1.2" stroke="currentColor" stroke-width="1.4"/><path d="M5 13.5h6M8 11.5v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
         Desktop
       </a>`;
-    document.body.appendChild(wrap);
+    const host = document.querySelector('.device') || document.body;
+    host.appendChild(wrap);
     wrap.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
       try { localStorage.setItem('dp.viewmode', a.dataset.vm); } catch(e) {}
     }));
