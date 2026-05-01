@@ -55,8 +55,8 @@
       svg:'<svg viewBox="0 0 24 24" fill="none"><path d="M12 3l9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10l9-7Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>' },
     { id:'tasks', href:'tasks.html', label:'Tasks',
       svg:'<svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 3v4M16 3v4M4 10h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M9 14l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
-    { id:'plant', href:'plant.html', label:'Plant',
-      svg:'<svg viewBox="0 0 24 24" fill="none"><path d="M3 12c2 0 2-3 5-3s3 3 5 3 2-3 5-3 3 3 3 3v8H3v-8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="6" r="2.2" stroke="currentColor" stroke-width="1.7"/></svg>' },
+    { id:'logbook', href:'logbook.html', label:'Logbook',
+      svg:'<svg viewBox="0 0 24 24" fill="none"><path d="M6 4h9l3 3v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 11h8M8 14h8M8 17h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>' },
     { id:'report', href:'report.html', label:'Report',
       svg:'<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>' },
   ];
@@ -127,7 +127,6 @@
       else if (c === 'bottom-nav') el.outerHTML = bottomNav(el.dataset.active || '');
       else if (c === 'launcher') el.outerHTML = launcher(el.dataset.active || '');
     });
-    injectViewToggle();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
   else mount();

@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Outlet turbidity · Digital Paani</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_shared.css"/>
+<style>
+  /* ===== Page-specific (only what the design system doesn't cover) ===== */
+
+  /* hero gauge */
+  .hero-card {
+    background: linear-gradient(180deg, #FFFFFF 0%, #FAFAF7 100%);
+    border-radius: 24px;
+    padding: 24px 20px;
+    box-shadow: var(--sh-card);
+    text-align: center;
+  }
+  .gauge { position: relative; width: 200px; height: 200px; margin: 4px auto 8px; }
+  .gauge svg { display: block; }
+  .gauge-value { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+  .gauge-num { font-size: 44px; font-weight: 800; line-height: 1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; color: var(--c-crit); }
+  .gauge-unit { font-size: 11px; font-weight: 600; color: var(--c-ink-500); text-transform: uppercase; letter-spacing: .12em; }
+  .gauge-limit { font-size: 11px; color: var(--c-ink-500); font-weight: 500; margin-top: 6px; }
+  .gauge-limit strong { color: var(--c-crit); font-weight: 700; }
+
+  .delta-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; background: var(--c-crit-soft); color: var(--c-crit); }
+  .delta-pill svg { width: 10px; height: 10px; }
+
+  /* metric tile */
+  .metric { background: #fff; border-radius: 14px; padding: 12px 14px; box-shadow: var(--sh-line); }
+  .metric .lab { font-size: 10px; font-weight: 700; color: var(--c-ink-500); text-transform: uppercase; letter-spacing: .1em; }
+  .metric .val { font-size: 22px; font-weight: 800; line-height: 1.05; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .metric .val .u { font-size: 11px; font-weight: 500; color: var(--c-ink-500); margin-left: 3px; }
+  .metric .trend { display:flex; align-items:center; justify-content:space-between; margin-top: 4px; }
+  .metric .trend .delta { font-size: 10.5px; font-weight: 700; }
+  .metric .spark { width: 56px; height: 18px; }
+  .metric.crit { box-shadow: inset 0 0 0 1px var(--c-crit-line); }
+  .metric.crit .val { color: var(--c-crit); }
+  .metric.warn { box-shadow: inset 0 0 0 1px var(--c-warn-line); }
+  .metric.warn .val { color: var(--c-warn); }
+  .metric.ok .val { color: var(--c-ink-900); }
+
+  /* section heading */
+  .sec-h { display: flex; align-items: baseline; justify-content: space-between; padding: 0 4px 8px; }
+  .sec-h .t { font-size: 13px; font-weight: 700; color: var(--c-ink-900); }
+  .sec-h .a { font-size: 11.5px; color: var(--c-ink-500); font-weight: 600; }
+
+  /* trend chart */
+  .chart-card { background: #fff; border-radius: 16px; padding: 14px 14px 8px; box-shadow: var(--sh-line); }
+  .chart-meta { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:8px; }
+  .chart-meta .v { font-size: 18px; font-weight:800; }
+  .chart-meta .l { font-size: 10.5px; color: var(--c-ink-500); font-weight:600; }
+  .chart-card svg { display: block; width: 100%; }
+
+  /* equipment row */
+  .eq-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .eq-card { background: #fff; border-radius: 14px; padding: 10px 12px; box-shadow: var(--sh-line); display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit; transition: box-shadow .15s ease, transform .15s ease; }
+  .eq-card:active { transform: scale(.985); }
+  .eq-card .id { font-size: 11px; font-weight: 700; }
+  .eq-card .name { font-size: 10px; color: var(--c-ink-500); margin-top: 2px; }
+  .eq-card.crit { box-shadow: inset 0 0 0 1px var(--c-crit-line); }
+  .eq-card.warn { box-shadow: inset 0 0 0 1px var(--c-warn-line); }
+
+  /* history */
+  .hist-row { display:flex; align-items:flex-start; gap: 10px; padding: 10px 12px; border-radius: 12px; }
+  .hist-row + .hist-row { margin-top: 4px; }
+  .hist-row:hover { background: var(--c-ink-100); }
+  .hist-dot { margin-top: 5px; width: 8px; height: 8px; border-radius: 999px; flex: none; }
+  .hist-row .day { font-size: 10.5px; color: var(--c-ink-500); font-weight: 600; }
+  .hist-row .what { font-size: 12.5px; font-weight: 600; margin-top: 2px; }
+  .hist-row .who { font-size: 10.5px; color: var(--c-ink-500); margin-top: 2px; }
+
+  /* sticky CTA */
+  .cta-dock { position: absolute; left: 0; right: 0; bottom: 86px; z-index: 35; padding: 12px 12px 6px; background: linear-gradient(to top, var(--c-paper) 60%, rgba(250,250,247,0)); }
+  .cta-row { display: grid; grid-template-columns: 1fr; gap: 8px; }
+  .cta-row .ds-btn { width: 100%; box-shadow: 0 8px 22px rgba(225,29,46,.25); }
+
+  /* utility */
+  .scroll-pad { padding-bottom: 200px; }
+
+  /* severity strip — sticky under top bar */
+  .sev-strip {
+    position: sticky; top: 48px; z-index: 30;
+    margin: 0 16px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: var(--c-crit);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(225,29,46,.25);
+    display: flex; align-items: center; gap: 8px;
+    animation: ds-softpulse 1.6s ease-out infinite;
+  }
+  .sev-strip .ring { width: 8px; height: 8px; border-radius: 999px; background: #fff; flex: none; animation: ds-blink 1.4s linear infinite; }
+  @keyframes ds-blink { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+  .sev-strip .lab { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; opacity: .92; }
+  .sev-strip .id  { font-size: 11px; font-weight: 600; opacity: .85; margin-left: auto; font-variant-numeric: tabular-nums; }
+
+  /* page title */
+  .issue-title { padding: 16px 20px 6px; }
+  .issue-title h1 { font-size: 22px; font-weight: 800; line-height: 1.18; letter-spacing: -.012em; }
+  .issue-title p { font-size: 12.5px; color: var(--c-ink-500); margin-top: 4px; line-height: 1.4; }
+</style>
+</head>
+<body>
+<div class="ds-stage">
+
+  <aside class="ds-launcher">
+    <div class="ds-launcher-eyebrow">Digital Paani · Prototype</div>
+    <a href="issue.html" class="ds-launcher-link active">Issue <span class="meta">Active</span></a>
+    
+    <a href="tasks.html" class="ds-launcher-link">Tasks <span class="meta">Kanban</span></a>
+    <a href="issues.html" class="ds-launcher-link">Issues list <span class="meta">All</span></a>
+    <a href="logbook.html" class="ds-launcher-link">Logbook <span class="meta">Bulk</span></a>
+    <a href="equipment.html" class="ds-launcher-link">Equipment <span class="meta">Card</span></a>
+    <a href="report.html" class="ds-launcher-link">Report <span class="meta">New</span></a>
+    <a href="styleguide.html" class="ds-launcher-link">Design system <span class="meta">DS</span></a>
+  </aside>
+
+  <div class="device">
+    <div class="notch"></div>
+
+    <!-- Status bar -->
+    <div class="ds-statusbar">
+      <span>9:41</span>
+      <span class="ds-statusbar-icons">
+        <svg width="16" height="10" viewBox="0 0 16 10" fill="currentColor"><rect x="0" y="6" width="3" height="4" rx="1"/><rect x="4.5" y="4" width="3" height="6" rx="1"/><rect x="9" y="2" width="3" height="8" rx="1"/><rect x="13.5" y="0" width="3" height="10" rx="1"/></svg>
+        <svg width="22" height="10" viewBox="0 0 22 10" fill="none"><rect x=".5" y=".5" width="18" height="9" rx="2" stroke="currentColor"/><rect x="2" y="2" width="15" height="6" rx="1" fill="currentColor"/><rect x="19.5" y="3.5" width="1.5" height="3" rx=".5" fill="currentColor"/></svg>
+      </span>
+    </div>
+
+    <main class="absolute inset-0" style="padding-top:48px; overflow-y:auto;">
+
+      <!-- Header -->
+      <div class="ds-page-head">
+        <div>
+          <div class="ds-micro">Honda Manesar STP</div>
+          <div class="ds-page-title" style="font-size:14px; margin-top:2px;">लाइव · 12 sec पहले update</div>
+        </div>
+        <a href="#" class="tap" style="width:36px; height:36px; border-radius:999px; background:#fff; box-shadow: var(--sh-line); display:grid; place-items:center; text-decoration:none;">
+          <span style="width:26px; height:26px; border-radius:999px; background: var(--c-ink-900); color:#fff; font-size:11px; font-weight:700; display:grid; place-items:center;">RA</span>
+        </a>
+      </div>
+
+      <!-- Severity strip (sticky) -->
+      <div class="sev-strip">
+        <span class="ring"></span>
+        <span class="lab">सक्रिय · Critical</span>
+        <span class="id">#IS-2041 · 2 min</span>
+      </div>
+
+      <div class="scroll-pad">
+
+      <!-- Issue title -->
+      <div class="issue-title">
+        <h1>Outlet turbidity 14 NTU</h1>
+        <p>Limit 10 NTU से ऊपर · पिछले 2 घंटे से बढ़ रहा है</p>
+      </div>
+
+      <!-- Hero gauge -->
+      <div style="padding: 0 16px;">
+        <div class="hero-card">
+          <div class="gauge">
+            <svg viewBox="0 0 200 200" width="200" height="200">
+              <!-- Background ring -->
+              <circle cx="100" cy="100" r="84" fill="none" stroke="#EAEDF2" stroke-width="14"/>
+              <!-- Safe zone arc (0-50% of circumference) -->
+              <circle cx="100" cy="100" r="84" fill="none" stroke="#16A34A" stroke-width="14"
+                      stroke-dasharray="264 528" stroke-dashoffset="0"
+                      transform="rotate(135 100 100)" stroke-linecap="round"/>
+              <!-- Warn zone arc (50-75%) -->
+              <circle cx="100" cy="100" r="84" fill="none" stroke="#F59E0B" stroke-width="14"
+                      stroke-dasharray="132 528" stroke-dashoffset="-264"
+                      transform="rotate(135 100 100)" stroke-linecap="round"/>
+              <!-- Crit zone arc (75-100%) -->
+              <circle cx="100" cy="100" r="84" fill="none" stroke="#E11D2E" stroke-width="14"
+                      stroke-dasharray="132 528" stroke-dashoffset="-396"
+                      transform="rotate(135 100 100)" stroke-linecap="round"/>
+              <!-- Needle marker at 70% (14 NTU on 0-20 scale) -->
+              <g transform="rotate(45 100 100)">
+                <circle cx="100" cy="16" r="9" fill="#fff" stroke="#0B1220" stroke-width="3"/>
+              </g>
+              <!-- Limit tick at 50% -->
+              <g transform="rotate(0 100 100)">
+                <line x1="100" y1="8" x2="100" y2="24" stroke="#0B1220" stroke-width="2" stroke-linecap="round"/>
+                <text x="100" y="42" text-anchor="middle" font-size="9" fill="#6B7280" font-weight="700">10</text>
+              </g>
+            </svg>
+            <div class="gauge-value">
+              <span class="gauge-num ds-num">14</span>
+              <span class="gauge-unit">NTU · अभी</span>
+            </div>
+          </div>
+          <div class="delta-pill">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M6 2v8M3 5l3-3 3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            +133% vs 7-day average
+          </div>
+          <div class="gauge-limit">Discharge limit <strong>10 NTU</strong> · Status <strong>out of range</strong></div>
+        </div>
+      </div>
+
+      <!-- Live IOT sensor data -->
+      <div style="padding: 16px 16px 0;">
+        <div class="sec-h">
+          <span class="t">Live readings · IOT sensors</span>
+          <span class="a">अभी</span>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+
+          <div class="metric crit">
+            <div class="lab">Outlet turbidity</div>
+            <div class="val ds-num">14<span class="u">NTU</span></div>
+            <div class="trend">
+              <span class="delta" style="color: var(--c-crit);">+133%</span>
+              <svg class="spark" viewBox="0 0 56 18" fill="none">
+                <path d="M0 14 L8 13 L16 12 L24 10 L32 8 L40 6 L48 4 L56 2" stroke="#E11D2E" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="metric crit">
+            <div class="lab">Outlet TSS</div>
+            <div class="val ds-num">18<span class="u">mg/L</span></div>
+            <div class="trend">
+              <span class="delta" style="color: var(--c-crit);">+200%</span>
+              <svg class="spark" viewBox="0 0 56 18" fill="none">
+                <path d="M0 15 L8 14 L16 13 L24 11 L32 9 L40 7 L48 5 L56 3" stroke="#E11D2E" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="metric warn">
+            <div class="lab">DO · Aeration AT-01</div>
+            <div class="val ds-num">1.8<span class="u">mg/L</span></div>
+            <div class="trend">
+              <span class="delta" style="color: var(--c-warn);">below 2.0</span>
+              <svg class="spark" viewBox="0 0 56 18" fill="none">
+                <path d="M0 6 L8 7 L16 8 L24 10 L32 11 L40 12 L48 13 L56 14" stroke="#F59E0B" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="metric ok">
+            <div class="lab">Inlet flow</div>
+            <div class="val ds-num">92<span class="u">m³/h</span></div>
+            <div class="trend">
+              <span class="delta" style="color: var(--c-ok);">design के अंदर</span>
+              <svg class="spark" viewBox="0 0 56 18" fill="none">
+                <path d="M0 9 L8 10 L16 8 L24 11 L32 9 L40 10 L48 9 L56 9" stroke="#16A34A" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Historical chart -->
+      <div style="padding: 16px 16px 0;">
+        <div class="sec-h">
+          <span class="t">Last 7 days · Outlet turbidity</span>
+          <a href="#" class="a tap" style="text-decoration:none; color: var(--c-ink-500);">30d →</a>
+        </div>
+        <div class="chart-card">
+          <div class="chart-meta">
+            <div>
+              <div class="v ds-num">14 NTU <span style="font-size:11px; color: var(--c-crit); font-weight:700;">↑</span></div>
+              <div class="l">Today · vs 6 NTU avg</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="v ds-num" style="color: var(--c-crit);">3</div>
+              <div class="l">Days above limit</div>
+            </div>
+          </div>
+          <svg viewBox="0 0 320 140" style="height:140px;">
+            <defs>
+              <linearGradient id="grad-fill" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stop-color="#E11D2E" stop-opacity=".18"/>
+                <stop offset="100%" stop-color="#E11D2E" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- limit line -->
+            <line x1="0" y1="76" x2="320" y2="76" stroke="#E11D2E" stroke-width="1" stroke-dasharray="4 4"/>
+            <text x="318" y="71" text-anchor="end" font-size="10" fill="#E11D2E" font-weight="700">Limit · 10</text>
+            <!-- safe baseline -->
+            <line x1="0" y1="100" x2="320" y2="100" stroke="#D6DBE3" stroke-width="1" stroke-dasharray="3 5"/>
+            <text x="318" y="95" text-anchor="end" font-size="10" fill="#9AA3B2">5</text>
+            <!-- area fill -->
+            <path d="M0 116 L40 110 L80 102 L120 94 L160 84 L200 70 L240 52 L280 38 L320 30 L320 140 L0 140 Z" fill="url(#grad-fill)"/>
+            <!-- line -->
+            <path d="M0 116 L40 110 L80 102 L120 94 L160 84 L200 70 L240 52 L280 38 L320 30" fill="none" stroke="#0B1220" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- dots -->
+            <g fill="#0B1220">
+              <circle cx="0" cy="116" r="2"/><circle cx="40" cy="110" r="2"/><circle cx="80" cy="102" r="2"/>
+              <circle cx="120" cy="94" r="2"/><circle cx="160" cy="84" r="2"/><circle cx="200" cy="70" r="2"/>
+              <circle cx="240" cy="52" r="2"/><circle cx="280" cy="38" r="2"/>
+            </g>
+            <!-- highlight: today -->
+            <circle cx="320" cy="30" r="6" fill="#E11D2E" fill-opacity=".18"/>
+            <circle cx="320" cy="30" r="4" fill="#E11D2E"/>
+            <!-- x-axis labels -->
+            <g font-size="9.5" fill="#9AA3B2" font-weight="600">
+              <text x="0" y="135">D-7</text>
+              <text x="80" y="135">D-5</text>
+              <text x="160" y="135">D-3</text>
+              <text x="240" y="135">D-1</text>
+              <text x="318" y="135" text-anchor="end">आज</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Affected equipment -->
+      <div style="padding: 16px 16px 0;">
+        <div class="sec-h">
+          <span class="t">Affected equipment</span>
+          <a href="equipment.html" class="a tap" style="text-decoration:none; color: var(--c-ink-500);">सब देखें →</a>
+        </div>
+        <div class="eq-row">
+          <a href="equipment.html?eq=blower" class="eq-card crit">
+            <span class="ds-dot ds-dot--crit"></span>
+            <div><div class="id">BL-101</div><div class="name">Blower</div></div>
+          </a>
+          <a href="equipment.html?eq=aeration" class="eq-card warn">
+            <span class="ds-dot ds-dot--warn"></span>
+            <div><div class="id">AT-01</div><div class="name">Aeration</div></div>
+          </a>
+          <a href="equipment.html?eq=clarifier" class="eq-card warn">
+            <span class="ds-dot ds-dot--warn"></span>
+            <div><div class="id">CL-01</div><div class="name">Clarifier</div></div>
+          </a>
+        </div>
+      </div>
+
+      <!-- History -->
+      <div style="padding: 16px 16px 0;">
+        <div class="sec-h">
+          <span class="t">History · Similar issues</span>
+          <a href="issues.html?tab=resolved" class="a tap" style="text-decoration:none; color: var(--c-ink-500);">All →</a>
+        </div>
+        <div style="background:#fff; border-radius:14px; box-shadow: var(--sh-line); padding: 6px;">
+          <div class="hist-row">
+            <span class="hist-dot" style="background: var(--c-ok);"></span>
+            <div style="flex:1;">
+              <div class="day">12 दिन पहले · 6 hrs में हल</div>
+              <div class="what">Outlet turbidity 11 NTU — DO कम था</div>
+              <div class="who">Aeration +30% · DO 2.5 mg/L hold · Resolved</div>
+            </div>
+          </div>
+          <div class="hist-row">
+            <span class="hist-dot" style="background: var(--c-ok);"></span>
+            <div style="flex:1;">
+              <div class="day">28 दिन पहले · 4 hrs में हल</div>
+              <div class="what">Outlet TSS 22 mg/L — sludge wasting overdue</div>
+              <div class="who">RAS pump +15% · Resolved</div>
+            </div>
+          </div>
+          <div class="hist-row">
+            <span class="hist-dot" style="background: var(--c-warn);"></span>
+            <div style="flex:1;">
+              <div class="day">45 दिन पहले · 1 day · Escalated</div>
+              <div class="what">Outlet quality खराब — hydraulic overload</div>
+              <div class="who">Equalization tank usage · Sandeep K.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      </div>
+    </main>
+
+    <!-- Sticky CTA -->
+    <div class="cta-dock">
+      <div class="cta-row">
+        <a href="diagnostic.html" class="ds-btn ds-btn--danger">
+          जांच शुरू करें
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M7 4l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Bottom nav -->
+    <nav class="ds-nav">
+      <div class="ds-nav-bar">
+        <a href="issues.html" class="ds-nav-item active">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 3l9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10l9-7Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+          <span class="label">Issues</span>
+        </a>
+        <a href="tasks.html" class="ds-nav-item">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 3v4M16 3v4M4 10h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M9 14l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="label">Tasks</span>
+        </a>
+        <a href="logbook.html" class="ds-nav-item">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M6 4h9l3 3v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 11h8M8 14h8M8 17h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <span class="label">Logbook</span>
+        </a>
+        <a href="report.html" class="ds-nav-item">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <span class="label">Report</span>
+        </a>
+      </div>
+      <div class="ds-nav-handle"></div>
+    </nav>
+  </div>
+</div>
+
+<script src="_components.js" defer></script>
+</body>
+</html>

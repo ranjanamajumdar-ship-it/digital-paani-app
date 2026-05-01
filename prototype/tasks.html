@@ -99,9 +99,10 @@
 
   <aside class="hidden lg:flex flex-col w-56 sticky top-12 gap-2">
     <div class="text-[10px] uppercase tracking-[.18em] text-ink-500 font-semibold">Digital Paani · Prototype</div>
-    <a href="plant.html" class="tap rounded-xl bg-white shadow-line px-3 py-2.5 text-[12px] font-semibold flex items-center justify-between">Plant <span class="text-ink-400">SCADA</span></a>
     <a href="tasks.html" class="tap rounded-xl bg-ink-900 text-white px-3 py-2.5 text-[12px] font-semibold flex items-center justify-between">Tasks <span class="opacity-60">Kanban</span></a>
     <a href="issues.html" class="tap rounded-xl bg-white shadow-line px-3 py-2.5 text-[12px] font-semibold flex items-center justify-between">Issues <span class="text-ink-400">List</span></a>
+    <a href="logbook.html" class="tap rounded-xl bg-white shadow-line px-3 py-2.5 text-[12px] font-semibold flex items-center justify-between">Logbook <span class="text-ink-400">Bulk</span></a>
+    <a href="equipment.html" class="tap rounded-xl bg-white shadow-line px-3 py-2.5 text-[12px] font-semibold flex items-center justify-between">Equipment <span class="text-ink-400">Card</span></a>
     <a href="report.html" class="tap rounded-xl bg-white shadow-line px-3 py-2.5 text-[12px] font-semibold flex items-center justify-between">Report <span class="text-ink-400">New</span></a>
   </aside>
 
@@ -140,7 +141,7 @@
 
       <!-- Alarm Bar (in-progress state, since plant has active issue) -->
       <div class="px-5 mt-2">
-        <a href="plant.html" class="tap block w-full text-left rounded-2xl shadow-card overflow-hidden bg-prog text-white">
+        <a href="issue.html" class="tap block w-full text-left rounded-2xl shadow-card overflow-hidden bg-prog text-white">
           <div class="px-4 py-3 flex items-center gap-3">
             <span class="grid place-items-center w-7 h-7 rounded-full bg-white/15">
               <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"><path d="M3 12c2-2 4-2 6 0s4 2 6 0 4-2 6 0" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -767,9 +768,9 @@
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 3v4M16 3v4M4 10h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M9 14l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <span class="text-[10px] font-bold">काम</span>
         </a>
-        <a href="plant.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-500">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M3 12c2 0 2-3 5-3s3 3 5 3 2-3 5-3 3 3 3 3v8H3v-8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="6" r="2.2" stroke="currentColor" stroke-width="1.7"/></svg>
-          <span class="text-[10px] font-medium">प्लांट</span>
+        <a href="logbook.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-500">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M6 4h9l3 3v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 11h8M8 14h8M8 17h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <span class="text-[10px] font-medium">Logbook</span>
         </a>
         <a href="report.html" class="tap flex-1 flex flex-col items-center py-1.5 gap-0.5 text-ink-500">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
@@ -991,7 +992,7 @@
   document.querySelectorAll('.task-card').forEach(card => {
     card.querySelectorAll('button').forEach(btn => {
       const txt = (btn.textContent || '').trim();
-      if (['Start','Continue','अभी शुरू करें','Submit','Schedule'].includes(txt)) {
+      if (['Start','Continue','Start Now','Submit','Schedule','शुरू करें','आगे बढ़ें','अभी शुरू करें','जमा करें','तय करें'].includes(txt)) {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           const title = card.querySelector('.text-\\[13\\.5px\\]')?.textContent?.trim();
