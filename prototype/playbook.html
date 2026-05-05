@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Digital Paani — Playbook Prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#0F172A; --ink2:#334155; --ink3:#64748B; }
+  html,body { font-family:Inter,ui-sans-serif,system-ui,sans-serif; background:#F1F5F9; color:var(--ink); }
+  .screen { display:none; }
+  .screen.active { display:block; }
+  .chip { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:9999px; font-size:11px; font-weight:500; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; border-radius:10px; padding:8px 14px; font-size:13px; font-weight:600; transition:all .15s; cursor:pointer; }
+  .btn-primary { background:#0F172A; color:#fff; }
+  .btn-primary:hover { background:#1e293b; }
+  .btn-ghost { background:#F1F5F9; color:#0F172A; }
+  .btn-ghost:hover { background:#e2e8f0; }
+  .card { background:#fff; border-radius:14px; box-shadow:0 1px 2px rgba(15,23,42,.04), 0 4px 16px rgba(15,23,42,.06); }
+  .sev-bar { height:4px; border-radius:2px; display:flex; overflow:hidden; gap:2px; }
+  .sev-bar > div { transition:all .2s; }
+  .pulse { animation:pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+  .slide-in { animation:slide-in .25s ease-out; }
+  @keyframes slide-in { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .highlight-row { animation:hl 1.2s ease-out; }
+  @keyframes hl { 0%{background:#fef3c7} 100%{background:transparent} }
+  .timeline-line { height:2px; background:linear-gradient(90deg,#cbd5e1 0,#cbd5e1 100%); position:relative; }
+  .timeline-dot { width:14px; height:14px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 0 2px currentColor; }
+  .toast { animation:toast .3s ease-out; }
+  @keyframes toast { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  [contenteditable]:focus { outline:2px solid #2563eb; outline-offset:2px; border-radius:4px; }
+  .editable-chip { background:#EFF6FF; color:#1E40AF; padding:2px 8px; border-radius:6px; border:1px dashed #93C5FD; cursor:text; font-weight:500; }
+  .editable-chip:hover { background:#DBEAFE; }
+  details > summary { list-style:none; cursor:pointer; }
+  details > summary::-webkit-details-marker { display:none; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- ===== Top Nav ===== -->
+<nav class="bg-white border-b border-slate-200 sticky top-0 z-30">
+  <div class="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+    <div class="flex items-center gap-8">
+      <div class="font-bold text-[15px]">Digital Paani</div>
+      <div class="flex items-center gap-1 text-sm">
+        <button onclick="show('plants')" id="nav-plants" class="px-3 py-1.5 rounded-lg font-medium">Plants <span class="text-slate-400 ml-1">5</span></button>
+        <button onclick="show('insights')" id="nav-insights" class="px-3 py-1.5 rounded-lg font-medium">Insights <span class="text-slate-400 ml-1">18</span></button>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="text-xs text-slate-500">Prototype · v2 (Playbook)</span>
+      <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-semibold">RM</div>
+    </div>
+  </div>
+</nav>
+
+<!-- =========================================================
+     PLANTS SCREEN
+========================================================= -->
+<section id="screen-plants" class="screen active">
+  <div class="max-w-7xl mx-auto px-6 py-8">
+
+    <div class="flex items-end justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold">Plants</h1>
+        <p class="text-sm text-slate-500 mt-1">Configuration layer · sorted by severity</p>
+      </div>
+      <div class="flex gap-2">
+        <input placeholder="Search plants…" class="border border-slate-200 rounded-lg px-3 py-2 text-sm w-64"/>
+      </div>
+    </div>
+
+    <!-- Plant cards -->
+    <div class="grid grid-cols-3 gap-4" id="plants-grid">
+      <!-- Alpha (incidents - top) -->
+      <div class="card p-5">
+        <div class="sev-bar mb-4">
+          <div style="background:#DC2626;flex:2"></div>
+          <div style="background:#F59E0B;flex:1"></div>
+          <div style="background:#e2e8f0;flex:1"></div>
+        </div>
+        <h3 class="font-semibold text-[15px]">Alpha Manufacturing Unit</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Mumbai, MH · 4 insights</p>
+        <div class="flex flex-wrap gap-1.5 mt-3">
+          <span class="chip" style="background:#FEE2E2;color:#991B1B">● 2 incident</span>
+          <span class="chip" style="background:#FEF3C7;color:#92400E">● 1 issue</span>
+        </div>
+        <div class="flex gap-2 mt-5">
+          <button class="btn btn-ghost flex-1" onclick="show('insights')">View insights</button>
+          <button class="btn btn-primary flex-1" onclick="openDefaults('Alpha Manufacturing Unit')">Configure defaults</button>
+        </div>
+      </div>
+
+      <!-- Beta -->
+      <div class="card p-5">
+        <div class="sev-bar mb-4">
+          <div style="background:#F59E0B;flex:2"></div>
+          <div style="background:#e2e8f0;flex:3"></div>
+        </div>
+        <h3 class="font-semibold text-[15px]">Beta Refinery Complex</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Surat, GJ · 5 insights</p>
+        <div class="flex flex-wrap gap-1.5 mt-3">
+          <span class="chip" style="background:#FEF3C7;color:#92400E">● 2 issue</span>
+        </div>
+        <div class="flex gap-2 mt-5">
+          <button class="btn btn-ghost flex-1" onclick="show('insights')">View insights</button>
+          <button class="btn btn-primary flex-1" onclick="openDefaults('Beta Refinery Complex')">Configure defaults</button>
+        </div>
+      </div>
+
+      <!-- Delta -->
+      <div class="card p-5">
+        <div class="sev-bar mb-4">
+          <div style="background:#FBBF24;flex:2"></div>
+          <div style="background:#e2e8f0;flex:3"></div>
+        </div>
+        <h3 class="font-semibold text-[15px]">Delta Processing Plant</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Nagpur, MH · 4 insights</p>
+        <div class="flex flex-wrap gap-1.5 mt-3">
+          <span class="chip" style="background:#FEF9C3;color:#854D0E">● 2 warning</span>
+        </div>
+        <div class="flex gap-2 mt-5">
+          <button class="btn btn-ghost flex-1" onclick="show('insights')">View insights</button>
+          <button class="btn btn-primary flex-1" onclick="openDefaults('Delta Processing Plant')">Configure defaults</button>
+        </div>
+      </div>
+
+      <!-- Gamma -->
+      <div class="card p-5 opacity-90">
+        <div class="sev-bar mb-4">
+          <div style="background:#FBBF24;flex:1"></div>
+          <div style="background:#e2e8f0;flex:4"></div>
+        </div>
+        <h3 class="font-semibold text-[15px]">Gamma Cold Storage</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Pune, MH · 3 insights</p>
+        <div class="flex flex-wrap gap-1.5 mt-3">
+          <span class="chip" style="background:#FEF9C3;color:#854D0E">● 1 warning</span>
+        </div>
+        <div class="flex gap-2 mt-5">
+          <button class="btn btn-ghost flex-1" onclick="show('insights')">View insights</button>
+          <button class="btn btn-primary flex-1" onclick="openDefaults('Gamma Cold Storage')">Configure defaults</button>
+        </div>
+      </div>
+
+      <!-- Epsilon (all clear) -->
+      <div class="card p-5 opacity-70">
+        <div class="sev-bar mb-4">
+          <div style="background:#16A34A;flex:1"></div>
+          <div style="background:#e2e8f0;flex:4"></div>
+        </div>
+        <h3 class="font-semibold text-[15px] text-slate-600">Epsilon Packaging Hub</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Chennai, TN · 2 insights</p>
+        <div class="flex flex-wrap gap-1.5 mt-3">
+          <span class="chip" style="background:#DCFCE7;color:#166534">● all clear</span>
+        </div>
+        <div class="flex gap-2 mt-5">
+          <button class="btn btn-ghost flex-1" onclick="show('insights')">View insights</button>
+          <button class="btn btn-primary flex-1" onclick="openDefaults('Epsilon Packaging Hub')">Configure defaults</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="text-xs text-slate-500 mt-6">Click <b>Configure defaults</b> on any plant to set escalation timelines per severity — every new insight in that plant inherits these settings.</p>
+  </div>
+</section>
+
+<!-- =========================================================
+     INSIGHTS SCREEN
+========================================================= -->
+<section id="screen-insights" class="screen">
+  <div class="max-w-7xl mx-auto px-6 py-8">
+
+    <div class="flex items-end justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold">Insights <span id="insight-count" class="text-slate-400 font-normal text-lg">· 18</span></h1>
+        <p class="text-sm text-slate-500 mt-1">Operational layer · live status</p>
+      </div>
+      <button class="btn btn-primary" onclick="openNewInsight()">+ New insight</button>
+    </div>
+
+    <!-- Search + primary filters row -->
+    <div class="flex items-center gap-2 mb-3">
+      <input placeholder="Search insights…" class="border border-slate-200 rounded-lg px-3 py-2 text-sm flex-1"/>
+      <select class="border border-slate-200 rounded-lg px-3 py-2 text-sm" onchange="applyFilter('plant',this.value)">
+        <option>All plants</option><option>Alpha</option><option>Beta</option><option>Delta</option><option>Gamma</option>
+      </select>
+      <select class="border border-slate-200 rounded-lg px-3 py-2 text-sm" onchange="applyFilter('severity',this.value)">
+        <option>All severities</option><option>Incident</option><option>Issue</option><option>Warning</option>
+      </select>
+      <select class="border border-slate-200 rounded-lg px-3 py-2 text-sm">
+        <option>All statuses</option><option>Active</option><option>Resolved</option><option>Paused</option>
+      </select>
+      <button class="btn btn-ghost" onclick="document.getElementById('drawer').classList.toggle('hidden')">More filters</button>
+    </div>
+
+    <!-- Drawer (hidden by default) - Equipment, Channel, Esc time, Repeats -->
+    <div id="drawer" class="hidden card p-4 mb-3 grid grid-cols-4 gap-4">
+      <div>
+        <label class="text-[11px] uppercase text-slate-500 font-semibold">Equipment</label>
+        <select class="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-sm mt-1"><option>Any</option><option>Pump</option><option>Tank</option><option>Valve</option><option>Blower</option></select>
+      </div>
+      <div>
+        <label class="text-[11px] uppercase text-slate-500 font-semibold">Channel</label>
+        <div class="flex gap-1 mt-1">
+          <button class="chip border border-slate-200">Email</button>
+          <button class="chip border border-slate-200">SMS</button>
+          <button class="chip border border-slate-200">WA</button>
+          <button class="chip border border-slate-200">Call</button>
+        </div>
+      </div>
+      <div>
+        <label class="text-[11px] uppercase text-slate-500 font-semibold">Escalation time</label>
+        <div class="flex gap-1 mt-1 flex-wrap">
+          <button class="chip border border-slate-200">&lt;5m</button>
+          <button class="chip border border-slate-200">5–15m</button>
+          <button class="chip border border-slate-200">15–60m</button>
+          <button class="chip border border-slate-200">&gt;1h</button>
+        </div>
+      </div>
+      <div>
+        <label class="text-[11px] uppercase text-slate-500 font-semibold">Repeats</label>
+        <select class="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-sm mt-1"><option>Any</option><option>On</option><option>Off</option></select>
+      </div>
+    </div>
+
+    <!-- Active filter chips -->
+    <div id="filter-chips" class="flex gap-2 mb-3 hidden">
+      <span class="text-xs text-slate-500 self-center">Active:</span>
+    </div>
+
+    <!-- Insights list -->
+    <div class="card overflow-hidden">
+      <div class="grid grid-cols-12 px-4 py-2 text-[11px] uppercase text-slate-500 font-semibold border-b border-slate-100 bg-slate-50">
+        <div class="col-span-5">Insight</div>
+        <div class="col-span-2">Plant · Equipment</div>
+        <div class="col-span-2">Status</div>
+        <div class="col-span-2">Last triggered</div>
+        <div class="col-span-1 text-right">On</div>
+      </div>
+
+      <div id="insights-list">
+        <!-- rows generated by JS -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     NEW INSIGHT MODAL (Playbook sentence builder)
+========================================================= -->
+<div id="modal-new" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-6">
+  <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-10">
+      <div>
+        <h2 class="font-bold text-lg">New insight</h2>
+        <p class="text-xs text-slate-500">Build it as a sentence — no forms.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <span id="completion" class="text-xs text-slate-500">Step 1 of 3</span>
+        <button class="text-slate-400 hover:text-slate-700" onclick="closeNewInsight()">✕</button>
+      </div>
+    </div>
+
+    <div class="p-6">
+      <!-- Progress -->
+      <div class="flex gap-1 mb-6">
+        <div id="prog-1" class="h-1 flex-1 bg-blue-500 rounded"></div>
+        <div id="prog-2" class="h-1 flex-1 bg-slate-200 rounded"></div>
+        <div id="prog-3" class="h-1 flex-1 bg-slate-200 rounded"></div>
+      </div>
+
+      <!-- Sentence builder -->
+      <div class="card p-6 bg-slate-50 leading-loose text-[15px]">
+        <div class="mb-4">
+          <span class="text-slate-500 font-semibold uppercase text-[11px] mr-2">When</span>
+          <span class="editable-chip" contenteditable="true" onblur="markStep(1)">PT-101</span>
+          <span class="editable-chip" contenteditable="true">≥</span>
+          <span class="editable-chip" contenteditable="true">12.0 bar</span>
+          <span class="text-slate-500">on</span>
+          <span class="editable-chip" contenteditable="true">Tank</span>
+          <span class="text-slate-500">at</span>
+          <span class="editable-chip" contenteditable="true">Alpha Manufacturing Unit</span>
+        </div>
+
+        <div class="mb-4">
+          <span class="text-slate-500 font-semibold uppercase text-[11px] mr-2">Then</span>
+          <span class="text-slate-700">notify</span>
+          <span class="editable-chip" contenteditable="true" onblur="markStep(2);showUserHelper(this,'new')">Ravi Kumar</span>
+          <span class="text-slate-500">via</span>
+          <span class="editable-chip" contenteditable="true">SMS, WhatsApp</span>
+          <span class="text-slate-500">immediately.</span>
+
+          <!-- User helper inline -->
+          <div id="user-helper" class="hidden mt-2 ml-12 p-3 rounded-lg bg-blue-50 border border-blue-200 text-xs text-blue-900">
+            <div class="font-semibold mb-1">ⓘ Ravi Kumar — current assignments</div>
+            <div>Already on <b>3 insights</b> in Alpha (immediate, 10min, 15min).</div>
+            <div class="mt-1 text-amber-700">⚠ No access to Beta Refinery. <button class="underline font-semibold" onclick="grantAccess()">Grant access</button></div>
+          </div>
+        </div>
+
+        <!-- Escalation timeline -->
+        <div class="mb-4 mt-6 border-t border-slate-200 pt-4">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-slate-500 font-semibold uppercase text-[11px]">Escalation timeline</span>
+            <span class="text-[11px] text-slate-400">Inherits Alpha · Incident defaults · <button class="underline" onclick="markStep(3)">Customize</button></span>
+          </div>
+          <div id="timeline" class="relative pl-2">
+            <!-- timeline rendered by JS -->
+          </div>
+        </div>
+
+        <div>
+          <span class="text-slate-500 font-semibold uppercase text-[11px] mr-2">Closes when</span>
+          <span class="editable-chip" contenteditable="true">PT-101 &lt; 11.0 bar for 120s</span>
+          <span class="text-slate-400 text-xs ml-2">optional · defaults to manual close</span>
+        </div>
+      </div>
+
+      <!-- Severity (auto-suggested) -->
+      <div class="mt-4 p-3 rounded-lg bg-amber-50 border border-amber-200 text-xs">
+        <b>Suggested severity: Incident</b> — based on threshold magnitude. <button class="underline">Change</button>
+      </div>
+    </div>
+
+    <div class="px-6 py-4 border-t border-slate-100 flex justify-between items-center sticky bottom-0 bg-white">
+      <button class="text-xs text-slate-500 hover:underline" onclick="saveDraft()">Save as draft</button>
+      <div class="flex gap-2">
+        <button class="btn btn-ghost" onclick="closeNewInsight()">Cancel</button>
+        <button class="btn btn-primary" onclick="createInsight()">Create insight</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================
+     PLANT DEFAULTS MODAL
+========================================================= -->
+<div id="modal-defaults" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-6">
+  <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+      <div>
+        <h2 class="font-bold text-lg">Configure defaults — <span id="defaults-plant"></span></h2>
+        <p class="text-xs text-slate-500">Set escalation timelines per severity. New insights inherit these settings.</p>
+      </div>
+      <button class="text-slate-400 hover:text-slate-700" onclick="closeDefaults()">✕</button>
+    </div>
+    <div class="p-6 space-y-3">
+      <!-- Severity rows -->
+      <div class="card p-4 border border-slate-100">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full" style="background:#DC2626"></span>
+            <b>Incident</b>
+          </div>
+          <button class="text-xs text-blue-600 hover:underline">+ Add step</button>
+        </div>
+        <div class="space-y-2 text-sm">
+          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">Immediate</span> <span>Plant Manager</span> <span class="text-slate-400 text-xs">via Call, SMS</span></div>
+          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">5 min</span> <span>Shift Lead</span> <span class="text-slate-400 text-xs">via SMS</span></div>
+          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">15 min</span> <span>Operations Head</span> <span class="text-slate-400 text-xs">via Call</span></div>
+        </div>
+      </div>
+      <div class="card p-4 border border-slate-100">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full" style="background:#F59E0B"></span>
+            <b>Issue</b>
+          </div>
+          <button class="text-xs text-blue-600 hover:underline">+ Add step</button>
+        </div>
+        <div class="space-y-2 text-sm">
+          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">Immediate</span> <span>Shift Lead</span> <span class="text-slate-400 text-xs">via SMS, WA</span></div>
+          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">30 min</span> <span>Plant Manager</span> <span class="text-slate-400 text-xs">via Email</span></div>
+        </div>
+      </div>
+      <div class="card p-4 border border-slate-100">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full" style="background:#FBBF24"></span>
+            <b>Warning</b>
+          </div>
+          <button class="text-xs text-blue-600 hover:underline">+ Add step</button>
+        </div>
+        <div class="space-y-2 text-sm">
+          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">Immediate</span> <span>Operator on duty</span> <span class="text-slate-400 text-xs">via WhatsApp</span></div>
+        </div>
+      </div>
+      <div class="card p-4 border border-slate-100 opacity-60">
+        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:#2563EB"></span><b>Achievement / Improvement</b><span class="text-xs text-slate-500 ml-auto">Digest only · no escalation</span></div>
+      </div>
+    </div>
+    <div class="px-6 py-4 border-t border-slate-100 flex justify-end gap-2">
+      <button class="btn btn-ghost" onclick="closeDefaults()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveDefaults()">Save defaults</button>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================
+     TOAST
+========================================================= -->
+<div id="toast-container" class="fixed bottom-6 right-6 z-50 space-y-2"></div>
+
+<script>
+// ------- Navigation -------
+function show(name) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  ['plants','insights'].forEach(n=>{
+    const el = document.getElementById('nav-'+n);
+    el.style.background = n===name ? '#0F172A' : '';
+    el.style.color = n===name ? '#fff' : '';
+  });
+}
+show('plants');
+
+// ------- Insights data -------
+const insights = [
+  {id:1, name:'Tank pressure exceeds 12 bar', plant:'Alpha', equip:'Tank', sev:'incident', status:'Active', last:'2h 14m', on:true},
+  {id:2, name:'Pump vibration anomaly', plant:'Alpha', equip:'Pump', sev:'incident', status:'Active', last:'47m', on:true},
+  {id:3, name:'Valve response time degraded', plant:'Alpha', equip:'Valve', sev:'issue', status:'Active', last:'1h 02m', on:true},
+  {id:4, name:'Blower temperature high', plant:'Beta', equip:'Blower', sev:'issue', status:'Active', last:'3h 11m', on:true},
+  {id:5, name:'Tank fill rate below target', plant:'Beta', equip:'Tank', sev:'issue', status:'Active', last:'4h', on:true},
+  {id:6, name:'Cold storage temp drift', plant:'Gamma', equip:'Sensor', sev:'warning', status:'Active', last:'30m', on:true},
+  {id:7, name:'Pump runtime over threshold', plant:'Delta', equip:'Pump', sev:'warning', status:'Active', last:'1h 20m', on:true},
+  {id:8, name:'Conveyor speed deviation', plant:'Delta', equip:'Conveyor', sev:'warning', status:'Resolved', last:'5h ago', on:false},
+];
+
+const sevColors = {
+  incident:{bg:'#FEE2E2',fg:'#991B1B',dot:'#DC2626'},
+  issue:{bg:'#FEF3C7',fg:'#92400E',dot:'#F59E0B'},
+  warning:{bg:'#FEF9C3',fg:'#854D0E',dot:'#FBBF24'},
+};
+
+function renderInsights() {
+  const list = document.getElementById('insights-list');
+  list.innerHTML = insights.map(i => `
+    <div class="border-b border-slate-100 last:border-0">
+      <div class="grid grid-cols-12 px-4 py-3 hover:bg-slate-50 cursor-pointer items-center" onclick="toggleTimeline(${i.id})">
+        <div class="col-span-5 flex items-center gap-2">
+          <span class="chip" style="background:${sevColors[i.sev].bg};color:${sevColors[i.sev].fg}">● ${i.sev}</span>
+          <span class="text-sm font-medium">${i.name}</span>
+        </div>
+        <div class="col-span-2 text-sm text-slate-600">${i.plant} · ${i.equip}</div>
+        <div class="col-span-2 text-sm">
+          ${i.status==='Active' ? `<span class="text-red-600 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-red-500 pulse"></span> Active ${i.last}</span>` : `<span class="text-slate-500">${i.status}</span>`}
+        </div>
+        <div class="col-span-2 text-sm text-slate-500">${i.last}</div>
+        <div class="col-span-1 text-right" onclick="event.stopPropagation()">
+          <label class="inline-flex items-center cursor-pointer">
+            <input type="checkbox" ${i.on?'checked':''} onchange="toggleInsight(${i.id},this.checked)" class="sr-only peer"/>
+            <div class="w-9 h-5 bg-slate-200 peer-checked:bg-emerald-500 rounded-full transition relative">
+              <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition peer-checked:translate-x-4"></div>
+            </div>
+          </label>
+        </div>
+      </div>
+      <div id="tl-${i.id}" class="hidden px-4 pb-4 pt-1 bg-slate-50">
+        ${renderInsightTimeline(i)}
+      </div>
+    </div>
+  `).join('');
+}
+function renderInsightTimeline(i) {
+  const steps = [
+    {t:'0', user:'Ravi Kumar', ch:'SMS, WA', label:'Immediate'},
+    {t:'10m', user:'Shift Lead', ch:'Call', label:'10 min'},
+    {t:'30m', user:'Plant Manager', ch:'Email', label:'30 min'},
+  ];
+  return `
+    <div class="ml-2 pl-6 border-l-2 border-slate-200 space-y-3 py-2">
+      ${steps.map((s,idx)=>`
+        <div class="relative">
+          <div class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-white border-2 border-slate-400"></div>
+          <div class="text-sm flex items-center gap-3">
+            <span class="chip bg-slate-200 w-20 justify-center">${s.label}</span>
+            <span class="font-medium">${s.user}</span>
+            <span class="text-slate-500 text-xs">via ${s.ch}</span>
+            <button class="ml-auto text-xs text-blue-600 hover:underline" onclick="event.stopPropagation();showHelper('${s.user}')">Edit</button>
+          </div>
+        </div>
+      `).join('')}
+      <button class="text-xs text-blue-600 hover:underline ml-1">+ Add step</button>
+    </div>
+  `;
+}
+function toggleTimeline(id){ document.getElementById('tl-'+id).classList.toggle('hidden'); }
+function toggleInsight(id, on){
+  const i = insights.find(x=>x.id===id); i.on = on;
+  toast(`Insight ${on?'resumed':'paused'} — <button class="underline" onclick="toggleInsight(${id},${!on});this.parentElement.remove()">Undo</button>`);
+}
+renderInsights();
+
+// ------- Filter chips -------
+const activeFilters = {};
+function applyFilter(key, val) {
+  if (val.startsWith('All')) delete activeFilters[key];
+  else activeFilters[key] = val;
+  const chipsRow = document.getElementById('filter-chips');
+  const keys = Object.keys(activeFilters);
+  if (!keys.length) { chipsRow.classList.add('hidden'); return; }
+  chipsRow.classList.remove('hidden');
+  chipsRow.innerHTML = `<span class="text-xs text-slate-500 self-center">Active:</span>` +
+    keys.map(k=>`<button class="chip bg-slate-100 hover:bg-slate-200" onclick="clearFilter('${k}')">${k}: ${activeFilters[k]} ✕</button>`).join('') +
+    `<button class="text-xs text-slate-500 underline self-center" onclick="clearAllFilters()">Clear all</button>`;
+  // simulate count change
+  document.getElementById('insight-count').textContent = `· ${Math.max(2, 18 - keys.length*4)}`;
+}
+function clearFilter(k){ delete activeFilters[k]; applyFilter('','All'); }
+function clearAllFilters(){ Object.keys(activeFilters).forEach(k=>delete activeFilters[k]); applyFilter('','All'); document.getElementById('insight-count').textContent='· 18'; }
+
+// ------- New Insight modal -------
+function openNewInsight() {
+  document.getElementById('modal-new').classList.remove('hidden');
+  document.getElementById('modal-new').classList.add('flex');
+  renderModalTimeline();
+}
+function closeNewInsight() {
+  document.getElementById('modal-new').classList.add('hidden');
+  document.getElementById('modal-new').classList.remove('flex');
+}
+function renderModalTimeline() {
+  const steps = [
+    {t:'0min', user:'Ravi Kumar', ch:'SMS, WA', label:'Immediate', color:'#DC2626'},
+    {t:'10min', user:'Shift Lead', ch:'Call', label:'After 10 min', color:'#F59E0B'},
+    {t:'30min', user:'Plant Manager', ch:'Email', label:'After 30 min', color:'#64748B'},
+  ];
+  document.getElementById('timeline').innerHTML = `
+    <div class="relative ml-2 pl-6 border-l-2 border-slate-300 space-y-4 pb-2">
+      ${steps.map(s=>`
+        <div class="relative slide-in">
+          <div class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-white border-2" style="border-color:${s.color}"></div>
+          <div class="flex items-center gap-3 text-sm">
+            <span class="chip bg-white border border-slate-200 w-24 justify-center">${s.label}</span>
+            <span class="editable-chip" contenteditable="true" onblur="showUserHelper(this,'${s.user}')">${s.user}</span>
+            <span class="text-slate-500 text-xs">via</span>
+            <span class="editable-chip" contenteditable="true">${s.ch}</span>
+            <button class="ml-auto text-xs text-slate-400 hover:text-red-600">✕</button>
+          </div>
+        </div>
+      `).join('')}
+      <button class="text-xs text-blue-600 hover:underline">+ Add step</button>
+    </div>
+  `;
+}
+function showUserHelper(el, name) {
+  document.getElementById('user-helper').classList.remove('hidden');
+}
+function grantAccess() {
+  toast('✓ Access granted to Beta Refinery for Ravi Kumar');
+  document.getElementById('user-helper').innerHTML = '<div class="font-semibold text-emerald-700">✓ Permissions resolved — Ravi can be assigned across all plants.</div>';
+}
+function markStep(n) {
+  for (let i=1;i<=n;i++) document.getElementById('prog-'+i).classList.replace('bg-slate-200','bg-blue-500');
+  document.getElementById('completion').textContent = n===3 ? 'Ready to create' : `Step ${Math.min(n+1,3)} of 3`;
+}
+function saveDraft() { toast('Draft saved · find it at the top of Insights'); closeNewInsight(); }
+function createInsight() {
+  closeNewInsight();
+  show('insights');
+  // Add a new row at top
+  insights.unshift({id:99, name:'Tank pressure exceeds 12 bar', plant:'Alpha', equip:'Tank', sev:'incident', status:'Active', last:'just now', on:true});
+  renderInsights();
+  document.querySelector('#insights-list > div').classList.add('highlight-row');
+  toast('✓ Insight created · <button class="underline" onclick="toggleTimeline(99)">View timeline</button>');
+}
+
+// ------- Plant defaults modal -------
+function openDefaults(plant) {
+  document.getElementById('defaults-plant').textContent = plant;
+  document.getElementById('modal-defaults').classList.remove('hidden');
+  document.getElementById('modal-defaults').classList.add('flex');
+}
+function closeDefaults() {
+  document.getElementById('modal-defaults').classList.add('hidden');
+  document.getElementById('modal-defaults').classList.remove('flex');
+}
+function saveDefaults() {
+  closeDefaults();
+  toast('✓ Defaults saved · future insights will inherit these timelines');
+}
+
+// ------- Toast -------
+function toast(html) {
+  const el = document.createElement('div');
+  el.className = 'toast bg-slate-900 text-white text-sm px-4 py-3 rounded-lg shadow-lg max-w-sm';
+  el.innerHTML = html;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(()=>el.remove(), 5000);
+}
+
+function showHelper(name){ toast(`ⓘ ${name} is on 3 other insights · <button class="underline">View</button>`); }
+</script>
+
+</body>
+</html>
