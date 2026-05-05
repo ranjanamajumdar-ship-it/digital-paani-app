@@ -187,8 +187,8 @@
       <span class="text-sm"><b id="bulk-count">0</b> insights selected</span>
       <div class="h-6 w-px bg-white/20"></div>
       <button class="btn btn-sm bg-white text-slate-900 hover:bg-slate-100" onclick="openBulkAssign()">+ Assign supervisors</button>
+      <button class="btn btn-sm bg-white text-slate-900 hover:bg-slate-100" onclick="openGroupAssign()">+ Assign to group</button>
       <button class="btn btn-sm bg-white/10 text-white hover:bg-white/20" onclick="bulkPause()">⏸ Pause all</button>
-      <button class="btn btn-sm bg-white/10 text-white hover:bg-white/20">Edit channels</button>
       <button class="text-xs underline ml-auto" onclick="clearSelection()">Clear selection</button>
     </div>
 
@@ -369,6 +369,28 @@
     <div class="px-6 py-4 border-t border-slate-100 flex justify-end gap-2">
       <button class="btn btn-ghost" onclick="closeDefaults()">Cancel</button>
       <button class="btn btn-primary" onclick="saveDefaults()">Save defaults</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============== GROUP ASSIGN MODAL ============== -->
+<div id="modal-group" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-6">
+  <div class="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+      <div>
+        <h2 class="font-bold text-lg">Assign to a group</h2>
+        <p class="text-xs text-slate-500">Adding to <b id="group-modal-count">0</b> insights · everyone in the group will be notified per their saved escalation order.</p>
+      </div>
+      <button class="text-slate-400 hover:text-slate-700" onclick="closeGroupAssign()">✕</button>
+    </div>
+    <div class="p-6 space-y-3">
+      <input id="group-search" placeholder="🔍 Search groups…" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm" oninput="renderGroups(this.value)"/>
+      <div id="group-list" class="space-y-2"></div>
+      <button class="w-full text-sm text-blue-600 hover:underline py-2 border border-dashed border-slate-300 rounded-lg" onclick="toast('Group builder — coming soon')">+ Create new group</button>
+    </div>
+    <div class="px-6 py-4 border-t border-slate-100 flex justify-end gap-2">
+      <button class="btn btn-ghost" onclick="closeGroupAssign()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmGroupAssign()">Assign group to <span id="group-confirm-count">0</span> insights</button>
     </div>
   </div>
 </div>
@@ -710,6 +732,68 @@ function confirmBulkAssign() {
   clearSelection();
   renderInsights();
   toast(`✓ Added ${bulkSupervisors.length} supervisor${bulkSupervisors.length>1?'s':''} to ${n} insights`);
+}
+
+// ---------- Group assign modal ----------
+const groups = [
+  {id:'g1', name:'Andheri Day Shift', desc:'Operators on shift A · 06:00–14:00', members:['Priya Sharma','Vikas Patel','Rohan K.'], channels:'WA, SMS', steps:'Immediate → 10min → 30min'},
+  {id:'g2', name:'Operations Leadership', desc:'Cross-STP managers, escalation pool', members:['Meera Rao','Arjun Mehta','Sanjay G.'], channels:'📞 ✉ WA', steps:'Immediate → 5min → 20min'},
+  {id:'g3', name:'On-call Engineers', desc:'Maintenance & instrumentation', members:['Karan B.','Anita D.'], channels:'📞 SMS', steps:'Immediate → 15min'},
+  {id:'g4', name:'Andheri Night Shift', desc:'Shift B · 22:00–06:00', members:['Vikas Patel','Rajesh M.','Neha T.'], channels:'📞 WA', steps:'Immediate → 5min'},
+  {id:'g5', name:'Compliance & Reporting', desc:'Digest only · no escalation', members:['Anjali V.','Priya Sharma'], channels:'✉', steps:'Daily digest'},
+];
+let selectedGroup = null;
+function openGroupAssign() {
+  if (!selected.size) { toast('Select at least one insight first'); return; }
+  selectedGroup = null;
+  document.getElementById('group-modal-count').textContent = selected.size;
+  document.getElementById('group-confirm-count').textContent = selected.size;
+  document.getElementById('group-search').value = '';
+  renderGroups('');
+  document.getElementById('modal-group').classList.remove('hidden');
+  document.getElementById('modal-group').classList.add('flex');
+}
+function closeGroupAssign() {
+  document.getElementById('modal-group').classList.add('hidden');
+  document.getElementById('modal-group').classList.remove('flex');
+}
+function renderGroups(q) {
+  const list = groups.filter(g => !q || (g.name+g.desc+g.members.join(' ')).toLowerCase().includes(q.toLowerCase()));
+  document.getElementById('group-list').innerHTML = list.map(g=>`
+    <button class="w-full text-left p-4 rounded-lg border ${selectedGroup===g.id?'border-blue-500 bg-blue-50':'border-slate-200 hover:bg-slate-50'} transition" onclick="pickGroup('${g.id}')">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex-1">
+          <div class="flex items-center gap-2">
+            <span class="font-semibold text-sm">${g.name}</span>
+            <span class="chip bg-slate-100 text-slate-600">${g.members.length} members</span>
+          </div>
+          <div class="text-xs text-slate-500 mt-0.5">${g.desc}</div>
+          <div class="flex -space-x-1.5 mt-2">
+            ${g.members.slice(0,4).map(m=>`<div class="w-6 h-6 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-semibold" title="${m}">${m.split(' ').map(x=>x[0]).join('').slice(0,2)}</div>`).join('')}
+            ${g.members.length>4?`<div class="w-6 h-6 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px]">+${g.members.length-4}</div>`:''}
+          </div>
+        </div>
+        <div class="text-right text-[11px] text-slate-500 shrink-0">
+          <div>${g.channels}</div>
+          <div class="mt-0.5">${g.steps}</div>
+        </div>
+      </div>
+    </button>
+  `).join('') || `<div class="p-4 text-center text-xs text-slate-400">No groups match.</div>`;
+}
+function pickGroup(id) { selectedGroup = id; renderGroups(document.getElementById('group-search').value); }
+function confirmGroupAssign() {
+  if (!selectedGroup) { toast('Pick a group first'); return; }
+  const g = groups.find(x=>x.id===selectedGroup);
+  selected.forEach(id=>{
+    const i = insights.find(x=>x.id===id);
+    if (i) g.members.forEach(m=>{ if(!i.supervisors.includes(m)) i.supervisors.push(m); });
+  });
+  const n = selected.size;
+  closeGroupAssign();
+  clearSelection();
+  renderInsights();
+  toast(`✓ Assigned <b>${g.name}</b> (${g.members.length} members) to ${n} insights`);
 }
 
 // ---------- New insight modal ----------
