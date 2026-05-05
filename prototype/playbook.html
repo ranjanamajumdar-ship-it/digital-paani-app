@@ -3,13 +3,12 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Digital Paani — Playbook Prototype</title>
+<title>Digital Paani — STP Insights Prototype</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root { --ink:#0F172A; --ink2:#334155; --ink3:#64748B; }
-  html,body { font-family:Inter,ui-sans-serif,system-ui,sans-serif; background:#F1F5F9; color:var(--ink); }
+  html,body { font-family:Inter,ui-sans-serif,system-ui,sans-serif; background:#F1F5F9; color:#0F172A; }
   .screen { display:none; }
   .screen.active { display:block; }
   .chip { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:9999px; font-size:11px; font-weight:500; }
@@ -18,24 +17,36 @@
   .btn-primary:hover { background:#1e293b; }
   .btn-ghost { background:#F1F5F9; color:#0F172A; }
   .btn-ghost:hover { background:#e2e8f0; }
+  .btn-sm { padding:6px 10px; font-size:12px; }
   .card { background:#fff; border-radius:14px; box-shadow:0 1px 2px rgba(15,23,42,.04), 0 4px 16px rgba(15,23,42,.06); }
   .sev-bar { height:4px; border-radius:2px; display:flex; overflow:hidden; gap:2px; }
-  .sev-bar > div { transition:all .2s; }
   .pulse { animation:pulse 1.6s ease-in-out infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
   .slide-in { animation:slide-in .25s ease-out; }
   @keyframes slide-in { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-  .highlight-row { animation:hl 1.2s ease-out; }
+  .drawer-in { animation:drawer-in .3s ease-out; }
+  @keyframes drawer-in { from{transform:translateX(100%)} to{transform:translateX(0)} }
+  .highlight-row { animation:hl 1.5s ease-out; }
   @keyframes hl { 0%{background:#fef3c7} 100%{background:transparent} }
-  .timeline-line { height:2px; background:linear-gradient(90deg,#cbd5e1 0,#cbd5e1 100%); position:relative; }
-  .timeline-dot { width:14px; height:14px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 0 2px currentColor; }
   .toast { animation:toast .3s ease-out; }
   @keyframes toast { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
   [contenteditable]:focus { outline:2px solid #2563eb; outline-offset:2px; border-radius:4px; }
   .editable-chip { background:#EFF6FF; color:#1E40AF; padding:2px 8px; border-radius:6px; border:1px dashed #93C5FD; cursor:text; font-weight:500; }
   .editable-chip:hover { background:#DBEAFE; }
+  .ch-pill { width:30px; height:30px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; cursor:pointer; transition:all .15s; }
+  .ch-pill.on { background:#0F172A; color:#fff; }
+  .ch-pill.off { background:#F1F5F9; color:#94A3B8; }
+  .ch-pill.off:hover { background:#E2E8F0; }
+  .sparkline { stroke:#2563EB; fill:none; stroke-width:1.5; }
+  .sensor-bar { height:60px; background:linear-gradient(180deg,#EFF6FF,#fff); border-radius:6px; position:relative; overflow:hidden; }
   details > summary { list-style:none; cursor:pointer; }
   details > summary::-webkit-details-marker { display:none; }
+  /* Custom checkbox */
+  .cb { width:16px; height:16px; border:1.5px solid #CBD5E1; border-radius:4px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; background:#fff; }
+  .cb.checked { background:#0F172A; border-color:#0F172A; }
+  .cb.checked::after { content:'✓'; color:#fff; font-size:11px; font-weight:700; }
+  .cb.indeterminate { background:#0F172A; border-color:#0F172A; }
+  .cb.indeterminate::after { content:'–'; color:#fff; font-size:14px; font-weight:700; }
 </style>
 </head>
 <body class="min-h-screen">
@@ -44,213 +55,165 @@
 <nav class="bg-white border-b border-slate-200 sticky top-0 z-30">
   <div class="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
     <div class="flex items-center gap-8">
-      <div class="font-bold text-[15px]">Digital Paani</div>
+      <div class="font-bold text-[15px]">Digital Paani <span class="text-slate-400 font-normal">· STP Operations</span></div>
       <div class="flex items-center gap-1 text-sm">
-        <button onclick="show('plants')" id="nav-plants" class="px-3 py-1.5 rounded-lg font-medium">Plants <span class="text-slate-400 ml-1">5</span></button>
+        <button onclick="show('plants')" id="nav-plants" class="px-3 py-1.5 rounded-lg font-medium">STPs <span class="text-slate-400 ml-1">5</span></button>
         <button onclick="show('insights')" id="nav-insights" class="px-3 py-1.5 rounded-lg font-medium">Insights <span class="text-slate-400 ml-1">18</span></button>
       </div>
     </div>
     <div class="flex items-center gap-3">
-      <span class="text-xs text-slate-500">Prototype · v2 (Playbook)</span>
+      <span class="text-xs text-slate-500">v2 prototype</span>
       <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-semibold">RM</div>
     </div>
   </div>
 </nav>
 
-<!-- =========================================================
-     PLANTS SCREEN
-========================================================= -->
+<!-- ============== STPs SCREEN ============== -->
 <section id="screen-plants" class="screen active">
   <div class="max-w-7xl mx-auto px-6 py-8">
-
     <div class="flex items-end justify-between mb-6">
       <div>
-        <h1 class="text-2xl font-bold">Plants</h1>
+        <h1 class="text-2xl font-bold">Sewage Treatment Plants</h1>
         <p class="text-sm text-slate-500 mt-1">Configuration layer · sorted by severity</p>
       </div>
-      <div class="flex gap-2">
-        <input placeholder="Search plants…" class="border border-slate-200 rounded-lg px-3 py-2 text-sm w-64"/>
-      </div>
+      <input placeholder="Search STPs…" class="border border-slate-200 rounded-lg px-3 py-2 text-sm w-64"/>
     </div>
 
-    <!-- Plant cards -->
-    <div class="grid grid-cols-3 gap-4" id="plants-grid">
-      <!-- Alpha (incidents - top) -->
+    <div class="grid grid-cols-3 gap-4">
       <div class="card p-5">
-        <div class="sev-bar mb-4">
-          <div style="background:#DC2626;flex:2"></div>
-          <div style="background:#F59E0B;flex:1"></div>
-          <div style="background:#e2e8f0;flex:1"></div>
-        </div>
-        <h3 class="font-semibold text-[15px]">Alpha Manufacturing Unit</h3>
-        <p class="text-xs text-slate-500 mt-0.5">Mumbai, MH · 4 insights</p>
+        <div class="sev-bar mb-4"><div style="background:#DC2626;flex:2"></div><div style="background:#F59E0B;flex:1"></div><div style="background:#e2e8f0;flex:1"></div></div>
+        <h3 class="font-semibold text-[15px]">Andheri STP</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Mumbai · 25 MLD · 4 active insights</p>
         <div class="flex flex-wrap gap-1.5 mt-3">
           <span class="chip" style="background:#FEE2E2;color:#991B1B">● 2 incident</span>
           <span class="chip" style="background:#FEF3C7;color:#92400E">● 1 issue</span>
         </div>
         <div class="flex gap-2 mt-5">
-          <button class="btn btn-ghost flex-1" onclick="show('insights')">View insights</button>
-          <button class="btn btn-primary flex-1" onclick="openDefaults('Alpha Manufacturing Unit')">Configure defaults</button>
+          <button class="btn btn-ghost flex-1" onclick="show('insights');filterByPlant('Andheri STP')">View insights</button>
+          <button class="btn btn-primary flex-1" onclick="openDefaults('Andheri STP')">Configure defaults</button>
         </div>
       </div>
 
-      <!-- Beta -->
       <div class="card p-5">
-        <div class="sev-bar mb-4">
-          <div style="background:#F59E0B;flex:2"></div>
-          <div style="background:#e2e8f0;flex:3"></div>
-        </div>
-        <h3 class="font-semibold text-[15px]">Beta Refinery Complex</h3>
-        <p class="text-xs text-slate-500 mt-0.5">Surat, GJ · 5 insights</p>
+        <div class="sev-bar mb-4"><div style="background:#F59E0B;flex:2"></div><div style="background:#e2e8f0;flex:3"></div></div>
+        <h3 class="font-semibold text-[15px]">Bandra STP</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Mumbai · 18 MLD · 5 active insights</p>
         <div class="flex flex-wrap gap-1.5 mt-3">
           <span class="chip" style="background:#FEF3C7;color:#92400E">● 2 issue</span>
         </div>
         <div class="flex gap-2 mt-5">
-          <button class="btn btn-ghost flex-1" onclick="show('insights')">View insights</button>
-          <button class="btn btn-primary flex-1" onclick="openDefaults('Beta Refinery Complex')">Configure defaults</button>
+          <button class="btn btn-ghost flex-1" onclick="show('insights');filterByPlant('Bandra STP')">View insights</button>
+          <button class="btn btn-primary flex-1" onclick="openDefaults('Bandra STP')">Configure defaults</button>
         </div>
       </div>
 
-      <!-- Delta -->
       <div class="card p-5">
-        <div class="sev-bar mb-4">
-          <div style="background:#FBBF24;flex:2"></div>
-          <div style="background:#e2e8f0;flex:3"></div>
-        </div>
-        <h3 class="font-semibold text-[15px]">Delta Processing Plant</h3>
-        <p class="text-xs text-slate-500 mt-0.5">Nagpur, MH · 4 insights</p>
+        <div class="sev-bar mb-4"><div style="background:#FBBF24;flex:2"></div><div style="background:#e2e8f0;flex:3"></div></div>
+        <h3 class="font-semibold text-[15px]">Powai STP</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Mumbai · 12 MLD · 4 active insights</p>
         <div class="flex flex-wrap gap-1.5 mt-3">
           <span class="chip" style="background:#FEF9C3;color:#854D0E">● 2 warning</span>
         </div>
         <div class="flex gap-2 mt-5">
-          <button class="btn btn-ghost flex-1" onclick="show('insights')">View insights</button>
-          <button class="btn btn-primary flex-1" onclick="openDefaults('Delta Processing Plant')">Configure defaults</button>
+          <button class="btn btn-ghost flex-1" onclick="show('insights');filterByPlant('Powai STP')">View insights</button>
+          <button class="btn btn-primary flex-1" onclick="openDefaults('Powai STP')">Configure defaults</button>
         </div>
       </div>
 
-      <!-- Gamma -->
       <div class="card p-5 opacity-90">
-        <div class="sev-bar mb-4">
-          <div style="background:#FBBF24;flex:1"></div>
-          <div style="background:#e2e8f0;flex:4"></div>
-        </div>
-        <h3 class="font-semibold text-[15px]">Gamma Cold Storage</h3>
-        <p class="text-xs text-slate-500 mt-0.5">Pune, MH · 3 insights</p>
+        <div class="sev-bar mb-4"><div style="background:#FBBF24;flex:1"></div><div style="background:#e2e8f0;flex:4"></div></div>
+        <h3 class="font-semibold text-[15px]">Thane STP</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Thane · 30 MLD · 3 active insights</p>
         <div class="flex flex-wrap gap-1.5 mt-3">
           <span class="chip" style="background:#FEF9C3;color:#854D0E">● 1 warning</span>
         </div>
         <div class="flex gap-2 mt-5">
-          <button class="btn btn-ghost flex-1" onclick="show('insights')">View insights</button>
-          <button class="btn btn-primary flex-1" onclick="openDefaults('Gamma Cold Storage')">Configure defaults</button>
+          <button class="btn btn-ghost flex-1" onclick="show('insights');filterByPlant('Thane STP')">View insights</button>
+          <button class="btn btn-primary flex-1" onclick="openDefaults('Thane STP')">Configure defaults</button>
         </div>
       </div>
 
-      <!-- Epsilon (all clear) -->
       <div class="card p-5 opacity-70">
-        <div class="sev-bar mb-4">
-          <div style="background:#16A34A;flex:1"></div>
-          <div style="background:#e2e8f0;flex:4"></div>
-        </div>
-        <h3 class="font-semibold text-[15px] text-slate-600">Epsilon Packaging Hub</h3>
-        <p class="text-xs text-slate-500 mt-0.5">Chennai, TN · 2 insights</p>
+        <div class="sev-bar mb-4"><div style="background:#16A34A;flex:1"></div><div style="background:#e2e8f0;flex:4"></div></div>
+        <h3 class="font-semibold text-[15px] text-slate-600">Vashi STP</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Navi Mumbai · 20 MLD · 2 active</p>
         <div class="flex flex-wrap gap-1.5 mt-3">
           <span class="chip" style="background:#DCFCE7;color:#166534">● all clear</span>
         </div>
         <div class="flex gap-2 mt-5">
-          <button class="btn btn-ghost flex-1" onclick="show('insights')">View insights</button>
-          <button class="btn btn-primary flex-1" onclick="openDefaults('Epsilon Packaging Hub')">Configure defaults</button>
+          <button class="btn btn-ghost flex-1" onclick="show('insights');filterByPlant('Vashi STP')">View insights</button>
+          <button class="btn btn-primary flex-1" onclick="openDefaults('Vashi STP')">Configure defaults</button>
         </div>
       </div>
     </div>
 
-    <p class="text-xs text-slate-500 mt-6">Click <b>Configure defaults</b> on any plant to set escalation timelines per severity — every new insight in that plant inherits these settings.</p>
+    <p class="text-xs text-slate-500 mt-6">Click <b>Configure defaults</b> to set escalation timelines per severity — every new insight in that STP inherits these supervisors and channels.</p>
   </div>
 </section>
 
-<!-- =========================================================
-     INSIGHTS SCREEN
-========================================================= -->
+<!-- ============== INSIGHTS SCREEN ============== -->
 <section id="screen-insights" class="screen">
   <div class="max-w-7xl mx-auto px-6 py-8">
 
     <div class="flex items-end justify-between mb-6">
       <div>
         <h1 class="text-2xl font-bold">Insights <span id="insight-count" class="text-slate-400 font-normal text-lg">· 18</span></h1>
-        <p class="text-sm text-slate-500 mt-1">Operational layer · live status</p>
+        <p class="text-sm text-slate-500 mt-1">Click any row to see history, sensor readings, and supervisors.</p>
       </div>
       <button class="btn btn-primary" onclick="openNewInsight()">+ New insight</button>
     </div>
 
-    <!-- Search + primary filters row -->
-    <div class="flex items-center gap-2 mb-3">
-      <input placeholder="Search insights…" class="border border-slate-200 rounded-lg px-3 py-2 text-sm flex-1"/>
-      <select class="border border-slate-200 rounded-lg px-3 py-2 text-sm" onchange="applyFilter('plant',this.value)">
-        <option>All plants</option><option>Alpha</option><option>Beta</option><option>Delta</option><option>Gamma</option>
+    <!-- Filters: simple bar -->
+    <div class="card p-3 mb-3 flex flex-wrap items-center gap-2">
+      <input id="search" placeholder="🔍 Search insights, sensors, equipment…" oninput="renderInsights()" class="border-0 px-2 py-1.5 text-sm flex-1 min-w-[200px] focus:outline-none"/>
+      <div class="h-6 w-px bg-slate-200"></div>
+      <select id="f-plant" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
+        <option value="">All STPs</option><option>Andheri STP</option><option>Bandra STP</option><option>Powai STP</option><option>Thane STP</option><option>Vashi STP</option>
       </select>
-      <select class="border border-slate-200 rounded-lg px-3 py-2 text-sm" onchange="applyFilter('severity',this.value)">
-        <option>All severities</option><option>Incident</option><option>Issue</option><option>Warning</option>
+      <select id="f-sev" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
+        <option value="">All severities</option><option>incident</option><option>issue</option><option>warning</option>
       </select>
-      <select class="border border-slate-200 rounded-lg px-3 py-2 text-sm">
-        <option>All statuses</option><option>Active</option><option>Resolved</option><option>Paused</option>
+      <select id="f-equip" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
+        <option value="">All equipment</option><option>Aerator</option><option>Pump</option><option>Tank</option><option>Blower</option><option>Valve</option>
       </select>
-      <button class="btn btn-ghost" onclick="document.getElementById('drawer').classList.toggle('hidden')">More filters</button>
+      <select id="f-status" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
+        <option value="">Any status</option><option>Active</option><option>Resolved</option>
+      </select>
+      <button class="text-xs text-slate-500 hover:text-slate-900 underline ml-auto" onclick="clearAllFilters()">Reset</button>
     </div>
 
-    <!-- Drawer (hidden by default) - Equipment, Channel, Esc time, Repeats -->
-    <div id="drawer" class="hidden card p-4 mb-3 grid grid-cols-4 gap-4">
-      <div>
-        <label class="text-[11px] uppercase text-slate-500 font-semibold">Equipment</label>
-        <select class="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-sm mt-1"><option>Any</option><option>Pump</option><option>Tank</option><option>Valve</option><option>Blower</option></select>
-      </div>
-      <div>
-        <label class="text-[11px] uppercase text-slate-500 font-semibold">Channel</label>
-        <div class="flex gap-1 mt-1">
-          <button class="chip border border-slate-200">Email</button>
-          <button class="chip border border-slate-200">SMS</button>
-          <button class="chip border border-slate-200">WA</button>
-          <button class="chip border border-slate-200">Call</button>
-        </div>
-      </div>
-      <div>
-        <label class="text-[11px] uppercase text-slate-500 font-semibold">Escalation time</label>
-        <div class="flex gap-1 mt-1 flex-wrap">
-          <button class="chip border border-slate-200">&lt;5m</button>
-          <button class="chip border border-slate-200">5–15m</button>
-          <button class="chip border border-slate-200">15–60m</button>
-          <button class="chip border border-slate-200">&gt;1h</button>
-        </div>
-      </div>
-      <div>
-        <label class="text-[11px] uppercase text-slate-500 font-semibold">Repeats</label>
-        <select class="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-sm mt-1"><option>Any</option><option>On</option><option>Off</option></select>
-      </div>
-    </div>
-
-    <!-- Active filter chips -->
-    <div id="filter-chips" class="flex gap-2 mb-3 hidden">
-      <span class="text-xs text-slate-500 self-center">Active:</span>
+    <!-- Bulk action bar (sticky, only when selections exist) -->
+    <div id="bulk-bar" class="hidden card p-3 mb-3 bg-slate-900 text-white flex items-center gap-3 slide-in">
+      <span class="text-sm"><b id="bulk-count">0</b> insights selected</span>
+      <div class="h-6 w-px bg-white/20"></div>
+      <button class="btn btn-sm bg-white text-slate-900 hover:bg-slate-100" onclick="openBulkAssign()">+ Assign supervisors</button>
+      <button class="btn btn-sm bg-white/10 text-white hover:bg-white/20" onclick="bulkPause()">⏸ Pause all</button>
+      <button class="btn btn-sm bg-white/10 text-white hover:bg-white/20">Edit channels</button>
+      <button class="text-xs underline ml-auto" onclick="clearSelection()">Clear selection</button>
     </div>
 
     <!-- Insights list -->
     <div class="card overflow-hidden">
-      <div class="grid grid-cols-12 px-4 py-2 text-[11px] uppercase text-slate-500 font-semibold border-b border-slate-100 bg-slate-50">
-        <div class="col-span-5">Insight</div>
-        <div class="col-span-2">Plant · Equipment</div>
+      <div class="grid grid-cols-12 px-4 py-2 text-[11px] uppercase text-slate-500 font-semibold border-b border-slate-100 bg-slate-50 items-center">
+        <div class="col-span-1"><span class="cb" id="cb-all" onclick="toggleAll()"></span></div>
+        <div class="col-span-4">Insight</div>
+        <div class="col-span-2">STP · Equipment</div>
+        <div class="col-span-2">Supervisors</div>
         <div class="col-span-2">Status</div>
-        <div class="col-span-2">Last triggered</div>
         <div class="col-span-1 text-right">On</div>
       </div>
-
-      <div id="insights-list">
-        <!-- rows generated by JS -->
-      </div>
+      <div id="insights-list"></div>
     </div>
   </div>
 </section>
 
-<!-- =========================================================
-     NEW INSIGHT MODAL (Playbook sentence builder)
-========================================================= -->
+<!-- ============== INSIGHT DETAIL DRAWER ============== -->
+<div id="detail-drawer" class="fixed inset-y-0 right-0 w-[600px] bg-white shadow-2xl z-40 hidden overflow-y-auto">
+  <div id="detail-content"></div>
+</div>
+<div id="detail-overlay" class="fixed inset-0 bg-black/30 z-30 hidden" onclick="closeDetail()"></div>
+
+<!-- ============== NEW INSIGHT MODAL ============== -->
 <div id="modal-new" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-6">
   <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
     <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-10">
@@ -258,73 +221,41 @@
         <h2 class="font-bold text-lg">New insight</h2>
         <p class="text-xs text-slate-500">Build it as a sentence — no forms.</p>
       </div>
-      <div class="flex items-center gap-3">
-        <span id="completion" class="text-xs text-slate-500">Step 1 of 3</span>
-        <button class="text-slate-400 hover:text-slate-700" onclick="closeNewInsight()">✕</button>
-      </div>
+      <button class="text-slate-400 hover:text-slate-700" onclick="closeNewInsight()">✕</button>
     </div>
-
     <div class="p-6">
-      <!-- Progress -->
-      <div class="flex gap-1 mb-6">
-        <div id="prog-1" class="h-1 flex-1 bg-blue-500 rounded"></div>
-        <div id="prog-2" class="h-1 flex-1 bg-slate-200 rounded"></div>
-        <div id="prog-3" class="h-1 flex-1 bg-slate-200 rounded"></div>
-      </div>
-
-      <!-- Sentence builder -->
       <div class="card p-6 bg-slate-50 leading-loose text-[15px]">
-        <div class="mb-4">
+        <div class="mb-3">
           <span class="text-slate-500 font-semibold uppercase text-[11px] mr-2">When</span>
-          <span class="editable-chip" contenteditable="true" onblur="markStep(1)">PT-101</span>
-          <span class="editable-chip" contenteditable="true">≥</span>
-          <span class="editable-chip" contenteditable="true">12.0 bar</span>
+          <span class="editable-chip" contenteditable="true">DO sensor</span>
+          <span class="editable-chip" contenteditable="true">&lt;</span>
+          <span class="editable-chip" contenteditable="true">2.0 mg/L</span>
           <span class="text-slate-500">on</span>
-          <span class="editable-chip" contenteditable="true">Tank</span>
+          <span class="editable-chip" contenteditable="true">Aeration tank</span>
           <span class="text-slate-500">at</span>
-          <span class="editable-chip" contenteditable="true">Alpha Manufacturing Unit</span>
+          <span class="editable-chip" contenteditable="true">Andheri STP</span>
         </div>
-
-        <div class="mb-4">
+        <div class="mb-3">
           <span class="text-slate-500 font-semibold uppercase text-[11px] mr-2">Then</span>
-          <span class="text-slate-700">notify</span>
-          <span class="editable-chip" contenteditable="true" onblur="markStep(2);showUserHelper(this,'new')">Ravi Kumar</span>
-          <span class="text-slate-500">via</span>
-          <span class="editable-chip" contenteditable="true">SMS, WhatsApp</span>
-          <span class="text-slate-500">immediately.</span>
-
-          <!-- User helper inline -->
-          <div id="user-helper" class="hidden mt-2 ml-12 p-3 rounded-lg bg-blue-50 border border-blue-200 text-xs text-blue-900">
-            <div class="font-semibold mb-1">ⓘ Ravi Kumar — current assignments</div>
-            <div>Already on <b>3 insights</b> in Alpha (immediate, 10min, 15min).</div>
-            <div class="mt-1 text-amber-700">⚠ No access to Beta Refinery. <button class="underline font-semibold" onclick="grantAccess()">Grant access</button></div>
-          </div>
+          <span class="text-slate-700">notify supervisors below</span>
         </div>
 
         <!-- Escalation timeline -->
-        <div class="mb-4 mt-6 border-t border-slate-200 pt-4">
+        <div class="mt-5 border-t border-slate-200 pt-4">
           <div class="flex items-center justify-between mb-3">
             <span class="text-slate-500 font-semibold uppercase text-[11px]">Escalation timeline</span>
-            <span class="text-[11px] text-slate-400">Inherits Alpha · Incident defaults · <button class="underline" onclick="markStep(3)">Customize</button></span>
+            <span class="text-[11px] text-slate-400">Inherits Andheri · Incident defaults · <button class="underline">Customize</button></span>
           </div>
-          <div id="timeline" class="relative pl-2">
-            <!-- timeline rendered by JS -->
-          </div>
+          <div id="timeline"></div>
         </div>
 
-        <div>
+        <div class="mt-4 pt-4 border-t border-slate-200">
           <span class="text-slate-500 font-semibold uppercase text-[11px] mr-2">Closes when</span>
-          <span class="editable-chip" contenteditable="true">PT-101 &lt; 11.0 bar for 120s</span>
-          <span class="text-slate-400 text-xs ml-2">optional · defaults to manual close</span>
+          <span class="editable-chip" contenteditable="true">DO &gt; 2.5 mg/L for 5 min</span>
+          <span class="text-slate-400 text-xs ml-2">optional</span>
         </div>
-      </div>
-
-      <!-- Severity (auto-suggested) -->
-      <div class="mt-4 p-3 rounded-lg bg-amber-50 border border-amber-200 text-xs">
-        <b>Suggested severity: Incident</b> — based on threshold magnitude. <button class="underline">Change</button>
       </div>
     </div>
-
     <div class="px-6 py-4 border-t border-slate-100 flex justify-between items-center sticky bottom-0 bg-white">
       <button class="text-xs text-slate-500 hover:underline" onclick="saveDraft()">Save as draft</button>
       <div class="flex gap-2">
@@ -335,61 +266,104 @@
   </div>
 </div>
 
-<!-- =========================================================
-     PLANT DEFAULTS MODAL
-========================================================= -->
+<!-- ============== BULK ASSIGN MODAL ============== -->
+<div id="modal-bulk" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-6">
+  <div class="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+      <div>
+        <h2 class="font-bold text-lg">Assign supervisors</h2>
+        <p class="text-xs text-slate-500">Adding to <b id="bulk-modal-count">0</b> insights · they'll be notified per the timeline below.</p>
+      </div>
+      <button class="text-slate-400 hover:text-slate-700" onclick="closeBulkAssign()">✕</button>
+    </div>
+    <div class="p-6 space-y-4">
+
+      <!-- Supervisor picker -->
+      <div>
+        <label class="text-[11px] uppercase text-slate-500 font-semibold">Supervisors to add</label>
+        <div id="bulk-supervisors" class="flex flex-wrap gap-2 mt-2 p-3 border border-slate-200 rounded-lg min-h-[48px]"></div>
+        <input id="sup-search" placeholder="Type a name… (try: Priya, Arjun, Meera)" class="mt-2 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm" oninput="searchSupervisor(this.value)"/>
+        <div id="sup-suggestions" class="mt-1 border border-slate-200 rounded-lg overflow-hidden hidden"></div>
+      </div>
+
+      <!-- Step (when in escalation) -->
+      <div>
+        <label class="text-[11px] uppercase text-slate-500 font-semibold">Notify them</label>
+        <div class="flex gap-2 mt-2">
+          <button class="btn btn-sm btn-primary" onclick="setStep(this,'imm')">Immediately</button>
+          <button class="btn btn-sm btn-ghost" onclick="setStep(this,'10')">After 10 min</button>
+          <button class="btn btn-sm btn-ghost" onclick="setStep(this,'30')">After 30 min</button>
+          <button class="btn btn-sm btn-ghost" onclick="setStep(this,'custom')">Custom…</button>
+        </div>
+      </div>
+
+      <!-- Channels (progressive) -->
+      <div>
+        <label class="text-[11px] uppercase text-slate-500 font-semibold">Communication channels</label>
+        <div class="flex items-center gap-2 mt-2">
+          <button class="ch-pill on" id="ch-wa" onclick="toggleCh(this)" title="WhatsApp">WA</button>
+          <details class="inline-block">
+            <summary class="btn btn-sm btn-ghost">+ More channels</summary>
+            <div class="absolute mt-2 card p-3 z-10 flex gap-2">
+              <button class="ch-pill off" onclick="toggleCh(this)">SMS</button>
+              <button class="ch-pill off" onclick="toggleCh(this)">📞</button>
+              <button class="ch-pill off" onclick="toggleCh(this)">✉</button>
+            </div>
+          </details>
+          <span class="text-xs text-slate-500 ml-2">WhatsApp on by default · click + to add SMS, Call, Email</span>
+        </div>
+      </div>
+
+      <!-- Helper -->
+      <div id="bulk-helper" class="text-xs p-3 rounded-lg bg-blue-50 text-blue-900 hidden"></div>
+    </div>
+    <div class="px-6 py-4 border-t border-slate-100 flex justify-end gap-2">
+      <button class="btn btn-ghost" onclick="closeBulkAssign()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmBulkAssign()">Assign to <span id="bulk-confirm-count">0</span> insights</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============== DEFAULTS MODAL ============== -->
 <div id="modal-defaults" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-6">
   <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
     <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
       <div>
         <h2 class="font-bold text-lg">Configure defaults — <span id="defaults-plant"></span></h2>
-        <p class="text-xs text-slate-500">Set escalation timelines per severity. New insights inherit these settings.</p>
+        <p class="text-xs text-slate-500">Future insights in this STP inherit these timelines.</p>
       </div>
       <button class="text-slate-400 hover:text-slate-700" onclick="closeDefaults()">✕</button>
     </div>
     <div class="p-6 space-y-3">
-      <!-- Severity rows -->
       <div class="card p-4 border border-slate-100">
         <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full" style="background:#DC2626"></span>
-            <b>Incident</b>
-          </div>
+          <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:#DC2626"></span><b>Incident</b></div>
           <button class="text-xs text-blue-600 hover:underline">+ Add step</button>
         </div>
         <div class="space-y-2 text-sm">
-          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">Immediate</span> <span>Plant Manager</span> <span class="text-slate-400 text-xs">via Call, SMS</span></div>
-          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">5 min</span> <span>Shift Lead</span> <span class="text-slate-400 text-xs">via SMS</span></div>
-          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">15 min</span> <span>Operations Head</span> <span class="text-slate-400 text-xs">via Call</span></div>
+          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">Immediate</span> <span>Plant Manager</span> <span class="text-slate-400 text-xs">📞 ✉ WA</span></div>
+          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">5 min</span> <span>Shift Lead</span> <span class="text-slate-400 text-xs">SMS</span></div>
+          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">15 min</span> <span>Operations Head</span> <span class="text-slate-400 text-xs">📞</span></div>
         </div>
       </div>
       <div class="card p-4 border border-slate-100">
         <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full" style="background:#F59E0B"></span>
-            <b>Issue</b>
-          </div>
+          <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:#F59E0B"></span><b>Issue</b></div>
           <button class="text-xs text-blue-600 hover:underline">+ Add step</button>
         </div>
         <div class="space-y-2 text-sm">
-          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">Immediate</span> <span>Shift Lead</span> <span class="text-slate-400 text-xs">via SMS, WA</span></div>
-          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">30 min</span> <span>Plant Manager</span> <span class="text-slate-400 text-xs">via Email</span></div>
+          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">Immediate</span> <span>Shift Lead</span> <span class="text-slate-400 text-xs">SMS WA</span></div>
+          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">30 min</span> <span>Plant Manager</span> <span class="text-slate-400 text-xs">✉</span></div>
         </div>
       </div>
       <div class="card p-4 border border-slate-100">
         <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full" style="background:#FBBF24"></span>
-            <b>Warning</b>
-          </div>
+          <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:#FBBF24"></span><b>Warning</b></div>
           <button class="text-xs text-blue-600 hover:underline">+ Add step</button>
         </div>
         <div class="space-y-2 text-sm">
-          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">Immediate</span> <span>Operator on duty</span> <span class="text-slate-400 text-xs">via WhatsApp</span></div>
+          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">Immediate</span> <span>Operator on duty</span> <span class="text-slate-400 text-xs">WA</span></div>
         </div>
-      </div>
-      <div class="card p-4 border border-slate-100 opacity-60">
-        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:#2563EB"></span><b>Achievement / Improvement</b><span class="text-xs text-slate-500 ml-auto">Digest only · no escalation</span></div>
       </div>
     </div>
     <div class="px-6 py-4 border-t border-slate-100 flex justify-end gap-2">
@@ -399,13 +373,11 @@
   </div>
 </div>
 
-<!-- =========================================================
-     TOAST
-========================================================= -->
+<!-- ============== TOAST ============== -->
 <div id="toast-container" class="fixed bottom-6 right-6 z-50 space-y-2"></div>
 
 <script>
-// ------- Navigation -------
+// ---------- Navigation ----------
 function show(name) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+name).classList.add('active');
@@ -417,102 +389,330 @@ function show(name) {
 }
 show('plants');
 
-// ------- Insights data -------
+// ---------- Data ----------
 const insights = [
-  {id:1, name:'Tank pressure exceeds 12 bar', plant:'Alpha', equip:'Tank', sev:'incident', status:'Active', last:'2h 14m', on:true},
-  {id:2, name:'Pump vibration anomaly', plant:'Alpha', equip:'Pump', sev:'incident', status:'Active', last:'47m', on:true},
-  {id:3, name:'Valve response time degraded', plant:'Alpha', equip:'Valve', sev:'issue', status:'Active', last:'1h 02m', on:true},
-  {id:4, name:'Blower temperature high', plant:'Beta', equip:'Blower', sev:'issue', status:'Active', last:'3h 11m', on:true},
-  {id:5, name:'Tank fill rate below target', plant:'Beta', equip:'Tank', sev:'issue', status:'Active', last:'4h', on:true},
-  {id:6, name:'Cold storage temp drift', plant:'Gamma', equip:'Sensor', sev:'warning', status:'Active', last:'30m', on:true},
-  {id:7, name:'Pump runtime over threshold', plant:'Delta', equip:'Pump', sev:'warning', status:'Active', last:'1h 20m', on:true},
-  {id:8, name:'Conveyor speed deviation', plant:'Delta', equip:'Conveyor', sev:'warning', status:'Resolved', last:'5h ago', on:false},
+  {id:1, name:'DO drop in aeration tank', plant:'Andheri STP', equip:'Aerator A-1', sev:'incident', status:'Active', last:'2h 14m', on:true, supervisors:['Ravi K.','Priya S.'], sensor:'DO-101', threshold:'< 2.0 mg/L', current:'1.4 mg/L'},
+  {id:2, name:'Inlet pump vibration high', plant:'Andheri STP', equip:'Pump P-3', sev:'incident', status:'Active', last:'47m', on:true, supervisors:['Ravi K.'], sensor:'VIB-203', threshold:'> 8 mm/s', current:'9.6 mm/s'},
+  {id:3, name:'pH out of range', plant:'Andheri STP', equip:'Equalization tank', sev:'issue', status:'Active', last:'1h 02m', on:true, supervisors:['Arjun M.'], sensor:'PH-505', threshold:'5.5–9.0', current:'9.4'},
+  {id:4, name:'Blower load high', plant:'Bandra STP', equip:'Blower B-2', sev:'issue', status:'Active', last:'3h 11m', on:true, supervisors:['Meera R.'], sensor:'AMP-B2', threshold:'> 80 A', current:'92 A'},
+  {id:5, name:'MLSS below target', plant:'Bandra STP', equip:'Aeration tank', sev:'issue', status:'Active', last:'4h', on:true, supervisors:[], sensor:'MLSS-1', threshold:'> 2500 mg/L', current:'2100 mg/L'},
+  {id:6, name:'Effluent turbidity rising', plant:'Powai STP', equip:'Outlet', sev:'warning', status:'Active', last:'30m', on:true, supervisors:['Operator'], sensor:'TURB-O', threshold:'> 5 NTU', current:'6.2 NTU'},
+  {id:7, name:'Sludge pump runtime over limit', plant:'Powai STP', equip:'Sludge pump', sev:'warning', status:'Active', last:'1h 20m', on:true, supervisors:[], sensor:'RT-SP', threshold:'> 8 hrs/day', current:'9.1 hrs'},
+  {id:8, name:'Chlorine dosing low', plant:'Thane STP', equip:'Cl₂ doser', sev:'warning', status:'Resolved', last:'5h ago', on:false, supervisors:['Meera R.'], sensor:'CL-1', threshold:'< 0.5 mg/L', current:'0.7 mg/L'},
 ];
-
 const sevColors = {
   incident:{bg:'#FEE2E2',fg:'#991B1B',dot:'#DC2626'},
   issue:{bg:'#FEF3C7',fg:'#92400E',dot:'#F59E0B'},
   warning:{bg:'#FEF9C3',fg:'#854D0E',dot:'#FBBF24'},
 };
+const selected = new Set();
 
+// ---------- Filters ----------
+function filterByPlant(p) { document.getElementById('f-plant').value = p; renderInsights(); }
+function clearAllFilters() {
+  ['search','f-plant','f-sev','f-equip','f-status'].forEach(id=>document.getElementById(id).value='');
+  renderInsights();
+}
+function getFiltered() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const p = document.getElementById('f-plant').value;
+  const s = document.getElementById('f-sev').value;
+  const e = document.getElementById('f-equip').value;
+  const st = document.getElementById('f-status').value;
+  return insights.filter(i =>
+    (!q || (i.name+i.plant+i.equip+i.sensor).toLowerCase().includes(q)) &&
+    (!p || i.plant===p) &&
+    (!s || i.sev===s) &&
+    (!e || i.equip.toLowerCase().includes(e.toLowerCase())) &&
+    (!st || i.status===st)
+  );
+}
+
+// ---------- Render insights table ----------
 function renderInsights() {
-  const list = document.getElementById('insights-list');
-  list.innerHTML = insights.map(i => `
-    <div class="border-b border-slate-100 last:border-0">
-      <div class="grid grid-cols-12 px-4 py-3 hover:bg-slate-50 cursor-pointer items-center" onclick="toggleTimeline(${i.id})">
-        <div class="col-span-5 flex items-center gap-2">
-          <span class="chip" style="background:${sevColors[i.sev].bg};color:${sevColors[i.sev].fg}">● ${i.sev}</span>
-          <span class="text-sm font-medium">${i.name}</span>
-        </div>
-        <div class="col-span-2 text-sm text-slate-600">${i.plant} · ${i.equip}</div>
-        <div class="col-span-2 text-sm">
-          ${i.status==='Active' ? `<span class="text-red-600 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-red-500 pulse"></span> Active ${i.last}</span>` : `<span class="text-slate-500">${i.status}</span>`}
-        </div>
-        <div class="col-span-2 text-sm text-slate-500">${i.last}</div>
-        <div class="col-span-1 text-right" onclick="event.stopPropagation()">
-          <label class="inline-flex items-center cursor-pointer">
-            <input type="checkbox" ${i.on?'checked':''} onchange="toggleInsight(${i.id},this.checked)" class="sr-only peer"/>
-            <div class="w-9 h-5 bg-slate-200 peer-checked:bg-emerald-500 rounded-full transition relative">
-              <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition peer-checked:translate-x-4"></div>
-            </div>
-          </label>
+  const list = getFiltered();
+  document.getElementById('insight-count').textContent = `· ${list.length}`;
+  document.getElementById('insights-list').innerHTML = list.map(i => `
+    <div class="grid grid-cols-12 px-4 py-3 hover:bg-slate-50 cursor-pointer items-center border-b border-slate-100 last:border-0 ${selected.has(i.id)?'bg-blue-50/50':''}" onclick="openDetail(${i.id})">
+      <div class="col-span-1" onclick="event.stopPropagation();toggleSel(${i.id})">
+        <span class="cb ${selected.has(i.id)?'checked':''}"></span>
+      </div>
+      <div class="col-span-4 flex items-center gap-2">
+        <span class="chip" style="background:${sevColors[i.sev].bg};color:${sevColors[i.sev].fg}">● ${i.sev}</span>
+        <div>
+          <div class="text-sm font-medium">${i.name}</div>
+          <div class="text-[11px] text-slate-500">${i.sensor} · ${i.threshold}</div>
         </div>
       </div>
-      <div id="tl-${i.id}" class="hidden px-4 pb-4 pt-1 bg-slate-50">
-        ${renderInsightTimeline(i)}
+      <div class="col-span-2 text-sm text-slate-600">${i.plant}<div class="text-[11px] text-slate-400">${i.equip}</div></div>
+      <div class="col-span-2 text-sm">
+        ${i.supervisors.length ?
+          `<div class="flex -space-x-1.5">${i.supervisors.slice(0,3).map(s=>`<div class="w-6 h-6 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-semibold" title="${s}">${s.split(' ')[0][0]}${s.split(' ')[1]?s.split(' ')[1][0]:''}</div>`).join('')}${i.supervisors.length>3?`<div class="w-6 h-6 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px]">+${i.supervisors.length-3}</div>`:''}</div>` :
+          `<button class="text-xs text-blue-600 hover:underline" onclick="event.stopPropagation();toggleSel(${i.id});openBulkAssign()">+ Add</button>`
+        }
       </div>
-    </div>
-  `).join('');
-}
-function renderInsightTimeline(i) {
-  const steps = [
-    {t:'0', user:'Ravi Kumar', ch:'SMS, WA', label:'Immediate'},
-    {t:'10m', user:'Shift Lead', ch:'Call', label:'10 min'},
-    {t:'30m', user:'Plant Manager', ch:'Email', label:'30 min'},
-  ];
-  return `
-    <div class="ml-2 pl-6 border-l-2 border-slate-200 space-y-3 py-2">
-      ${steps.map((s,idx)=>`
-        <div class="relative">
-          <div class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-white border-2 border-slate-400"></div>
-          <div class="text-sm flex items-center gap-3">
-            <span class="chip bg-slate-200 w-20 justify-center">${s.label}</span>
-            <span class="font-medium">${s.user}</span>
-            <span class="text-slate-500 text-xs">via ${s.ch}</span>
-            <button class="ml-auto text-xs text-blue-600 hover:underline" onclick="event.stopPropagation();showHelper('${s.user}')">Edit</button>
+      <div class="col-span-2 text-sm">
+        ${i.status==='Active' ? `<span class="text-red-600 flex items-center gap-1.5 text-xs"><span class="w-1.5 h-1.5 rounded-full bg-red-500 pulse"></span>Active · ${i.last}</span>` : `<span class="text-slate-400 text-xs">Resolved · ${i.last}</span>`}
+      </div>
+      <div class="col-span-1 text-right" onclick="event.stopPropagation()">
+        <label class="inline-flex items-center cursor-pointer">
+          <input type="checkbox" ${i.on?'checked':''} onchange="toggleInsight(${i.id},this.checked)" class="sr-only peer"/>
+          <div class="w-9 h-5 bg-slate-200 peer-checked:bg-emerald-500 rounded-full transition relative">
+            <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition peer-checked:translate-x-4"></div>
           </div>
-        </div>
-      `).join('')}
-      <button class="text-xs text-blue-600 hover:underline ml-1">+ Add step</button>
+        </label>
+      </div>
     </div>
-  `;
+  `).join('') || `<div class="p-8 text-center text-slate-400 text-sm">No insights match these filters.</div>`;
+  updateSelectAll();
 }
-function toggleTimeline(id){ document.getElementById('tl-'+id).classList.toggle('hidden'); }
+
+// ---------- Selection ----------
+function toggleSel(id) {
+  if (selected.has(id)) selected.delete(id); else selected.add(id);
+  renderInsights();
+  updateBulkBar();
+}
+function toggleAll() {
+  const list = getFiltered();
+  if (list.every(i=>selected.has(i.id))) list.forEach(i=>selected.delete(i.id));
+  else list.forEach(i=>selected.add(i.id));
+  renderInsights();
+  updateBulkBar();
+}
+function updateSelectAll() {
+  const list = getFiltered();
+  const cb = document.getElementById('cb-all');
+  cb.classList.remove('checked','indeterminate');
+  if (!list.length) return;
+  if (list.every(i=>selected.has(i.id))) cb.classList.add('checked');
+  else if (list.some(i=>selected.has(i.id))) cb.classList.add('indeterminate');
+}
+function updateBulkBar() {
+  const bar = document.getElementById('bulk-bar');
+  if (selected.size) { bar.classList.remove('hidden'); document.getElementById('bulk-count').textContent = selected.size; }
+  else bar.classList.add('hidden');
+}
+function clearSelection() { selected.clear(); renderInsights(); updateBulkBar(); }
+function bulkPause() {
+  selected.forEach(id=>{ const i = insights.find(x=>x.id===id); if(i) i.on=false; });
+  toast(`✓ Paused ${selected.size} insights · <button class="underline" onclick="bulkResume()">Undo</button>`);
+  clearSelection();
+}
+function bulkResume() {
+  insights.forEach(i=>i.on=true); renderInsights(); toast('✓ Resumed');
+}
 function toggleInsight(id, on){
   const i = insights.find(x=>x.id===id); i.on = on;
-  toast(`Insight ${on?'resumed':'paused'} — <button class="underline" onclick="toggleInsight(${id},${!on});this.parentElement.remove()">Undo</button>`);
+  toast(`Insight ${on?'resumed':'paused'} · <button class="underline" onclick="toggleInsight(${id},${!on});this.parentElement.remove()">Undo</button>`);
 }
-renderInsights();
 
-// ------- Filter chips -------
-const activeFilters = {};
-function applyFilter(key, val) {
-  if (val.startsWith('All')) delete activeFilters[key];
-  else activeFilters[key] = val;
-  const chipsRow = document.getElementById('filter-chips');
-  const keys = Object.keys(activeFilters);
-  if (!keys.length) { chipsRow.classList.add('hidden'); return; }
-  chipsRow.classList.remove('hidden');
-  chipsRow.innerHTML = `<span class="text-xs text-slate-500 self-center">Active:</span>` +
-    keys.map(k=>`<button class="chip bg-slate-100 hover:bg-slate-200" onclick="clearFilter('${k}')">${k}: ${activeFilters[k]} ✕</button>`).join('') +
-    `<button class="text-xs text-slate-500 underline self-center" onclick="clearAllFilters()">Clear all</button>`;
-  // simulate count change
-  document.getElementById('insight-count').textContent = `· ${Math.max(2, 18 - keys.length*4)}`;
+// ---------- Detail drawer ----------
+function openDetail(id) {
+  const i = insights.find(x=>x.id===id);
+  if (!i) return;
+  const c = sevColors[i.sev];
+  document.getElementById('detail-content').innerHTML = `
+    <div class="drawer-in">
+      <!-- Header -->
+      <div class="px-6 py-4 border-b border-slate-100 sticky top-0 bg-white z-10">
+        <div class="flex items-center justify-between mb-2">
+          <button class="text-slate-400 hover:text-slate-700 text-sm" onclick="closeDetail()">← Close</button>
+          <div class="flex gap-2">
+            <button class="btn btn-sm btn-ghost">Edit</button>
+            <button class="btn btn-sm btn-ghost">⋯</button>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="chip" style="background:${c.bg};color:${c.fg}">● ${i.sev}</span>
+          ${i.status==='Active' ? `<span class="text-red-600 flex items-center gap-1.5 text-xs font-medium"><span class="w-1.5 h-1.5 rounded-full bg-red-500 pulse"></span>Active · ${i.last}</span>` : `<span class="text-slate-400 text-xs">Resolved</span>`}
+        </div>
+        <h2 class="font-bold text-xl">${i.name}</h2>
+        <p class="text-sm text-slate-500 mt-0.5">${i.plant} · ${i.equip}</p>
+      </div>
+
+      <div class="p-6 space-y-6">
+
+        <!-- Live reading + sparkline -->
+        <div class="card p-4 border border-slate-100">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <div class="text-[11px] uppercase text-slate-500 font-semibold">Current reading · ${i.sensor}</div>
+              <div class="text-2xl font-bold mt-1" style="color:${c.dot}">${i.current}</div>
+              <div class="text-xs text-slate-500">Threshold: ${i.threshold}</div>
+            </div>
+            <svg viewBox="0 0 200 60" class="w-48 h-16">
+              <path class="sparkline" d="M0,40 L20,38 L40,42 L60,30 L80,32 L100,20 L120,18 L140,12 L160,10 L180,8 L200,6"/>
+              <circle cx="200" cy="6" r="3" fill="${c.dot}"/>
+            </svg>
+          </div>
+          <div class="flex gap-2 text-xs">
+            <button class="chip bg-slate-100">1H</button>
+            <button class="chip bg-slate-900 text-white">24H</button>
+            <button class="chip bg-slate-100">7D</button>
+            <button class="chip bg-slate-100">30D</button>
+          </div>
+        </div>
+
+        <!-- Conditions -->
+        <div>
+          <div class="text-[11px] uppercase text-slate-500 font-semibold mb-2">Conditions</div>
+          <div class="card p-4 border border-slate-100 text-sm space-y-2">
+            <div><span class="text-slate-500">Opens when</span> <code class="bg-slate-100 px-2 py-0.5 rounded text-[12px]">${i.sensor} ${i.threshold}</code> sustained 60s</div>
+            <div><span class="text-slate-500">Closes when</span> <code class="bg-slate-100 px-2 py-0.5 rounded text-[12px]">${i.sensor} back in range for 5 min</code> · or manual</div>
+          </div>
+        </div>
+
+        <!-- Equipment -->
+        <div>
+          <div class="text-[11px] uppercase text-slate-500 font-semibold mb-2">Equipment</div>
+          <div class="card p-4 border border-slate-100 text-sm grid grid-cols-2 gap-y-2">
+            <div><span class="text-slate-500">Tag</span> <span class="font-medium">${i.equip}</span></div>
+            <div><span class="text-slate-500">Sensor</span> <span class="font-medium">${i.sensor}</span></div>
+            <div><span class="text-slate-500">Installed</span> <span>2023-08-12</span></div>
+            <div><span class="text-slate-500">Last service</span> <span>2026-04-03</span></div>
+          </div>
+        </div>
+
+        <!-- Supervisors / escalation timeline -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <div class="text-[11px] uppercase text-slate-500 font-semibold">Personnel monitoring · escalation</div>
+            <button class="text-xs text-blue-600 hover:underline" onclick="closeDetail();selected.clear();selected.add(${i.id});updateBulkBar();openBulkAssign()">+ Add supervisor</button>
+          </div>
+          <div class="card p-4 border border-slate-100">
+            <div class="ml-2 pl-6 border-l-2 border-slate-200 space-y-3 py-1">
+              ${[
+                {t:'Immediate', user:i.supervisors[0]||'Plant Manager', ch:'📞 ✉ WA', color:'#DC2626'},
+                {t:'10 min', user:i.supervisors[1]||'Shift Lead', ch:'SMS', color:'#F59E0B'},
+                {t:'30 min', user:'Operations Head', ch:'📞', color:'#64748B'},
+              ].map(s=>`
+                <div class="relative">
+                  <div class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-white border-2" style="border-color:${s.color}"></div>
+                  <div class="text-sm flex items-center gap-3">
+                    <span class="chip bg-slate-100 w-20 justify-center">${s.t}</span>
+                    <span class="font-medium">${s.user}</span>
+                    <span class="text-slate-500 text-xs">${s.ch}</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+
+        <!-- History timeline -->
+        <div>
+          <div class="text-[11px] uppercase text-slate-500 font-semibold mb-2">History</div>
+          <div class="card p-4 border border-slate-100 text-sm space-y-3">
+            <div class="flex gap-3"><span class="text-slate-400 text-xs w-32 shrink-0">2026-05-05 09:21</span><span><b>Opened</b> · ${i.sensor} = ${i.current}</span></div>
+            <div class="flex gap-3"><span class="text-slate-400 text-xs w-32 shrink-0">2026-05-05 09:21</span><span>Notified <b>${i.supervisors[0]||'Plant Manager'}</b> via WhatsApp, Call</span></div>
+            <div class="flex gap-3"><span class="text-slate-400 text-xs w-32 shrink-0">2026-05-05 09:31</span><span>Escalated to <b>Shift Lead</b> · no acknowledgement</span></div>
+            <div class="flex gap-3"><span class="text-slate-400 text-xs w-32 shrink-0">2026-05-04 14:02</span><span>Last resolved · automatic close</span></div>
+            <button class="text-xs text-blue-600 hover:underline">View full history (24 events)</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  `;
+  document.getElementById('detail-drawer').classList.remove('hidden');
+  document.getElementById('detail-overlay').classList.remove('hidden');
 }
-function clearFilter(k){ delete activeFilters[k]; applyFilter('','All'); }
-function clearAllFilters(){ Object.keys(activeFilters).forEach(k=>delete activeFilters[k]); applyFilter('','All'); document.getElementById('insight-count').textContent='· 18'; }
+function closeDetail() {
+  document.getElementById('detail-drawer').classList.add('hidden');
+  document.getElementById('detail-overlay').classList.add('hidden');
+}
 
-// ------- New Insight modal -------
+// ---------- Bulk assign modal ----------
+let bulkSupervisors = [];
+let bulkStep = 'imm';
+function openBulkAssign() {
+  if (!selected.size) { toast('Select at least one insight first'); return; }
+  bulkSupervisors = [];
+  document.getElementById('bulk-modal-count').textContent = selected.size;
+  document.getElementById('bulk-confirm-count').textContent = selected.size;
+  document.getElementById('bulk-supervisors').innerHTML = '<span class="text-xs text-slate-400">No supervisors yet — type below to add.</span>';
+  document.getElementById('modal-bulk').classList.remove('hidden');
+  document.getElementById('modal-bulk').classList.add('flex');
+}
+function closeBulkAssign() {
+  document.getElementById('modal-bulk').classList.add('hidden');
+  document.getElementById('modal-bulk').classList.remove('flex');
+}
+const allSupervisors = [
+  {n:'Priya Sharma', role:'Shift Lead · Andheri', count:5},
+  {n:'Arjun Mehta', role:'Plant Manager · Bandra', count:3, noaccess:['Andheri STP']},
+  {n:'Meera Rao', role:'Operations Head', count:8},
+  {n:'Vikas Patel', role:'Operator · Powai', count:2},
+];
+function searchSupervisor(q) {
+  const box = document.getElementById('sup-suggestions');
+  if (!q) { box.classList.add('hidden'); return; }
+  const matches = allSupervisors.filter(s=>s.n.toLowerCase().includes(q.toLowerCase()));
+  box.classList.remove('hidden');
+  box.innerHTML = matches.map(s=>`
+    <button class="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm" onclick="addSupervisor('${s.n}','${s.role}',${s.count},${JSON.stringify(s.noaccess||[]).replace(/"/g,'&quot;')})">
+      <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-semibold">${s.n.split(' ').map(x=>x[0]).join('')}</div>
+      <div class="flex-1">
+        <div class="font-medium">${s.n}</div>
+        <div class="text-[11px] text-slate-500">${s.role} · on ${s.count} insights</div>
+      </div>
+      ${s.noaccess?`<span class="chip bg-amber-100 text-amber-800">⚠ access</span>`:''}
+    </button>
+  `).join('') || `<div class="px-3 py-2 text-xs text-slate-400">No match</div>`;
+}
+function addSupervisor(name, role, count, noaccess) {
+  bulkSupervisors.push({name, role, count, noaccess});
+  document.getElementById('sup-search').value = '';
+  document.getElementById('sup-suggestions').classList.add('hidden');
+  renderBulkSupervisors();
+  // Helper updates
+  const helper = document.getElementById('bulk-helper');
+  helper.classList.remove('hidden');
+  const accessIssues = bulkSupervisors.filter(s=>s.noaccess && s.noaccess.length);
+  helper.innerHTML = `
+    <div class="font-semibold mb-1">ⓘ Current assignments</div>
+    ${bulkSupervisors.map(s=>`<div>${s.name} — already on <b>${s.count}</b> insights ${s.noaccess && s.noaccess.length?`<span class="text-amber-700">· ⚠ no access to ${s.noaccess.join(', ')} <button class="underline font-semibold" onclick="grantAccess('${s.name}')">Grant</button></span>`:''}</div>`).join('')}
+  `;
+}
+function renderBulkSupervisors() {
+  const box = document.getElementById('bulk-supervisors');
+  if (!bulkSupervisors.length) { box.innerHTML = '<span class="text-xs text-slate-400">No supervisors yet — type below to add.</span>'; return; }
+  box.innerHTML = bulkSupervisors.map((s,idx)=>`
+    <span class="chip bg-slate-100 text-slate-800 pr-1">
+      ${s.name} ${s.noaccess && s.noaccess.length?'<span class="text-amber-600">⚠</span>':''}
+      <button class="ml-1 hover:text-red-600" onclick="removeSupervisor(${idx})">✕</button>
+    </span>
+  `).join('');
+}
+function removeSupervisor(idx) { bulkSupervisors.splice(idx,1); renderBulkSupervisors(); }
+function grantAccess(name) {
+  const s = bulkSupervisors.find(x=>x.name===name); if(s) s.noaccess=[];
+  toast(`✓ Access granted to ${name}`);
+  renderBulkSupervisors();
+  const helper = document.getElementById('bulk-helper');
+  helper.innerHTML = helper.innerHTML.replace(/⚠[^<]*<button[^<]*<\/button>/g,'<span class="text-emerald-700">✓ access granted</span>');
+}
+function setStep(btn, val) {
+  bulkStep = val;
+  btn.parentElement.querySelectorAll('button').forEach(b=>{b.classList.remove('btn-primary');b.classList.add('btn-ghost')});
+  btn.classList.remove('btn-ghost'); btn.classList.add('btn-primary');
+}
+function toggleCh(btn) { btn.classList.toggle('on'); btn.classList.toggle('off'); }
+function confirmBulkAssign() {
+  if (!bulkSupervisors.length) { toast('Add at least one supervisor'); return; }
+  selected.forEach(id=>{
+    const i = insights.find(x=>x.id===id);
+    if (i) bulkSupervisors.forEach(s=>{ if(!i.supervisors.includes(s.name)) i.supervisors.push(s.name); });
+  });
+  const n = selected.size;
+  closeBulkAssign();
+  clearSelection();
+  renderInsights();
+  toast(`✓ Added ${bulkSupervisors.length} supervisor${bulkSupervisors.length>1?'s':''} to ${n} insights`);
+}
+
+// ---------- New insight modal ----------
 function openNewInsight() {
   document.getElementById('modal-new').classList.remove('hidden');
   document.getElementById('modal-new').classList.add('flex');
@@ -524,19 +724,18 @@ function closeNewInsight() {
 }
 function renderModalTimeline() {
   const steps = [
-    {t:'0min', user:'Ravi Kumar', ch:'SMS, WA', label:'Immediate', color:'#DC2626'},
-    {t:'10min', user:'Shift Lead', ch:'Call', label:'After 10 min', color:'#F59E0B'},
-    {t:'30min', user:'Plant Manager', ch:'Email', label:'After 30 min', color:'#64748B'},
+    {t:'Immediate', user:'Plant Manager', ch:'📞 ✉ WA', color:'#DC2626'},
+    {t:'After 10 min', user:'Shift Lead', ch:'SMS', color:'#F59E0B'},
+    {t:'After 30 min', user:'Operations Head', ch:'📞', color:'#64748B'},
   ];
   document.getElementById('timeline').innerHTML = `
-    <div class="relative ml-2 pl-6 border-l-2 border-slate-300 space-y-4 pb-2">
+    <div class="ml-2 pl-6 border-l-2 border-slate-300 space-y-4 pb-2">
       ${steps.map(s=>`
         <div class="relative slide-in">
           <div class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-white border-2" style="border-color:${s.color}"></div>
           <div class="flex items-center gap-3 text-sm">
-            <span class="chip bg-white border border-slate-200 w-24 justify-center">${s.label}</span>
-            <span class="editable-chip" contenteditable="true" onblur="showUserHelper(this,'${s.user}')">${s.user}</span>
-            <span class="text-slate-500 text-xs">via</span>
+            <span class="chip bg-white border border-slate-200 w-24 justify-center">${s.t}</span>
+            <span class="editable-chip" contenteditable="true">${s.user}</span>
             <span class="editable-chip" contenteditable="true">${s.ch}</span>
             <button class="ml-auto text-xs text-slate-400 hover:text-red-600">✕</button>
           </div>
@@ -546,29 +745,16 @@ function renderModalTimeline() {
     </div>
   `;
 }
-function showUserHelper(el, name) {
-  document.getElementById('user-helper').classList.remove('hidden');
-}
-function grantAccess() {
-  toast('✓ Access granted to Beta Refinery for Ravi Kumar');
-  document.getElementById('user-helper').innerHTML = '<div class="font-semibold text-emerald-700">✓ Permissions resolved — Ravi can be assigned across all plants.</div>';
-}
-function markStep(n) {
-  for (let i=1;i<=n;i++) document.getElementById('prog-'+i).classList.replace('bg-slate-200','bg-blue-500');
-  document.getElementById('completion').textContent = n===3 ? 'Ready to create' : `Step ${Math.min(n+1,3)} of 3`;
-}
-function saveDraft() { toast('Draft saved · find it at the top of Insights'); closeNewInsight(); }
+function saveDraft() { toast('Draft saved'); closeNewInsight(); }
 function createInsight() {
   closeNewInsight();
   show('insights');
-  // Add a new row at top
-  insights.unshift({id:99, name:'Tank pressure exceeds 12 bar', plant:'Alpha', equip:'Tank', sev:'incident', status:'Active', last:'just now', on:true});
+  insights.unshift({id:99, name:'DO drop in aeration tank', plant:'Andheri STP', equip:'Aerator A-1', sev:'incident', status:'Active', last:'just now', on:true, supervisors:['Plant Manager','Shift Lead'], sensor:'DO-101', threshold:'< 2.0 mg/L', current:'1.4 mg/L'});
   renderInsights();
-  document.querySelector('#insights-list > div').classList.add('highlight-row');
-  toast('✓ Insight created · <button class="underline" onclick="toggleTimeline(99)">View timeline</button>');
+  toast('✓ Insight created');
 }
 
-// ------- Plant defaults modal -------
+// ---------- Defaults ----------
 function openDefaults(plant) {
   document.getElementById('defaults-plant').textContent = plant;
   document.getElementById('modal-defaults').classList.remove('hidden');
@@ -578,12 +764,9 @@ function closeDefaults() {
   document.getElementById('modal-defaults').classList.add('hidden');
   document.getElementById('modal-defaults').classList.remove('flex');
 }
-function saveDefaults() {
-  closeDefaults();
-  toast('✓ Defaults saved · future insights will inherit these timelines');
-}
+function saveDefaults() { closeDefaults(); toast('✓ Defaults saved · future insights inherit these timelines'); }
 
-// ------- Toast -------
+// ---------- Toast ----------
 function toast(html) {
   const el = document.createElement('div');
   el.className = 'toast bg-slate-900 text-white text-sm px-4 py-3 rounded-lg shadow-lg max-w-sm';
@@ -592,8 +775,7 @@ function toast(html) {
   setTimeout(()=>el.remove(), 5000);
 }
 
-function showHelper(name){ toast(`ⓘ ${name} is on 3 other insights · <button class="underline">View</button>`); }
+renderInsights();
 </script>
-
 </body>
 </html>
