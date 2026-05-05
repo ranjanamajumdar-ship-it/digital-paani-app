@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Digital Paani — STP Insights Prototype</title>
+<title>Digital Paani — Plant Insights Prototype</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -55,10 +55,11 @@
 <nav class="bg-white border-b border-slate-200 sticky top-0 z-30">
   <div class="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
     <div class="flex items-center gap-8">
-      <div class="font-bold text-[15px]">Digital Paani <span class="text-slate-400 font-normal">· STP Operations</span></div>
-      <div class="flex items-center gap-1 text-sm">
-        <button onclick="show('plants')" id="nav-plants" class="px-3 py-1.5 rounded-lg font-medium">STPs <span class="text-slate-400 ml-1">5</span></button>
-        <button onclick="show('insights')" id="nav-insights" class="px-3 py-1.5 rounded-lg font-medium">Insights <span class="text-slate-400 ml-1">18</span></button>
+      <div class="font-bold text-[15px]">Digital Paani <span class="text-slate-400 font-normal">· Plant Operations</span></div>
+      <div class="flex items-center gap-1 text-sm text-slate-500" id="breadcrumb">
+        <button onclick="show('plants')" class="px-3 py-1.5 rounded-lg font-medium hover:bg-slate-100">Plants</button>
+        <span id="bc-sep" class="hidden">›</span>
+        <span id="bc-plant" class="px-2 py-1.5 font-medium text-slate-900 hidden"></span>
       </div>
     </div>
     <div class="flex items-center gap-3">
@@ -68,7 +69,7 @@
   </div>
 </nav>
 
-<!-- ============== STPs SCREEN ============== -->
+<!-- ============== Plants SCREEN ============== -->
 <section id="screen-plants" class="screen active">
   <div class="max-w-7xl mx-auto px-6 py-8">
     <div class="flex items-end justify-between mb-6">
@@ -76,78 +77,78 @@
         <h1 class="text-2xl font-bold">Sewage Treatment Plants</h1>
         <p class="text-sm text-slate-500 mt-1">Configuration layer · sorted by severity</p>
       </div>
-      <input placeholder="Search STPs…" class="border border-slate-200 rounded-lg px-3 py-2 text-sm w-64"/>
+      <input placeholder="Search Plants…" class="border border-slate-200 rounded-lg px-3 py-2 text-sm w-64"/>
     </div>
 
     <div class="grid grid-cols-3 gap-4">
       <div class="card p-5">
         <div class="sev-bar mb-4"><div style="background:#DC2626;flex:2"></div><div style="background:#F59E0B;flex:1"></div><div style="background:#e2e8f0;flex:1"></div></div>
-        <h3 class="font-semibold text-[15px]">Andheri STP</h3>
+        <h3 class="font-semibold text-[15px]">Andheri Plant</h3>
         <p class="text-xs text-slate-500 mt-0.5">Mumbai · 25 MLD · 4 active insights</p>
         <div class="flex flex-wrap gap-1.5 mt-3">
           <span class="chip" style="background:#FEE2E2;color:#991B1B">● 2 incident</span>
           <span class="chip" style="background:#FEF3C7;color:#92400E">● 1 issue</span>
         </div>
         <div class="flex gap-2 mt-5">
-          <button class="btn btn-ghost flex-1" onclick="show('insights');filterByPlant('Andheri STP')">View insights</button>
-          <button class="btn btn-primary flex-1" onclick="openDefaults('Andheri STP')">Configure defaults</button>
+          <button class="btn btn-ghost flex-1" onclick="filterByPlant('Andheri Plant')">View insights</button>
+          <button class="btn btn-primary flex-1" onclick="openDefaults('Andheri Plant')">Configure defaults</button>
         </div>
       </div>
 
       <div class="card p-5">
         <div class="sev-bar mb-4"><div style="background:#F59E0B;flex:2"></div><div style="background:#e2e8f0;flex:3"></div></div>
-        <h3 class="font-semibold text-[15px]">Bandra STP</h3>
+        <h3 class="font-semibold text-[15px]">Bandra Plant</h3>
         <p class="text-xs text-slate-500 mt-0.5">Mumbai · 18 MLD · 5 active insights</p>
         <div class="flex flex-wrap gap-1.5 mt-3">
           <span class="chip" style="background:#FEF3C7;color:#92400E">● 2 issue</span>
         </div>
         <div class="flex gap-2 mt-5">
-          <button class="btn btn-ghost flex-1" onclick="show('insights');filterByPlant('Bandra STP')">View insights</button>
-          <button class="btn btn-primary flex-1" onclick="openDefaults('Bandra STP')">Configure defaults</button>
+          <button class="btn btn-ghost flex-1" onclick="filterByPlant('Bandra Plant')">View insights</button>
+          <button class="btn btn-primary flex-1" onclick="openDefaults('Bandra Plant')">Configure defaults</button>
         </div>
       </div>
 
       <div class="card p-5">
         <div class="sev-bar mb-4"><div style="background:#FBBF24;flex:2"></div><div style="background:#e2e8f0;flex:3"></div></div>
-        <h3 class="font-semibold text-[15px]">Powai STP</h3>
+        <h3 class="font-semibold text-[15px]">Powai Plant</h3>
         <p class="text-xs text-slate-500 mt-0.5">Mumbai · 12 MLD · 4 active insights</p>
         <div class="flex flex-wrap gap-1.5 mt-3">
           <span class="chip" style="background:#FEF9C3;color:#854D0E">● 2 warning</span>
         </div>
         <div class="flex gap-2 mt-5">
-          <button class="btn btn-ghost flex-1" onclick="show('insights');filterByPlant('Powai STP')">View insights</button>
-          <button class="btn btn-primary flex-1" onclick="openDefaults('Powai STP')">Configure defaults</button>
+          <button class="btn btn-ghost flex-1" onclick="filterByPlant('Powai Plant')">View insights</button>
+          <button class="btn btn-primary flex-1" onclick="openDefaults('Powai Plant')">Configure defaults</button>
         </div>
       </div>
 
       <div class="card p-5 opacity-90">
         <div class="sev-bar mb-4"><div style="background:#FBBF24;flex:1"></div><div style="background:#e2e8f0;flex:4"></div></div>
-        <h3 class="font-semibold text-[15px]">Thane STP</h3>
+        <h3 class="font-semibold text-[15px]">Thane Plant</h3>
         <p class="text-xs text-slate-500 mt-0.5">Thane · 30 MLD · 3 active insights</p>
         <div class="flex flex-wrap gap-1.5 mt-3">
           <span class="chip" style="background:#FEF9C3;color:#854D0E">● 1 warning</span>
         </div>
         <div class="flex gap-2 mt-5">
-          <button class="btn btn-ghost flex-1" onclick="show('insights');filterByPlant('Thane STP')">View insights</button>
-          <button class="btn btn-primary flex-1" onclick="openDefaults('Thane STP')">Configure defaults</button>
+          <button class="btn btn-ghost flex-1" onclick="filterByPlant('Thane Plant')">View insights</button>
+          <button class="btn btn-primary flex-1" onclick="openDefaults('Thane Plant')">Configure defaults</button>
         </div>
       </div>
 
       <div class="card p-5 opacity-70">
         <div class="sev-bar mb-4"><div style="background:#16A34A;flex:1"></div><div style="background:#e2e8f0;flex:4"></div></div>
-        <h3 class="font-semibold text-[15px] text-slate-600">Vashi STP</h3>
+        <h3 class="font-semibold text-[15px] text-slate-600">Vashi Plant</h3>
         <p class="text-xs text-slate-500 mt-0.5">Navi Mumbai · 20 MLD · 2 active</p>
         <div class="flex flex-wrap gap-1.5 mt-3">
           <span class="chip" style="background:#DCFCE7;color:#166534">● all clear</span>
         </div>
         <div class="flex gap-2 mt-5">
-          <button class="btn btn-ghost flex-1" onclick="show('insights');filterByPlant('Vashi STP')">View insights</button>
-          <button class="btn btn-primary flex-1" onclick="openDefaults('Vashi STP')">Configure defaults</button>
+          <button class="btn btn-ghost flex-1" onclick="filterByPlant('Vashi Plant')">View insights</button>
+          <button class="btn btn-primary flex-1" onclick="openDefaults('Vashi Plant')">Configure defaults</button>
         </div>
       </div>
     </div>
 
-    <p class="text-xs text-slate-500 mt-6">Click <b>Configure defaults</b> to set escalation timelines per severity — every new insight in that STP inherits these supervisors and channels.</p>
+    <p class="text-xs text-slate-500 mt-6">Click <b>Configure defaults</b> to set escalation timelines per severity — every new insight in that Plant inherits these supervisors and channels.</p>
   </div>
 </section>
 
@@ -155,20 +156,24 @@
 <section id="screen-insights" class="screen">
   <div class="max-w-7xl mx-auto px-6 py-8">
 
+    <button onclick="show('plants')" class="text-sm text-slate-500 hover:text-slate-900 mb-3">← Back to all plants</button>
     <div class="flex items-end justify-between mb-6">
       <div>
-        <h1 class="text-2xl font-bold">Insights <span id="insight-count" class="text-slate-400 font-normal text-lg">· 18</span></h1>
-        <p class="text-sm text-slate-500 mt-1">Click any row to see history, sensor readings, and supervisors.</p>
+        <h1 class="text-2xl font-bold" id="insights-h1">Insights <span id="insight-count" class="text-slate-400 font-normal text-lg">· 18</span></h1>
+        <p class="text-sm text-slate-500 mt-1" id="insights-sub">Click any row to see history, sensor readings, and supervisors.</p>
       </div>
-      <button class="btn btn-primary" onclick="openNewInsight()">+ New insight</button>
+      <div class="flex gap-2">
+        <button class="btn btn-ghost" onclick="openDefaults(currentPlant)">Configure defaults</button>
+        <button class="btn btn-primary" onclick="openNewInsight()">+ New insight</button>
+      </div>
     </div>
 
-    <!-- Filters: simple bar -->
+    <!-- Filters: simple bar (plant-scoped) -->
     <div class="card p-3 mb-3 flex flex-wrap items-center gap-2">
       <input id="search" placeholder="🔍 Search insights, sensors, equipment…" oninput="renderInsights()" class="border-0 px-2 py-1.5 text-sm flex-1 min-w-[200px] focus:outline-none"/>
       <div class="h-6 w-px bg-slate-200"></div>
-      <select id="f-plant" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
-        <option value="">All STPs</option><option>Andheri STP</option><option>Bandra STP</option><option>Powai STP</option><option>Thane STP</option><option>Vashi STP</option>
+      <select id="f-plant" class="hidden">
+        <option value="">All Plants</option>
       </select>
       <select id="f-sev" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
         <option value="">All severities</option><option>incident</option><option>issue</option><option>warning</option>
@@ -197,7 +202,7 @@
       <div class="grid grid-cols-12 px-4 py-2 text-[11px] uppercase text-slate-500 font-semibold border-b border-slate-100 bg-slate-50 items-center">
         <div class="col-span-1"><span class="cb" id="cb-all" onclick="toggleAll()"></span></div>
         <div class="col-span-4">Insight</div>
-        <div class="col-span-2">STP · Equipment</div>
+        <div class="col-span-2">Plant · Equipment</div>
         <div class="col-span-2">Supervisors</div>
         <div class="col-span-2">Status</div>
         <div class="col-span-1 text-right">On</div>
@@ -233,7 +238,7 @@
           <span class="text-slate-500">on</span>
           <span class="editable-chip" contenteditable="true">Aeration tank</span>
           <span class="text-slate-500">at</span>
-          <span class="editable-chip" contenteditable="true">Andheri STP</span>
+          <span class="editable-chip" contenteditable="true">Andheri Plant</span>
         </div>
         <div class="mb-3">
           <span class="text-slate-500 font-semibold uppercase text-[11px] mr-2">Then</span>
@@ -330,7 +335,7 @@
     <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
       <div>
         <h2 class="font-bold text-lg">Configure defaults — <span id="defaults-plant"></span></h2>
-        <p class="text-xs text-slate-500">Future insights in this STP inherit these timelines.</p>
+        <p class="text-xs text-slate-500">Future insights in this Plant inherit these timelines.</p>
       </div>
       <button class="text-slate-400 hover:text-slate-700" onclick="closeDefaults()">✕</button>
     </div>
@@ -400,27 +405,33 @@
 
 <script>
 // ---------- Navigation ----------
+let currentPlant = '';
 function show(name) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+name).classList.add('active');
-  ['plants','insights'].forEach(n=>{
-    const el = document.getElementById('nav-'+n);
-    el.style.background = n===name ? '#0F172A' : '';
-    el.style.color = n===name ? '#fff' : '';
-  });
+  const sep = document.getElementById('bc-sep');
+  const bc = document.getElementById('bc-plant');
+  if (name === 'insights' && currentPlant) {
+    sep.classList.remove('hidden'); bc.classList.remove('hidden'); bc.textContent = currentPlant;
+  } else {
+    sep.classList.add('hidden'); bc.classList.add('hidden');
+    currentPlant = '';
+    document.getElementById('f-plant').value = '';
+  }
+  window.scrollTo(0,0);
 }
 show('plants');
 
 // ---------- Data ----------
 const insights = [
-  {id:1, name:'DO drop in aeration tank', plant:'Andheri STP', equip:'Aerator A-1', sev:'incident', status:'Active', last:'2h 14m', on:true, supervisors:['Ravi K.','Priya S.'], sensor:'DO-101', threshold:'< 2.0 mg/L', current:'1.4 mg/L'},
-  {id:2, name:'Inlet pump vibration high', plant:'Andheri STP', equip:'Pump P-3', sev:'incident', status:'Active', last:'47m', on:true, supervisors:['Ravi K.'], sensor:'VIB-203', threshold:'> 8 mm/s', current:'9.6 mm/s'},
-  {id:3, name:'pH out of range', plant:'Andheri STP', equip:'Equalization tank', sev:'issue', status:'Active', last:'1h 02m', on:true, supervisors:['Arjun M.'], sensor:'PH-505', threshold:'5.5–9.0', current:'9.4'},
-  {id:4, name:'Blower load high', plant:'Bandra STP', equip:'Blower B-2', sev:'issue', status:'Active', last:'3h 11m', on:true, supervisors:['Meera R.'], sensor:'AMP-B2', threshold:'> 80 A', current:'92 A'},
-  {id:5, name:'MLSS below target', plant:'Bandra STP', equip:'Aeration tank', sev:'issue', status:'Active', last:'4h', on:true, supervisors:[], sensor:'MLSS-1', threshold:'> 2500 mg/L', current:'2100 mg/L'},
-  {id:6, name:'Effluent turbidity rising', plant:'Powai STP', equip:'Outlet', sev:'warning', status:'Active', last:'30m', on:true, supervisors:['Operator'], sensor:'TURB-O', threshold:'> 5 NTU', current:'6.2 NTU'},
-  {id:7, name:'Sludge pump runtime over limit', plant:'Powai STP', equip:'Sludge pump', sev:'warning', status:'Active', last:'1h 20m', on:true, supervisors:[], sensor:'RT-SP', threshold:'> 8 hrs/day', current:'9.1 hrs'},
-  {id:8, name:'Chlorine dosing low', plant:'Thane STP', equip:'Cl₂ doser', sev:'warning', status:'Resolved', last:'5h ago', on:false, supervisors:['Meera R.'], sensor:'CL-1', threshold:'< 0.5 mg/L', current:'0.7 mg/L'},
+  {id:1, name:'DO drop in aeration tank', plant:'Andheri Plant', equip:'Aerator A-1', sev:'incident', status:'Active', last:'2h 14m', on:true, supervisors:['Ravi K.','Priya S.'], sensor:'DO-101', threshold:'< 2.0 mg/L', current:'1.4 mg/L'},
+  {id:2, name:'Inlet pump vibration high', plant:'Andheri Plant', equip:'Pump P-3', sev:'incident', status:'Active', last:'47m', on:true, supervisors:['Ravi K.'], sensor:'VIB-203', threshold:'> 8 mm/s', current:'9.6 mm/s'},
+  {id:3, name:'pH out of range', plant:'Andheri Plant', equip:'Equalization tank', sev:'issue', status:'Active', last:'1h 02m', on:true, supervisors:['Arjun M.'], sensor:'PH-505', threshold:'5.5–9.0', current:'9.4'},
+  {id:4, name:'Blower load high', plant:'Bandra Plant', equip:'Blower B-2', sev:'issue', status:'Active', last:'3h 11m', on:true, supervisors:['Meera R.'], sensor:'AMP-B2', threshold:'> 80 A', current:'92 A'},
+  {id:5, name:'MLSS below target', plant:'Bandra Plant', equip:'Aeration tank', sev:'issue', status:'Active', last:'4h', on:true, supervisors:[], sensor:'MLSS-1', threshold:'> 2500 mg/L', current:'2100 mg/L'},
+  {id:6, name:'Effluent turbidity rising', plant:'Powai Plant', equip:'Outlet', sev:'warning', status:'Active', last:'30m', on:true, supervisors:['Operator'], sensor:'TURB-O', threshold:'> 5 NTU', current:'6.2 NTU'},
+  {id:7, name:'Sludge pump runtime over limit', plant:'Powai Plant', equip:'Sludge pump', sev:'warning', status:'Active', last:'1h 20m', on:true, supervisors:[], sensor:'RT-SP', threshold:'> 8 hrs/day', current:'9.1 hrs'},
+  {id:8, name:'Chlorine dosing low', plant:'Thane Plant', equip:'Cl₂ doser', sev:'warning', status:'Resolved', last:'5h ago', on:false, supervisors:['Meera R.'], sensor:'CL-1', threshold:'< 0.5 mg/L', current:'0.7 mg/L'},
 ];
 const sevColors = {
   incident:{bg:'#FEE2E2',fg:'#991B1B',dot:'#DC2626'},
@@ -430,7 +441,14 @@ const sevColors = {
 const selected = new Set();
 
 // ---------- Filters ----------
-function filterByPlant(p) { document.getElementById('f-plant').value = p; renderInsights(); }
+function filterByPlant(p) {
+  currentPlant = p;
+  document.getElementById('f-plant').value = p;
+  document.getElementById('insights-h1').innerHTML = `${p} <span id="insight-count" class="text-slate-400 font-normal text-lg">· 0</span>`;
+  document.getElementById('insights-sub').textContent = 'Live insights · click any row for sensor history, conditions, and supervisors.';
+  show('insights');
+  renderInsights();
+}
 function clearAllFilters() {
   ['search','f-plant','f-sev','f-equip','f-status'].forEach(id=>document.getElementById(id).value='');
   renderInsights();
@@ -663,7 +681,7 @@ function closeBulkAssign() {
 }
 const allSupervisors = [
   {n:'Priya Sharma', role:'Shift Lead · Andheri', count:5},
-  {n:'Arjun Mehta', role:'Plant Manager · Bandra', count:3, noaccess:['Andheri STP']},
+  {n:'Arjun Mehta', role:'Plant Manager · Bandra', count:3, noaccess:['Andheri Plant']},
   {n:'Meera Rao', role:'Operations Head', count:8},
   {n:'Vikas Patel', role:'Operator · Powai', count:2},
 ];
@@ -737,7 +755,7 @@ function confirmBulkAssign() {
 // ---------- Group assign modal ----------
 const groups = [
   {id:'g1', name:'Andheri Day Shift', desc:'Operators on shift A · 06:00–14:00', members:['Priya Sharma','Vikas Patel','Rohan K.'], channels:'WA, SMS', steps:'Immediate → 10min → 30min'},
-  {id:'g2', name:'Operations Leadership', desc:'Cross-STP managers, escalation pool', members:['Meera Rao','Arjun Mehta','Sanjay G.'], channels:'📞 ✉ WA', steps:'Immediate → 5min → 20min'},
+  {id:'g2', name:'Operations Leadership', desc:'Cross-Plant managers, escalation pool', members:['Meera Rao','Arjun Mehta','Sanjay G.'], channels:'📞 ✉ WA', steps:'Immediate → 5min → 20min'},
   {id:'g3', name:'On-call Engineers', desc:'Maintenance & instrumentation', members:['Karan B.','Anita D.'], channels:'📞 SMS', steps:'Immediate → 15min'},
   {id:'g4', name:'Andheri Night Shift', desc:'Shift B · 22:00–06:00', members:['Vikas Patel','Rajesh M.','Neha T.'], channels:'📞 WA', steps:'Immediate → 5min'},
   {id:'g5', name:'Compliance & Reporting', desc:'Digest only · no escalation', members:['Anjali V.','Priya Sharma'], channels:'✉', steps:'Daily digest'},
@@ -833,7 +851,7 @@ function saveDraft() { toast('Draft saved'); closeNewInsight(); }
 function createInsight() {
   closeNewInsight();
   show('insights');
-  insights.unshift({id:99, name:'DO drop in aeration tank', plant:'Andheri STP', equip:'Aerator A-1', sev:'incident', status:'Active', last:'just now', on:true, supervisors:['Plant Manager','Shift Lead'], sensor:'DO-101', threshold:'< 2.0 mg/L', current:'1.4 mg/L'});
+  insights.unshift({id:99, name:'DO drop in aeration tank', plant:'Andheri Plant', equip:'Aerator A-1', sev:'incident', status:'Active', last:'just now', on:true, supervisors:['Plant Manager','Shift Lead'], sensor:'DO-101', threshold:'< 2.0 mg/L', current:'1.4 mg/L'});
   renderInsights();
   toast('✓ Insight created');
 }
