@@ -296,14 +296,104 @@
       <button class="text-xs text-slate-500 hover:text-slate-900 underline ml-auto" onclick="clearAllFilters()">Reset</button>
     </div>
 
-    <!-- Bulk action bar (sticky, only when selections exist) -->
-    <div id="bulk-bar" class="hidden card p-3 mb-3 bg-slate-900 text-white flex items-center gap-3 slide-in">
-      <span class="text-sm"><b id="bulk-count">0</b> insights selected</span>
-      <div class="h-6 w-px bg-white/20"></div>
-      <button class="btn btn-sm bg-white text-slate-900 hover:bg-slate-100" onclick="openBulkAssign()">+ Assign users</button>
-      <button class="btn btn-sm bg-white/10 text-white hover:bg-white/20" onclick="bulkPause()">⏸ Pause all</button>
-      <button class="text-xs underline ml-auto" onclick="clearSelection()">Clear selection</button>
-    </div>
+    <!-- Bulk action panel (inline, expands when selections exist) -->
+    <section id="bulk-panel" class="hidden card mb-3 overflow-hidden slide-in">
+      <!-- Compact selection header -->
+      <div class="px-6 py-3 bg-slate-900 text-white flex flex-wrap items-center gap-3">
+        <span class="text-sm"><b id="bulk-count">0</b> insight<span id="bulk-count-s">s</span> selected</span>
+        <div id="bulk-summary-pills" class="flex flex-wrap gap-1.5"></div>
+        <div class="ml-auto flex items-center gap-2">
+          <button class="btn btn-sm bg-white/10 text-white hover:bg-white/20" onclick="bulkPause()">⏸ Pause all</button>
+          <button class="text-xs underline" onclick="clearSelection()">Clear selection</button>
+        </div>
+      </div>
+
+      <!-- Header: title + goal-gradient progress -->
+      <div class="px-7 pt-5 pb-4 border-b border-slate-100">
+        <div class="flex items-start justify-between mb-4">
+          <div>
+            <h2 class="text-lg font-bold tracking-tight">Assign users <span class="text-slate-400 font-normal text-sm">to <b id="bulk-modal-count">0</b> insight<span id="bulk-modal-count-s">s</span></span></h2>
+            <p class="text-xs text-slate-500 mt-0.5">Add multiple users to one or many insights at once.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="progress-step" id="ps-1" data-step="1"><span class="step-dot">1</span><span class="step-label">Users</span></div>
+          <div class="step-line" id="line-1"></div>
+          <div class="progress-step" id="ps-2" data-step="2"><span class="step-dot">2</span><span class="step-label">Timing</span></div>
+          <div class="step-line" id="line-2"></div>
+          <div class="progress-step" id="ps-3" data-step="3"><span class="step-dot">3</span><span class="step-label">Channels</span></div>
+        </div>
+      </div>
+
+      <!-- Step 1: WHO -->
+      <section class="px-7 py-5 border-b border-slate-100">
+        <h3 class="font-semibold text-[14px] mb-1">Who should be notified?</h3>
+        <p class="text-xs text-slate-500 mb-3">Search and add as many users as you need.</p>
+        <div class="user-search-wrap">
+          <span class="user-search-icon">🔍</span>
+          <input id="sup-search" class="user-search" placeholder="Type a name, role, or saved group…" oninput="searchUser(this.value)" onfocus="searchUser(this.value)"/>
+        </div>
+        <div id="sup-suggestions" class="user-suggestions hidden mt-1"></div>
+        <div id="bulk-users-block" class="mt-4 hidden">
+          <div class="flex items-center justify-between mb-2">
+            <div class="text-[11px] uppercase text-slate-500 font-semibold tracking-wide">Selected <span class="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-slate-900 text-white text-[10px]" id="sel-count">0</span></div>
+            <button class="text-[11px] text-slate-400 hover:text-red-600" onclick="clearSelectedUsers()">Clear all</button>
+          </div>
+          <div id="bulk-users" class="flex flex-wrap gap-2"></div>
+        </div>
+        <div id="bulk-helper" class="hidden mt-3 helper-card"></div>
+      </section>
+
+      <!-- Step 2: WHEN -->
+      <section id="step-timing" class="px-7 py-5 border-b border-slate-100 hidden">
+        <h3 class="font-semibold text-[14px] mb-1">When should they be notified?</h3>
+        <p class="text-xs text-slate-500 mb-3">Pick a moment in the escalation timeline.</p>
+        <div class="grid grid-cols-4 gap-2">
+          <button class="time-chip on" data-v="imm" onclick="setTimingChip(this)"><span class="time-chip-icon">⚡</span><span class="time-chip-label">Immediately</span><span class="time-chip-sub">When opens</span></button>
+          <button class="time-chip" data-v="10" onclick="setTimingChip(this)"><span class="time-chip-icon">⏱</span><span class="time-chip-label">+10 min</span><span class="time-chip-sub">If no response</span></button>
+          <button class="time-chip" data-v="30" onclick="setTimingChip(this)"><span class="time-chip-icon">⏱</span><span class="time-chip-label">+30 min</span><span class="time-chip-sub">If still open</span></button>
+          <button class="time-chip" data-v="custom" onclick="setTimingChip(this)"><span class="time-chip-icon">⚙</span><span class="time-chip-label">Custom</span><span class="time-chip-sub">Set delay</span></button>
+        </div>
+        <div id="custom-min-wrap" class="hidden mt-3 flex items-center gap-2">
+          <input id="custom-min" type="number" min="1" placeholder="Minutes" class="w-32 border border-slate-200 rounded-lg px-3 py-2 text-sm" oninput="updatePreview()"/>
+          <span class="text-xs text-slate-500">minutes after the insight opens</span>
+        </div>
+      </section>
+
+      <!-- Step 3: HOW -->
+      <section id="step-channels" class="px-7 py-5 hidden">
+        <h3 class="font-semibold text-[14px] mb-1">How should they be notified?</h3>
+        <p class="text-xs text-slate-500 mb-3">WhatsApp by default. Add more if needed.</p>
+        <div class="grid grid-cols-4 gap-2">
+          <button class="big-ch on" data-v="wa" onclick="bulkToggleCh(this)"><span class="big-ch-icon">WA</span><span class="big-ch-label">WhatsApp</span></button>
+          <button class="big-ch" data-v="sms" onclick="bulkToggleCh(this)"><span class="big-ch-icon">SMS</span><span class="big-ch-label">SMS</span></button>
+          <button class="big-ch" data-v="call" onclick="bulkToggleCh(this)"><span class="big-ch-icon">📞</span><span class="big-ch-label">Call</span></button>
+          <button class="big-ch" data-v="email" onclick="bulkToggleCh(this)"><span class="big-ch-icon">✉</span><span class="big-ch-label">Email</span></button>
+        </div>
+        <details class="mt-5">
+          <summary class="text-sm text-blue-600 hover:underline cursor-pointer inline-flex items-center gap-1">＋ Save these users as a reusable group</summary>
+          <div class="mt-3 p-4 bg-slate-50 rounded-xl">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" id="save-group-cb" class="w-4 h-4"/>
+              <span class="text-sm">Save selection as a group</span>
+            </label>
+            <input id="save-group-name" placeholder="Group name (e.g. Andheri Day Shift)" class="mt-2 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"/>
+            <p class="text-[11px] text-slate-500 mt-1.5">Pick this group from the search next time.</p>
+          </div>
+        </details>
+      </section>
+
+      <!-- Footer -->
+      <div class="px-7 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between gap-3">
+        <div class="text-xs text-slate-600 flex-1 min-w-0" id="assign-preview">Pick at least one user to continue</div>
+        <div class="flex gap-2 shrink-0">
+          <button class="btn btn-ghost" onclick="clearSelection()">Cancel</button>
+          <button id="assign-btn" class="btn btn-primary opacity-50 pointer-events-none" onclick="confirmBulkAssign()">
+            Assign to <span id="bulk-confirm-count">0</span> insight<span id="bulk-confirm-count-s">s</span>
+          </button>
+        </div>
+      </div>
+    </section>
 
     <!-- Insights list -->
     <div class="card overflow-hidden">
@@ -376,154 +466,6 @@
         <button class="btn btn-primary" onclick="createInsight()">Create insight</button>
       </div>
     </div>
-  </div>
-</div>
-
-<!-- ============== BULK ASSIGN MODAL (redesigned) ============== -->
-<div id="modal-bulk" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-6">
-  <div class="bg-white rounded-3xl max-w-2xl w-full flex flex-col shadow-2xl" style="max-height:92vh">
-
-    <!-- Header with goal-gradient progress -->
-    <div class="px-7 pt-6 pb-5 border-b border-slate-100">
-      <div class="flex items-start justify-between mb-5">
-        <div>
-          <h2 class="text-xl font-bold tracking-tight">Assign users</h2>
-          <p class="text-sm text-slate-500 mt-1" id="bulk-summary-text">Adding to <b id="bulk-modal-count">0</b> insights</p>
-          <div id="bulk-summary-pills" class="flex flex-wrap gap-1.5 mt-2"></div>
-        </div>
-        <button class="w-9 h-9 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-400 text-lg" onclick="closeBulkAssign()" aria-label="Close">✕</button>
-      </div>
-
-      <!-- Goal-gradient progress -->
-      <div class="flex items-center gap-2">
-        <div class="progress-step" id="ps-1" data-step="1">
-          <span class="step-dot">1</span>
-          <span class="step-label">Users</span>
-        </div>
-        <div class="step-line" id="line-1"></div>
-        <div class="progress-step" id="ps-2" data-step="2">
-          <span class="step-dot">2</span>
-          <span class="step-label">Timing</span>
-        </div>
-        <div class="step-line" id="line-2"></div>
-        <div class="progress-step" id="ps-3" data-step="3">
-          <span class="step-dot">3</span>
-          <span class="step-label">Channels</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Body -->
-    <div class="flex-1 overflow-y-auto">
-
-      <!-- Step 1: WHO -->
-      <section class="px-7 py-6 border-b border-slate-100" data-section="1">
-        <h3 class="font-semibold text-[15px] mb-1">Who should be notified?</h3>
-        <p class="text-xs text-slate-500 mb-4">Search and add as many users as you need.</p>
-
-        <div class="user-search-wrap">
-          <span class="user-search-icon">🔍</span>
-          <input id="sup-search" class="user-search" placeholder="Type a name, role, or saved group…" oninput="searchUser(this.value)" onfocus="searchUser(this.value)"/>
-        </div>
-        <div id="sup-suggestions" class="user-suggestions hidden"></div>
-
-        <!-- Selected users -->
-        <div id="bulk-users-block" class="mt-5 hidden">
-          <div class="flex items-center justify-between mb-2">
-            <div class="text-[11px] uppercase text-slate-500 font-semibold tracking-wide">Selected <span class="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-slate-900 text-white text-[10px]" id="sel-count">0</span></div>
-            <button class="text-[11px] text-slate-400 hover:text-red-600" onclick="clearSelectedUsers()">Clear all</button>
-          </div>
-          <div id="bulk-users" class="flex flex-wrap gap-2"></div>
-        </div>
-
-        <!-- Helper -->
-        <div id="bulk-helper" class="hidden mt-4 helper-card"></div>
-      </section>
-
-      <!-- Step 2: WHEN -->
-      <section id="step-timing" class="px-7 py-6 border-b border-slate-100 hidden" data-section="2">
-        <h3 class="font-semibold text-[15px] mb-1">When should they be notified?</h3>
-        <p class="text-xs text-slate-500 mb-4">Pick a moment in the escalation timeline.</p>
-        <div class="grid grid-cols-4 gap-2">
-          <button class="time-chip on" data-v="imm" onclick="setTimingChip(this)">
-            <span class="time-chip-icon">⚡</span>
-            <span class="time-chip-label">Immediately</span>
-            <span class="time-chip-sub">When opens</span>
-          </button>
-          <button class="time-chip" data-v="10" onclick="setTimingChip(this)">
-            <span class="time-chip-icon">⏱</span>
-            <span class="time-chip-label">+10 min</span>
-            <span class="time-chip-sub">If no response</span>
-          </button>
-          <button class="time-chip" data-v="30" onclick="setTimingChip(this)">
-            <span class="time-chip-icon">⏱</span>
-            <span class="time-chip-label">+30 min</span>
-            <span class="time-chip-sub">If still open</span>
-          </button>
-          <button class="time-chip" data-v="custom" onclick="setTimingChip(this)">
-            <span class="time-chip-icon">⚙</span>
-            <span class="time-chip-label">Custom</span>
-            <span class="time-chip-sub">Set delay</span>
-          </button>
-        </div>
-        <div id="custom-min-wrap" class="hidden mt-3 flex items-center gap-2">
-          <input id="custom-min" type="number" min="1" placeholder="Minutes" class="w-32 border border-slate-200 rounded-lg px-3 py-2 text-sm" oninput="updatePreview()"/>
-          <span class="text-xs text-slate-500">minutes after the insight opens</span>
-        </div>
-      </section>
-
-      <!-- Step 3: HOW -->
-      <section id="step-channels" class="px-7 py-6 hidden" data-section="3">
-        <h3 class="font-semibold text-[15px] mb-1">How should they be notified?</h3>
-        <p class="text-xs text-slate-500 mb-4">WhatsApp is on by default. Add more channels if needed.</p>
-        <div class="grid grid-cols-4 gap-2">
-          <button class="big-ch on" data-v="wa" onclick="bulkToggleCh(this)">
-            <span class="big-ch-icon">WA</span>
-            <span class="big-ch-label">WhatsApp</span>
-          </button>
-          <button class="big-ch" data-v="sms" onclick="bulkToggleCh(this)">
-            <span class="big-ch-icon">SMS</span>
-            <span class="big-ch-label">SMS</span>
-          </button>
-          <button class="big-ch" data-v="call" onclick="bulkToggleCh(this)">
-            <span class="big-ch-icon">📞</span>
-            <span class="big-ch-label">Call</span>
-          </button>
-          <button class="big-ch" data-v="email" onclick="bulkToggleCh(this)">
-            <span class="big-ch-icon">✉</span>
-            <span class="big-ch-label">Email</span>
-          </button>
-        </div>
-
-        <!-- Optional: save as group, collapsed -->
-        <details class="mt-6">
-          <summary class="text-sm text-blue-600 hover:underline cursor-pointer inline-flex items-center gap-1">＋ Save these users as a reusable group</summary>
-          <div class="mt-3 p-4 bg-slate-50 rounded-xl">
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" id="save-group-cb" class="w-4 h-4"/>
-              <span class="text-sm">Save selection as a group</span>
-            </label>
-            <input id="save-group-name" placeholder="Group name (e.g. Andheri Day Shift)" class="mt-2 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"/>
-            <p class="text-[11px] text-slate-500 mt-1.5">Pick this group from the search next time.</p>
-          </div>
-        </details>
-      </section>
-
-    </div>
-
-    <!-- Sticky footer with smart preview -->
-    <div class="px-7 py-4 border-t border-slate-100 bg-white rounded-b-3xl">
-      <div class="flex items-center justify-between gap-3">
-        <div class="text-xs text-slate-500 flex-1 min-w-0" id="assign-preview">Pick at least one user to continue</div>
-        <div class="flex gap-2 shrink-0">
-          <button class="btn btn-ghost" onclick="closeBulkAssign()">Cancel</button>
-          <button id="assign-btn" class="btn btn-primary opacity-50 pointer-events-none" onclick="confirmBulkAssign()">
-            Assign to <span id="bulk-confirm-count">0</span> insights
-          </button>
-        </div>
-      </div>
-    </div>
-
   </div>
 </div>
 
@@ -809,9 +751,37 @@ function updateSelectAll() {
   else if (list.some(i=>selected.has(i.id))) cb.indeterminate = true;
 }
 function updateBulkBar() {
-  const bar = document.getElementById('bulk-bar');
-  if (selected.size) { bar.classList.remove('hidden'); document.getElementById('bulk-count').textContent = selected.size; }
-  else bar.classList.add('hidden');
+  const panel = document.getElementById('bulk-panel');
+  if (selected.size) {
+    if (panel.classList.contains('hidden')) {
+      panel.classList.remove('hidden');
+      // Initialize the assignment flow state on first reveal
+      initBulkPanel();
+    } else {
+      // Refresh count + summary pills as selection changes
+      refreshBulkPanelHeader();
+    }
+  } else {
+    panel.classList.add('hidden');
+  }
+}
+function refreshBulkPanelHeader() {
+  const n = selected.size;
+  document.getElementById('bulk-count').textContent = n;
+  document.getElementById('bulk-modal-count').textContent = n;
+  document.getElementById('bulk-confirm-count').textContent = n;
+  document.getElementById('bulk-count-s').textContent = n===1?'':'s';
+  document.getElementById('bulk-modal-count-s').textContent = n===1?'':'s';
+  document.getElementById('bulk-confirm-count-s').textContent = n===1?'':'s';
+  // Pills
+  const sels = [...selected].map(id=>insights.find(x=>x.id===id)).filter(Boolean);
+  const sevCounts = {}; const plantSet = new Set();
+  sels.forEach(i=>{ sevCounts[i.sev]=(sevCounts[i.sev]||0)+1; plantSet.add(i.plant); });
+  document.getElementById('bulk-summary-pills').innerHTML =
+    Object.entries(sevCounts).map(([sev,nn])=>`<span class="chip" style="background:${sevColors[sev].bg};color:${sevColors[sev].fg}">${nn} ${sev}</span>`).join('') +
+    [...plantSet].slice(0,3).map(p=>`<span class="chip bg-white/15 text-white">${p}</span>`).join('') +
+    (plantSet.size>3?`<span class="chip bg-white/15 text-white">+${plantSet.size-3} more</span>`:'');
+  updatePreview();
 }
 function clearSelection() { selected.clear(); renderInsights(); updateBulkBar(); }
 function bulkPause() {
@@ -960,47 +930,40 @@ let bulkTiming = 'imm';
 let bulkChans = { wa:true };
 let recentUserNames = ['Priya Sharma','Meera Rao','Ravi Kumar'];
 
-function openBulkAssign() {
-  if (!selected.size) { toast('Select at least one insight first'); return; }
+// Initializes the inline bulk-assign panel state when it first becomes visible
+function initBulkPanel() {
   bulkUsers = [];
   bulkTiming = 'imm';
   bulkChans = { wa:true };
-  // Header
-  document.getElementById('bulk-modal-count').textContent = selected.size;
-  document.getElementById('bulk-confirm-count').textContent = selected.size;
-  // Pills summary (severities & plants for context)
-  const sels = [...selected].map(id=>insights.find(x=>x.id===id)).filter(Boolean);
-  const sevCounts = {};
-  const plantSet = new Set();
-  sels.forEach(i=>{ sevCounts[i.sev]=(sevCounts[i.sev]||0)+1; plantSet.add(i.plant); });
-  document.getElementById('bulk-summary-pills').innerHTML =
-    Object.entries(sevCounts).map(([sev,n])=>`<span class="chip" style="background:${sevColors[sev].bg};color:${sevColors[sev].fg}">${n} ${sev}</span>`).join('') +
-    [...plantSet].slice(0,3).map(p=>`<span class="chip bg-slate-100 text-slate-700">${p}</span>`).join('') +
-    (plantSet.size>3?`<span class="chip bg-slate-100 text-slate-500">+${plantSet.size-3} more</span>`:'');
+  refreshBulkPanelHeader();
   // Reset UI state
-  document.getElementById('sup-search').value = '';
+  const ss = document.getElementById('sup-search'); if (ss) ss.value = '';
   document.getElementById('bulk-users-block').classList.add('hidden');
   document.getElementById('bulk-helper').classList.add('hidden');
   document.getElementById('step-timing').classList.add('hidden');
   document.getElementById('step-channels').classList.add('hidden');
   document.getElementById('custom-min-wrap').classList.add('hidden');
-  // Show recents in dropdown
-  searchUser('');
   // Reset save-group
   const cb = document.getElementById('save-group-cb'); if(cb) cb.checked = false;
   const gn = document.getElementById('save-group-name'); if(gn) gn.value = '';
   // Reset chip selections
   document.querySelectorAll('#step-timing .time-chip').forEach(b=>b.classList.toggle('on', b.dataset.v==='imm'));
   document.querySelectorAll('#step-channels .big-ch').forEach(b=>b.classList.toggle('on', b.dataset.v==='wa'));
+  // Hide suggestions until user focuses search
+  const sug = document.getElementById('sup-suggestions'); if (sug) sug.classList.add('hidden');
   updateProgress();
   updatePreview();
-  document.getElementById('modal-bulk').classList.remove('hidden');
-  document.getElementById('modal-bulk').classList.add('flex');
-  setTimeout(()=>document.getElementById('sup-search').focus(), 100);
+}
+// Legacy entrypoints — kept for places that still call openBulkAssign() (e.g. quick-add link)
+function openBulkAssign() {
+  if (!selected.size) { toast('Select at least one insight first'); return; }
+  updateBulkBar();
+  document.getElementById('bulk-panel').scrollIntoView({behavior:'smooth', block:'start'});
+  setTimeout(()=>{ const s=document.getElementById('sup-search'); if (s) s.focus(); }, 250);
 }
 function closeBulkAssign() {
-  document.getElementById('modal-bulk').classList.add('hidden');
-  document.getElementById('modal-bulk').classList.remove('flex');
+  // Inline panel closes by clearing the selection
+  selected.clear(); renderInsights(); updateBulkBar();
 }
 
 function avatarHTML(user, size=22) {
