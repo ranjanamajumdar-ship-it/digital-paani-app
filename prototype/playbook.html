@@ -148,7 +148,7 @@
       </div>
     </div>
 
-    <p class="text-xs text-slate-500 mt-6">Click <b>Configure defaults</b> to set escalation timelines per severity — every new insight in that Plant inherits these supervisors and channels.</p>
+    <p class="text-xs text-slate-500 mt-6">Click <b>Configure defaults</b> to set escalation timelines per severity — every new insight in that Plant inherits these users and channels.</p>
   </div>
 </section>
 
@@ -160,7 +160,7 @@
     <div class="flex items-end justify-between mb-6">
       <div>
         <h1 class="text-2xl font-bold" id="insights-h1">Insights <span id="insight-count" class="text-slate-400 font-normal text-lg">· 18</span></h1>
-        <p class="text-sm text-slate-500 mt-1" id="insights-sub">Click any row to see history, sensor readings, and supervisors.</p>
+        <p class="text-sm text-slate-500 mt-1" id="insights-sub">Click any row to see history, sensor readings, and users.</p>
       </div>
       <div class="flex gap-2">
         <button class="btn btn-ghost" onclick="openDefaults(currentPlant)">Configure defaults</button>
@@ -191,8 +191,7 @@
     <div id="bulk-bar" class="hidden card p-3 mb-3 bg-slate-900 text-white flex items-center gap-3 slide-in">
       <span class="text-sm"><b id="bulk-count">0</b> insights selected</span>
       <div class="h-6 w-px bg-white/20"></div>
-      <button class="btn btn-sm bg-white text-slate-900 hover:bg-slate-100" onclick="openBulkAssign()">+ Assign supervisors</button>
-      <button class="btn btn-sm bg-white text-slate-900 hover:bg-slate-100" onclick="openGroupAssign()">+ Assign to group</button>
+      <button class="btn btn-sm bg-white text-slate-900 hover:bg-slate-100" onclick="openBulkAssign()">+ Assign users</button>
       <button class="btn btn-sm bg-white/10 text-white hover:bg-white/20" onclick="bulkPause()">⏸ Pause all</button>
       <button class="text-xs underline ml-auto" onclick="clearSelection()">Clear selection</button>
     </div>
@@ -203,7 +202,7 @@
         <div class="col-span-1"><span class="cb" id="cb-all" onclick="toggleAll()"></span></div>
         <div class="col-span-4">Insight</div>
         <div class="col-span-2">Plant · Equipment</div>
-        <div class="col-span-2">Supervisors</div>
+        <div class="col-span-2">Users</div>
         <div class="col-span-2">Status</div>
         <div class="col-span-1 text-right">On</div>
       </div>
@@ -242,7 +241,7 @@
         </div>
         <div class="mb-3">
           <span class="text-slate-500 font-semibold uppercase text-[11px] mr-2">Then</span>
-          <span class="text-slate-700">notify supervisors below</span>
+          <span class="text-slate-700">notify users below</span>
         </div>
 
         <!-- Escalation timeline -->
@@ -276,18 +275,18 @@
   <div class="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto">
     <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
       <div>
-        <h2 class="font-bold text-lg">Assign supervisors</h2>
+        <h2 class="font-bold text-lg">Assign users</h2>
         <p class="text-xs text-slate-500">Adding to <b id="bulk-modal-count">0</b> insights · they'll be notified per the timeline below.</p>
       </div>
       <button class="text-slate-400 hover:text-slate-700" onclick="closeBulkAssign()">✕</button>
     </div>
     <div class="p-6 space-y-4">
 
-      <!-- Supervisor picker -->
+      <!-- User picker -->
       <div>
-        <label class="text-[11px] uppercase text-slate-500 font-semibold">Supervisors to add</label>
-        <div id="bulk-supervisors" class="flex flex-wrap gap-2 mt-2 p-3 border border-slate-200 rounded-lg min-h-[48px]"></div>
-        <input id="sup-search" placeholder="Type a name… (try: Priya, Arjun, Meera)" class="mt-2 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm" oninput="searchSupervisor(this.value)"/>
+        <label class="text-[11px] uppercase text-slate-500 font-semibold">Users to add</label>
+        <div id="bulk-users" class="flex flex-wrap gap-2 mt-2 p-3 border border-slate-200 rounded-lg min-h-[48px]"></div>
+        <input id="sup-search" placeholder="Type a name or group… (try: Priya, Andheri Day Shift)" class="mt-2 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm" oninput="searchUser(this.value)"/>
         <div id="sup-suggestions" class="mt-1 border border-slate-200 rounded-lg overflow-hidden hidden"></div>
       </div>
 
@@ -321,6 +320,16 @@
 
       <!-- Helper -->
       <div id="bulk-helper" class="text-xs p-3 rounded-lg bg-blue-50 text-blue-900 hidden"></div>
+
+      <!-- Save as group -->
+      <div class="border-t border-slate-100 pt-4">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="save-group-cb" onchange="document.getElementById('save-group-name').classList.toggle('hidden',!this.checked)" class="w-4 h-4"/>
+          <span class="text-sm">Save these users as a reusable group</span>
+        </label>
+        <input id="save-group-name" placeholder="Group name (e.g. Andheri Day Shift)" class="hidden mt-2 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"/>
+        <p class="text-[11px] text-slate-500 mt-1.5">Reusable groups can be picked from the user search next time you assign.</p>
+      </div>
     </div>
     <div class="px-6 py-4 border-t border-slate-100 flex justify-end gap-2">
       <button class="btn btn-ghost" onclick="closeBulkAssign()">Cancel</button>
@@ -378,28 +387,6 @@
   </div>
 </div>
 
-<!-- ============== GROUP ASSIGN MODAL ============== -->
-<div id="modal-group" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-6">
-  <div class="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto">
-    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-      <div>
-        <h2 class="font-bold text-lg">Assign to a group</h2>
-        <p class="text-xs text-slate-500">Adding to <b id="group-modal-count">0</b> insights · everyone in the group will be notified per their saved escalation order.</p>
-      </div>
-      <button class="text-slate-400 hover:text-slate-700" onclick="closeGroupAssign()">✕</button>
-    </div>
-    <div class="p-6 space-y-3">
-      <input id="group-search" placeholder="🔍 Search groups…" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm" oninput="renderGroups(this.value)"/>
-      <div id="group-list" class="space-y-2"></div>
-      <button class="w-full text-sm text-blue-600 hover:underline py-2 border border-dashed border-slate-300 rounded-lg" onclick="toast('Group builder — coming soon')">+ Create new group</button>
-    </div>
-    <div class="px-6 py-4 border-t border-slate-100 flex justify-end gap-2">
-      <button class="btn btn-ghost" onclick="closeGroupAssign()">Cancel</button>
-      <button class="btn btn-primary" onclick="confirmGroupAssign()">Assign group to <span id="group-confirm-count">0</span> insights</button>
-    </div>
-  </div>
-</div>
-
 <!-- ============== TOAST ============== -->
 <div id="toast-container" class="fixed bottom-6 right-6 z-50 space-y-2"></div>
 
@@ -424,14 +411,14 @@ show('plants');
 
 // ---------- Data ----------
 const insights = [
-  {id:1, name:'DO drop in aeration tank', plant:'Andheri Plant', equip:'Aerator A-1', sev:'incident', status:'Active', last:'2h 14m', on:true, supervisors:['Ravi K.','Priya S.'], sensor:'DO-101', threshold:'< 2.0 mg/L', current:'1.4 mg/L'},
-  {id:2, name:'Inlet pump vibration high', plant:'Andheri Plant', equip:'Pump P-3', sev:'incident', status:'Active', last:'47m', on:true, supervisors:['Ravi K.'], sensor:'VIB-203', threshold:'> 8 mm/s', current:'9.6 mm/s'},
-  {id:3, name:'pH out of range', plant:'Andheri Plant', equip:'Equalization tank', sev:'issue', status:'Active', last:'1h 02m', on:true, supervisors:['Arjun M.'], sensor:'PH-505', threshold:'5.5–9.0', current:'9.4'},
-  {id:4, name:'Blower load high', plant:'Bandra Plant', equip:'Blower B-2', sev:'issue', status:'Active', last:'3h 11m', on:true, supervisors:['Meera R.'], sensor:'AMP-B2', threshold:'> 80 A', current:'92 A'},
-  {id:5, name:'MLSS below target', plant:'Bandra Plant', equip:'Aeration tank', sev:'issue', status:'Active', last:'4h', on:true, supervisors:[], sensor:'MLSS-1', threshold:'> 2500 mg/L', current:'2100 mg/L'},
-  {id:6, name:'Effluent turbidity rising', plant:'Powai Plant', equip:'Outlet', sev:'warning', status:'Active', last:'30m', on:true, supervisors:['Operator'], sensor:'TURB-O', threshold:'> 5 NTU', current:'6.2 NTU'},
-  {id:7, name:'Sludge pump runtime over limit', plant:'Powai Plant', equip:'Sludge pump', sev:'warning', status:'Active', last:'1h 20m', on:true, supervisors:[], sensor:'RT-SP', threshold:'> 8 hrs/day', current:'9.1 hrs'},
-  {id:8, name:'Chlorine dosing low', plant:'Thane Plant', equip:'Cl₂ doser', sev:'warning', status:'Resolved', last:'5h ago', on:false, supervisors:['Meera R.'], sensor:'CL-1', threshold:'< 0.5 mg/L', current:'0.7 mg/L'},
+  {id:1, name:'DO drop in aeration tank', plant:'Andheri Plant', equip:'Aerator A-1', sev:'incident', status:'Active', last:'2h 14m', on:true, users:['Ravi K.','Priya S.'], sensor:'DO-101', threshold:'< 2.0 mg/L', current:'1.4 mg/L'},
+  {id:2, name:'Inlet pump vibration high', plant:'Andheri Plant', equip:'Pump P-3', sev:'incident', status:'Active', last:'47m', on:true, users:['Ravi K.'], sensor:'VIB-203', threshold:'> 8 mm/s', current:'9.6 mm/s'},
+  {id:3, name:'pH out of range', plant:'Andheri Plant', equip:'Equalization tank', sev:'issue', status:'Active', last:'1h 02m', on:true, users:['Arjun M.'], sensor:'PH-505', threshold:'5.5–9.0', current:'9.4'},
+  {id:4, name:'Blower load high', plant:'Bandra Plant', equip:'Blower B-2', sev:'issue', status:'Active', last:'3h 11m', on:true, users:['Meera R.'], sensor:'AMP-B2', threshold:'> 80 A', current:'92 A'},
+  {id:5, name:'MLSS below target', plant:'Bandra Plant', equip:'Aeration tank', sev:'issue', status:'Active', last:'4h', on:true, users:[], sensor:'MLSS-1', threshold:'> 2500 mg/L', current:'2100 mg/L'},
+  {id:6, name:'Effluent turbidity rising', plant:'Powai Plant', equip:'Outlet', sev:'warning', status:'Active', last:'30m', on:true, users:['Operator'], sensor:'TURB-O', threshold:'> 5 NTU', current:'6.2 NTU'},
+  {id:7, name:'Sludge pump runtime over limit', plant:'Powai Plant', equip:'Sludge pump', sev:'warning', status:'Active', last:'1h 20m', on:true, users:[], sensor:'RT-SP', threshold:'> 8 hrs/day', current:'9.1 hrs'},
+  {id:8, name:'Chlorine dosing low', plant:'Thane Plant', equip:'Cl₂ doser', sev:'warning', status:'Resolved', last:'5h ago', on:false, users:['Meera R.'], sensor:'CL-1', threshold:'< 0.5 mg/L', current:'0.7 mg/L'},
 ];
 const sevColors = {
   incident:{bg:'#FEE2E2',fg:'#991B1B',dot:'#DC2626'},
@@ -445,7 +432,7 @@ function filterByPlant(p) {
   currentPlant = p;
   document.getElementById('f-plant').value = p;
   document.getElementById('insights-h1').innerHTML = `${p} <span id="insight-count" class="text-slate-400 font-normal text-lg">· 0</span>`;
-  document.getElementById('insights-sub').textContent = 'Live insights · click any row for sensor history, conditions, and supervisors.';
+  document.getElementById('insights-sub').textContent = 'Live insights · click any row for sensor history, conditions, and users.';
   show('insights');
   renderInsights();
 }
@@ -486,8 +473,8 @@ function renderInsights() {
       </div>
       <div class="col-span-2 text-sm text-slate-600">${i.plant}<div class="text-[11px] text-slate-400">${i.equip}</div></div>
       <div class="col-span-2 text-sm">
-        ${i.supervisors.length ?
-          `<div class="flex -space-x-1.5">${i.supervisors.slice(0,3).map(s=>`<div class="w-6 h-6 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-semibold" title="${s}">${s.split(' ')[0][0]}${s.split(' ')[1]?s.split(' ')[1][0]:''}</div>`).join('')}${i.supervisors.length>3?`<div class="w-6 h-6 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px]">+${i.supervisors.length-3}</div>`:''}</div>` :
+        ${i.users.length ?
+          `<div class="flex -space-x-1.5">${i.users.slice(0,3).map(s=>`<div class="w-6 h-6 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-semibold" title="${s}">${s.split(' ')[0][0]}${s.split(' ')[1]?s.split(' ')[1][0]:''}</div>`).join('')}${i.users.length>3?`<div class="w-6 h-6 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px]">+${i.users.length-3}</div>`:''}</div>` :
           `<button class="text-xs text-blue-600 hover:underline" onclick="event.stopPropagation();toggleSel(${i.id});openBulkAssign()">+ Add</button>`
         }
       </div>
@@ -614,17 +601,17 @@ function openDetail(id) {
           </div>
         </div>
 
-        <!-- Supervisors / escalation timeline -->
+        <!-- Users / escalation timeline -->
         <div>
           <div class="flex items-center justify-between mb-2">
             <div class="text-[11px] uppercase text-slate-500 font-semibold">Personnel monitoring · escalation</div>
-            <button class="text-xs text-blue-600 hover:underline" onclick="closeDetail();selected.clear();selected.add(${i.id});updateBulkBar();openBulkAssign()">+ Add supervisor</button>
+            <button class="text-xs text-blue-600 hover:underline" onclick="closeDetail();selected.clear();selected.add(${i.id});updateBulkBar();openBulkAssign()">+ Add user</button>
           </div>
           <div class="card p-4 border border-slate-100">
             <div class="ml-2 pl-6 border-l-2 border-slate-200 space-y-3 py-1">
               ${[
-                {t:'Immediate', user:i.supervisors[0]||'Plant Manager', ch:'📞 ✉ WA', color:'#DC2626'},
-                {t:'10 min', user:i.supervisors[1]||'Shift Lead', ch:'SMS', color:'#F59E0B'},
+                {t:'Immediate', user:i.users[0]||'Plant Manager', ch:'📞 ✉ WA', color:'#DC2626'},
+                {t:'10 min', user:i.users[1]||'Shift Lead', ch:'SMS', color:'#F59E0B'},
                 {t:'30 min', user:'Operations Head', ch:'📞', color:'#64748B'},
               ].map(s=>`
                 <div class="relative">
@@ -645,7 +632,7 @@ function openDetail(id) {
           <div class="text-[11px] uppercase text-slate-500 font-semibold mb-2">History</div>
           <div class="card p-4 border border-slate-100 text-sm space-y-3">
             <div class="flex gap-3"><span class="text-slate-400 text-xs w-32 shrink-0">2026-05-05 09:21</span><span><b>Opened</b> · ${i.sensor} = ${i.current}</span></div>
-            <div class="flex gap-3"><span class="text-slate-400 text-xs w-32 shrink-0">2026-05-05 09:21</span><span>Notified <b>${i.supervisors[0]||'Plant Manager'}</b> via WhatsApp, Call</span></div>
+            <div class="flex gap-3"><span class="text-slate-400 text-xs w-32 shrink-0">2026-05-05 09:21</span><span>Notified <b>${i.users[0]||'Plant Manager'}</b> via WhatsApp, Call</span></div>
             <div class="flex gap-3"><span class="text-slate-400 text-xs w-32 shrink-0">2026-05-05 09:31</span><span>Escalated to <b>Shift Lead</b> · no acknowledgement</span></div>
             <div class="flex gap-3"><span class="text-slate-400 text-xs w-32 shrink-0">2026-05-04 14:02</span><span>Last resolved · automatic close</span></div>
             <button class="text-xs text-blue-600 hover:underline">View full history (24 events)</button>
@@ -664,14 +651,18 @@ function closeDetail() {
 }
 
 // ---------- Bulk assign modal ----------
-let bulkSupervisors = [];
+let bulkUsers = [];
 let bulkStep = 'imm';
 function openBulkAssign() {
   if (!selected.size) { toast('Select at least one insight first'); return; }
-  bulkSupervisors = [];
+  bulkUsers = [];
   document.getElementById('bulk-modal-count').textContent = selected.size;
   document.getElementById('bulk-confirm-count').textContent = selected.size;
-  document.getElementById('bulk-supervisors').innerHTML = '<span class="text-xs text-slate-400">No supervisors yet — type below to add.</span>';
+  document.getElementById('bulk-users').innerHTML = '<span class="text-xs text-slate-400">No users yet — type below to add. Or pick a saved group.</span>';
+  document.getElementById('save-group-cb').checked = false;
+  document.getElementById('save-group-name').value = '';
+  document.getElementById('save-group-name').classList.add('hidden');
+  document.getElementById('bulk-helper').classList.add('hidden');
   document.getElementById('modal-bulk').classList.remove('hidden');
   document.getElementById('modal-bulk').classList.add('flex');
 }
@@ -679,57 +670,85 @@ function closeBulkAssign() {
   document.getElementById('modal-bulk').classList.add('hidden');
   document.getElementById('modal-bulk').classList.remove('flex');
 }
-const allSupervisors = [
+const allUsers = [
   {n:'Priya Sharma', role:'Shift Lead · Andheri', count:5},
   {n:'Arjun Mehta', role:'Plant Manager · Bandra', count:3, noaccess:['Andheri Plant']},
   {n:'Meera Rao', role:'Operations Head', count:8},
   {n:'Vikas Patel', role:'Operator · Powai', count:2},
 ];
-function searchSupervisor(q) {
+function searchUser(q) {
   const box = document.getElementById('sup-suggestions');
   if (!q) { box.classList.add('hidden'); return; }
-  const matches = allSupervisors.filter(s=>s.n.toLowerCase().includes(q.toLowerCase()));
+  const userMatches = allUsers.filter(s=>s.n.toLowerCase().includes(q.toLowerCase()));
+  const groupMatches = groups.filter(g=>(g.name+' '+g.desc).toLowerCase().includes(q.toLowerCase()));
   box.classList.remove('hidden');
-  box.innerHTML = matches.map(s=>`
-    <button class="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm" onclick="addSupervisor('${s.n}','${s.role}',${s.count},${JSON.stringify(s.noaccess||[]).replace(/"/g,'&quot;')})">
-      <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-semibold">${s.n.split(' ').map(x=>x[0]).join('')}</div>
-      <div class="flex-1">
-        <div class="font-medium">${s.n}</div>
-        <div class="text-[11px] text-slate-500">${s.role} · on ${s.count} insights</div>
-      </div>
-      ${s.noaccess?`<span class="chip bg-amber-100 text-amber-800">⚠ access</span>`:''}
-    </button>
-  `).join('') || `<div class="px-3 py-2 text-xs text-slate-400">No match</div>`;
+  let html = '';
+  if (groupMatches.length) {
+    html += `<div class="px-3 py-1.5 text-[10px] uppercase font-semibold text-slate-500 bg-slate-50">Groups</div>`;
+    html += groupMatches.map(g=>`
+      <button class="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm" onclick="addGroup('${g.id}')">
+        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-xs">👥</div>
+        <div class="flex-1">
+          <div class="font-medium">${g.name}</div>
+          <div class="text-[11px] text-slate-500">${g.members.length} members · ${g.desc}</div>
+        </div>
+      </button>
+    `).join('');
+  }
+  if (userMatches.length) {
+    html += `<div class="px-3 py-1.5 text-[10px] uppercase font-semibold text-slate-500 bg-slate-50">Users</div>`;
+    html += userMatches.map(s=>`
+      <button class="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm" onclick="addUser('${s.n}','${s.role}',${s.count},${JSON.stringify(s.noaccess||[]).replace(/"/g,'&quot;')})">
+        <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-semibold">${s.n.split(' ').map(x=>x[0]).join('')}</div>
+        <div class="flex-1">
+          <div class="font-medium">${s.n}</div>
+          <div class="text-[11px] text-slate-500">${s.role} · on ${s.count} insights</div>
+        </div>
+        ${s.noaccess?`<span class="chip bg-amber-100 text-amber-800">⚠ access</span>`:''}
+      </button>
+    `).join('');
+  }
+  box.innerHTML = html || `<div class="px-3 py-2 text-xs text-slate-400">No match</div>`;
 }
-function addSupervisor(name, role, count, noaccess) {
-  bulkSupervisors.push({name, role, count, noaccess});
+function addGroup(gid) {
+  const g = groups.find(x=>x.id===gid); if(!g) return;
+  g.members.forEach(m => {
+    if (!bulkUsers.find(u=>u.name===m)) bulkUsers.push({name:m, role:`From ${g.name}`, count:0, noaccess:[]});
+  });
   document.getElementById('sup-search').value = '';
   document.getElementById('sup-suggestions').classList.add('hidden');
-  renderBulkSupervisors();
+  renderBulkUsers();
+  toast(`Added ${g.members.length} members from "${g.name}"`);
+}
+function addUser(name, role, count, noaccess) {
+  bulkUsers.push({name, role, count, noaccess});
+  document.getElementById('sup-search').value = '';
+  document.getElementById('sup-suggestions').classList.add('hidden');
+  renderBulkUsers();
   // Helper updates
   const helper = document.getElementById('bulk-helper');
   helper.classList.remove('hidden');
-  const accessIssues = bulkSupervisors.filter(s=>s.noaccess && s.noaccess.length);
+  const accessIssues = bulkUsers.filter(s=>s.noaccess && s.noaccess.length);
   helper.innerHTML = `
     <div class="font-semibold mb-1">ⓘ Current assignments</div>
-    ${bulkSupervisors.map(s=>`<div>${s.name} — already on <b>${s.count}</b> insights ${s.noaccess && s.noaccess.length?`<span class="text-amber-700">· ⚠ no access to ${s.noaccess.join(', ')} <button class="underline font-semibold" onclick="grantAccess('${s.name}')">Grant</button></span>`:''}</div>`).join('')}
+    ${bulkUsers.map(s=>`<div>${s.name} — already on <b>${s.count}</b> insights ${s.noaccess && s.noaccess.length?`<span class="text-amber-700">· ⚠ no access to ${s.noaccess.join(', ')} <button class="underline font-semibold" onclick="grantAccess('${s.name}')">Grant</button></span>`:''}</div>`).join('')}
   `;
 }
-function renderBulkSupervisors() {
-  const box = document.getElementById('bulk-supervisors');
-  if (!bulkSupervisors.length) { box.innerHTML = '<span class="text-xs text-slate-400">No supervisors yet — type below to add.</span>'; return; }
-  box.innerHTML = bulkSupervisors.map((s,idx)=>`
+function renderBulkUsers() {
+  const box = document.getElementById('bulk-users');
+  if (!bulkUsers.length) { box.innerHTML = '<span class="text-xs text-slate-400">No users yet — type below to add.</span>'; return; }
+  box.innerHTML = bulkUsers.map((s,idx)=>`
     <span class="chip bg-slate-100 text-slate-800 pr-1">
       ${s.name} ${s.noaccess && s.noaccess.length?'<span class="text-amber-600">⚠</span>':''}
-      <button class="ml-1 hover:text-red-600" onclick="removeSupervisor(${idx})">✕</button>
+      <button class="ml-1 hover:text-red-600" onclick="removeUser(${idx})">✕</button>
     </span>
   `).join('');
 }
-function removeSupervisor(idx) { bulkSupervisors.splice(idx,1); renderBulkSupervisors(); }
+function removeUser(idx) { bulkUsers.splice(idx,1); renderBulkUsers(); }
 function grantAccess(name) {
-  const s = bulkSupervisors.find(x=>x.name===name); if(s) s.noaccess=[];
+  const s = bulkUsers.find(x=>x.name===name); if(s) s.noaccess=[];
   toast(`✓ Access granted to ${name}`);
-  renderBulkSupervisors();
+  renderBulkUsers();
   const helper = document.getElementById('bulk-helper');
   helper.innerHTML = helper.innerHTML.replace(/⚠[^<]*<button[^<]*<\/button>/g,'<span class="text-emerald-700">✓ access granted</span>');
 }
@@ -740,16 +759,22 @@ function setStep(btn, val) {
 }
 function toggleCh(btn) { btn.classList.toggle('on'); btn.classList.toggle('off'); }
 function confirmBulkAssign() {
-  if (!bulkSupervisors.length) { toast('Add at least one supervisor'); return; }
+  if (!bulkUsers.length) { toast('Add at least one user'); return; }
   selected.forEach(id=>{
     const i = insights.find(x=>x.id===id);
-    if (i) bulkSupervisors.forEach(s=>{ if(!i.supervisors.includes(s.name)) i.supervisors.push(s.name); });
+    if (i) bulkUsers.forEach(s=>{ if(!i.users.includes(s.name)) i.users.push(s.name); });
   });
   const n = selected.size;
+  let groupMsg = '';
+  if (document.getElementById('save-group-cb').checked) {
+    const gname = document.getElementById('save-group-name').value.trim() || `Group ${groups.length+1}`;
+    groups.push({id:'g'+(groups.length+1), name:gname, desc:'Custom group', members:bulkUsers.map(u=>u.name), channels:'WA', steps:'Immediate'});
+    groupMsg = ` · saved as group "<b>${gname}</b>"`;
+  }
   closeBulkAssign();
   clearSelection();
   renderInsights();
-  toast(`✓ Added ${bulkSupervisors.length} supervisor${bulkSupervisors.length>1?'s':''} to ${n} insights`);
+  toast(`✓ Added ${bulkUsers.length} user${bulkUsers.length>1?'s':''} to ${n} insights${groupMsg}`);
 }
 
 // ---------- Group assign modal ----------
@@ -805,7 +830,7 @@ function confirmGroupAssign() {
   const g = groups.find(x=>x.id===selectedGroup);
   selected.forEach(id=>{
     const i = insights.find(x=>x.id===id);
-    if (i) g.members.forEach(m=>{ if(!i.supervisors.includes(m)) i.supervisors.push(m); });
+    if (i) g.members.forEach(m=>{ if(!i.users.includes(m)) i.users.push(m); });
   });
   const n = selected.size;
   closeGroupAssign();
@@ -851,7 +876,7 @@ function saveDraft() { toast('Draft saved'); closeNewInsight(); }
 function createInsight() {
   closeNewInsight();
   show('insights');
-  insights.unshift({id:99, name:'DO drop in aeration tank', plant:'Andheri Plant', equip:'Aerator A-1', sev:'incident', status:'Active', last:'just now', on:true, supervisors:['Plant Manager','Shift Lead'], sensor:'DO-101', threshold:'< 2.0 mg/L', current:'1.4 mg/L'});
+  insights.unshift({id:99, name:'DO drop in aeration tank', plant:'Andheri Plant', equip:'Aerator A-1', sev:'incident', status:'Active', last:'just now', on:true, users:['Plant Manager','Shift Lead'], sensor:'DO-101', threshold:'< 2.0 mg/L', current:'1.4 mg/L'});
   renderInsights();
   toast('✓ Insight created');
 }
