@@ -78,6 +78,73 @@
   .sensor-bar { height:60px; background:linear-gradient(180deg,#EFF6FF,#fff); border-radius:6px; position:relative; overflow:hidden; }
   details > summary { list-style:none; cursor:pointer; }
   details > summary::-webkit-details-marker { display:none; }
+  /* === Bulk Assign Modal v2 === */
+  /* Goal-gradient progress */
+  .progress-step { display:inline-flex; align-items:center; gap:8px; padding:6px 12px 6px 6px; border-radius:9999px; transition:all .25s ease; }
+  .progress-step .step-dot { width:24px; height:24px; border-radius:50%; background:#E2E8F0; color:#94A3B8; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; transition:all .25s ease; }
+  .progress-step .step-label { font-size:13px; font-weight:500; color:#94A3B8; transition:color .25s ease; }
+  .progress-step.active { background:#F1F5F9; }
+  .progress-step.active .step-dot { background:#0F172A; color:#fff; }
+  .progress-step.active .step-label { color:#0F172A; font-weight:600; }
+  .progress-step.done .step-dot { background:#16A34A; color:#fff; }
+  .progress-step.done .step-dot::before { content:'✓'; }
+  .progress-step.done .step-dot > span, .progress-step.done .step-dot { font-size:0; }
+  .progress-step.done .step-dot::before { font-size:13px; font-weight:700; }
+  .progress-step.done .step-label { color:#16A34A; }
+  .step-line { flex:1; height:2px; background:#E2E8F0; border-radius:2px; transition:background .3s; min-width:20px; }
+  .step-line.done { background:#16A34A; }
+
+  /* User search input */
+  .user-search-wrap { position:relative; }
+  .user-search-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#94A3B8; font-size:14px; pointer-events:none; }
+  .user-search { width:100%; padding:13px 14px 13px 40px; border:1.5px solid #E2E8F0; border-radius:12px; font-size:14px; outline:none; transition:border-color .15s, box-shadow .15s; background:#fff; }
+  .user-search:focus { border-color:#0F172A; box-shadow:0 0 0 3px rgba(15,23,42,.06); }
+
+  /* User suggestions dropdown */
+  .user-suggestions { background:#fff; border:1px solid #E2E8F0; border-radius:12px; max-height:280px; overflow-y:auto; box-shadow:0 4px 16px rgba(15,23,42,.06); }
+  .user-suggestion { display:flex; align-items:center; gap:12px; padding:10px 14px; cursor:pointer; transition:background .12s; border:none; background:transparent; width:100%; text-align:left; }
+  .user-suggestion:hover { background:#F8FAFC; }
+  .user-suggestion .avatar { width:34px; height:34px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#fff; flex-shrink:0; }
+  .user-suggestion .meta { flex:1; min-width:0; }
+  .user-suggestion .name { font-size:13.5px; font-weight:600; color:#0F172A; }
+  .user-suggestion .role { font-size:11.5px; color:#64748B; margin-top:1px; }
+  .suggestion-section { padding:8px 14px 4px; font-size:10.5px; font-weight:700; text-transform:uppercase; color:#94A3B8; letter-spacing:.04em; background:#FAFBFC; }
+
+  /* Selected user chip */
+  .user-chip { display:inline-flex; align-items:center; gap:8px; padding:6px 6px 6px 10px; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:9999px; transition:all .15s; animation:slide-in .2s ease-out; }
+  .user-chip:hover { background:#E2E8F0; }
+  .user-chip .chip-avatar { width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:9.5px; font-weight:700; color:#fff; }
+  .user-chip .chip-name { font-size:13px; font-weight:500; color:#0F172A; }
+  .user-chip .chip-x { width:20px; height:20px; border-radius:50%; background:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:10px; color:#64748B; cursor:pointer; border:none; transition:all .12s; }
+  .user-chip .chip-x:hover { background:#0F172A; color:#fff; }
+  .user-chip.warn { background:#FEF3C7; border-color:#FDE68A; }
+  .user-chip.warn .chip-name { color:#92400E; }
+
+  /* Helper card */
+  .helper-card { padding:12px 14px; background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; font-size:12.5px; color:#1E3A8A; }
+  .helper-card b { color:#1E40AF; }
+  .helper-card.warn { background:#FFFBEB; border-color:#FDE68A; color:#78350F; }
+  .helper-card .grant-btn { color:#0F172A; font-weight:600; text-decoration:underline; cursor:pointer; }
+  .helper-card .grant-btn:hover { color:#1E40AF; }
+
+  /* Time chip (Step 2) */
+  .time-chip { display:flex; flex-direction:column; align-items:center; gap:4px; padding:14px 10px; background:#fff; border:1.5px solid #E2E8F0; border-radius:14px; cursor:pointer; transition:all .18s ease; }
+  .time-chip:hover { border-color:#CBD5E1; transform:translateY(-1px); }
+  .time-chip.on { background:#0F172A; border-color:#0F172A; }
+  .time-chip.on .time-chip-label, .time-chip.on .time-chip-icon { color:#fff; }
+  .time-chip.on .time-chip-sub { color:rgba(255,255,255,.6); }
+  .time-chip-icon { font-size:18px; color:#64748B; }
+  .time-chip-label { font-size:13px; font-weight:600; color:#0F172A; }
+  .time-chip-sub { font-size:10.5px; color:#94A3B8; }
+
+  /* Big channel button (Step 3) */
+  .big-ch { display:flex; flex-direction:column; align-items:center; gap:6px; padding:16px 10px; background:#fff; border:1.5px solid #E2E8F0; border-radius:14px; cursor:pointer; transition:all .18s ease; }
+  .big-ch:hover { border-color:#CBD5E1; transform:translateY(-1px); }
+  .big-ch.on { background:#0F172A; border-color:#0F172A; color:#fff; }
+  .big-ch-icon { width:36px; height:36px; border-radius:10px; background:#F1F5F9; display:inline-flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#0F172A; transition:all .18s; }
+  .big-ch.on .big-ch-icon { background:rgba(255,255,255,.15); color:#fff; }
+  .big-ch-label { font-size:13px; font-weight:600; }
+
   /* Real checkbox styling */
   .row-cb { width:18px; height:18px; cursor:pointer; accent-color:#0F172A; margin-left:4px; }
   /* Custom checkbox */
@@ -312,71 +379,151 @@
   </div>
 </div>
 
-<!-- ============== BULK ASSIGN MODAL ============== -->
-<div id="modal-bulk" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-6">
-  <div class="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto">
-    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-      <div>
-        <h2 class="font-bold text-lg">Assign users</h2>
-        <p class="text-xs text-slate-500">Adding to <b id="bulk-modal-count">0</b> insights · they'll be notified per the timeline below.</p>
-      </div>
-      <button class="text-slate-400 hover:text-slate-700" onclick="closeBulkAssign()">✕</button>
-    </div>
-    <div class="p-6 space-y-4">
+<!-- ============== BULK ASSIGN MODAL (redesigned) ============== -->
+<div id="modal-bulk" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-6">
+  <div class="bg-white rounded-3xl max-w-2xl w-full flex flex-col shadow-2xl" style="max-height:92vh">
 
-      <!-- User picker -->
-      <div>
-        <label class="text-[11px] uppercase text-slate-500 font-semibold">Users to add</label>
-        <div id="bulk-users" class="flex flex-wrap gap-2 mt-2 p-3 border border-slate-200 rounded-lg min-h-[48px]"></div>
-        <input id="sup-search" placeholder="Type a name or group… (try: Priya, Andheri Day Shift)" class="mt-2 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm" oninput="searchUser(this.value)"/>
-        <div id="sup-suggestions" class="mt-1 border border-slate-200 rounded-lg overflow-hidden hidden"></div>
+    <!-- Header with goal-gradient progress -->
+    <div class="px-7 pt-6 pb-5 border-b border-slate-100">
+      <div class="flex items-start justify-between mb-5">
+        <div>
+          <h2 class="text-xl font-bold tracking-tight">Assign users</h2>
+          <p class="text-sm text-slate-500 mt-1" id="bulk-summary-text">Adding to <b id="bulk-modal-count">0</b> insights</p>
+          <div id="bulk-summary-pills" class="flex flex-wrap gap-1.5 mt-2"></div>
+        </div>
+        <button class="w-9 h-9 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-400 text-lg" onclick="closeBulkAssign()" aria-label="Close">✕</button>
       </div>
 
-      <!-- Step (when in escalation) -->
-      <div>
-        <label class="text-[11px] uppercase text-slate-500 font-semibold">Notify them</label>
-        <div class="flex gap-2 mt-2">
-          <button class="btn btn-sm btn-primary" onclick="setStep(this,'imm')">Immediately</button>
-          <button class="btn btn-sm btn-ghost" onclick="setStep(this,'10')">After 10 min</button>
-          <button class="btn btn-sm btn-ghost" onclick="setStep(this,'30')">After 30 min</button>
-          <button class="btn btn-sm btn-ghost" onclick="setStep(this,'custom')">Custom…</button>
+      <!-- Goal-gradient progress -->
+      <div class="flex items-center gap-2">
+        <div class="progress-step" id="ps-1" data-step="1">
+          <span class="step-dot">1</span>
+          <span class="step-label">Users</span>
+        </div>
+        <div class="step-line" id="line-1"></div>
+        <div class="progress-step" id="ps-2" data-step="2">
+          <span class="step-dot">2</span>
+          <span class="step-label">Timing</span>
+        </div>
+        <div class="step-line" id="line-2"></div>
+        <div class="progress-step" id="ps-3" data-step="3">
+          <span class="step-dot">3</span>
+          <span class="step-label">Channels</span>
         </div>
       </div>
+    </div>
 
-      <!-- Channels (progressive) -->
-      <div>
-        <label class="text-[11px] uppercase text-slate-500 font-semibold">Communication channels</label>
-        <div class="flex items-center gap-2 mt-2">
-          <button class="ch-pill on" id="ch-wa" onclick="toggleCh(this)" title="WhatsApp">WA</button>
-          <details class="inline-block">
-            <summary class="btn btn-sm btn-ghost">+ More channels</summary>
-            <div class="absolute mt-2 card p-3 z-10 flex gap-2">
-              <button class="ch-pill off" onclick="toggleCh(this)">SMS</button>
-              <button class="ch-pill off" onclick="toggleCh(this)">📞</button>
-              <button class="ch-pill off" onclick="toggleCh(this)">✉</button>
-            </div>
-          </details>
-          <span class="text-xs text-slate-500 ml-2">WhatsApp on by default · click + to add SMS, Call, Email</span>
+    <!-- Body -->
+    <div class="flex-1 overflow-y-auto">
+
+      <!-- Step 1: WHO -->
+      <section class="px-7 py-6 border-b border-slate-100" data-section="1">
+        <h3 class="font-semibold text-[15px] mb-1">Who should be notified?</h3>
+        <p class="text-xs text-slate-500 mb-4">Search and add as many users as you need.</p>
+
+        <div class="user-search-wrap">
+          <span class="user-search-icon">🔍</span>
+          <input id="sup-search" class="user-search" placeholder="Type a name, role, or saved group…" oninput="searchUser(this.value)" onfocus="searchUser(this.value)"/>
+        </div>
+        <div id="sup-suggestions" class="user-suggestions hidden"></div>
+
+        <!-- Selected users -->
+        <div id="bulk-users-block" class="mt-5 hidden">
+          <div class="flex items-center justify-between mb-2">
+            <div class="text-[11px] uppercase text-slate-500 font-semibold tracking-wide">Selected <span class="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-slate-900 text-white text-[10px]" id="sel-count">0</span></div>
+            <button class="text-[11px] text-slate-400 hover:text-red-600" onclick="clearSelectedUsers()">Clear all</button>
+          </div>
+          <div id="bulk-users" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <!-- Helper -->
+        <div id="bulk-helper" class="hidden mt-4 helper-card"></div>
+      </section>
+
+      <!-- Step 2: WHEN -->
+      <section id="step-timing" class="px-7 py-6 border-b border-slate-100 hidden" data-section="2">
+        <h3 class="font-semibold text-[15px] mb-1">When should they be notified?</h3>
+        <p class="text-xs text-slate-500 mb-4">Pick a moment in the escalation timeline.</p>
+        <div class="grid grid-cols-4 gap-2">
+          <button class="time-chip on" data-v="imm" onclick="setTimingChip(this)">
+            <span class="time-chip-icon">⚡</span>
+            <span class="time-chip-label">Immediately</span>
+            <span class="time-chip-sub">When opens</span>
+          </button>
+          <button class="time-chip" data-v="10" onclick="setTimingChip(this)">
+            <span class="time-chip-icon">⏱</span>
+            <span class="time-chip-label">+10 min</span>
+            <span class="time-chip-sub">If no response</span>
+          </button>
+          <button class="time-chip" data-v="30" onclick="setTimingChip(this)">
+            <span class="time-chip-icon">⏱</span>
+            <span class="time-chip-label">+30 min</span>
+            <span class="time-chip-sub">If still open</span>
+          </button>
+          <button class="time-chip" data-v="custom" onclick="setTimingChip(this)">
+            <span class="time-chip-icon">⚙</span>
+            <span class="time-chip-label">Custom</span>
+            <span class="time-chip-sub">Set delay</span>
+          </button>
+        </div>
+        <div id="custom-min-wrap" class="hidden mt-3 flex items-center gap-2">
+          <input id="custom-min" type="number" min="1" placeholder="Minutes" class="w-32 border border-slate-200 rounded-lg px-3 py-2 text-sm" oninput="updatePreview()"/>
+          <span class="text-xs text-slate-500">minutes after the insight opens</span>
+        </div>
+      </section>
+
+      <!-- Step 3: HOW -->
+      <section id="step-channels" class="px-7 py-6 hidden" data-section="3">
+        <h3 class="font-semibold text-[15px] mb-1">How should they be notified?</h3>
+        <p class="text-xs text-slate-500 mb-4">WhatsApp is on by default. Add more channels if needed.</p>
+        <div class="grid grid-cols-4 gap-2">
+          <button class="big-ch on" data-v="wa" onclick="bulkToggleCh(this)">
+            <span class="big-ch-icon">WA</span>
+            <span class="big-ch-label">WhatsApp</span>
+          </button>
+          <button class="big-ch" data-v="sms" onclick="bulkToggleCh(this)">
+            <span class="big-ch-icon">SMS</span>
+            <span class="big-ch-label">SMS</span>
+          </button>
+          <button class="big-ch" data-v="call" onclick="bulkToggleCh(this)">
+            <span class="big-ch-icon">📞</span>
+            <span class="big-ch-label">Call</span>
+          </button>
+          <button class="big-ch" data-v="email" onclick="bulkToggleCh(this)">
+            <span class="big-ch-icon">✉</span>
+            <span class="big-ch-label">Email</span>
+          </button>
+        </div>
+
+        <!-- Optional: save as group, collapsed -->
+        <details class="mt-6">
+          <summary class="text-sm text-blue-600 hover:underline cursor-pointer inline-flex items-center gap-1">＋ Save these users as a reusable group</summary>
+          <div class="mt-3 p-4 bg-slate-50 rounded-xl">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" id="save-group-cb" class="w-4 h-4"/>
+              <span class="text-sm">Save selection as a group</span>
+            </label>
+            <input id="save-group-name" placeholder="Group name (e.g. Andheri Day Shift)" class="mt-2 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"/>
+            <p class="text-[11px] text-slate-500 mt-1.5">Pick this group from the search next time.</p>
+          </div>
+        </details>
+      </section>
+
+    </div>
+
+    <!-- Sticky footer with smart preview -->
+    <div class="px-7 py-4 border-t border-slate-100 bg-white rounded-b-3xl">
+      <div class="flex items-center justify-between gap-3">
+        <div class="text-xs text-slate-500 flex-1 min-w-0" id="assign-preview">Pick at least one user to continue</div>
+        <div class="flex gap-2 shrink-0">
+          <button class="btn btn-ghost" onclick="closeBulkAssign()">Cancel</button>
+          <button id="assign-btn" class="btn btn-primary opacity-50 pointer-events-none" onclick="confirmBulkAssign()">
+            Assign to <span id="bulk-confirm-count">0</span> insights
+          </button>
         </div>
       </div>
-
-      <!-- Helper -->
-      <div id="bulk-helper" class="text-xs p-3 rounded-lg bg-blue-50 text-blue-900 hidden"></div>
-
-      <!-- Save as group -->
-      <div class="border-t border-slate-100 pt-4">
-        <label class="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" id="save-group-cb" onchange="document.getElementById('save-group-name').classList.toggle('hidden',!this.checked)" class="w-4 h-4"/>
-          <span class="text-sm">Save these users as a reusable group</span>
-        </label>
-        <input id="save-group-name" placeholder="Group name (e.g. Andheri Day Shift)" class="hidden mt-2 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"/>
-        <p class="text-[11px] text-slate-500 mt-1.5">Reusable groups can be picked from the user search next time you assign.</p>
-      </div>
     </div>
-    <div class="px-6 py-4 border-t border-slate-100 flex justify-end gap-2">
-      <button class="btn btn-ghost" onclick="closeBulkAssign()">Cancel</button>
-      <button class="btn btn-primary" onclick="confirmBulkAssign()">Assign to <span id="bulk-confirm-count">0</span> insights</button>
-    </div>
+
   </div>
 </div>
 
@@ -796,132 +943,271 @@ function closeDetail() {
   document.getElementById('detail-overlay').classList.add('hidden');
 }
 
-// ---------- Bulk assign modal ----------
+// ---------- Bulk assign modal v2 ----------
+const allUsers = [
+  {n:'Priya Sharma', role:'Shift Lead · Andheri', count:5, color:'#0EA5E9'},
+  {n:'Arjun Mehta', role:'Plant Manager · Bandra', count:3, noaccess:['Andheri Plant'], color:'#8B5CF6'},
+  {n:'Meera Rao', role:'Operations Head · All plants', count:8, color:'#F59E0B'},
+  {n:'Vikas Patel', role:'Operator · Powai', count:2, color:'#10B981'},
+  {n:'Ravi Kumar', role:'Senior Operator · Andheri', count:6, color:'#EC4899'},
+  {n:'Anjali Verma', role:'Compliance · All plants', count:4, color:'#6366F1'},
+  {n:'Karan Bhatt', role:'Maintenance Engineer', count:7, color:'#EF4444'},
+  {n:'Neha Tandon', role:'Night Shift Lead', count:3, color:'#14B8A6'},
+];
+
 let bulkUsers = [];
-let bulkStep = 'imm';
+let bulkTiming = 'imm';
+let bulkChans = { wa:true };
+let recentUserNames = ['Priya Sharma','Meera Rao','Ravi Kumar'];
+
 function openBulkAssign() {
   if (!selected.size) { toast('Select at least one insight first'); return; }
   bulkUsers = [];
+  bulkTiming = 'imm';
+  bulkChans = { wa:true };
+  // Header
   document.getElementById('bulk-modal-count').textContent = selected.size;
   document.getElementById('bulk-confirm-count').textContent = selected.size;
-  document.getElementById('bulk-users').innerHTML = '<span class="text-xs text-slate-400">No users yet — type below to add. Or pick a saved group.</span>';
-  document.getElementById('save-group-cb').checked = false;
-  document.getElementById('save-group-name').value = '';
-  document.getElementById('save-group-name').classList.add('hidden');
+  // Pills summary (severities & plants for context)
+  const sels = [...selected].map(id=>insights.find(x=>x.id===id)).filter(Boolean);
+  const sevCounts = {};
+  const plantSet = new Set();
+  sels.forEach(i=>{ sevCounts[i.sev]=(sevCounts[i.sev]||0)+1; plantSet.add(i.plant); });
+  document.getElementById('bulk-summary-pills').innerHTML =
+    Object.entries(sevCounts).map(([sev,n])=>`<span class="chip" style="background:${sevColors[sev].bg};color:${sevColors[sev].fg}">${n} ${sev}</span>`).join('') +
+    [...plantSet].slice(0,3).map(p=>`<span class="chip bg-slate-100 text-slate-700">${p}</span>`).join('') +
+    (plantSet.size>3?`<span class="chip bg-slate-100 text-slate-500">+${plantSet.size-3} more</span>`:'');
+  // Reset UI state
+  document.getElementById('sup-search').value = '';
+  document.getElementById('bulk-users-block').classList.add('hidden');
   document.getElementById('bulk-helper').classList.add('hidden');
+  document.getElementById('step-timing').classList.add('hidden');
+  document.getElementById('step-channels').classList.add('hidden');
+  document.getElementById('custom-min-wrap').classList.add('hidden');
+  // Show recents in dropdown
+  searchUser('');
+  // Reset save-group
+  const cb = document.getElementById('save-group-cb'); if(cb) cb.checked = false;
+  const gn = document.getElementById('save-group-name'); if(gn) gn.value = '';
+  // Reset chip selections
+  document.querySelectorAll('#step-timing .time-chip').forEach(b=>b.classList.toggle('on', b.dataset.v==='imm'));
+  document.querySelectorAll('#step-channels .big-ch').forEach(b=>b.classList.toggle('on', b.dataset.v==='wa'));
+  updateProgress();
+  updatePreview();
   document.getElementById('modal-bulk').classList.remove('hidden');
   document.getElementById('modal-bulk').classList.add('flex');
+  setTimeout(()=>document.getElementById('sup-search').focus(), 100);
 }
 function closeBulkAssign() {
   document.getElementById('modal-bulk').classList.add('hidden');
   document.getElementById('modal-bulk').classList.remove('flex');
 }
-const allUsers = [
-  {n:'Priya Sharma', role:'Shift Lead · Andheri', count:5},
-  {n:'Arjun Mehta', role:'Plant Manager · Bandra', count:3, noaccess:['Andheri Plant']},
-  {n:'Meera Rao', role:'Operations Head', count:8},
-  {n:'Vikas Patel', role:'Operator · Powai', count:2},
-];
+
+function avatarHTML(user, size=22) {
+  const initials = user.n.split(' ').map(x=>x[0]).slice(0,2).join('');
+  const cls = size>=30 ? 'avatar' : 'chip-avatar';
+  return `<span class="${cls}" style="background:${user.color||'#64748B'};width:${size}px;height:${size}px">${initials}</span>`;
+}
+
 function searchUser(q) {
   const box = document.getElementById('sup-suggestions');
-  if (!q) { box.classList.add('hidden'); return; }
-  const userMatches = allUsers.filter(s=>s.n.toLowerCase().includes(q.toLowerCase()));
-  const groupMatches = groups.filter(g=>(g.name+' '+g.desc).toLowerCase().includes(q.toLowerCase()));
-  box.classList.remove('hidden');
+  q = (q||'').trim().toLowerCase();
   let html = '';
-  if (groupMatches.length) {
-    html += `<div class="px-3 py-1.5 text-[10px] uppercase font-semibold text-slate-500 bg-slate-50">Groups</div>`;
-    html += groupMatches.map(g=>`
-      <button class="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm" onclick="addGroup('${g.id}')">
-        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-xs">👥</div>
-        <div class="flex-1">
-          <div class="font-medium">${g.name}</div>
-          <div class="text-[11px] text-slate-500">${g.members.length} members · ${g.desc}</div>
-        </div>
-      </button>
-    `).join('');
+  const taken = new Set(bulkUsers.map(u=>u.name));
+  if (!q) {
+    // Show Recent + Groups when empty
+    const recent = allUsers.filter(u=>recentUserNames.includes(u.n) && !taken.has(u.n)).slice(0,3);
+    const moreGroups = (typeof groups !== 'undefined' ? groups : []).slice(0,3);
+    if (recent.length) {
+      html += `<div class="suggestion-section">Recent</div>`;
+      html += recent.map(u=>userSuggestionHTML(u)).join('');
+    }
+    if (moreGroups.length) {
+      html += `<div class="suggestion-section">Saved groups</div>`;
+      html += moreGroups.map(g=>groupSuggestionHTML(g)).join('');
+    }
+    if (!html) html = `<div class="px-4 py-3 text-xs text-slate-400">Start typing to search users…</div>`;
+  } else {
+    const userMatches = allUsers.filter(s=>!taken.has(s.n) && (s.n+s.role).toLowerCase().includes(q));
+    const groupMatches = (typeof groups !== 'undefined' ? groups : []).filter(g=>(g.name+' '+g.desc).toLowerCase().includes(q));
+    if (groupMatches.length) {
+      html += `<div class="suggestion-section">Groups</div>`;
+      html += groupMatches.map(g=>groupSuggestionHTML(g)).join('');
+    }
+    if (userMatches.length) {
+      html += `<div class="suggestion-section">Users</div>`;
+      html += userMatches.map(u=>userSuggestionHTML(u)).join('');
+    }
+    if (!html) html = `<div class="px-4 py-3 text-xs text-slate-400">No match for "${q}"</div>`;
   }
-  if (userMatches.length) {
-    html += `<div class="px-3 py-1.5 text-[10px] uppercase font-semibold text-slate-500 bg-slate-50">Users</div>`;
-    html += userMatches.map(s=>`
-      <button class="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm" onclick="addUser('${s.n}','${s.role}',${s.count},${JSON.stringify(s.noaccess||[]).replace(/"/g,'&quot;')})">
-        <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-semibold">${s.n.split(' ').map(x=>x[0]).join('')}</div>
-        <div class="flex-1">
-          <div class="font-medium">${s.n}</div>
-          <div class="text-[11px] text-slate-500">${s.role} · on ${s.count} insights</div>
-        </div>
-        ${s.noaccess?`<span class="chip bg-amber-100 text-amber-800">⚠ access</span>`:''}
-      </button>
-    `).join('');
-  }
-  box.innerHTML = html || `<div class="px-3 py-2 text-xs text-slate-400">No match</div>`;
+  box.innerHTML = html;
+  box.classList.remove('hidden');
 }
-function addGroup(gid) {
-  const g = groups.find(x=>x.id===gid); if(!g) return;
-  g.members.forEach(m => {
-    if (!bulkUsers.find(u=>u.name===m)) bulkUsers.push({name:m, role:`From ${g.name}`, count:0, noaccess:[]});
-  });
-  document.getElementById('sup-search').value = '';
-  document.getElementById('sup-suggestions').classList.add('hidden');
-  renderBulkUsers();
-  toast(`Added ${g.members.length} members from "${g.name}"`);
-}
-function addUser(name, role, count, noaccess) {
-  bulkUsers.push({name, role, count, noaccess});
-  document.getElementById('sup-search').value = '';
-  document.getElementById('sup-suggestions').classList.add('hidden');
-  renderBulkUsers();
-  // Helper updates
-  const helper = document.getElementById('bulk-helper');
-  helper.classList.remove('hidden');
-  const accessIssues = bulkUsers.filter(s=>s.noaccess && s.noaccess.length);
-  helper.innerHTML = `
-    <div class="font-semibold mb-1">ⓘ Current assignments</div>
-    ${bulkUsers.map(s=>`<div>${s.name} — already on <b>${s.count}</b> insights ${s.noaccess && s.noaccess.length?`<span class="text-amber-700">· ⚠ no access to ${s.noaccess.join(', ')} <button class="underline font-semibold" onclick="grantAccess('${s.name}')">Grant</button></span>`:''}</div>`).join('')}
+function userSuggestionHTML(u) {
+  return `
+    <button class="user-suggestion" onclick='addUserByName(${JSON.stringify(u.n)})'>
+      ${avatarHTML(u, 34)}
+      <div class="meta">
+        <div class="name">${u.n}</div>
+        <div class="role">${u.role} · on ${u.count} insights</div>
+      </div>
+      ${u.noaccess?`<span class="chip" style="background:#FEF3C7;color:#92400E">⚠ access</span>`:''}
+    </button>
   `;
 }
+function groupSuggestionHTML(g) {
+  return `
+    <button class="user-suggestion" onclick="addGroupById('${g.id}')">
+      <span class="avatar" style="background:#3B82F6;width:34px;height:34px">👥</span>
+      <div class="meta">
+        <div class="name">${g.name}</div>
+        <div class="role">${g.members.length} members · ${g.desc}</div>
+      </div>
+    </button>
+  `;
+}
+function addUserByName(name) {
+  const u = allUsers.find(x=>x.n===name); if(!u) return;
+  if (bulkUsers.find(b=>b.name===name)) return;
+  bulkUsers.push({name:u.n, role:u.role, count:u.count, color:u.color, noaccess:[...(u.noaccess||[])]});
+  postAdd();
+}
+function addGroupById(gid) {
+  const g = (typeof groups !== 'undefined' ? groups : []).find(x=>x.id===gid); if(!g) return;
+  let added = 0;
+  g.members.forEach(m => {
+    if (!bulkUsers.find(u=>u.name===m)) {
+      const u = allUsers.find(x=>x.n===m);
+      bulkUsers.push({name:m, role:u?u.role:`From ${g.name}`, count:u?u.count:0, color:u?u.color:'#64748B', noaccess:u?[...(u.noaccess||[])]:[]});
+      added++;
+    }
+  });
+  toast(`Added ${added} from "${g.name}"`);
+  postAdd();
+}
+function postAdd() {
+  document.getElementById('sup-search').value = '';
+  searchUser('');
+  renderBulkUsers();
+  document.getElementById('step-timing').classList.remove('hidden');
+  updateHelper();
+  updateProgress();
+  updatePreview();
+}
+function clearSelectedUsers() { bulkUsers = []; renderBulkUsers(); updateHelper(); updateProgress(); updatePreview(); searchUser(''); document.getElementById('bulk-users-block').classList.add('hidden'); }
 function renderBulkUsers() {
+  const block = document.getElementById('bulk-users-block');
   const box = document.getElementById('bulk-users');
-  if (!bulkUsers.length) { box.innerHTML = '<span class="text-xs text-slate-400">No users yet — type below to add.</span>'; return; }
-  box.innerHTML = bulkUsers.map((s,idx)=>`
-    <span class="chip bg-slate-100 text-slate-800 pr-1">
-      ${s.name} ${s.noaccess && s.noaccess.length?'<span class="text-amber-600">⚠</span>':''}
-      <button class="ml-1 hover:text-red-600" onclick="removeUser(${idx})">✕</button>
+  document.getElementById('sel-count').textContent = bulkUsers.length;
+  if (!bulkUsers.length) { block.classList.add('hidden'); return; }
+  block.classList.remove('hidden');
+  box.innerHTML = bulkUsers.map((u,idx)=>`
+    <span class="user-chip ${u.noaccess && u.noaccess.length?'warn':''}">
+      <span class="chip-avatar" style="background:${u.color||'#64748B'}">${u.name.split(' ').map(x=>x[0]).slice(0,2).join('')}</span>
+      <span class="chip-name">${u.name}${u.noaccess && u.noaccess.length?' ⚠':''}</span>
+      <button class="chip-x" onclick="removeUser(${idx})" title="Remove">✕</button>
     </span>
   `).join('');
 }
-function removeUser(idx) { bulkUsers.splice(idx,1); renderBulkUsers(); }
-function grantAccess(name) {
-  const s = bulkUsers.find(x=>x.name===name); if(s) s.noaccess=[];
-  toast(`✓ Access granted to ${name}`);
-  renderBulkUsers();
+function removeUser(idx) { bulkUsers.splice(idx,1); renderBulkUsers(); updateHelper(); updateProgress(); updatePreview(); if(!bulkUsers.length){document.getElementById('step-timing').classList.add('hidden');document.getElementById('step-channels').classList.add('hidden');} }
+function updateHelper() {
   const helper = document.getElementById('bulk-helper');
-  helper.innerHTML = helper.innerHTML.replace(/⚠[^<]*<button[^<]*<\/button>/g,'<span class="text-emerald-700">✓ access granted</span>');
+  if (!bulkUsers.length) { helper.classList.add('hidden'); return; }
+  const access = bulkUsers.filter(u=>u.noaccess && u.noaccess.length);
+  if (access.length) {
+    helper.classList.remove('hidden'); helper.classList.add('warn'); helper.classList.remove('helper-card');
+    helper.className = 'mt-4 helper-card warn';
+    helper.innerHTML = `<b>Permission gap:</b> ${access.map(u=>`${u.name} (${u.noaccess.join(', ')})`).join('; ')}. <button class="grant-btn" onclick="grantAllAccess()">Grant access for all</button>`;
+  } else {
+    helper.classList.remove('hidden'); helper.classList.remove('warn');
+    helper.className = 'mt-4 helper-card';
+    const totalLoad = bulkUsers.reduce((s,u)=>s+(u.count||0),0);
+    helper.innerHTML = `${bulkUsers.length} user${bulkUsers.length>1?'s':''} · already on <b>${totalLoad}</b> existing insights combined.`;
+  }
 }
-function setStep(btn, val) {
-  bulkStep = val;
-  btn.parentElement.querySelectorAll('button').forEach(b=>{b.classList.remove('btn-primary');b.classList.add('btn-ghost')});
-  btn.classList.remove('btn-ghost'); btn.classList.add('btn-primary');
+function grantAllAccess() {
+  bulkUsers.forEach(u=>u.noaccess=[]);
+  toast(`✓ Access granted across ${bulkUsers.length} users`);
+  renderBulkUsers(); updateHelper();
 }
-function toggleCh(btn) { btn.classList.toggle('on'); btn.classList.toggle('off'); }
+function setTimingChip(btn) {
+  document.querySelectorAll('#step-timing .time-chip').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  bulkTiming = btn.dataset.v;
+  document.getElementById('custom-min-wrap').classList.toggle('hidden', bulkTiming!=='custom');
+  document.getElementById('step-channels').classList.remove('hidden');
+  updateProgress(); updatePreview();
+}
+function bulkToggleCh(btn) {
+  const v = btn.dataset.v;
+  bulkChans[v] = !bulkChans[v]; if (!bulkChans[v]) delete bulkChans[v];
+  btn.classList.toggle('on');
+  updatePreview();
+}
+function updateProgress() {
+  const ps1 = document.getElementById('ps-1');
+  const ps2 = document.getElementById('ps-2');
+  const ps3 = document.getElementById('ps-3');
+  const l1 = document.getElementById('line-1');
+  const l2 = document.getElementById('line-2');
+  ps1.classList.remove('active','done'); ps2.classList.remove('active','done'); ps3.classList.remove('active','done');
+  l1.classList.remove('done'); l2.classList.remove('done');
+  if (!bulkUsers.length) { ps1.classList.add('active'); return; }
+  ps1.classList.add('done'); l1.classList.add('done');
+  if (!document.querySelector('#step-channels:not(.hidden)')) { ps2.classList.add('active'); return; }
+  ps2.classList.add('done'); l2.classList.add('done');
+  ps3.classList.add('active');
+}
+function updatePreview() {
+  const btn = document.getElementById('assign-btn');
+  const preview = document.getElementById('assign-preview');
+  const ready = bulkUsers.length && Object.keys(bulkChans).length;
+  if (ready) {
+    btn.classList.remove('opacity-50','pointer-events-none');
+    const timeStr = bulkTiming==='imm' ? 'immediately' : bulkTiming==='custom' ? `+${document.getElementById('custom-min').value||'?'} min` : `+${bulkTiming} min`;
+    const chStr = Object.keys(bulkChans).map(c=>({wa:'WhatsApp',sms:'SMS',call:'Call',email:'Email'}[c])).join(', ');
+    preview.innerHTML = `<b>${bulkUsers.length}</b> user${bulkUsers.length>1?'s':''} → <b>${selected.size}</b> insight${selected.size>1?'s':''} · ${timeStr} · ${chStr}`;
+  } else {
+    btn.classList.add('opacity-50','pointer-events-none');
+    if (!bulkUsers.length) preview.textContent = 'Pick at least one user to continue';
+    else if (!Object.keys(bulkChans).length) preview.textContent = 'Pick at least one channel';
+    else preview.textContent = '';
+  }
+}
 function confirmBulkAssign() {
-  if (!bulkUsers.length) { toast('Add at least one user'); return; }
+  if (!bulkUsers.length || !Object.keys(bulkChans).length) return;
   selected.forEach(id=>{
     const i = insights.find(x=>x.id===id);
-    if (i) bulkUsers.forEach(s=>{ if(!i.users.includes(s.name)) i.users.push(s.name); });
+    if (i) bulkUsers.forEach(u=>{ if(!i.users.includes(u.name)) i.users.push(u.name); });
   });
+  // Update recents
+  bulkUsers.forEach(u=>{ if(!recentUserNames.includes(u.name)) recentUserNames.unshift(u.name); });
+  recentUserNames = recentUserNames.slice(0,5);
   const n = selected.size;
   let groupMsg = '';
-  if (document.getElementById('save-group-cb').checked) {
-    const gname = document.getElementById('save-group-name').value.trim() || `Group ${groups.length+1}`;
-    groups.push({id:'g'+(groups.length+1), name:gname, desc:'Custom group', members:bulkUsers.map(u=>u.name), channels:'WA', steps:'Immediate'});
-    groupMsg = ` · saved as group "<b>${gname}</b>"`;
+  const cb = document.getElementById('save-group-cb');
+  if (cb && cb.checked) {
+    const gname = document.getElementById('save-group-name').value.trim() || `Group ${(groups||[]).length+1}`;
+    if (typeof groups !== 'undefined') groups.push({id:'g'+(groups.length+1), name:gname, desc:'Custom group', members:bulkUsers.map(u=>u.name), channels:Object.keys(bulkChans).join(', '), steps:bulkTiming});
+    groupMsg = ` · saved as "<b>${gname}</b>"`;
   }
   closeBulkAssign();
   clearSelection();
   renderInsights();
-  toast(`✓ Added ${bulkUsers.length} user${bulkUsers.length>1?'s':''} to ${n} insights${groupMsg}`);
+  toast(`✓ ${bulkUsers.length} user${bulkUsers.length>1?'s':''} assigned to ${n} insight${n>1?'s':''}${groupMsg}`);
 }
+// Click outside dropdown to close
+document.addEventListener('click', (e) => {
+  const wrap = document.getElementById('sup-suggestions');
+  if (!wrap || wrap.classList.contains('hidden')) return;
+  const inSearch = e.target.closest('#sup-search') || e.target.closest('#sup-suggestions');
+  if (!inSearch) wrap.classList.add('hidden');
+});
+// Reopen dropdown when search is focused
+document.addEventListener('DOMContentLoaded', () => {
+  const s = document.getElementById('sup-search');
+  if (s) s.addEventListener('focus', ()=>searchUser(s.value));
+});
 
 // ---------- Group assign modal ----------
 const groups = [
