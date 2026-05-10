@@ -56,10 +56,9 @@
   <div class="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
     <div class="flex items-center gap-8">
       <div class="font-bold text-[15px]">Digital Paani <span class="text-slate-400 font-normal">· Plant Operations</span></div>
-      <div class="flex items-center gap-1 text-sm text-slate-500" id="breadcrumb">
-        <button onclick="show('plants')" class="px-3 py-1.5 rounded-lg font-medium hover:bg-slate-100">Plants</button>
-        <span id="bc-sep" class="hidden">›</span>
-        <span id="bc-plant" class="px-2 py-1.5 font-medium text-slate-900 hidden"></span>
+      <div class="flex items-center gap-1 text-sm">
+        <button onclick="show('plants')" id="nav-plants" class="px-3 py-1.5 rounded-lg font-medium">Plants <span class="text-slate-400 ml-1">5</span></button>
+        <button onclick="show('insights')" id="nav-insights" class="px-3 py-1.5 rounded-lg font-medium">Insights <span class="text-slate-400 ml-1">18</span></button>
       </div>
     </div>
     <div class="flex items-center gap-3">
@@ -89,9 +88,10 @@
           <span class="chip" style="background:#FEE2E2;color:#991B1B">● 2 incident</span>
           <span class="chip" style="background:#FEF3C7;color:#92400E">● 1 issue</span>
         </div>
-        <div class="flex gap-2 mt-5">
-          <button class="btn btn-ghost flex-1" onclick="filterByPlant('Andheri Plant')">View insights</button>
-          <button class="btn btn-primary flex-1" onclick="openDefaults('Andheri Plant')">Configure defaults</button>
+        <button class="btn btn-primary w-full mt-5" onclick="filterByPlant('Andheri Plant')">View insights</button>
+        <div class="flex gap-2 mt-2">
+          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openEscalations('Andheri Plant')">⚡ Escalations</button>
+          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openDigests('Andheri Plant')">✉ Digests</button>
         </div>
       </div>
 
@@ -102,9 +102,10 @@
         <div class="flex flex-wrap gap-1.5 mt-3">
           <span class="chip" style="background:#FEF3C7;color:#92400E">● 2 issue</span>
         </div>
-        <div class="flex gap-2 mt-5">
-          <button class="btn btn-ghost flex-1" onclick="filterByPlant('Bandra Plant')">View insights</button>
-          <button class="btn btn-primary flex-1" onclick="openDefaults('Bandra Plant')">Configure defaults</button>
+        <button class="btn btn-primary w-full mt-5" onclick="filterByPlant('Bandra Plant')">View insights</button>
+        <div class="flex gap-2 mt-2">
+          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openEscalations('Bandra Plant')">⚡ Escalations</button>
+          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openDigests('Bandra Plant')">✉ Digests</button>
         </div>
       </div>
 
@@ -115,9 +116,10 @@
         <div class="flex flex-wrap gap-1.5 mt-3">
           <span class="chip" style="background:#FEF9C3;color:#854D0E">● 2 warning</span>
         </div>
-        <div class="flex gap-2 mt-5">
-          <button class="btn btn-ghost flex-1" onclick="filterByPlant('Powai Plant')">View insights</button>
-          <button class="btn btn-primary flex-1" onclick="openDefaults('Powai Plant')">Configure defaults</button>
+        <button class="btn btn-primary w-full mt-5" onclick="filterByPlant('Powai Plant')">View insights</button>
+        <div class="flex gap-2 mt-2">
+          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openEscalations('Powai Plant')">⚡ Escalations</button>
+          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openDigests('Powai Plant')">✉ Digests</button>
         </div>
       </div>
 
@@ -128,9 +130,10 @@
         <div class="flex flex-wrap gap-1.5 mt-3">
           <span class="chip" style="background:#FEF9C3;color:#854D0E">● 1 warning</span>
         </div>
-        <div class="flex gap-2 mt-5">
-          <button class="btn btn-ghost flex-1" onclick="filterByPlant('Thane Plant')">View insights</button>
-          <button class="btn btn-primary flex-1" onclick="openDefaults('Thane Plant')">Configure defaults</button>
+        <button class="btn btn-primary w-full mt-5" onclick="filterByPlant('Thane Plant')">View insights</button>
+        <div class="flex gap-2 mt-2">
+          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openEscalations('Thane Plant')">⚡ Escalations</button>
+          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openDigests('Thane Plant')">✉ Digests</button>
         </div>
       </div>
 
@@ -141,14 +144,15 @@
         <div class="flex flex-wrap gap-1.5 mt-3">
           <span class="chip" style="background:#DCFCE7;color:#166534">● all clear</span>
         </div>
-        <div class="flex gap-2 mt-5">
-          <button class="btn btn-ghost flex-1" onclick="filterByPlant('Vashi Plant')">View insights</button>
-          <button class="btn btn-primary flex-1" onclick="openDefaults('Vashi Plant')">Configure defaults</button>
+        <button class="btn btn-primary w-full mt-5" onclick="filterByPlant('Vashi Plant')">View insights</button>
+        <div class="flex gap-2 mt-2">
+          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openEscalations('Vashi Plant')">⚡ Escalations</button>
+          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openDigests('Vashi Plant')">✉ Digests</button>
         </div>
       </div>
     </div>
 
-    <p class="text-xs text-slate-500 mt-6">Click <b>Configure defaults</b> to set escalation timelines per severity — every new insight in that Plant inherits these users and channels.</p>
+    <p class="text-xs text-slate-500 mt-6">Each plant has two configurations: <b>⚡ Escalations</b> (timing + channels + messages, applied to every new insight in that plant) and <b>✉ Digests</b> (scheduled summaries sent to client recipients).</p>
   </div>
 </section>
 
@@ -156,24 +160,23 @@
 <section id="screen-insights" class="screen">
   <div class="max-w-7xl mx-auto px-6 py-8">
 
-    <button onclick="show('plants')" class="text-sm text-slate-500 hover:text-slate-900 mb-3">← Back to all plants</button>
     <div class="flex items-end justify-between mb-6">
       <div>
         <h1 class="text-2xl font-bold" id="insights-h1">Insights <span id="insight-count" class="text-slate-400 font-normal text-lg">· 18</span></h1>
         <p class="text-sm text-slate-500 mt-1" id="insights-sub">Click any row to see history, sensor readings, and users.</p>
       </div>
       <div class="flex gap-2">
-        <button class="btn btn-ghost" onclick="openDefaults(currentPlant)">Configure defaults</button>
         <button class="btn btn-primary" onclick="openNewInsight()">+ New insight</button>
       </div>
     </div>
 
-    <!-- Filters: simple bar (plant-scoped) -->
+    <!-- Filters -->
     <div class="card p-3 mb-3 flex flex-wrap items-center gap-2">
       <input id="search" placeholder="🔍 Search insights, sensors, equipment…" oninput="renderInsights()" class="border-0 px-2 py-1.5 text-sm flex-1 min-w-[200px] focus:outline-none"/>
       <div class="h-6 w-px bg-slate-200"></div>
-      <select id="f-plant" class="hidden">
+      <select id="f-plant" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
         <option value="">All Plants</option>
+        <option>Andheri Plant</option><option>Bandra Plant</option><option>Powai Plant</option><option>Thane Plant</option><option>Vashi Plant</option>
       </select>
       <select id="f-sev" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
         <option value="">All severities</option><option>incident</option><option>issue</option><option>warning</option>
@@ -338,51 +341,122 @@
   </div>
 </div>
 
-<!-- ============== DEFAULTS MODAL ============== -->
-<div id="modal-defaults" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-6">
-  <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+<!-- ============== ESCALATIONS MODAL ============== -->
+<div id="modal-esc" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-6">
+  <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-10">
       <div>
-        <h2 class="font-bold text-lg">Configure defaults — <span id="defaults-plant"></span></h2>
-        <p class="text-xs text-slate-500">Future insights in this Plant inherit these timelines.</p>
+        <h2 class="font-bold text-lg">⚡ Escalations — <span id="esc-plant"></span></h2>
+        <p class="text-xs text-slate-500">Applied automatically to every new insight in this plant.</p>
       </div>
-      <button class="text-slate-400 hover:text-slate-700" onclick="closeDefaults()">✕</button>
+      <button class="text-slate-400 hover:text-slate-700" onclick="closeEscalations()">✕</button>
     </div>
-    <div class="p-6 space-y-3">
-      <div class="card p-4 border border-slate-100">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:#DC2626"></span><b>Incident</b></div>
-          <button class="text-xs text-blue-600 hover:underline">+ Add step</button>
-        </div>
-        <div class="space-y-2 text-sm">
-          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">Immediate</span> <span>Plant Manager</span> <span class="text-slate-400 text-xs">📞 ✉ WA</span></div>
-          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">5 min</span> <span>Shift Lead</span> <span class="text-slate-400 text-xs">SMS</span></div>
-          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">15 min</span> <span>Operations Head</span> <span class="text-slate-400 text-xs">📞</span></div>
+
+    <!-- Severity tabs -->
+    <div class="px-6 pt-4 flex gap-1 border-b border-slate-100">
+      <button class="esc-tab esc-tab-active px-3 py-2 text-sm font-medium border-b-2 border-slate-900" data-sev="incident" onclick="switchEscTab(this)"><span class="w-2 h-2 inline-block rounded-full" style="background:#DC2626"></span> Incident</button>
+      <button class="esc-tab px-3 py-2 text-sm text-slate-500 border-b-2 border-transparent" data-sev="issue" onclick="switchEscTab(this)"><span class="w-2 h-2 inline-block rounded-full" style="background:#F59E0B"></span> Issue</button>
+      <button class="esc-tab px-3 py-2 text-sm text-slate-500 border-b-2 border-transparent" data-sev="warning" onclick="switchEscTab(this)"><span class="w-2 h-2 inline-block rounded-full" style="background:#FBBF24"></span> Warning</button>
+    </div>
+
+    <div class="p-6">
+      <div id="esc-steps" class="space-y-3"></div>
+      <button class="mt-3 w-full py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg border border-dashed border-slate-300" onclick="addEscStep()">+ Add escalation step</button>
+    </div>
+
+    <div class="px-6 py-4 border-t border-slate-100 flex justify-end gap-2 sticky bottom-0 bg-white">
+      <button class="btn btn-ghost" onclick="closeEscalations()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEscalations()">Save escalations</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============== DIGESTS MODAL ============== -->
+<div id="modal-digest" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-6">
+  <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-10">
+      <div>
+        <h2 class="font-bold text-lg">✉ Digests — <span id="dig-plant"></span></h2>
+        <p class="text-xs text-slate-500">Scheduled summaries sent to client recipients.</p>
+      </div>
+      <button class="text-slate-400 hover:text-slate-700" onclick="closeDigests()">✕</button>
+    </div>
+
+    <div class="p-6 space-y-5">
+      <!-- Recipients -->
+      <div>
+        <label class="text-[11px] uppercase text-slate-500 font-semibold">Recipients</label>
+        <div id="dig-recipients" class="flex flex-wrap gap-2 mt-2 p-3 border border-slate-200 rounded-lg min-h-[44px]"></div>
+        <input id="dig-rec-input" placeholder="Type email and press Enter (e.g. client@acme.com)" class="mt-2 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm" onkeydown="if(event.key==='Enter'){addRecipient(this.value);this.value=''}"/>
+      </div>
+
+      <!-- Severity -->
+      <div>
+        <label class="text-[11px] uppercase text-slate-500 font-semibold">Include severities</label>
+        <div class="flex gap-2 mt-2">
+          <label class="chip bg-slate-100 cursor-pointer hover:bg-slate-200 px-3 py-1.5"><input type="checkbox" class="mr-1.5" checked> <span style="color:#991B1B">●</span> Incidents</label>
+          <label class="chip bg-slate-100 cursor-pointer hover:bg-slate-200 px-3 py-1.5"><input type="checkbox" class="mr-1.5" checked> <span style="color:#92400E">●</span> Issues</label>
+          <label class="chip bg-slate-100 cursor-pointer hover:bg-slate-200 px-3 py-1.5"><input type="checkbox" class="mr-1.5"> <span style="color:#854D0E">●</span> Warnings</label>
         </div>
       </div>
-      <div class="card p-4 border border-slate-100">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:#F59E0B"></span><b>Issue</b></div>
-          <button class="text-xs text-blue-600 hover:underline">+ Add step</button>
-        </div>
-        <div class="space-y-2 text-sm">
-          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">Immediate</span> <span>Shift Lead</span> <span class="text-slate-400 text-xs">SMS WA</span></div>
-          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">30 min</span> <span>Plant Manager</span> <span class="text-slate-400 text-xs">✉</span></div>
+
+      <!-- Status -->
+      <div>
+        <label class="text-[11px] uppercase text-slate-500 font-semibold">Status</label>
+        <div class="flex gap-2 mt-2" id="dig-status">
+          <button class="chip bg-slate-900 text-white px-3 py-1.5" data-v="open" onclick="pickStatus(this)">Open</button>
+          <button class="chip bg-slate-100 px-3 py-1.5" data-v="closed" onclick="pickStatus(this)">Closed</button>
+          <button class="chip bg-slate-100 px-3 py-1.5" data-v="both" onclick="pickStatus(this)">Both</button>
         </div>
       </div>
-      <div class="card p-4 border border-slate-100">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:#FBBF24"></span><b>Warning</b></div>
-          <button class="text-xs text-blue-600 hover:underline">+ Add step</button>
+
+      <!-- Historical range -->
+      <div>
+        <label class="text-[11px] uppercase text-slate-500 font-semibold">Historical range</label>
+        <div class="flex flex-wrap gap-2 mt-2" id="dig-range">
+          <button class="chip bg-slate-100 px-3 py-1.5" data-v="6h" onclick="pickRange(this)">Last 6 hours</button>
+          <button class="chip bg-slate-100 px-3 py-1.5" data-v="12h" onclick="pickRange(this)">Last 12 hours</button>
+          <button class="chip bg-slate-900 text-white px-3 py-1.5" data-v="24h" onclick="pickRange(this)">Last 24 hours</button>
+          <button class="chip bg-slate-100 px-3 py-1.5" data-v="7d" onclick="pickRange(this)">Last 7 days</button>
         </div>
-        <div class="space-y-2 text-sm">
-          <div class="flex items-center gap-3"><span class="chip bg-slate-100 w-20 justify-center">Immediate</span> <span>Operator on duty</span> <span class="text-slate-400 text-xs">WA</span></div>
+      </div>
+
+      <!-- Occurrence -->
+      <div>
+        <label class="text-[11px] uppercase text-slate-500 font-semibold">Occurrence</label>
+        <div class="flex flex-wrap gap-2 mt-2" id="dig-occ">
+          <button class="chip bg-slate-100 px-3 py-1.5" data-v="hourly" onclick="pickOcc(this)">Hourly</button>
+          <button class="chip bg-slate-900 text-white px-3 py-1.5" data-v="daily" onclick="pickOcc(this)">Daily</button>
+          <button class="chip bg-slate-100 px-3 py-1.5" data-v="weekly" onclick="pickOcc(this)">Weekly</button>
         </div>
+        <div id="occ-detail" class="mt-3 p-3 bg-slate-50 rounded-lg text-sm">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-slate-500">Send at</span>
+            <select id="occ-hour" class="border border-slate-200 rounded px-2 py-1 text-sm bg-white">
+              <option>08:00</option><option>09:00</option><option>10:00</option><option>12:00</option><option>17:00</option><option>20:00</option>
+            </select>
+            <span id="occ-day-wrap" class="hidden flex items-center gap-2">
+              <span class="text-slate-500">on</span>
+              <select class="border border-slate-200 rounded px-2 py-1 text-sm bg-white"><option>Mon</option><option>Tue</option><option>Wed</option><option>Thu</option><option>Fri</option></select>
+            </span>
+            <span class="text-slate-500" id="occ-tz">IST</span>
+          </div>
+          <div class="text-[11px] text-slate-500 mt-2" id="occ-summary">Next digest: tomorrow at 08:00 IST</div>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="p-3 bg-blue-50 rounded-lg text-xs text-blue-900">
+        <b>Preview:</b> <span id="dig-preview">Daily digest of <b>open Incidents and Issues</b> from <b>last 24 hours</b>, sent to recipients at <b>08:00 IST</b>.</span>
       </div>
     </div>
-    <div class="px-6 py-4 border-t border-slate-100 flex justify-end gap-2">
-      <button class="btn btn-ghost" onclick="closeDefaults()">Cancel</button>
-      <button class="btn btn-primary" onclick="saveDefaults()">Save defaults</button>
+
+    <div class="px-6 py-4 border-t border-slate-100 flex justify-between gap-2 sticky bottom-0 bg-white">
+      <button class="text-xs text-slate-500 hover:underline" onclick="toast('Test digest sent')">Send test now</button>
+      <div class="flex gap-2">
+        <button class="btn btn-ghost" onclick="closeDigests()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveDigests()">Save digest</button>
+      </div>
     </div>
   </div>
 </div>
@@ -396,14 +470,19 @@ let currentPlant = '';
 function show(name) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+name).classList.add('active');
-  const sep = document.getElementById('bc-sep');
-  const bc = document.getElementById('bc-plant');
-  if (name === 'insights' && currentPlant) {
-    sep.classList.remove('hidden'); bc.classList.remove('hidden'); bc.textContent = currentPlant;
-  } else {
-    sep.classList.add('hidden'); bc.classList.add('hidden');
+  ['plants','insights'].forEach(n=>{
+    const el = document.getElementById('nav-'+n);
+    el.style.background = n===name ? '#0F172A' : '';
+    el.style.color = n===name ? '#fff' : '';
+  });
+  if (name !== 'insights') {
     currentPlant = '';
+    const fp = document.getElementById('f-plant');
+    if (fp) fp.value = '';
+  } else if (!currentPlant) {
     document.getElementById('f-plant').value = '';
+    document.getElementById('insights-h1').innerHTML = `Insights <span id="insight-count" class="text-slate-400 font-normal text-lg">· 18</span>`;
+    if (typeof renderInsights === 'function') renderInsights();
   }
   window.scrollTo(0,0);
 }
@@ -430,10 +509,9 @@ const selected = new Set();
 // ---------- Filters ----------
 function filterByPlant(p) {
   currentPlant = p;
-  document.getElementById('f-plant').value = p;
-  document.getElementById('insights-h1').innerHTML = `${p} <span id="insight-count" class="text-slate-400 font-normal text-lg">· 0</span>`;
-  document.getElementById('insights-sub').textContent = 'Live insights · click any row for sensor history, conditions, and users.';
   show('insights');
+  document.getElementById('f-plant').value = p;
+  document.getElementById('insights-h1').innerHTML = `Insights <span class="text-slate-400 font-normal text-lg">· ${p}</span>`;
   renderInsights();
 }
 function clearAllFilters() {
@@ -881,17 +959,155 @@ function createInsight() {
   toast('✓ Insight created');
 }
 
-// ---------- Defaults ----------
-function openDefaults(plant) {
-  document.getElementById('defaults-plant').textContent = plant;
-  document.getElementById('modal-defaults').classList.remove('hidden');
-  document.getElementById('modal-defaults').classList.add('flex');
+// ---------- Escalations ----------
+const TIME_PRESETS = ['Immediate','+5 min','+10 min','+15 min','+30 min','+1 hour','+2 hours','Custom'];
+const CHANNELS = [
+  {id:'wa', label:'WhatsApp', icon:'WA'},
+  {id:'sms', label:'SMS', icon:'SMS'},
+  {id:'call', label:'Call', icon:'📞'},
+  {id:'email', label:'Email', icon:'✉'},
+];
+const DEFAULT_MSG = {
+  wa: 'Hi {{user}}, {{insight}} at {{plant}}. Sensor {{sensor}} = {{value}}. Please acknowledge.',
+  sms: '{{insight}} · {{plant}} · {{sensor}}={{value}}. Reply ACK.',
+  call: 'Spoken alert: {{insight}} at {{plant}}. Press 1 to acknowledge.',
+  email: 'A new {{severity}} has opened at {{plant}}.\n\n{{insight}}\nSensor: {{sensor}} = {{value}}\nThreshold: {{threshold}}\n\nView in dashboard: {{link}}',
+};
+
+let escState = { plant:'', sev:'incident', steps:{} };
+function defaultSteps(sev) {
+  const base = sev==='incident'
+    ? [{time:'Immediate', users:['Plant Manager'], chans:{wa:true,call:true}},{time:'+5 min', users:['Shift Lead'], chans:{sms:true}},{time:'+15 min', users:['Operations Head'], chans:{call:true}}]
+    : sev==='issue'
+    ? [{time:'Immediate', users:['Shift Lead'], chans:{wa:true,sms:true}},{time:'+30 min', users:['Plant Manager'], chans:{email:true}}]
+    : [{time:'Immediate', users:['Operator on duty'], chans:{wa:true}}];
+  return base.map(s=>({...s, msgs:{}}));
 }
-function closeDefaults() {
-  document.getElementById('modal-defaults').classList.add('hidden');
-  document.getElementById('modal-defaults').classList.remove('flex');
+function openEscalations(plant) {
+  escState = { plant, sev:'incident', steps:{
+    incident: defaultSteps('incident'),
+    issue: defaultSteps('issue'),
+    warning: defaultSteps('warning'),
+  }};
+  document.getElementById('esc-plant').textContent = plant;
+  renderEscSteps();
+  document.getElementById('modal-esc').classList.remove('hidden');
+  document.getElementById('modal-esc').classList.add('flex');
 }
-function saveDefaults() { closeDefaults(); toast('✓ Defaults saved · future insights inherit these timelines'); }
+function closeEscalations() {
+  document.getElementById('modal-esc').classList.add('hidden');
+  document.getElementById('modal-esc').classList.remove('flex');
+}
+function switchEscTab(btn) {
+  document.querySelectorAll('.esc-tab').forEach(t=>{
+    t.classList.remove('esc-tab-active','border-slate-900');
+    t.classList.add('text-slate-500','border-transparent');
+  });
+  btn.classList.add('esc-tab-active','border-slate-900');
+  btn.classList.remove('text-slate-500','border-transparent');
+  escState.sev = btn.dataset.sev;
+  renderEscSteps();
+}
+function renderEscSteps() {
+  const steps = escState.steps[escState.sev];
+  document.getElementById('esc-steps').innerHTML = steps.map((s,idx)=>`
+    <div class="card p-4 border border-slate-100">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="text-xs uppercase text-slate-500 font-semibold w-12">Step ${idx+1}</span>
+        <select class="border border-slate-200 rounded-lg px-2 py-1.5 text-sm" onchange="setStepTime(${idx},this.value)">
+          ${TIME_PRESETS.map(t=>`<option ${t===s.time?'selected':''}>${t}</option>`).join('')}
+        </select>
+        ${s.time==='Custom' ? `<input type="number" placeholder="min" class="w-20 border border-slate-200 rounded-lg px-2 py-1.5 text-sm" onchange="setStepCustom(${idx},this.value)"/>` : ''}
+        <span class="text-sm text-slate-500">→ notify</span>
+        <span class="text-sm font-medium">${s.users.join(', ')||'(no user)'}</span>
+        <button class="ml-auto text-xs text-slate-400 hover:text-red-600" onclick="removeEscStep(${idx})">Remove</button>
+      </div>
+      <!-- Channel toggles -->
+      <div class="flex items-center gap-1.5 flex-wrap">
+        <span class="text-[11px] text-slate-500 mr-1">Channels:</span>
+        ${CHANNELS.map(c=>`
+          <button class="ch-pill ${s.chans[c.id]?'on':'off'}" onclick="toggleStepCh(${idx},'${c.id}')" title="${c.label}">${c.icon}</button>
+        `).join('')}
+      </div>
+      <!-- Progressive: edit messages per channel -->
+      <details class="mt-3" ${Object.keys(s.chans).filter(k=>s.chans[k]).length?'':''}>
+        <summary class="text-xs text-blue-600 hover:underline cursor-pointer">✎ Edit messages for active channels</summary>
+        <div class="mt-3 space-y-3">
+          ${CHANNELS.filter(c=>s.chans[c.id]).map(c=>`
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-[11px] uppercase text-slate-500 font-semibold">${c.label} message</label>
+                <button class="text-[11px] text-slate-400 hover:text-blue-600" onclick="resetMsg(${idx},'${c.id}')">Reset to default</button>
+              </div>
+              <textarea class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm" rows="${c.id==='email'?4:2}" oninput="setMsg(${idx},'${c.id}',this.value)" placeholder="${DEFAULT_MSG[c.id]}">${s.msgs[c.id] ?? DEFAULT_MSG[c.id]}</textarea>
+              <div class="text-[10px] text-slate-400 mt-1">Variables: {{user}} {{plant}} {{insight}} {{sensor}} {{value}} {{threshold}} {{severity}} {{link}}</div>
+            </div>
+          `).join('') || '<div class="text-xs text-slate-400">Turn on a channel above to edit its message.</div>'}
+        </div>
+      </details>
+    </div>
+  `).join('');
+}
+function setStepTime(idx, val) { escState.steps[escState.sev][idx].time = val; renderEscSteps(); }
+function setStepCustom(idx, val) { escState.steps[escState.sev][idx].time = '+'+val+' min'; }
+function toggleStepCh(idx, cid) {
+  const s = escState.steps[escState.sev][idx];
+  s.chans[cid] = !s.chans[cid]; if (!s.chans[cid]) delete s.chans[cid];
+  renderEscSteps();
+}
+function setMsg(idx, cid, val) { escState.steps[escState.sev][idx].msgs[cid] = val; }
+function resetMsg(idx, cid) { delete escState.steps[escState.sev][idx].msgs[cid]; renderEscSteps(); }
+function addEscStep() {
+  escState.steps[escState.sev].push({time:'+10 min', users:['Pick a user'], chans:{wa:true}, msgs:{}});
+  renderEscSteps();
+}
+function removeEscStep(idx) { escState.steps[escState.sev].splice(idx,1); renderEscSteps(); }
+function saveEscalations() { closeEscalations(); toast(`✓ Escalations saved for ${escState.plant} · applies to all new insights`); }
+
+// ---------- Digests ----------
+let digRecipients = ['ops@andheri-stp.com'];
+let digState = { plant:'', status:'open', range:'24h', occ:'daily' };
+function openDigests(plant) {
+  digState.plant = plant;
+  digRecipients = ['client-ops@'+plant.toLowerCase().replace(/\s/g,'-')+'.com'];
+  document.getElementById('dig-plant').textContent = plant;
+  renderRecipients();
+  updateDigPreview();
+  document.getElementById('modal-digest').classList.remove('hidden');
+  document.getElementById('modal-digest').classList.add('flex');
+}
+function closeDigests() {
+  document.getElementById('modal-digest').classList.add('hidden');
+  document.getElementById('modal-digest').classList.remove('flex');
+}
+function renderRecipients() {
+  const box = document.getElementById('dig-recipients');
+  if (!digRecipients.length) { box.innerHTML = '<span class="text-xs text-slate-400">Add at least one recipient.</span>'; return; }
+  box.innerHTML = digRecipients.map((e,i)=>`<span class="chip bg-slate-100">${e} <button class="ml-1 hover:text-red-600" onclick="removeRecipient(${i})">✕</button></span>`).join('');
+}
+function addRecipient(v) { v=v.trim(); if(!v) return; digRecipients.push(v); renderRecipients(); }
+function removeRecipient(i) { digRecipients.splice(i,1); renderRecipients(); }
+function pickStatus(btn) { pickChip(btn, 'dig-status'); digState.status = btn.dataset.v; updateDigPreview(); }
+function pickRange(btn) { pickChip(btn, 'dig-range'); digState.range = btn.dataset.v; updateDigPreview(); }
+function pickOcc(btn) {
+  pickChip(btn, 'dig-occ'); digState.occ = btn.dataset.v;
+  document.getElementById('occ-day-wrap').classList.toggle('hidden', btn.dataset.v !== 'weekly');
+  document.getElementById('occ-hour').parentElement.querySelector('span').textContent = btn.dataset.v==='hourly' ? 'Send at the top of every hour' : 'Send at';
+  document.getElementById('occ-hour').classList.toggle('hidden', btn.dataset.v==='hourly');
+  updateDigPreview();
+}
+function pickChip(btn, groupId) {
+  document.getElementById(groupId).querySelectorAll('button').forEach(b=>{ b.classList.remove('bg-slate-900','text-white'); b.classList.add('bg-slate-100'); });
+  btn.classList.add('bg-slate-900','text-white'); btn.classList.remove('bg-slate-100');
+}
+function updateDigPreview() {
+  const rangeMap = {'6h':'last 6 hours','12h':'last 12 hours','24h':'last 24 hours','7d':'last 7 days'};
+  const occMap = {'hourly':'every hour','daily':'every day at 08:00 IST','weekly':'every week at 08:00 IST'};
+  const statusMap = {'open':'open','closed':'closed','both':'open and closed'};
+  document.getElementById('dig-preview').innerHTML = `${(digState.occ||'daily').replace(/^./,c=>c.toUpperCase())} digest of <b>${statusMap[digState.status]} insights</b> from <b>${rangeMap[digState.range]}</b>, sent ${occMap[digState.occ]}.`;
+  document.getElementById('occ-summary').textContent = `Schedule: ${occMap[digState.occ]}`;
+}
+function saveDigests() { closeDigests(); toast(`✓ Digest saved for ${digState.plant} · ${digRecipients.length} recipient${digRecipients.length>1?'s':''}`); }
 
 // ---------- Toast ----------
 function toast(html) {
