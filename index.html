@@ -47,7 +47,19 @@
   .ch-toggle .ch-label { flex:1; text-align:left; }
   .ch-toggle .ch-state { font-size:10px; padding:2px 6px; background:rgba(255,255,255,.15); border-radius:4px; text-transform:uppercase; }
   .ch-toggle.off .ch-state { background:#F1F5F9; color:#94A3B8; }
-  /* Channel composer */
+  /* Clean composer (matches screenshot) */
+  .composer-clean { background:#fff; border:1px solid #E2E8F0; border-radius:14px; overflow:hidden; }
+  .composer-clean-subj { display:flex; align-items:center; padding:10px 14px; border-bottom:1px solid #F1F5F9; }
+  .composer-clean-subj input { flex:1; border:none; outline:none; font-size:13px; }
+  .composer-clean textarea { width:100%; border:none; outline:none; padding:14px; font-size:14px; resize:vertical; min-height:100px; line-height:1.5; color:#0F172A; }
+  .composer-clean textarea::placeholder { color:#94A3B8; }
+  .composer-clean-footer { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-top:1px solid #F1F5F9; background:#fff; }
+  .composer-clean-btn { display:inline-flex; align-items:center; gap:6px; background:#2563EB; color:#fff; padding:8px 14px; border-radius:9999px; font-size:13px; font-weight:600; border:none; cursor:pointer; transition:background .15s; }
+  .composer-clean-btn:hover { background:#1D4ED8; }
+  .composer-clean-icons { display:flex; align-items:center; gap:4px; }
+  .composer-clean-icons button { width:32px; height:32px; border-radius:8px; border:none; background:transparent; color:#64748B; font-size:13px; cursor:pointer; transition:background .15s; }
+  .composer-clean-icons button:hover { background:#F1F5F9; color:#0F172A; }
+  /* Old composer (unused now but kept for backwards compat) */
   .composer { background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden; }
   .composer-header { display:flex; align-items:center; gap:8px; padding:8px 12px; background:#fff; border-bottom:1px solid #E2E8F0; }
   .composer-toolbar { display:flex; align-items:center; gap:4px; padding:8px 12px; background:#fff; border-bottom:1px solid #E2E8F0; flex-wrap:wrap; }
@@ -592,7 +604,7 @@ function renderInsights() {
   document.getElementById('insight-count').textContent = `· ${list.length}`;
   document.getElementById('insights-list').innerHTML = list.map(i => `
     <div class="grid grid-cols-12 px-4 py-3 hover:bg-slate-50 items-center border-b border-slate-100 last:border-0 ${selected.has(i.id)?'bg-blue-50/50':''}" data-id="${i.id}">
-      <div class="col-span-1 cursor-pointer" data-action="toggle">
+      <div class="col-span-1 cursor-pointer py-1" data-action="toggle" onclick="toggleSel(${i.id});event.stopPropagation()">
         <span class="cb ${selected.has(i.id)?'checked':''}" style="pointer-events:none"></span>
       </div>
       <div class="col-span-4 flex items-center gap-2 cursor-pointer" data-action="open">
@@ -1112,9 +1124,19 @@ function renderBlock(b, kind, idx) {
         `).join('')}
       </div>
     </div>
-    <!-- Composers per active channel -->
-    <div class="space-y-3">
-      ${CHANNELS.filter(c=>b.chans[c.id]).map(c=>renderComposer(b,c,kind,idx)).join('')}
+    <!-- Composers per active channel — skips Call (uses saved IVR template) -->
+    <div class="space-y-4">
+      ${CHANNELS.filter(c=>b.chans[c.id] && c.id!=='call').map(c=>renderComposer(b,c,kind,idx)).join('')}
+      ${b.chans.call ? `
+        <div class="card border border-slate-200 p-4 flex items-center gap-3 bg-slate-50">
+          <div class="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center">📞</div>
+          <div class="flex-1">
+            <div class="text-sm font-medium">Call</div>
+            <div class="text-xs text-slate-500">Voice call uses the saved IVR template — no per-step message needed.</div>
+          </div>
+          <button class="text-xs text-slate-500 hover:text-blue-600" onclick="toast('IVR template editor — coming soon')">Configure IVR</button>
+        </div>
+      ` : ''}
     </div>
   `;
 }
@@ -1123,41 +1145,43 @@ function renderComposer(b, c, kind, idx) {
   const msg = b.msgs[c.id] ?? DEFAULT_MSG[c.id];
   const subj = b.subjects[c.id] ?? `[{{severity}}] {{insight}} at {{plant}}`;
   const id = `msg-${kind}-${idx}-${c.id}`;
+  const note = c.id==='sms' ? '160 chars per segment' : c.id==='email' ? 'Plain text email' : 'Sent via WhatsApp Business';
   return `
-    <div class="composer">
-      <div class="composer-header">
-        <span class="text-base">${c.icon}</span>
-        <b class="text-sm">${c.label}</b>
-        <span class="text-xs text-slate-400">to ${b.users.length||0} user${b.users.length===1?'':'s'}</span>
-        <button class="ml-auto text-xs text-slate-400 hover:text-blue-600" onclick="resetMsg('${kind}',${idx},'${c.id}')">Reset</button>
-        <button class="text-xs text-slate-400 hover:text-red-600" onclick="toggleCh('${kind}',${idx},'${c.id}')">✕</button>
+    <div>
+      <div class="flex items-center justify-between mb-1.5">
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-semibold">${c.icon} ${c.label} message</span>
+        </div>
+        <span class="text-[11px] text-slate-400">${note}</span>
       </div>
-      ${c.id==='email' ? `
-        <div class="composer-toolbar">
-          <span class="text-[11px] text-slate-500 mr-1">Subject</span>
-          <input type="text" class="flex-1 px-2 py-1 text-sm bg-slate-50 rounded border-0 outline-none" oninput="setSubj('${kind}',${idx},'${c.id}',this.value)" value="${subj}"/>
-        </div>` : ''}
-      <div class="composer-toolbar">
-        <span class="text-[11px] text-slate-500 mr-1">Insert variable:</span>
-        <button onclick="insertVar('${id}','{{user}}')" class="var-chip">{{user}}</button>
-        <button onclick="insertVar('${id}','{{plant}}')" class="var-chip">{{plant}}</button>
-        <button onclick="insertVar('${id}','{{insight}}')" class="var-chip">{{insight}}</button>
-        <button onclick="insertVar('${id}','{{sensor}}')" class="var-chip">{{sensor}}</button>
-        <button onclick="insertVar('${id}','{{value}}')" class="var-chip">{{value}}</button>
-        <button onclick="insertVar('${id}','{{threshold}}')" class="var-chip">{{threshold}}</button>
-        <button onclick="insertVar('${id}','{{link}}')" class="var-chip">{{link}}</button>
-      </div>
-      <div class="composer-body">
-        <textarea id="${id}" rows="${c.id==='email'?5:3}" oninput="setMsg('${kind}',${idx},'${c.id}',this.value)" placeholder="Write the ${c.label.toLowerCase()} message…">${msg}</textarea>
-      </div>
-      <div class="composer-footer">
-        <span><span id="${id}-count">${msg.length}</span> chars${c.id==='sms'?` · ${Math.ceil(msg.length/160)} segment${Math.ceil(msg.length/160)===1?'':'s'}`:''}</span>
-        <div class="flex gap-3">
-          <button class="hover:text-blue-600" onclick="toast('Test ${c.label} sent')">Send test</button>
+      <div class="composer-clean">
+        ${c.id==='email' ? `
+          <div class="composer-clean-subj">
+            <span class="text-[11px] text-slate-400 mr-2">Subject</span>
+            <input type="text" oninput="setSubj('${kind}',${idx},'${c.id}',this.value)" value="${subj}"/>
+          </div>` : ''}
+        <textarea id="${id}" rows="${c.id==='email'?6:4}" oninput="setMsg('${kind}',${idx},'${c.id}',this.value)" placeholder="Write text here…">${msg}</textarea>
+        <div class="composer-clean-footer">
+          <button class="composer-clean-btn" onclick="toast('Test ${c.label} sent')">
+            <span>↗</span> Send test
+          </button>
+          <div class="composer-clean-icons">
+            <button title="Insert variable" onclick="cycleVar('${id}')">{ }</button>
+            <button title="Reset to default" onclick="resetMsg('${kind}',${idx},'${c.id}')">↻</button>
+            <button title="Remove channel" onclick="toggleCh('${kind}',${idx},'${c.id}')">✕</button>
+          </div>
         </div>
       </div>
     </div>
   `;
+}
+const VAR_CYCLE = ['{{user}}','{{plant}}','{{insight}}','{{sensor}}','{{value}}','{{threshold}}','{{severity}}','{{link}}'];
+let varCycleIdx = 0;
+function cycleVar(textareaId) {
+  const v = VAR_CYCLE[varCycleIdx % VAR_CYCLE.length];
+  varCycleIdx++;
+  insertVar(textareaId, v);
+  toast(`Inserted ${v} · click again to insert next variable`);
 }
 
 function getBlock(kind, idx) {
