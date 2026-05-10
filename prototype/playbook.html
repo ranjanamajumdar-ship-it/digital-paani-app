@@ -33,6 +33,31 @@
   [contenteditable]:focus { outline:2px solid #2563eb; outline-offset:2px; border-radius:4px; }
   .editable-chip { background:#EFF6FF; color:#1E40AF; padding:2px 8px; border-radius:6px; border:1px dashed #93C5FD; cursor:text; font-weight:500; }
   .editable-chip:hover { background:#DBEAFE; }
+  /* Severity pill (multi-select) */
+  .sev-pill { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:9999px; font-size:12px; font-weight:500; background:#fff; border:1.5px solid #E2E8F0; color:#64748B; cursor:pointer; transition:all .15s; }
+  .sev-pill:hover { border-color:#CBD5E1; }
+  .sev-pill .checkmark { display:none; width:14px; height:14px; border-radius:50%; background:#0F172A; color:#fff; align-items:center; justify-content:center; font-size:9px; font-weight:700; }
+  .sev-pill.on { background:#F1F5F9; border-color:#0F172A; color:#0F172A; font-weight:600; }
+  .sev-pill.on .checkmark { display:inline-flex; }
+  /* Channel toggle button */
+  .ch-toggle { display:flex; align-items:center; gap:8px; padding:10px 14px; border-radius:10px; border:1.5px solid #E2E8F0; background:#fff; color:#64748B; font-size:13px; font-weight:500; cursor:pointer; transition:all .15s; flex:1; }
+  .ch-toggle:hover { border-color:#CBD5E1; }
+  .ch-toggle.on { background:#0F172A; border-color:#0F172A; color:#fff; }
+  .ch-toggle .ch-icon { font-size:14px; font-weight:600; }
+  .ch-toggle .ch-label { flex:1; text-align:left; }
+  .ch-toggle .ch-state { font-size:10px; padding:2px 6px; background:rgba(255,255,255,.15); border-radius:4px; text-transform:uppercase; }
+  .ch-toggle.off .ch-state { background:#F1F5F9; color:#94A3B8; }
+  /* Channel composer */
+  .composer { background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden; }
+  .composer-header { display:flex; align-items:center; gap:8px; padding:8px 12px; background:#fff; border-bottom:1px solid #E2E8F0; }
+  .composer-toolbar { display:flex; align-items:center; gap:4px; padding:8px 12px; background:#fff; border-bottom:1px solid #E2E8F0; flex-wrap:wrap; }
+  .composer-toolbar button { padding:4px 8px; border-radius:6px; font-size:11px; color:#475569; background:transparent; border:none; cursor:pointer; }
+  .composer-toolbar button:hover { background:#F1F5F9; }
+  .composer-body { padding:12px; }
+  .composer-body textarea { width:100%; border:none; background:transparent; outline:none; font-size:13px; resize:vertical; min-height:80px; line-height:1.5; }
+  .composer-footer { display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:#fff; border-top:1px solid #E2E8F0; font-size:11px; color:#64748B; }
+  .var-chip { display:inline-block; padding:2px 6px; background:#EFF6FF; color:#1E40AF; border-radius:4px; font-size:10px; font-family:ui-monospace,monospace; cursor:pointer; margin:0 2px; }
+  .var-chip:hover { background:#DBEAFE; }
   .ch-pill { width:30px; height:30px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; cursor:pointer; transition:all .15s; }
   .ch-pill.on { background:#0F172A; color:#fff; }
   .ch-pill.off { background:#F1F5F9; color:#94A3B8; }
@@ -57,8 +82,8 @@
     <div class="flex items-center gap-8">
       <div class="font-bold text-[15px]">Digital Paani <span class="text-slate-400 font-normal">· Plant Operations</span></div>
       <div class="flex items-center gap-1 text-sm">
-        <button onclick="show('plants')" id="nav-plants" class="px-3 py-1.5 rounded-lg font-medium">Plants <span class="text-slate-400 ml-1">5</span></button>
-        <button onclick="show('insights')" id="nav-insights" class="px-3 py-1.5 rounded-lg font-medium">Insights <span class="text-slate-400 ml-1">18</span></button>
+        <button onclick="goPlants()" id="nav-plants" class="px-3 py-1.5 rounded-lg font-medium">Plants <span class="text-slate-400 ml-1">5</span></button>
+        <button onclick="goInsights()" id="nav-insights" class="px-3 py-1.5 rounded-lg font-medium">Insights <span class="text-slate-400 ml-1">18</span></button>
       </div>
     </div>
     <div class="flex items-center gap-3">
@@ -359,9 +384,29 @@
       <button class="esc-tab px-3 py-2 text-sm text-slate-500 border-b-2 border-transparent" data-sev="warning" onclick="switchEscTab(this)"><span class="w-2 h-2 inline-block rounded-full" style="background:#FBBF24"></span> Warning</button>
     </div>
 
-    <div class="p-6">
-      <div id="esc-steps" class="space-y-3"></div>
-      <button class="mt-3 w-full py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg border border-dashed border-slate-300" onclick="addEscStep()">+ Add escalation step</button>
+    <div class="p-6 space-y-5">
+      <!-- Immediate notification (always fires) -->
+      <div class="card border border-slate-100 overflow-hidden">
+        <div class="px-4 py-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="chip bg-slate-900 text-white px-2 py-0.5">📢 Immediate</span>
+            <span class="text-sm font-medium">Fires the moment the insight opens</span>
+          </div>
+        </div>
+        <div id="esc-immediate" class="p-4"></div>
+      </div>
+
+      <!-- Followup escalation steps -->
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <span class="chip bg-amber-100 text-amber-800 px-2 py-0.5">⏱ Followup</span>
+            <span class="text-sm font-medium">Escalate if unresolved</span>
+          </div>
+          <button class="btn btn-sm btn-ghost" onclick="addEscStep()">+ Add escalation step</button>
+        </div>
+        <div id="esc-steps" class="space-y-3"></div>
+      </div>
     </div>
 
     <div class="px-6 py-4 border-t border-slate-100 flex justify-end gap-2 sticky bottom-0 bg-white">
@@ -390,13 +435,13 @@
         <input id="dig-rec-input" placeholder="Type email and press Enter (e.g. client@acme.com)" class="mt-2 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm" onkeydown="if(event.key==='Enter'){addRecipient(this.value);this.value=''}"/>
       </div>
 
-      <!-- Severity -->
+      <!-- Severity (multi-select) -->
       <div>
-        <label class="text-[11px] uppercase text-slate-500 font-semibold">Include severities</label>
-        <div class="flex gap-2 mt-2">
-          <label class="chip bg-slate-100 cursor-pointer hover:bg-slate-200 px-3 py-1.5"><input type="checkbox" class="mr-1.5" checked> <span style="color:#991B1B">●</span> Incidents</label>
-          <label class="chip bg-slate-100 cursor-pointer hover:bg-slate-200 px-3 py-1.5"><input type="checkbox" class="mr-1.5" checked> <span style="color:#92400E">●</span> Issues</label>
-          <label class="chip bg-slate-100 cursor-pointer hover:bg-slate-200 px-3 py-1.5"><input type="checkbox" class="mr-1.5"> <span style="color:#854D0E">●</span> Warnings</label>
+        <label class="text-[11px] uppercase text-slate-500 font-semibold">Include severities <span class="text-slate-400 normal-case font-normal">· tap any combination</span></label>
+        <div class="flex gap-2 mt-2" id="dig-sev">
+          <button class="sev-pill on" data-v="incident" onclick="toggleSev(this)"><span class="checkmark">✓</span> <span style="color:#991B1B">●</span> Incidents</button>
+          <button class="sev-pill on" data-v="issue" onclick="toggleSev(this)"><span class="checkmark">✓</span> <span style="color:#92400E">●</span> Issues</button>
+          <button class="sev-pill" data-v="warning" onclick="toggleSev(this)"><span class="checkmark">✓</span> <span style="color:#854D0E">●</span> Warnings</button>
         </div>
       </div>
 
@@ -485,6 +530,14 @@ function show(name) {
     if (typeof renderInsights === 'function') renderInsights();
   }
   window.scrollTo(0,0);
+}
+function goPlants() { currentPlant=''; show('plants'); }
+function goInsights() {
+  currentPlant='';
+  document.getElementById('f-plant').value='';
+  document.getElementById('insights-h1').innerHTML = `Insights <span id="insight-count" class="text-slate-400 font-normal text-lg">· 18</span>`;
+  show('insights');
+  renderInsights();
 }
 show('plants');
 
@@ -974,23 +1027,29 @@ const DEFAULT_MSG = {
   email: 'A new {{severity}} has opened at {{plant}}.\n\n{{insight}}\nSensor: {{sensor}} = {{value}}\nThreshold: {{threshold}}\n\nView in dashboard: {{link}}',
 };
 
-let escState = { plant:'', sev:'incident', steps:{} };
-function defaultSteps(sev) {
-  const base = sev==='incident'
-    ? [{time:'Immediate', users:['Plant Manager'], chans:{wa:true,call:true}},{time:'+5 min', users:['Shift Lead'], chans:{sms:true}},{time:'+15 min', users:['Operations Head'], chans:{call:true}}]
-    : sev==='issue'
-    ? [{time:'Immediate', users:['Shift Lead'], chans:{wa:true,sms:true}},{time:'+30 min', users:['Plant Manager'], chans:{email:true}}]
-    : [{time:'Immediate', users:['Operator on duty'], chans:{wa:true}}];
-  return base.map(s=>({...s, msgs:{}}));
+let escState = { plant:'', sev:'incident', cfg:{} };
+function blankBlock(users, chans) { return { users, chans, msgs:{}, subjects:{} }; }
+function defaultCfg(sev) {
+  if (sev==='incident') return {
+    immediate: blankBlock(['Plant Manager'], {wa:true, call:true}),
+    steps: [
+      {time:'+5 min', ...blankBlock(['Shift Lead'], {sms:true})},
+      {time:'+15 min', ...blankBlock(['Operations Head'], {call:true})},
+    ],
+  };
+  if (sev==='issue') return {
+    immediate: blankBlock(['Shift Lead'], {wa:true, sms:true}),
+    steps: [{time:'+30 min', ...blankBlock(['Plant Manager'], {email:true})}],
+  };
+  return {
+    immediate: blankBlock(['Operator on duty'], {wa:true}),
+    steps: [],
+  };
 }
 function openEscalations(plant) {
-  escState = { plant, sev:'incident', steps:{
-    incident: defaultSteps('incident'),
-    issue: defaultSteps('issue'),
-    warning: defaultSteps('warning'),
-  }};
+  escState = { plant, sev:'incident', cfg:{ incident:defaultCfg('incident'), issue:defaultCfg('issue'), warning:defaultCfg('warning') } };
   document.getElementById('esc-plant').textContent = plant;
-  renderEscSteps();
+  renderEsc();
   document.getElementById('modal-esc').classList.remove('hidden');
   document.getElementById('modal-esc').classList.add('flex');
 }
@@ -1006,62 +1065,140 @@ function switchEscTab(btn) {
   btn.classList.add('esc-tab-active','border-slate-900');
   btn.classList.remove('text-slate-500','border-transparent');
   escState.sev = btn.dataset.sev;
-  renderEscSteps();
+  renderEsc();
 }
-function renderEscSteps() {
-  const steps = escState.steps[escState.sev];
-  document.getElementById('esc-steps').innerHTML = steps.map((s,idx)=>`
-    <div class="card p-4 border border-slate-100">
-      <div class="flex items-center gap-3 mb-3">
-        <span class="text-xs uppercase text-slate-500 font-semibold w-12">Step ${idx+1}</span>
-        <select class="border border-slate-200 rounded-lg px-2 py-1.5 text-sm" onchange="setStepTime(${idx},this.value)">
-          ${TIME_PRESETS.map(t=>`<option ${t===s.time?'selected':''}>${t}</option>`).join('')}
-        </select>
-        ${s.time==='Custom' ? `<input type="number" placeholder="min" class="w-20 border border-slate-200 rounded-lg px-2 py-1.5 text-sm" onchange="setStepCustom(${idx},this.value)"/>` : ''}
-        <span class="text-sm text-slate-500">→ notify</span>
-        <span class="text-sm font-medium">${s.users.join(', ')||'(no user)'}</span>
-        <button class="ml-auto text-xs text-slate-400 hover:text-red-600" onclick="removeEscStep(${idx})">Remove</button>
+
+function renderEsc() {
+  const cfg = escState.cfg[escState.sev];
+  document.getElementById('esc-immediate').innerHTML = renderBlock(cfg.immediate, 'imm', null);
+  document.getElementById('esc-steps').innerHTML = cfg.steps.length
+    ? cfg.steps.map((s,idx)=>`
+        <div class="card p-4 border border-slate-100">
+          <div class="flex items-center gap-3 mb-3 pb-3 border-b border-slate-100">
+            <span class="chip bg-amber-100 text-amber-800">Step ${idx+1}</span>
+            <select class="border border-slate-200 rounded-lg px-2 py-1.5 text-sm" onchange="setStepTime(${idx},this.value)">
+              ${TIME_PRESETS.filter(t=>t!=='Immediate').map(t=>`<option ${t===s.time?'selected':''}>${t}</option>`).join('')}
+            </select>
+            ${s.time==='Custom' ? `<input type="number" placeholder="minutes" class="w-24 border border-slate-200 rounded-lg px-2 py-1.5 text-sm" oninput="setStepCustom(${idx},this.value)"/>` : ''}
+            <button class="ml-auto text-xs text-slate-400 hover:text-red-600" onclick="removeEscStep(${idx})">Remove step</button>
+          </div>
+          ${renderBlock(s, 'step', idx)}
+        </div>
+      `).join('')
+    : `<div class="card p-6 border border-dashed border-slate-200 text-center text-sm text-slate-400">No followup steps. Click <b>+ Add escalation step</b> to add one.</div>`;
+}
+
+function renderBlock(b, kind, idx) {
+  const ref = kind==='imm' ? `imm` : `step-${idx}`;
+  return `
+    <!-- Users -->
+    <div class="mb-3">
+      <div class="text-[11px] uppercase text-slate-500 font-semibold mb-1.5">Notify users</div>
+      <div class="flex flex-wrap gap-1.5">
+        ${b.users.map((u,uIdx)=>`<span class="chip bg-slate-100 text-slate-800">${u} <button class="ml-1 hover:text-red-600" onclick="rmUser('${kind}',${idx},${uIdx})">✕</button></span>`).join('')}
+        <button class="chip bg-white border border-dashed border-slate-300 text-slate-500 hover:bg-slate-50" onclick="addUserPrompt('${kind}',${idx})">+ Add user</button>
       </div>
-      <!-- Channel toggles -->
-      <div class="flex items-center gap-1.5 flex-wrap">
-        <span class="text-[11px] text-slate-500 mr-1">Channels:</span>
+    </div>
+    <!-- Channels -->
+    <div class="mb-3">
+      <div class="text-[11px] uppercase text-slate-500 font-semibold mb-1.5">Channels <span class="text-slate-400 normal-case font-normal">· click to enable, opens a message editor below</span></div>
+      <div class="flex gap-2">
         ${CHANNELS.map(c=>`
-          <button class="ch-pill ${s.chans[c.id]?'on':'off'}" onclick="toggleStepCh(${idx},'${c.id}')" title="${c.label}">${c.icon}</button>
+          <button class="ch-toggle ${b.chans[c.id]?'on':'off'}" onclick="toggleCh('${kind}',${idx},'${c.id}')">
+            <span class="ch-icon">${c.icon}</span>
+            <span class="ch-label">${c.label}</span>
+            <span class="ch-state">${b.chans[c.id]?'On':'Off'}</span>
+          </button>
         `).join('')}
       </div>
-      <!-- Progressive: edit messages per channel -->
-      <details class="mt-3" ${Object.keys(s.chans).filter(k=>s.chans[k]).length?'':''}>
-        <summary class="text-xs text-blue-600 hover:underline cursor-pointer">✎ Edit messages for active channels</summary>
-        <div class="mt-3 space-y-3">
-          ${CHANNELS.filter(c=>s.chans[c.id]).map(c=>`
-            <div>
-              <div class="flex items-center justify-between mb-1">
-                <label class="text-[11px] uppercase text-slate-500 font-semibold">${c.label} message</label>
-                <button class="text-[11px] text-slate-400 hover:text-blue-600" onclick="resetMsg(${idx},'${c.id}')">Reset to default</button>
-              </div>
-              <textarea class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm" rows="${c.id==='email'?4:2}" oninput="setMsg(${idx},'${c.id}',this.value)" placeholder="${DEFAULT_MSG[c.id]}">${s.msgs[c.id] ?? DEFAULT_MSG[c.id]}</textarea>
-              <div class="text-[10px] text-slate-400 mt-1">Variables: {{user}} {{plant}} {{insight}} {{sensor}} {{value}} {{threshold}} {{severity}} {{link}}</div>
-            </div>
-          `).join('') || '<div class="text-xs text-slate-400">Turn on a channel above to edit its message.</div>'}
-        </div>
-      </details>
     </div>
-  `).join('');
+    <!-- Composers per active channel -->
+    <div class="space-y-3">
+      ${CHANNELS.filter(c=>b.chans[c.id]).map(c=>renderComposer(b,c,kind,idx)).join('')}
+    </div>
+  `;
 }
-function setStepTime(idx, val) { escState.steps[escState.sev][idx].time = val; renderEscSteps(); }
-function setStepCustom(idx, val) { escState.steps[escState.sev][idx].time = '+'+val+' min'; }
-function toggleStepCh(idx, cid) {
-  const s = escState.steps[escState.sev][idx];
-  s.chans[cid] = !s.chans[cid]; if (!s.chans[cid]) delete s.chans[cid];
-  renderEscSteps();
+
+function renderComposer(b, c, kind, idx) {
+  const msg = b.msgs[c.id] ?? DEFAULT_MSG[c.id];
+  const subj = b.subjects[c.id] ?? `[{{severity}}] {{insight}} at {{plant}}`;
+  const id = `msg-${kind}-${idx}-${c.id}`;
+  return `
+    <div class="composer">
+      <div class="composer-header">
+        <span class="text-base">${c.icon}</span>
+        <b class="text-sm">${c.label}</b>
+        <span class="text-xs text-slate-400">to ${b.users.length||0} user${b.users.length===1?'':'s'}</span>
+        <button class="ml-auto text-xs text-slate-400 hover:text-blue-600" onclick="resetMsg('${kind}',${idx},'${c.id}')">Reset</button>
+        <button class="text-xs text-slate-400 hover:text-red-600" onclick="toggleCh('${kind}',${idx},'${c.id}')">✕</button>
+      </div>
+      ${c.id==='email' ? `
+        <div class="composer-toolbar">
+          <span class="text-[11px] text-slate-500 mr-1">Subject</span>
+          <input type="text" class="flex-1 px-2 py-1 text-sm bg-slate-50 rounded border-0 outline-none" oninput="setSubj('${kind}',${idx},'${c.id}',this.value)" value="${subj}"/>
+        </div>` : ''}
+      <div class="composer-toolbar">
+        <span class="text-[11px] text-slate-500 mr-1">Insert variable:</span>
+        <button onclick="insertVar('${id}','{{user}}')" class="var-chip">{{user}}</button>
+        <button onclick="insertVar('${id}','{{plant}}')" class="var-chip">{{plant}}</button>
+        <button onclick="insertVar('${id}','{{insight}}')" class="var-chip">{{insight}}</button>
+        <button onclick="insertVar('${id}','{{sensor}}')" class="var-chip">{{sensor}}</button>
+        <button onclick="insertVar('${id}','{{value}}')" class="var-chip">{{value}}</button>
+        <button onclick="insertVar('${id}','{{threshold}}')" class="var-chip">{{threshold}}</button>
+        <button onclick="insertVar('${id}','{{link}}')" class="var-chip">{{link}}</button>
+      </div>
+      <div class="composer-body">
+        <textarea id="${id}" rows="${c.id==='email'?5:3}" oninput="setMsg('${kind}',${idx},'${c.id}',this.value)" placeholder="Write the ${c.label.toLowerCase()} message…">${msg}</textarea>
+      </div>
+      <div class="composer-footer">
+        <span><span id="${id}-count">${msg.length}</span> chars${c.id==='sms'?` · ${Math.ceil(msg.length/160)} segment${Math.ceil(msg.length/160)===1?'':'s'}`:''}</span>
+        <div class="flex gap-3">
+          <button class="hover:text-blue-600" onclick="toast('Test ${c.label} sent')">Send test</button>
+        </div>
+      </div>
+    </div>
+  `;
 }
-function setMsg(idx, cid, val) { escState.steps[escState.sev][idx].msgs[cid] = val; }
-function resetMsg(idx, cid) { delete escState.steps[escState.sev][idx].msgs[cid]; renderEscSteps(); }
+
+function getBlock(kind, idx) {
+  const cfg = escState.cfg[escState.sev];
+  return kind==='imm' ? cfg.immediate : cfg.steps[idx];
+}
+function toggleCh(kind, idx, cid) {
+  const b = getBlock(kind, idx);
+  b.chans[cid] = !b.chans[cid]; if (!b.chans[cid]) delete b.chans[cid];
+  renderEsc();
+}
+function setMsg(kind, idx, cid, val) {
+  getBlock(kind, idx).msgs[cid] = val;
+  const cnt = document.getElementById(`msg-${kind}-${idx}-${cid}-count`);
+  if (cnt) cnt.textContent = val.length;
+}
+function setSubj(kind, idx, cid, val) { getBlock(kind, idx).subjects[cid] = val; }
+function resetMsg(kind, idx, cid) { delete getBlock(kind, idx).msgs[cid]; delete getBlock(kind, idx).subjects[cid]; renderEsc(); }
+function insertVar(textareaId, v) {
+  const t = document.getElementById(textareaId); if(!t) return;
+  const start = t.selectionStart, end = t.selectionEnd;
+  t.value = t.value.slice(0,start) + v + t.value.slice(end);
+  t.focus(); t.setSelectionRange(start+v.length, start+v.length);
+  t.dispatchEvent(new Event('input'));
+}
+function addUserPrompt(kind, idx) {
+  const name = prompt('User name (e.g. Plant Manager, Priya Sharma):');
+  if (!name || !name.trim()) return;
+  getBlock(kind, idx).users.push(name.trim());
+  renderEsc();
+}
+function rmUser(kind, idx, uIdx) {
+  getBlock(kind, idx).users.splice(uIdx,1); renderEsc();
+}
+function setStepTime(idx, val) { escState.cfg[escState.sev].steps[idx].time = val; renderEsc(); }
+function setStepCustom(idx, val) { if(val) escState.cfg[escState.sev].steps[idx].time = '+'+val+' min'; }
 function addEscStep() {
-  escState.steps[escState.sev].push({time:'+10 min', users:['Pick a user'], chans:{wa:true}, msgs:{}});
-  renderEscSteps();
+  escState.cfg[escState.sev].steps.push({time:'+10 min', ...blankBlock([], {wa:true})});
+  renderEsc();
 }
-function removeEscStep(idx) { escState.steps[escState.sev].splice(idx,1); renderEscSteps(); }
+function removeEscStep(idx) { escState.cfg[escState.sev].steps.splice(idx,1); renderEsc(); }
 function saveEscalations() { closeEscalations(); toast(`✓ Escalations saved for ${escState.plant} · applies to all new insights`); }
 
 // ---------- Digests ----------
@@ -1087,6 +1224,10 @@ function renderRecipients() {
 }
 function addRecipient(v) { v=v.trim(); if(!v) return; digRecipients.push(v); renderRecipients(); }
 function removeRecipient(i) { digRecipients.splice(i,1); renderRecipients(); }
+function toggleSev(btn) { btn.classList.toggle('on'); updateDigPreview(); }
+function getSelectedSevs() {
+  return Array.from(document.querySelectorAll('#dig-sev .sev-pill.on')).map(b=>b.dataset.v);
+}
 function pickStatus(btn) { pickChip(btn, 'dig-status'); digState.status = btn.dataset.v; updateDigPreview(); }
 function pickRange(btn) { pickChip(btn, 'dig-range'); digState.range = btn.dataset.v; updateDigPreview(); }
 function pickOcc(btn) {
@@ -1104,7 +1245,9 @@ function updateDigPreview() {
   const rangeMap = {'6h':'last 6 hours','12h':'last 12 hours','24h':'last 24 hours','7d':'last 7 days'};
   const occMap = {'hourly':'every hour','daily':'every day at 08:00 IST','weekly':'every week at 08:00 IST'};
   const statusMap = {'open':'open','closed':'closed','both':'open and closed'};
-  document.getElementById('dig-preview').innerHTML = `${(digState.occ||'daily').replace(/^./,c=>c.toUpperCase())} digest of <b>${statusMap[digState.status]} insights</b> from <b>${rangeMap[digState.range]}</b>, sent ${occMap[digState.occ]}.`;
+  const sevs = getSelectedSevs();
+  const sevText = sevs.length ? sevs.map(s=>s.charAt(0).toUpperCase()+s.slice(1)+'s').join(', ') : '(no severities selected)';
+  document.getElementById('dig-preview').innerHTML = `${(digState.occ||'daily').replace(/^./,c=>c.toUpperCase())} digest of <b>${statusMap[digState.status]} ${sevText}</b> from <b>${rangeMap[digState.range]}</b>, sent ${occMap[digState.occ]}.`;
   document.getElementById('occ-summary').textContent = `Schedule: ${occMap[digState.occ]}`;
 }
 function saveDigests() { closeDigests(); toast(`✓ Digest saved for ${digState.plant} · ${digRecipients.length} recipient${digRecipients.length>1?'s':''}`); }
