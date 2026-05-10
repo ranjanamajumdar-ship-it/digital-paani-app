@@ -591,28 +591,28 @@ function renderInsights() {
   const list = getFiltered();
   document.getElementById('insight-count').textContent = `· ${list.length}`;
   document.getElementById('insights-list').innerHTML = list.map(i => `
-    <div class="grid grid-cols-12 px-4 py-3 hover:bg-slate-50 cursor-pointer items-center border-b border-slate-100 last:border-0 ${selected.has(i.id)?'bg-blue-50/50':''}" onclick="openDetail(${i.id})">
-      <div class="col-span-1" onclick="event.stopPropagation();toggleSel(${i.id})">
-        <span class="cb ${selected.has(i.id)?'checked':''}"></span>
+    <div class="grid grid-cols-12 px-4 py-3 hover:bg-slate-50 items-center border-b border-slate-100 last:border-0 ${selected.has(i.id)?'bg-blue-50/50':''}" data-id="${i.id}">
+      <div class="col-span-1 cursor-pointer" data-action="toggle">
+        <span class="cb ${selected.has(i.id)?'checked':''}" style="pointer-events:none"></span>
       </div>
-      <div class="col-span-4 flex items-center gap-2">
+      <div class="col-span-4 flex items-center gap-2 cursor-pointer" data-action="open">
         <span class="chip" style="background:${sevColors[i.sev].bg};color:${sevColors[i.sev].fg}">● ${i.sev}</span>
         <div>
           <div class="text-sm font-medium">${i.name}</div>
           <div class="text-[11px] text-slate-500">${i.sensor} · ${i.threshold}</div>
         </div>
       </div>
-      <div class="col-span-2 text-sm text-slate-600">${i.plant}<div class="text-[11px] text-slate-400">${i.equip}</div></div>
+      <div class="col-span-2 text-sm text-slate-600 cursor-pointer" data-action="open">${i.plant}<div class="text-[11px] text-slate-400">${i.equip}</div></div>
       <div class="col-span-2 text-sm">
         ${i.users.length ?
-          `<div class="flex -space-x-1.5">${i.users.slice(0,3).map(s=>`<div class="w-6 h-6 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-semibold" title="${s}">${s.split(' ')[0][0]}${s.split(' ')[1]?s.split(' ')[1][0]:''}</div>`).join('')}${i.users.length>3?`<div class="w-6 h-6 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px]">+${i.users.length-3}</div>`:''}</div>` :
-          `<button class="text-xs text-blue-600 hover:underline" onclick="event.stopPropagation();toggleSel(${i.id});openBulkAssign()">+ Add</button>`
+          `<div class="flex -space-x-1.5 cursor-pointer" data-action="open">${i.users.slice(0,3).map(s=>`<div class="w-6 h-6 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-semibold" title="${s}">${s.split(' ')[0][0]}${s.split(' ')[1]?s.split(' ')[1][0]:''}</div>`).join('')}${i.users.length>3?`<div class="w-6 h-6 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px]">+${i.users.length-3}</div>`:''}</div>` :
+          `<button class="text-xs text-blue-600 hover:underline" data-action="quick-add">+ Add</button>`
         }
       </div>
-      <div class="col-span-2 text-sm">
+      <div class="col-span-2 text-sm cursor-pointer" data-action="open">
         ${i.status==='Active' ? `<span class="text-red-600 flex items-center gap-1.5 text-xs"><span class="w-1.5 h-1.5 rounded-full bg-red-500 pulse"></span>Active · ${i.last}</span>` : `<span class="text-slate-400 text-xs">Resolved · ${i.last}</span>`}
       </div>
-      <div class="col-span-1 text-right" onclick="event.stopPropagation()">
+      <div class="col-span-1 text-right" data-action="toggle-on">
         <label class="inline-flex items-center cursor-pointer">
           <input type="checkbox" ${i.on?'checked':''} onchange="toggleInsight(${i.id},this.checked)" class="sr-only peer"/>
           <div class="w-9 h-5 bg-slate-200 peer-checked:bg-emerald-500 rounded-full transition relative">
@@ -1262,6 +1262,21 @@ function toast(html) {
 }
 
 renderInsights();
+
+// Event delegation for insights list — separates row-click (open detail)
+// from checkbox-cell click (toggle selection) reliably
+document.getElementById('insights-list').addEventListener('click', (e) => {
+  const actionEl = e.target.closest('[data-action]');
+  if (!actionEl) return;
+  const row = actionEl.closest('[data-id]');
+  if (!row) return;
+  const id = parseInt(row.dataset.id, 10);
+  const action = actionEl.dataset.action;
+  if (action === 'toggle') { toggleSel(id); }
+  else if (action === 'open') { openDetail(id); }
+  else if (action === 'quick-add') { selected.clear(); selected.add(id); updateBulkBar(); openBulkAssign(); }
+  // 'toggle-on' is handled by the inner <input>'s onchange
+});
 </script>
 </body>
 </html>
