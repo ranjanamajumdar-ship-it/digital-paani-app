@@ -78,6 +78,8 @@
   .sensor-bar { height:60px; background:linear-gradient(180deg,#EFF6FF,#fff); border-radius:6px; position:relative; overflow:hidden; }
   details > summary { list-style:none; cursor:pointer; }
   details > summary::-webkit-details-marker { display:none; }
+  /* Real checkbox styling */
+  .row-cb { width:18px; height:18px; cursor:pointer; accent-color:#0F172A; margin-left:4px; }
   /* Custom checkbox */
   .cb { width:16px; height:16px; border:1.5px solid #CBD5E1; border-radius:4px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; background:#fff; }
   .cb.checked { background:#0F172A; border-color:#0F172A; }
@@ -239,7 +241,7 @@
     <!-- Insights list -->
     <div class="card overflow-hidden">
       <div class="grid grid-cols-12 px-4 py-2 text-[11px] uppercase text-slate-500 font-semibold border-b border-slate-100 bg-slate-50 items-center">
-        <div class="col-span-1"><span class="cb" id="cb-all" onclick="toggleAll()"></span></div>
+        <div class="col-span-1"><input type="checkbox" id="cb-all" class="row-cb" onclick="toggleAll()"/></div>
         <div class="col-span-4">Insight</div>
         <div class="col-span-2">Plant · Equipment</div>
         <div class="col-span-2">Users</div>
@@ -604,8 +606,8 @@ function renderInsights() {
   document.getElementById('insight-count').textContent = `· ${list.length}`;
   document.getElementById('insights-list').innerHTML = list.map(i => `
     <div class="grid grid-cols-12 px-4 py-3 hover:bg-slate-50 items-center border-b border-slate-100 last:border-0 ${selected.has(i.id)?'bg-blue-50/50':''}" data-id="${i.id}">
-      <div class="col-span-1 cursor-pointer py-1" data-action="toggle" onclick="toggleSel(${i.id});event.stopPropagation()">
-        <span class="cb ${selected.has(i.id)?'checked':''}" style="pointer-events:none"></span>
+      <div class="col-span-1 py-2">
+        <input type="checkbox" class="row-cb" ${selected.has(i.id)?'checked':''} onclick="toggleSel(${i.id});event.stopPropagation()" onchange="event.stopPropagation()"/>
       </div>
       <div class="col-span-4 flex items-center gap-2 cursor-pointer" data-action="open">
         <span class="chip" style="background:${sevColors[i.sev].bg};color:${sevColors[i.sev].fg}">● ${i.sev}</span>
@@ -653,10 +655,11 @@ function toggleAll() {
 function updateSelectAll() {
   const list = getFiltered();
   const cb = document.getElementById('cb-all');
-  cb.classList.remove('checked','indeterminate');
+  if (!cb) return;
+  cb.indeterminate = false; cb.checked = false;
   if (!list.length) return;
-  if (list.every(i=>selected.has(i.id))) cb.classList.add('checked');
-  else if (list.some(i=>selected.has(i.id))) cb.classList.add('indeterminate');
+  if (list.every(i=>selected.has(i.id))) cb.checked = true;
+  else if (list.some(i=>selected.has(i.id))) cb.indeterminate = true;
 }
 function updateBulkBar() {
   const bar = document.getElementById('bulk-bar');
