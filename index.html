@@ -1,1558 +1,744 @@
 <!doctype html>
-<html lang="en">
+<html lang="hi">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Digital Paani — Plant Insights Prototype</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Digital Paani — Operator v3</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  html,body { font-family:Inter,ui-sans-serif,system-ui,sans-serif; background:#F1F5F9; color:#0F172A; }
-  .screen { display:none; }
-  .screen.active { display:block; }
-  .chip { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:9999px; font-size:11px; font-weight:500; }
-  .btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; border-radius:10px; padding:8px 14px; font-size:13px; font-weight:600; transition:all .15s; cursor:pointer; }
-  .btn-primary { background:#0F172A; color:#fff; }
-  .btn-primary:hover { background:#1e293b; }
-  .btn-ghost { background:#F1F5F9; color:#0F172A; }
-  .btn-ghost:hover { background:#e2e8f0; }
-  .btn-sm { padding:6px 10px; font-size:12px; }
-  .card { background:#fff; border-radius:14px; box-shadow:0 1px 2px rgba(15,23,42,.04), 0 4px 16px rgba(15,23,42,.06); }
-  .sev-bar { height:4px; border-radius:2px; display:flex; overflow:hidden; gap:2px; }
-  .pulse { animation:pulse 1.6s ease-in-out infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-  .slide-in { animation:slide-in .25s ease-out; }
-  @keyframes slide-in { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-  .drawer-in { animation:drawer-in .3s ease-out; }
-  @keyframes drawer-in { from{transform:translateX(100%)} to{transform:translateX(0)} }
-  .highlight-row { animation:hl 1.5s ease-out; }
-  @keyframes hl { 0%{background:#fef3c7} 100%{background:transparent} }
-  .toast { animation:toast .3s ease-out; }
-  @keyframes toast { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-  [contenteditable]:focus { outline:2px solid #2563eb; outline-offset:2px; border-radius:4px; }
-  .editable-chip { background:#EFF6FF; color:#1E40AF; padding:2px 8px; border-radius:6px; border:1px dashed #93C5FD; cursor:text; font-weight:500; }
-  .editable-chip:hover { background:#DBEAFE; }
-  /* Severity pill (multi-select) */
-  .sev-pill { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:9999px; font-size:12px; font-weight:500; background:#fff; border:1.5px solid #E2E8F0; color:#64748B; cursor:pointer; transition:all .15s; }
-  .sev-pill:hover { border-color:#CBD5E1; }
-  .sev-pill .checkmark { display:none; width:14px; height:14px; border-radius:50%; background:#0F172A; color:#fff; align-items:center; justify-content:center; font-size:9px; font-weight:700; }
-  .sev-pill.on { background:#F1F5F9; border-color:#0F172A; color:#0F172A; font-weight:600; }
-  .sev-pill.on .checkmark { display:inline-flex; }
-  /* Channel toggle button */
-  .ch-toggle { display:flex; align-items:center; gap:8px; padding:10px 14px; border-radius:10px; border:1.5px solid #E2E8F0; background:#fff; color:#64748B; font-size:13px; font-weight:500; cursor:pointer; transition:all .15s; flex:1; }
-  .ch-toggle:hover { border-color:#CBD5E1; }
-  .ch-toggle.on { background:#0F172A; border-color:#0F172A; color:#fff; }
-  .ch-toggle .ch-icon { font-size:14px; font-weight:600; }
-  .ch-toggle .ch-label { flex:1; text-align:left; }
-  .ch-toggle .ch-state { font-size:10px; padding:2px 6px; background:rgba(255,255,255,.15); border-radius:4px; text-transform:uppercase; }
-  .ch-toggle.off .ch-state { background:#F1F5F9; color:#94A3B8; }
-  /* Clean composer (matches screenshot) */
-  .composer-clean { background:#fff; border:1px solid #E2E8F0; border-radius:14px; overflow:hidden; }
-  .composer-clean-subj { display:flex; align-items:center; padding:10px 14px; border-bottom:1px solid #F1F5F9; }
-  .composer-clean-subj input { flex:1; border:none; outline:none; font-size:13px; }
-  .composer-clean textarea { width:100%; border:none; outline:none; padding:14px; font-size:14px; resize:vertical; min-height:100px; line-height:1.5; color:#0F172A; }
-  .composer-clean textarea::placeholder { color:#94A3B8; }
-  .composer-clean-footer { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-top:1px solid #F1F5F9; background:#fff; }
-  .composer-clean-btn { display:inline-flex; align-items:center; gap:6px; background:#2563EB; color:#fff; padding:8px 14px; border-radius:9999px; font-size:13px; font-weight:600; border:none; cursor:pointer; transition:background .15s; }
-  .composer-clean-btn:hover { background:#1D4ED8; }
-  .composer-clean-icons { display:flex; align-items:center; gap:4px; }
-  .composer-clean-icons button { width:32px; height:32px; border-radius:8px; border:none; background:transparent; color:#64748B; font-size:13px; cursor:pointer; transition:background .15s; }
-  .composer-clean-icons button:hover { background:#F1F5F9; color:#0F172A; }
-  /* Old composer (unused now but kept for backwards compat) */
-  .composer { background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden; }
-  .composer-header { display:flex; align-items:center; gap:8px; padding:8px 12px; background:#fff; border-bottom:1px solid #E2E8F0; }
-  .composer-toolbar { display:flex; align-items:center; gap:4px; padding:8px 12px; background:#fff; border-bottom:1px solid #E2E8F0; flex-wrap:wrap; }
-  .composer-toolbar button { padding:4px 8px; border-radius:6px; font-size:11px; color:#475569; background:transparent; border:none; cursor:pointer; }
-  .composer-toolbar button:hover { background:#F1F5F9; }
-  .composer-body { padding:12px; }
-  .composer-body textarea { width:100%; border:none; background:transparent; outline:none; font-size:13px; resize:vertical; min-height:80px; line-height:1.5; }
-  .composer-footer { display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:#fff; border-top:1px solid #E2E8F0; font-size:11px; color:#64748B; }
-  .var-chip { display:inline-block; padding:2px 6px; background:#EFF6FF; color:#1E40AF; border-radius:4px; font-size:10px; font-family:ui-monospace,monospace; cursor:pointer; margin:0 2px; }
-  .var-chip:hover { background:#DBEAFE; }
-  .ch-pill { width:30px; height:30px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; cursor:pointer; transition:all .15s; }
-  .ch-pill.on { background:#0F172A; color:#fff; }
-  .ch-pill.off { background:#F1F5F9; color:#94A3B8; }
-  .ch-pill.off:hover { background:#E2E8F0; }
-  .sparkline { stroke:#2563EB; fill:none; stroke-width:1.5; }
-  .sensor-bar { height:60px; background:linear-gradient(180deg,#EFF6FF,#fff); border-radius:6px; position:relative; overflow:hidden; }
-  details > summary { list-style:none; cursor:pointer; }
-  details > summary::-webkit-details-marker { display:none; }
-  /* === Bulk Assign Modal v2 === */
-  /* Goal-gradient progress */
-  .progress-step { display:inline-flex; align-items:center; gap:8px; padding:6px 12px 6px 6px; border-radius:9999px; transition:all .25s ease; }
-  .progress-step .step-dot { width:24px; height:24px; border-radius:50%; background:#E2E8F0; color:#94A3B8; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; transition:all .25s ease; }
-  .progress-step .step-label { font-size:13px; font-weight:500; color:#94A3B8; transition:color .25s ease; }
-  .progress-step.active { background:#F1F5F9; }
-  .progress-step.active .step-dot { background:#0F172A; color:#fff; }
-  .progress-step.active .step-label { color:#0F172A; font-weight:600; }
-  .progress-step.done .step-dot { background:#16A34A; color:#fff; }
-  .progress-step.done .step-dot::before { content:'✓'; }
-  .progress-step.done .step-dot > span, .progress-step.done .step-dot { font-size:0; }
-  .progress-step.done .step-dot::before { font-size:13px; font-weight:700; }
-  .progress-step.done .step-label { color:#16A34A; }
-  .step-line { flex:1; height:2px; background:#E2E8F0; border-radius:2px; transition:background .3s; min-width:20px; }
-  .step-line.done { background:#16A34A; }
-
-  /* User search input */
-  .user-search-wrap { position:relative; }
-  .user-search-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#94A3B8; font-size:14px; pointer-events:none; }
-  .user-search { width:100%; padding:13px 14px 13px 40px; border:1.5px solid #E2E8F0; border-radius:12px; font-size:14px; outline:none; transition:border-color .15s, box-shadow .15s; background:#fff; }
-  .user-search:focus { border-color:#0F172A; box-shadow:0 0 0 3px rgba(15,23,42,.06); }
-
-  /* User suggestions dropdown */
-  .user-suggestions { background:#fff; border:1px solid #E2E8F0; border-radius:12px; max-height:280px; overflow-y:auto; box-shadow:0 4px 16px rgba(15,23,42,.06); }
-  .user-suggestion { display:flex; align-items:center; gap:12px; padding:10px 14px; cursor:pointer; transition:background .12s; border:none; background:transparent; width:100%; text-align:left; }
-  .user-suggestion:hover { background:#F8FAFC; }
-  .user-suggestion .avatar { width:34px; height:34px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#fff; flex-shrink:0; }
-  .user-suggestion .meta { flex:1; min-width:0; }
-  .user-suggestion .name { font-size:13.5px; font-weight:600; color:#0F172A; }
-  .user-suggestion .role { font-size:11.5px; color:#64748B; margin-top:1px; }
-  .suggestion-section { padding:8px 14px 4px; font-size:10.5px; font-weight:700; text-transform:uppercase; color:#94A3B8; letter-spacing:.04em; background:#FAFBFC; }
-
-  /* Selected user chip */
-  .user-chip { display:inline-flex; align-items:center; gap:8px; padding:6px 6px 6px 10px; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:9999px; transition:all .15s; animation:slide-in .2s ease-out; }
-  .user-chip:hover { background:#E2E8F0; }
-  .user-chip .chip-avatar { width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:9.5px; font-weight:700; color:#fff; }
-  .user-chip .chip-name { font-size:13px; font-weight:500; color:#0F172A; }
-  .user-chip .chip-x { width:20px; height:20px; border-radius:50%; background:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:10px; color:#64748B; cursor:pointer; border:none; transition:all .12s; }
-  .user-chip .chip-x:hover { background:#0F172A; color:#fff; }
-  .user-chip.warn { background:#FEF3C7; border-color:#FDE68A; }
-  .user-chip.warn .chip-name { color:#92400E; }
-
-  /* Helper card */
-  .helper-card { padding:12px 14px; background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; font-size:12.5px; color:#1E3A8A; }
-  .helper-card b { color:#1E40AF; }
-  .helper-card.warn { background:#FFFBEB; border-color:#FDE68A; color:#78350F; }
-  .helper-card .grant-btn { color:#0F172A; font-weight:600; text-decoration:underline; cursor:pointer; }
-  .helper-card .grant-btn:hover { color:#1E40AF; }
-
-  /* Time chip (Step 2) */
-  .time-chip { display:flex; flex-direction:column; align-items:center; gap:4px; padding:14px 10px; background:#fff; border:1.5px solid #E2E8F0; border-radius:14px; cursor:pointer; transition:all .18s ease; }
-  .time-chip:hover { border-color:#CBD5E1; transform:translateY(-1px); }
-  .time-chip.on { background:#0F172A; border-color:#0F172A; }
-  .time-chip.on .time-chip-label, .time-chip.on .time-chip-icon { color:#fff; }
-  .time-chip.on .time-chip-sub { color:rgba(255,255,255,.6); }
-  .time-chip-icon { font-size:18px; color:#64748B; }
-  .time-chip-label { font-size:13px; font-weight:600; color:#0F172A; }
-  .time-chip-sub { font-size:10.5px; color:#94A3B8; }
-
-  /* Big channel button (Step 3) */
-  .big-ch { display:flex; flex-direction:column; align-items:center; gap:6px; padding:16px 10px; background:#fff; border:1.5px solid #E2E8F0; border-radius:14px; cursor:pointer; transition:all .18s ease; }
-  .big-ch:hover { border-color:#CBD5E1; transform:translateY(-1px); }
-  .big-ch.on { background:#0F172A; border-color:#0F172A; color:#fff; }
-  .big-ch-icon { width:36px; height:36px; border-radius:10px; background:#F1F5F9; display:inline-flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#0F172A; transition:all .18s; }
-  .big-ch.on .big-ch-icon { background:rgba(255,255,255,.15); color:#fff; }
-  .big-ch-label { font-size:13px; font-weight:600; }
-
-  /* Real checkbox styling */
-  .row-cb { width:18px; height:18px; cursor:pointer; accent-color:#0F172A; margin-left:4px; }
-  /* Custom checkbox */
-  .cb { width:16px; height:16px; border:1.5px solid #CBD5E1; border-radius:4px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; background:#fff; }
-  .cb.checked { background:#0F172A; border-color:#0F172A; }
-  .cb.checked::after { content:'✓'; color:#fff; font-size:11px; font-weight:700; }
-  .cb.indeterminate { background:#0F172A; border-color:#0F172A; }
-  .cb.indeterminate::after { content:'–'; color:#fff; font-size:14px; font-weight:700; }
+:root {
+  --ink:     #0F172A;
+  --ink2:    #334155;
+  --muted:   #64748B;
+  --line:    #E8ECF0;
+  --surface: #F7F8FA;
+  --crit:    #DC2626;
+  --warn:    #D97706;
+  --ok:      #16A34A;
+  --info:    #2563EB;
+  --r:       16px;
+  --r-sm:    12px;
+  --shadow:  0 1px 3px rgba(15,23,42,.06),0 4px 16px rgba(15,23,42,.05);
+}
+html,body{background:#EFEFEF;font-family:'Inter','Noto Sans Devanagari',ui-sans-serif,sans-serif;-webkit-font-smoothing:antialiased;color:var(--ink);}
+.screen{display:none;}.screen.active{display:flex;}
+.t-label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;}
+.t-head{font-size:20px;font-weight:700;line-height:1.25;color:var(--ink);}
+.t-sub{font-size:13px;color:var(--muted);line-height:1.5;}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:9999px;font-size:11px;font-weight:600;}
+/* Fitts: min 52px height, full-width */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:var(--r-sm);padding:15px 20px;font-size:15px;font-weight:600;border:none;cursor:pointer;transition:opacity .1s,transform .08s;width:100%;}
+.btn:active{opacity:.82;transform:scale(.985);}
+.btn-primary{background:var(--ink);color:#fff;}
+.btn-ghost{background:var(--surface);color:var(--ink);}
+.btn-danger{background:var(--crit);color:#fff;}
+.btn-ok{background:var(--ok);color:#fff;}
+.btn-i{width:auto;padding:10px 18px;font-size:13px;border-radius:10px;}
+.card{background:#fff;border-radius:var(--r);box-shadow:var(--shadow);}
+/* Fitts + Von Restorff: large icon-anchored answer cards */
+.ans-card{width:100%;text-align:left;border:1.5px solid var(--line);border-radius:var(--r-sm);padding:15px 16px;min-height:68px;display:flex;align-items:center;gap:14px;cursor:pointer;background:#fff;transition:border-color .12s,background .1s,transform .08s;border:1.5px solid var(--line);}
+.ans-card:active{transform:scale(.99);background:var(--surface);}
+.ans-card:hover{background:#FAFAFA;}
+.ans-icon{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;}
+.ans-title{font-size:14px;font-weight:600;line-height:1.3;}
+.ans-sub{font-size:12px;color:var(--muted);line-height:1.4;margin-top:2px;}
+.divider{height:1px;background:var(--line);}
+.sparkline path{fill:none;stroke-width:1.5;}
+/* Bottom nav */
+nav .tab{transition:color .12s;color:var(--muted);}
+nav .tab.active{color:var(--ink);}
+nav .tab.active .tab-pill{background:rgba(15,23,42,.07);}
+nav .tab .tab-pill{border-radius:9999px;padding:4px 10px;}
+nav .tab .tab-label{font-size:10px;font-weight:500;}
+nav .tab.active .tab-label{font-weight:700;}
+.nav-btn{transition:background .1s;}
+.nav-btn.active{background:#F1F5F9;font-weight:600;}
+.metric{flex:1;border-radius:var(--r-sm);padding:12px;text-align:center;}
+.metric-val{font-size:22px;font-weight:700;line-height:1;margin-top:4px;}
+.metric-unit{font-size:12px;font-weight:500;margin-left:2px;}
+.metric-note{font-size:10px;margin-top:4px;}
+.sys-note{border-radius:10px;padding:10px 12px;background:#F0FDF4;border:1.5px solid #DCFCE7;}
+.action-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--surface);border-radius:10px;}
+.action-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;background:var(--ink);color:#fff;}
+.action-num.crit{background:var(--crit);}
 </style>
 </head>
-<body class="min-h-screen">
+<body>
+<div class="min-h-screen flex flex-col lg:flex-row items-start justify-center gap-6 p-4 lg:p-8">
 
-<!-- ===== Top Nav ===== -->
-<nav class="bg-white border-b border-slate-200 sticky top-0 z-30">
-  <div class="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
-    <div class="flex items-center gap-8">
-      <div class="font-bold text-[15px]">Digital Paani <span class="text-slate-400 font-normal">· Plant Operations</span></div>
-      <div class="flex items-center gap-1 text-sm">
-        <button onclick="goPlants()" id="nav-plants" class="px-3 py-1.5 rounded-lg font-medium">Plants <span class="text-slate-400 ml-1">5</span></button>
-        <button onclick="goInsights()" id="nav-insights" class="px-3 py-1.5 rounded-lg font-medium">Insights <span class="text-slate-400 ml-1">18</span></button>
-      </div>
+<!-- Sidebar -->
+<aside class="lg:w-52 w-full lg:sticky lg:top-8 shrink-0">
+  <div class="card p-4">
+    <div class="t-label" style="margin-bottom:2px;">Prototype v3</div>
+    <div style="font-size:17px;font-weight:700;">Digital Paani</div>
+    <div class="t-sub" style="font-size:11px;">Honda Manesar STP</div>
+    <div class="divider" style="margin:12px 0;"></div>
+    <div class="t-label" style="margin-bottom:6px;">Screens</div>
+    <nav style="display:flex;flex-direction:column;gap:2px;font-size:13px;">
+      <button data-go="whatsapp" class="nav-btn text-left px-3 py-2 rounded-lg hover:bg-slate-50">📱 WhatsApp Alert</button>
+      <button data-go="issues"   class="nav-btn text-left px-3 py-2 rounded-lg hover:bg-slate-50">⚠️ Issues</button>
+      <button data-go="tasks"    class="nav-btn text-left px-3 py-2 rounded-lg hover:bg-slate-50">✅ Tasks</button>
+      <button data-go="plant"    class="nav-btn text-left px-3 py-2 rounded-lg hover:bg-slate-50">🏭 Plant</button>
+      <button data-go="report"   class="nav-btn text-left px-3 py-2 rounded-lg hover:bg-slate-50">＋ Report</button>
+    </nav>
+    <div class="divider" style="margin:12px 0;"></div>
+    <div class="t-label" style="margin-bottom:6px;">Diagnostic Flows</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:12px;">
+      <button onclick="openIssue('dt006','collapsed')"  class="text-left px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-500">DO Low · overview</button>
+      <button onclick="openIssue('dt006','preflight')"  class="text-left px-3 py-2 rounded-lg hover:bg-slate-50 font-semibold" style="color:var(--info);">✦ Pre-flight</button>
+      <button onclick="openIssue('dt006','step1')"      class="text-left px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-500">Step 1 · DO reading</button>
+      <button onclick="openIssue('dt006','step2')"      class="text-left px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-500">Step 2 · movement</button>
+      <button onclick="openIssue('dt006','step3')"      class="text-left px-3 py-2 rounded-lg hover:bg-slate-50 font-semibold" style="color:var(--info);">✦ Step 3 · smell</button>
+      <button onclick="openIssue('dt006','step4')"      class="text-left px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-500">Step 4 · blower</button>
+      <button onclick="openIssue('dt006','step5')"      class="text-left px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-500">Step 5 · diffuser</button>
+      <button onclick="openIssue('dt006','escalate')"   class="text-left px-3 py-2 rounded-lg hover:bg-slate-50 font-semibold" style="color:var(--info);">✦ Escalation</button>
+      <button onclick="openIssue('biomass','collapsed')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-500 mt-1">Biomass Low</button>
+      <button onclick="openIssue('blower','collapsed')"  class="text-left px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-500">Blower Vibration</button>
     </div>
-    <div class="flex items-center gap-3">
-      <span class="text-xs text-slate-500">v2 prototype</span>
-      <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-semibold">RM</div>
+    <div class="divider" style="margin:12px 0;"></div>
+    <div style="font-size:10px;color:var(--muted);line-height:1.8;">
+      <b style="color:var(--ink);">v3 UX laws</b><br>
+      Fitts · Hick's · Jakob's<br>
+      Von Restorff · Miller<br>
+      Tesler · Doherty · Parkinson<br>
+      Cognitive Load
     </div>
   </div>
-</nav>
+</aside>
 
-<!-- ============== Plants SCREEN ============== -->
-<section id="screen-plants" class="screen active">
-  <div class="max-w-7xl mx-auto px-6 py-8">
-    <div class="flex items-end justify-between mb-6">
-      <div>
-        <h1 class="text-2xl font-bold">Sewage Treatment Plants</h1>
-        <p class="text-sm text-slate-500 mt-1">Configuration layer · sorted by severity</p>
-      </div>
-      <input placeholder="Search Plants…" class="border border-slate-200 rounded-lg px-3 py-2 text-sm w-64"/>
+<!-- Phone Shell — pure white, no grid (Cognitive Load: zero visual noise) -->
+<div>
+  <div class="relative w-[390px] h-[844px] rounded-[44px] overflow-hidden"
+       style="background:#fff;box-shadow:0 24px 64px rgba(15,23,42,.16),0 0 0 1px rgba(15,23,42,.08);">
+
+    <!-- Status bar -->
+    <div class="absolute top-0 inset-x-0 h-10 flex items-center justify-between px-6 z-40"
+         style="font-size:12px;font-weight:600;">
+      <span>9:41</span>
+      <span style="display:flex;align-items:center;gap:4px;">
+        <svg width="16" height="10" viewBox="0 0 16 10"><rect x="0" y="6" width="3" height="4" rx="1" fill="currentColor"/><rect x="4" y="4" width="3" height="6" rx="1" fill="currentColor"/><rect x="8" y="2" width="3" height="8" rx="1" fill="currentColor"/><rect x="12" y="0" width="3" height="10" rx="1" fill="currentColor"/></svg>
+        <svg width="24" height="10" viewBox="0 0 24 10"><rect x=".5" y=".5" width="20" height="9" rx="2" fill="none" stroke="currentColor"/><rect x="2" y="2" width="16" height="6" rx="1" fill="currentColor"/><rect x="21" y="3" width="2" height="4" rx="1" fill="currentColor"/></svg>
+      </span>
     </div>
 
-    <div class="grid grid-cols-3 gap-4">
-      <div class="card p-5">
-        <div class="sev-bar mb-4"><div style="background:#DC2626;flex:2"></div><div style="background:#F59E0B;flex:1"></div><div style="background:#e2e8f0;flex:1"></div></div>
-        <h3 class="font-semibold text-[15px]">Andheri Plant</h3>
-        <p class="text-xs text-slate-500 mt-0.5">Mumbai · 25 MLD · 4 active insights</p>
-        <div class="flex flex-wrap gap-1.5 mt-3">
-          <span class="chip" style="background:#FEE2E2;color:#991B1B">● 2 incident</span>
-          <span class="chip" style="background:#FEF3C7;color:#92400E">● 1 issue</span>
-        </div>
-        <button class="btn btn-primary w-full mt-5" onclick="filterByPlant('Andheri Plant')">View insights</button>
-        <div class="flex gap-2 mt-2">
-          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openEscalations('Andheri Plant')">⚡ Escalations</button>
-          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openDigests('Andheri Plant')">✉ Digests</button>
-        </div>
-      </div>
+    <main class="absolute inset-0 pt-10 pb-[76px] overflow-hidden">
 
-      <div class="card p-5">
-        <div class="sev-bar mb-4"><div style="background:#F59E0B;flex:2"></div><div style="background:#e2e8f0;flex:3"></div></div>
-        <h3 class="font-semibold text-[15px]">Bandra Plant</h3>
-        <p class="text-xs text-slate-500 mt-0.5">Mumbai · 18 MLD · 5 active insights</p>
-        <div class="flex flex-wrap gap-1.5 mt-3">
-          <span class="chip" style="background:#FEF3C7;color:#92400E">● 2 issue</span>
-        </div>
-        <button class="btn btn-primary w-full mt-5" onclick="filterByPlant('Bandra Plant')">View insights</button>
-        <div class="flex gap-2 mt-2">
-          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openEscalations('Bandra Plant')">⚡ Escalations</button>
-          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openDigests('Bandra Plant')">✉ Digests</button>
-        </div>
-      </div>
-
-      <div class="card p-5">
-        <div class="sev-bar mb-4"><div style="background:#FBBF24;flex:2"></div><div style="background:#e2e8f0;flex:3"></div></div>
-        <h3 class="font-semibold text-[15px]">Powai Plant</h3>
-        <p class="text-xs text-slate-500 mt-0.5">Mumbai · 12 MLD · 4 active insights</p>
-        <div class="flex flex-wrap gap-1.5 mt-3">
-          <span class="chip" style="background:#FEF9C3;color:#854D0E">● 2 warning</span>
-        </div>
-        <button class="btn btn-primary w-full mt-5" onclick="filterByPlant('Powai Plant')">View insights</button>
-        <div class="flex gap-2 mt-2">
-          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openEscalations('Powai Plant')">⚡ Escalations</button>
-          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openDigests('Powai Plant')">✉ Digests</button>
-        </div>
-      </div>
-
-      <div class="card p-5 opacity-90">
-        <div class="sev-bar mb-4"><div style="background:#FBBF24;flex:1"></div><div style="background:#e2e8f0;flex:4"></div></div>
-        <h3 class="font-semibold text-[15px]">Thane Plant</h3>
-        <p class="text-xs text-slate-500 mt-0.5">Thane · 30 MLD · 3 active insights</p>
-        <div class="flex flex-wrap gap-1.5 mt-3">
-          <span class="chip" style="background:#FEF9C3;color:#854D0E">● 1 warning</span>
-        </div>
-        <button class="btn btn-primary w-full mt-5" onclick="filterByPlant('Thane Plant')">View insights</button>
-        <div class="flex gap-2 mt-2">
-          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openEscalations('Thane Plant')">⚡ Escalations</button>
-          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openDigests('Thane Plant')">✉ Digests</button>
-        </div>
-      </div>
-
-      <div class="card p-5 opacity-70">
-        <div class="sev-bar mb-4"><div style="background:#16A34A;flex:1"></div><div style="background:#e2e8f0;flex:4"></div></div>
-        <h3 class="font-semibold text-[15px] text-slate-600">Vashi Plant</h3>
-        <p class="text-xs text-slate-500 mt-0.5">Navi Mumbai · 20 MLD · 2 active</p>
-        <div class="flex flex-wrap gap-1.5 mt-3">
-          <span class="chip" style="background:#DCFCE7;color:#166534">● all clear</span>
-        </div>
-        <button class="btn btn-primary w-full mt-5" onclick="filterByPlant('Vashi Plant')">View insights</button>
-        <div class="flex gap-2 mt-2">
-          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openEscalations('Vashi Plant')">⚡ Escalations</button>
-          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openDigests('Vashi Plant')">✉ Digests</button>
-        </div>
-      </div>
-    </div>
-
-    <p class="text-xs text-slate-500 mt-6">Each plant has two configurations: <b>⚡ Escalations</b> (timing + channels + messages, applied to every new insight in that plant) and <b>✉ Digests</b> (scheduled summaries sent to client recipients).</p>
-  </div>
-</section>
-
-<!-- ============== INSIGHTS SCREEN ============== -->
-<section id="screen-insights" class="screen">
-  <div class="max-w-7xl mx-auto px-6 py-8">
-
-    <div class="flex items-end justify-between mb-6">
-      <div>
-        <h1 class="text-2xl font-bold" id="insights-h1">Insights <span id="insight-count" class="text-slate-400 font-normal text-lg">· 18</span></h1>
-        <p class="text-sm text-slate-500 mt-1" id="insights-sub">Click any row to see history, sensor readings, and users.</p>
-      </div>
-      <div class="flex gap-2">
-        <button class="btn btn-primary" onclick="openNewInsight()">+ New insight</button>
-      </div>
-    </div>
-
-    <!-- Filters -->
-    <div class="card p-3 mb-3 flex flex-wrap items-center gap-2">
-      <input id="search" placeholder="🔍 Search insights, sensors, equipment…" oninput="renderInsights()" class="border-0 px-2 py-1.5 text-sm flex-1 min-w-[200px] focus:outline-none"/>
-      <div class="h-6 w-px bg-slate-200"></div>
-      <select id="f-plant" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
-        <option value="">All Plants</option>
-        <option>Andheri Plant</option><option>Bandra Plant</option><option>Powai Plant</option><option>Thane Plant</option><option>Vashi Plant</option>
-      </select>
-      <select id="f-sev" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
-        <option value="">All severities</option><option>incident</option><option>issue</option><option>warning</option>
-      </select>
-      <select id="f-equip" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
-        <option value="">All equipment</option><option>Aerator</option><option>Pump</option><option>Tank</option><option>Blower</option><option>Valve</option>
-      </select>
-      <select id="f-status" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
-        <option value="">Any status</option><option>Active</option><option>Resolved</option>
-      </select>
-      <button class="text-xs text-slate-500 hover:text-slate-900 underline ml-auto" onclick="clearAllFilters()">Reset</button>
-    </div>
-
-    <!-- Bulk action panel (inline, expands when selections exist) -->
-    <section id="bulk-panel" class="hidden card mb-3 overflow-hidden slide-in">
-      <!-- Compact selection header -->
-      <div class="px-6 py-3 bg-slate-900 text-white flex flex-wrap items-center gap-3">
-        <span class="text-sm"><b id="bulk-count">0</b> insight<span id="bulk-count-s">s</span> selected</span>
-        <div id="bulk-summary-pills" class="flex flex-wrap gap-1.5"></div>
-        <div class="ml-auto flex items-center gap-2">
-          <button class="btn btn-sm bg-white/10 text-white hover:bg-white/20" onclick="bulkPause()">⏸ Pause all</button>
-          <button class="text-xs underline" onclick="clearSelection()">Clear selection</button>
-        </div>
-      </div>
-
-      <!-- Header: title + goal-gradient progress -->
-      <div class="px-7 pt-5 pb-4 border-b border-slate-100">
-        <div class="flex items-start justify-between mb-4">
+      <!-- WHATSAPP — Jakob's: familiar dark chat UI operators already know -->
+      <section data-screen="whatsapp" class="screen active h-full flex-col" style="background:#0d1117;">
+        <div style="padding:12px 16px;background:#161d27;border-bottom:1px solid #1f2937;display:flex;align-items:center;gap:10px;">
+          <div style="width:38px;height:38px;border-radius:50%;background:#15803d;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">💧</div>
           <div>
-            <h2 class="text-lg font-bold tracking-tight">Assign users <span class="text-slate-400 font-normal text-sm">to <b id="bulk-modal-count">0</b> insight<span id="bulk-modal-count-s">s</span></span></h2>
-            <p class="text-xs text-slate-500 mt-0.5">Add multiple users to one or many insights at once.</p>
+            <div style="font-size:14px;font-weight:600;color:#fff;">Digital Paani Alerts</div>
+            <div style="font-size:11px;color:#6b7280;">Honda Manesar STP</div>
           </div>
         </div>
-        <div class="flex items-center gap-2">
-          <div class="progress-step" id="ps-1" data-step="1"><span class="step-dot">1</span><span class="step-label">Users</span></div>
-          <div class="step-line" id="line-1"></div>
-          <div class="progress-step" id="ps-2" data-step="2"><span class="step-dot">2</span><span class="step-label">Timing</span></div>
-          <div class="step-line" id="line-2"></div>
-          <div class="progress-step" id="ps-3" data-step="3"><span class="step-dot">3</span><span class="step-label">Channels</span></div>
-        </div>
-      </div>
-
-      <!-- Step 1: WHO -->
-      <section class="px-7 py-5 border-b border-slate-100">
-        <h3 class="font-semibold text-[14px] mb-1">Who should be notified?</h3>
-        <p class="text-xs text-slate-500 mb-3">Search and add as many users as you need.</p>
-        <div class="user-search-wrap">
-          <span class="user-search-icon">🔍</span>
-          <input id="sup-search" class="user-search" placeholder="Type a name, role, or saved group…" oninput="searchUser(this.value)" onfocus="searchUser(this.value)"/>
-        </div>
-        <div id="sup-suggestions" class="user-suggestions hidden mt-1"></div>
-        <div id="bulk-users-block" class="mt-4 hidden">
-          <div class="flex items-center justify-between mb-2">
-            <div class="text-[11px] uppercase text-slate-500 font-semibold tracking-wide">Selected <span class="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-slate-900 text-white text-[10px]" id="sel-count">0</span></div>
-            <button class="text-[11px] text-slate-400 hover:text-red-600" onclick="clearSelectedUsers()">Clear all</button>
+        <div class="flex-1 overflow-y-auto" style="padding:16px;display:flex;flex-direction:column;gap:12px;">
+          <div style="background:#0f2918;border:1.5px solid #166534;border-radius:14px;padding:16px;max-width:88%;">
+            <div style="font-size:10px;font-weight:700;color:#4ade80;letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px;">⚠ ALERT</div>
+            <div style="font-size:14px;font-weight:600;color:#fff;line-height:1.5;">एयरएशन टैंक (AT-01) में ऑक्सीजन कम हो रही है।</div>
+            <div style="font-size:12px;color:#9ca3af;margin-top:6px;line-height:1.5;">पानी की सफाई प्रभावित हो सकती है।<br>अभी जांच करें।</div>
           </div>
-          <div id="bulk-users" class="flex flex-wrap gap-2"></div>
+          <!-- Fitts: primary action full-width, secondary minimal -->
+          <div style="display:flex;gap:8px;max-width:88%;">
+            <button class="btn btn-i" style="background:rgba(255,255,255,.07);color:#9ca3af;" onclick="go('issues')">बाद में</button>
+            <button class="btn btn-i" style="flex:1;background:#16a34a;color:#fff;" onclick="openIssue('dt006','preflight')">देखें क्या हुआ →</button>
+          </div>
+          <div style="background:#111827;border:1px solid #1f2937;border-radius:12px;padding:12px 14px;max-width:88%;opacity:.5;">
+            <div style="font-size:10px;font-weight:600;color:#6b7280;text-transform:uppercase;margin-bottom:4px;">पहले का alert</div>
+            <div style="font-size:12px;color:#9ca3af;">ब्लोअर BL-101 का प्रेशर कम — जांच होने पर बंद हुआ</div>
+            <div style="font-size:10px;color:#4ade80;margin-top:4px;font-weight:600;">✓ Resolved</div>
+          </div>
         </div>
-        <div id="bulk-helper" class="hidden mt-3 helper-card"></div>
-      </section>
-
-      <!-- Step 2: WHEN -->
-      <section id="step-timing" class="px-7 py-5 border-b border-slate-100 hidden">
-        <h3 class="font-semibold text-[14px] mb-1">When should they be notified?</h3>
-        <p class="text-xs text-slate-500 mb-3">Pick a moment in the escalation timeline.</p>
-        <div class="grid grid-cols-4 gap-2">
-          <button class="time-chip on" data-v="imm" onclick="setTimingChip(this)"><span class="time-chip-icon">⚡</span><span class="time-chip-label">Immediately</span><span class="time-chip-sub">When opens</span></button>
-          <button class="time-chip" data-v="10" onclick="setTimingChip(this)"><span class="time-chip-icon">⏱</span><span class="time-chip-label">+10 min</span><span class="time-chip-sub">If no response</span></button>
-          <button class="time-chip" data-v="30" onclick="setTimingChip(this)"><span class="time-chip-icon">⏱</span><span class="time-chip-label">+30 min</span><span class="time-chip-sub">If still open</span></button>
-          <button class="time-chip" data-v="custom" onclick="setTimingChip(this)"><span class="time-chip-icon">⚙</span><span class="time-chip-label">Custom</span><span class="time-chip-sub">Set delay</span></button>
-        </div>
-        <div id="custom-min-wrap" class="hidden mt-3 flex items-center gap-2">
-          <input id="custom-min" type="number" min="1" placeholder="Minutes" class="w-32 border border-slate-200 rounded-lg px-3 py-2 text-sm" oninput="updatePreview()"/>
-          <span class="text-xs text-slate-500">minutes after the insight opens</span>
+        <div style="padding:10px 16px;background:#161d27;border-top:1px solid #1f2937;display:flex;align-items:center;gap:8px;">
+          <div style="flex:1;background:#1f2937;border-radius:20px;padding:10px 14px;font-size:14px;color:#374151;">Message</div>
+          <div style="width:38px;height:38px;border-radius:50%;background:#15803d;display:flex;align-items:center;justify-content:center;font-size:18px;">🎤</div>
         </div>
       </section>
 
-      <!-- Step 3: HOW -->
-      <section id="step-channels" class="px-7 py-5 hidden">
-        <h3 class="font-semibold text-[14px] mb-1">How should they be notified?</h3>
-        <p class="text-xs text-slate-500 mb-3">WhatsApp by default. Add more if needed.</p>
-        <div class="grid grid-cols-4 gap-2">
-          <button class="big-ch on" data-v="wa" onclick="bulkToggleCh(this)"><span class="big-ch-icon">WA</span><span class="big-ch-label">WhatsApp</span></button>
-          <button class="big-ch" data-v="sms" onclick="bulkToggleCh(this)"><span class="big-ch-icon">SMS</span><span class="big-ch-label">SMS</span></button>
-          <button class="big-ch" data-v="call" onclick="bulkToggleCh(this)"><span class="big-ch-icon">📞</span><span class="big-ch-label">Call</span></button>
-          <button class="big-ch" data-v="email" onclick="bulkToggleCh(this)"><span class="big-ch-icon">✉</span><span class="big-ch-label">Email</span></button>
-        </div>
-        <details class="mt-5">
-          <summary class="text-sm text-blue-600 hover:underline cursor-pointer inline-flex items-center gap-1">＋ Save these users as a reusable group</summary>
-          <div class="mt-3 p-4 bg-slate-50 rounded-xl">
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" id="save-group-cb" class="w-4 h-4"/>
-              <span class="text-sm">Save selection as a group</span>
-            </label>
-            <input id="save-group-name" placeholder="Group name (e.g. Andheri Day Shift)" class="mt-2 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"/>
-            <p class="text-[11px] text-slate-500 mt-1.5">Pick this group from the search next time.</p>
+      <!-- ISSUES — Miller: only 2 grouped by severity -->
+      <section data-screen="issues" class="screen h-full flex-col" style="background:var(--surface);">
+        <div style="padding:16px 16px 0;background:#fff;border-bottom:1px solid var(--line);">
+          <div class="t-label">Honda Manesar STP</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px;">
+            <h1 class="t-head" style="font-size:22px;">Issues</h1>
+            <div style="display:flex;gap:6px;">
+              <span class="chip" style="background:rgba(220,38,38,.08);color:var(--crit);">● 1 Critical</span>
+              <span class="chip" style="background:rgba(217,119,6,.08);color:var(--warn);">● 1 High</span>
+            </div>
           </div>
-        </details>
+          <div style="height:3px;"></div>
+        </div>
+        <div class="flex-1 overflow-y-auto" style="padding:12px 16px;display:flex;flex-direction:column;gap:8px;">
+          <div id="issuesList"></div>
+        </div>
       </section>
 
-      <!-- Footer -->
-      <div class="px-7 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between gap-3">
-        <div class="text-xs text-slate-600 flex-1 min-w-0" id="assign-preview">Pick at least one user to continue</div>
-        <div class="flex gap-2 shrink-0">
-          <button class="btn btn-ghost" onclick="clearSelection()">Cancel</button>
-          <button id="assign-btn" class="btn btn-primary opacity-50 pointer-events-none" onclick="confirmBulkAssign()">
-            Assign to <span id="bulk-confirm-count">0</span> insight<span id="bulk-confirm-count-s">s</span>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Insights list -->
-    <div class="card overflow-hidden">
-      <div class="grid grid-cols-12 px-4 py-2 text-[11px] uppercase text-slate-500 font-semibold border-b border-slate-100 bg-slate-50 items-center">
-        <div class="col-span-1"><input type="checkbox" id="cb-all" class="row-cb" onclick="toggleAll()"/></div>
-        <div class="col-span-4">Insight</div>
-        <div class="col-span-2">Plant · Equipment</div>
-        <div class="col-span-2">Users</div>
-        <div class="col-span-2">Status</div>
-        <div class="col-span-1 text-right">On</div>
-      </div>
-      <div id="insights-list"></div>
-    </div>
-  </div>
-</section>
-
-<!-- ============== INSIGHT DETAIL DRAWER ============== -->
-<div id="detail-drawer" class="fixed inset-y-0 right-0 w-[600px] bg-white shadow-2xl z-40 hidden overflow-y-auto">
-  <div id="detail-content"></div>
-</div>
-<div id="detail-overlay" class="fixed inset-0 bg-black/30 z-30 hidden" onclick="closeDetail()"></div>
-
-<!-- ============== NEW INSIGHT MODAL ============== -->
-<div id="modal-new" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-6">
-  <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-10">
-      <div>
-        <h2 class="font-bold text-lg">New insight</h2>
-        <p class="text-xs text-slate-500">Build it as a sentence — no forms.</p>
-      </div>
-      <button class="text-slate-400 hover:text-slate-700" onclick="closeNewInsight()">✕</button>
-    </div>
-    <div class="p-6">
-      <div class="card p-6 bg-slate-50 leading-loose text-[15px]">
-        <div class="mb-3">
-          <span class="text-slate-500 font-semibold uppercase text-[11px] mr-2">When</span>
-          <span class="editable-chip" contenteditable="true">DO sensor</span>
-          <span class="editable-chip" contenteditable="true">&lt;</span>
-          <span class="editable-chip" contenteditable="true">2.0 mg/L</span>
-          <span class="text-slate-500">on</span>
-          <span class="editable-chip" contenteditable="true">Aeration tank</span>
-          <span class="text-slate-500">at</span>
-          <span class="editable-chip" contenteditable="true">Andheri Plant</span>
-        </div>
-        <div class="mb-3">
-          <span class="text-slate-500 font-semibold uppercase text-[11px] mr-2">Then</span>
-          <span class="text-slate-700">notify users below</span>
-        </div>
-
-        <!-- Escalation timeline -->
-        <div class="mt-5 border-t border-slate-200 pt-4">
-          <div class="flex items-center justify-between mb-3">
-            <span class="text-slate-500 font-semibold uppercase text-[11px]">Escalation timeline</span>
-            <span class="text-[11px] text-slate-400">Inherits Andheri · Incident defaults · <button class="underline">Customize</button></span>
+      <!-- ISSUE FLOW — Parkinson: timer; Doherty: instant render -->
+      <section data-screen="issue-flow" class="screen h-full flex-col" style="background:#fff;">
+        <div style="padding:10px 14px;background:#fff;border-bottom:1px solid var(--line);">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <!-- Fitts: 40px circular back button -->
+            <button onclick="go('issues')" style="width:40px;height:40px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;flex-shrink:0;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <div style="flex:1;min-width:0;">
+              <div id="flowEquipment" class="t-label" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
+              <div id="flowTitle" style="font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
+            </div>
+            <!-- Parkinson's Law: time-box each step -->
+            <div id="stepTimer" style="display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:9999px;background:var(--ink);color:#fff;font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;flex-shrink:0;">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M9 2h6"/></svg>
+              <span id="stepTimerVal">00:00</span>
+            </div>
           </div>
-          <div id="timeline"></div>
-        </div>
-
-        <div class="mt-4 pt-4 border-t border-slate-200">
-          <span class="text-slate-500 font-semibold uppercase text-[11px] mr-2">Closes when</span>
-          <span class="editable-chip" contenteditable="true">DO &gt; 2.5 mg/L for 5 min</span>
-          <span class="text-slate-400 text-xs ml-2">optional</span>
-        </div>
-      </div>
-    </div>
-    <div class="px-6 py-4 border-t border-slate-100 flex justify-between items-center sticky bottom-0 bg-white">
-      <button class="text-xs text-slate-500 hover:underline" onclick="saveDraft()">Save as draft</button>
-      <div class="flex gap-2">
-        <button class="btn btn-ghost" onclick="closeNewInsight()">Cancel</button>
-        <button class="btn btn-primary" onclick="createInsight()">Create insight</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ============== ESCALATIONS MODAL ============== -->
-<div id="modal-esc" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-6">
-  <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-10">
-      <div>
-        <h2 class="font-bold text-lg">⚡ Escalations — <span id="esc-plant"></span></h2>
-        <p class="text-xs text-slate-500">Applied automatically to every new insight in this plant.</p>
-      </div>
-      <button class="text-slate-400 hover:text-slate-700" onclick="closeEscalations()">✕</button>
-    </div>
-
-    <!-- Severity tabs -->
-    <div class="px-6 pt-4 flex gap-1 border-b border-slate-100">
-      <button class="esc-tab esc-tab-active px-3 py-2 text-sm font-medium border-b-2 border-slate-900" data-sev="incident" onclick="switchEscTab(this)"><span class="w-2 h-2 inline-block rounded-full" style="background:#DC2626"></span> Incident</button>
-      <button class="esc-tab px-3 py-2 text-sm text-slate-500 border-b-2 border-transparent" data-sev="issue" onclick="switchEscTab(this)"><span class="w-2 h-2 inline-block rounded-full" style="background:#F59E0B"></span> Issue</button>
-      <button class="esc-tab px-3 py-2 text-sm text-slate-500 border-b-2 border-transparent" data-sev="warning" onclick="switchEscTab(this)"><span class="w-2 h-2 inline-block rounded-full" style="background:#FBBF24"></span> Warning</button>
-    </div>
-
-    <div class="p-6 space-y-5">
-      <!-- Immediate notification (always fires) -->
-      <div class="card border border-slate-100 overflow-hidden">
-        <div class="px-4 py-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="chip bg-slate-900 text-white px-2 py-0.5">📢 Immediate</span>
-            <span class="text-sm font-medium">Fires the moment the insight opens</span>
+          <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
+            <span id="stepBadge" class="chip" style="background:var(--surface);color:var(--ink2);"></span>
+            <div style="flex:1;height:5px;background:var(--line);border-radius:9999px;overflow:hidden;">
+              <div id="stepBar" style="height:100%;background:var(--ink);width:0%;transition:width .35s ease;border-radius:9999px;"></div>
+            </div>
           </div>
         </div>
-        <div id="esc-immediate" class="p-4"></div>
-      </div>
+        <div id="flowContent" class="flex-1 overflow-y-auto" style="padding:16px;"></div>
+      </section>
 
-      <!-- Followup escalation steps -->
-      <div>
-        <div class="flex items-center justify-between mb-2">
-          <div class="flex items-center gap-2">
-            <span class="chip bg-amber-100 text-amber-800 px-2 py-0.5">⏱ Followup</span>
-            <span class="text-sm font-medium">Escalate if unresolved</span>
+      <!-- TASKS — Miller: chunked by status tab -->
+      <section data-screen="tasks" class="screen h-full flex-col" style="background:var(--surface);">
+        <div style="padding:16px 16px 0;background:#fff;border-bottom:1px solid var(--line);">
+          <h1 class="t-head" style="font-size:22px;">Tasks</h1>
+          <div class="t-sub" style="margin-top:2px;">आज की पाली · 7 काम</div>
+          <div style="margin-top:12px;display:flex;padding:4px;background:var(--surface);border-radius:12px;">
+            <button style="flex:1;padding:8px;border-radius:10px;background:#fff;font-weight:700;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.06);">आज</button>
+            <button style="flex:1;padding:8px;border-radius:10px;font-size:13px;color:var(--muted);">बाकी</button>
+            <button style="flex:1;padding:8px;border-radius:10px;font-size:13px;color:var(--muted);">हो गए</button>
           </div>
-          <button class="btn btn-sm btn-ghost" onclick="addEscStep()">+ Add escalation step</button>
+          <div style="height:4px;"></div>
         </div>
-        <div id="esc-steps" class="space-y-3"></div>
-      </div>
-    </div>
-
-    <div class="px-6 py-4 border-t border-slate-100 flex justify-end gap-2 sticky bottom-0 bg-white">
-      <button class="btn btn-ghost" onclick="closeEscalations()">Cancel</button>
-      <button class="btn btn-primary" onclick="saveEscalations()">Save escalations</button>
-    </div>
-  </div>
-</div>
-
-<!-- ============== DIGESTS MODAL ============== -->
-<div id="modal-digest" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-6">
-  <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-10">
-      <div>
-        <h2 class="font-bold text-lg">✉ Digests — <span id="dig-plant"></span></h2>
-        <p class="text-xs text-slate-500">Scheduled summaries sent to client recipients.</p>
-      </div>
-      <button class="text-slate-400 hover:text-slate-700" onclick="closeDigests()">✕</button>
-    </div>
-
-    <div class="p-6 space-y-5">
-      <!-- Recipients -->
-      <div>
-        <label class="text-[11px] uppercase text-slate-500 font-semibold">Recipients</label>
-        <div id="dig-recipients" class="flex flex-wrap gap-2 mt-2 p-3 border border-slate-200 rounded-lg min-h-[44px]"></div>
-        <input id="dig-rec-input" placeholder="Type email and press Enter (e.g. client@acme.com)" class="mt-2 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm" onkeydown="if(event.key==='Enter'){addRecipient(this.value);this.value=''}"/>
-      </div>
-
-      <!-- Severity (multi-select) -->
-      <div>
-        <label class="text-[11px] uppercase text-slate-500 font-semibold">Include severities <span class="text-slate-400 normal-case font-normal">· tap any combination</span></label>
-        <div class="flex gap-2 mt-2" id="dig-sev">
-          <button class="sev-pill on" data-v="incident" onclick="toggleSev(this)"><span class="checkmark">✓</span> <span style="color:#991B1B">●</span> Incidents</button>
-          <button class="sev-pill on" data-v="issue" onclick="toggleSev(this)"><span class="checkmark">✓</span> <span style="color:#92400E">●</span> Issues</button>
-          <button class="sev-pill" data-v="warning" onclick="toggleSev(this)"><span class="checkmark">✓</span> <span style="color:#854D0E">●</span> Warnings</button>
+        <div class="flex-1 overflow-y-auto" style="padding:12px 16px;display:flex;flex-direction:column;gap:8px;">
+          <!-- Von Restorff: red border = overdue, impossible to miss -->
+          <div class="card" style="padding:14px;border-left:4px solid var(--crit);">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="chip" style="background:rgba(220,38,38,.08);color:var(--crit);">बाकी है</span>
+              <span style="font-size:11px;color:var(--muted);">AT-01 · 06:00 बजे था</span>
+            </div>
+            <div style="margin-top:6px;font-size:14px;font-weight:600;">SV30 जीवाणु टेस्ट</div>
+          </div>
+          <div class="card" style="padding:14px;border-left:4px solid var(--info);" id="expandTaskCard">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="chip" style="background:rgba(37,99,235,.08);color:var(--info);">जारी है</span>
+                <span style="font-size:11px;color:var(--muted);">BL-101 · 08:00</span>
+              </div>
+              <button style="font-size:12px;color:var(--info);font-weight:600;background:none;border:none;cursor:pointer;" id="toggleTask">देखें</button>
+            </div>
+            <div style="margin-top:6px;font-size:14px;font-weight:600;">ब्लोअर वाइब्रेशन चेकलिस्ट</div>
+            <div id="taskBody" style="display:none;margin-top:12px;flex-direction:column;gap:8px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface);border-radius:10px;">
+                <div style="font-size:13px;">बेअरिंग तापमान &lt; 70°C</div>
+                <div style="display:flex;gap:6px;">
+                  <button class="chip" style="background:rgba(22,163,74,.1);color:var(--ok);">✓ ठीक</button>
+                  <button class="chip" style="background:var(--surface);color:var(--ink2);">✗ नहीं</button>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface);border-radius:10px;">
+                <div style="font-size:13px;">वाइब्रेशन &lt; 4.5 mm/s</div>
+                <div style="display:flex;gap:6px;">
+                  <button class="chip" style="background:var(--surface);color:var(--ink2);">✓ ठीक</button>
+                  <button class="chip" style="background:rgba(220,38,38,.08);color:var(--crit);">✗ नहीं</button>
+                </div>
+              </div>
+              <button class="btn btn-danger" style="margin-top:4px;font-size:13px;" onclick="openIssue('blower','collapsed')">Issue बनाएं (1 समस्या)</button>
+            </div>
+          </div>
+          <div class="card" style="padding:14px;border-left:4px solid #CBD5E1;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="chip" style="background:var(--surface);color:var(--ink2);">बाकी है</span>
+              <span style="font-size:11px;color:var(--muted);">11:30 बजे</span>
+            </div>
+            <div style="margin-top:6px;font-size:14px;font-weight:600;">ऑक्सीजन माप · AT-01</div>
+          </div>
+          <div class="card" style="padding:14px;border-left:4px solid var(--ok);">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="chip" style="background:rgba(22,163,74,.08);color:var(--ok);">✓ हो गया</span>
+              <span style="font-size:11px;color:var(--muted);">07:12</span>
+            </div>
+            <div style="margin-top:6px;font-size:14px;font-weight:600;">Clarifier कीचड़ जांच</div>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <!-- Status -->
-      <div>
-        <label class="text-[11px] uppercase text-slate-500 font-semibold">Status</label>
-        <div class="flex gap-2 mt-2" id="dig-status">
-          <button class="chip bg-slate-900 text-white px-3 py-1.5" data-v="open" onclick="pickStatus(this)">Open</button>
-          <button class="chip bg-slate-100 px-3 py-1.5" data-v="closed" onclick="pickStatus(this)">Closed</button>
-          <button class="chip bg-slate-100 px-3 py-1.5" data-v="both" onclick="pickStatus(this)">Both</button>
+      <!-- PLANT -->
+      <section data-screen="plant" class="screen h-full flex-col" style="background:var(--surface);">
+        <div style="padding:16px 16px 0;background:#fff;border-bottom:1px solid var(--line);">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;">
+            <div>
+              <div class="t-label">Honda Manesar STP</div>
+              <h1 class="t-head" style="font-size:22px;margin-top:2px;">Plant</h1>
+            </div>
+            <div style="display:flex;gap:5px;">
+              <span class="chip" style="background:rgba(220,38,38,.08);color:var(--crit);">● 1</span>
+              <span class="chip" style="background:rgba(217,119,6,.08);color:var(--warn);">● 1</span>
+              <span class="chip" style="background:rgba(22,163,74,.08);color:var(--ok);">● 3</span>
+            </div>
+          </div>
+          <div style="margin-top:12px;display:flex;padding:4px;background:var(--surface);border-radius:12px;">
+            <button id="viewScada" style="flex:1;padding:8px;border-radius:10px;background:#fff;font-weight:700;font-size:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;gap:5px;border:none;cursor:pointer;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M6 8v4h12V8"/><path d="M12 12v4"/></svg>SCADA
+            </button>
+            <button id="viewList" style="flex:1;padding:8px;border-radius:10px;font-size:12px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:5px;border:none;cursor:pointer;background:transparent;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>List
+            </button>
+          </div>
+          <div style="height:4px;"></div>
         </div>
-      </div>
+        <div id="scadaView" class="flex-1 overflow-y-auto" style="padding:12px 16px;">
+          <div class="card" style="overflow:hidden;position:relative;height:380px;">
+            <svg viewBox="0 0 360 350" style="width:100%;height:100%;">
+              <g stroke="#CBD5E1" stroke-width="5" fill="none" stroke-linecap="round">
+                <path d="M40 80 H120"/><path d="M160 80 H230"/><path d="M270 80 V180"/>
+                <path d="M270 200 H180"/><path d="M140 200 V280"/><path d="M140 300 H240"/><path d="M280 300 H320"/>
+              </g>
+              <g stroke="#E2E8F0" stroke-width="1.5" fill="none" stroke-dasharray="4 4"><path d="M140 80 V200"/></g>
+              <g><rect x="12" y="60" width="34" height="40" rx="6" fill="#F1F5F9" stroke="#CBD5E1"/><text x="29" y="115" text-anchor="middle" font-size="10" fill="#334155" font-weight="600">Inlet</text></g>
+              <g><circle cx="140" cy="80" r="22" fill="#DCFCE7" stroke="#16A34A" stroke-width="2"/><text x="140" y="84" text-anchor="middle" font-size="9" fill="#166534" font-weight="700">EQ-01</text><text x="140" y="110" text-anchor="middle" font-size="9" fill="#16A34A" font-weight="600">Equal.</text></g>
+              <g id="blowerNode" style="cursor:pointer;"><rect x="230" y="52" width="50" height="38" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/><text x="255" y="76" text-anchor="middle" font-size="9" fill="#92400E" font-weight="700">BL-101</text><circle cx="274" cy="58" r="6" fill="#D97706"/><text x="274" y="61.5" text-anchor="middle" font-size="8" fill="white" font-weight="700">!</text><text x="255" y="104" text-anchor="middle" font-size="9" fill="#B45309" font-weight="600">Warning</text></g>
+              <g id="sbrNode" style="cursor:pointer;"><circle cx="270" cy="190" r="32" fill="#DC2626" opacity=".1"/><circle cx="270" cy="190" r="32" fill="none" stroke="#DC2626" stroke-width="2"><animate attributeName="r" values="32;38;32" dur="1.6s" repeatCount="indefinite"/><animate attributeName="opacity" values=".8;0;.8" dur="1.6s" repeatCount="indefinite"/></circle><circle cx="270" cy="190" r="26" fill="#FEE2E2" stroke="#DC2626" stroke-width="2.5"/><text x="270" y="188" text-anchor="middle" font-size="9" fill="#991B1B" font-weight="700">AT-01</text><text x="270" y="200" text-anchor="middle" font-size="9" fill="#991B1B" font-weight="700">एयरएशन</text><circle cx="290" cy="170" r="9" fill="#DC2626"/><text x="290" y="174" text-anchor="middle" font-size="11" fill="white" font-weight="700">!</text><text x="270" y="234" text-anchor="middle" font-size="9" fill="#DC2626" font-weight="700">Aeration</text></g>
+              <g><rect x="110" y="260" width="60" height="34" rx="8" fill="#DCFCE7" stroke="#16A34A" stroke-width="2"/><text x="140" y="281" text-anchor="middle" font-size="9" fill="#166534" font-weight="700">Clarifier</text><text x="140" y="309" text-anchor="middle" font-size="9" fill="#16A34A" font-weight="600">ठीक है</text></g>
+              <g fill="#94A3B8"><circle cx="80" cy="80" r="5"/><circle cx="200" cy="190" r="5"/></g>
+            </svg>
+            <div style="position:absolute;top:10px;left:10px;background:rgba(255,255,255,.92);backdrop-filter:blur(4px);border:1px solid var(--line);border-radius:8px;padding:4px 10px;font-size:11px;color:var(--muted);">लाल/पीले node पर tap करें</div>
+          </div>
+        </div>
+        <div id="listView" class="flex-1 overflow-y-auto" style="padding:12px 16px;display:none;">
+          <div class="card" style="overflow:hidden;">
+            <div style="padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--line);">
+              <div class="t-label">AT-01 एयरएशन टैंक</div>
+              <button style="display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;padding:10px 0;background:none;border:none;cursor:pointer;" onclick="openIssue('dt006','collapsed')">
+                <div><div style="font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;">AT-01 <span class="chip" style="background:var(--crit);color:#fff;">1 critical</span></div><div style="font-size:11px;color:var(--muted);margin-top:2px;">ऑक्सीजन 1.8 mg/L ↓ · गंदलापन 14 NTU</div></div>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+            </div>
+            <div style="padding:10px 14px;">
+              <div class="t-label">BL-101 ब्लोअर</div>
+              <button style="display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;padding:10px 0;background:none;border:none;cursor:pointer;" onclick="openIssue('blower','collapsed')">
+                <div><div style="font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;">BL-101 <span class="chip" style="background:var(--warn);color:#fff;">1 high</span></div><div style="font-size:11px;color:var(--muted);margin-top:2px;">वाइब्रेशन 5.8 mm/s · तापमान 68°C</div></div>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      <!-- Historical range -->
-      <div>
-        <label class="text-[11px] uppercase text-slate-500 font-semibold">Historical range</label>
-        <div class="flex flex-wrap gap-2 mt-2" id="dig-range">
-          <button class="chip bg-slate-100 px-3 py-1.5" data-v="6h" onclick="pickRange(this)">Last 6 hours</button>
-          <button class="chip bg-slate-100 px-3 py-1.5" data-v="12h" onclick="pickRange(this)">Last 12 hours</button>
-          <button class="chip bg-slate-900 text-white px-3 py-1.5" data-v="24h" onclick="pickRange(this)">Last 24 hours</button>
-          <button class="chip bg-slate-100 px-3 py-1.5" data-v="7d" onclick="pickRange(this)">Last 7 days</button>
+      <!-- REPORT — Cognitive Load: one field at a time -->
+      <section data-screen="report" class="screen h-full flex-col" style="background:var(--surface);">
+        <div style="padding:16px 16px 12px;background:#fff;border-bottom:1px solid var(--line);">
+          <h1 class="t-head" style="font-size:22px;">Issue बताएं</h1>
+          <div class="t-sub" style="margin-top:2px;">Supervisor को सूचना जाएगी</div>
         </div>
-      </div>
-
-      <!-- Occurrence -->
-      <div>
-        <label class="text-[11px] uppercase text-slate-500 font-semibold">Occurrence</label>
-        <div class="flex flex-wrap gap-2 mt-2" id="dig-occ">
-          <button class="chip bg-slate-100 px-3 py-1.5" data-v="hourly" onclick="pickOcc(this)">Hourly</button>
-          <button class="chip bg-slate-900 text-white px-3 py-1.5" data-v="daily" onclick="pickOcc(this)">Daily</button>
-          <button class="chip bg-slate-100 px-3 py-1.5" data-v="weekly" onclick="pickOcc(this)">Weekly</button>
-        </div>
-        <div id="occ-detail" class="mt-3 p-3 bg-slate-50 rounded-lg text-sm">
-          <div class="flex items-center gap-2 flex-wrap">
-            <span class="text-slate-500">Send at</span>
-            <select id="occ-hour" class="border border-slate-200 rounded px-2 py-1 text-sm bg-white">
-              <option>08:00</option><option>09:00</option><option>10:00</option><option>12:00</option><option>17:00</option><option>20:00</option>
+        <form class="flex-1 overflow-y-auto" style="padding:14px 16px;display:flex;flex-direction:column;gap:14px;" onsubmit="event.preventDefault();showToast('Issue भेजा गया');">
+          <div>
+            <label class="t-label" style="display:block;margin-bottom:6px;">Equipment</label>
+            <select style="width:100%;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font-size:14px;color:var(--ink);">
+              <option>AT-01 एयरएशन टैंक</option><option>BL-101 ब्लोअर</option><option>Clarifier</option><option>EQ-01</option>
             </select>
-            <span id="occ-day-wrap" class="hidden flex items-center gap-2">
-              <span class="text-slate-500">on</span>
-              <select class="border border-slate-200 rounded px-2 py-1 text-sm bg-white"><option>Mon</option><option>Tue</option><option>Wed</option><option>Thu</option><option>Fri</option></select>
-            </span>
-            <span class="text-slate-500" id="occ-tz">IST</span>
           </div>
-          <div class="text-[11px] text-slate-500 mt-2" id="occ-summary">Next digest: tomorrow at 08:00 IST</div>
-        </div>
-      </div>
+          <div>
+            <label class="t-label" style="display:block;margin-bottom:6px;">क्या दिख रहा है?</label>
+            <textarea rows="3" style="width:100%;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font-size:14px;color:var(--ink);resize:none;" placeholder="जो भी असामान्य लगा…"></textarea>
+          </div>
+          <div>
+            <label class="t-label" style="display:block;margin-bottom:6px;">Photo</label>
+            <button type="button" style="width:100%;border:2px dashed #CBD5E1;border-radius:12px;padding:22px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted);cursor:pointer;background:transparent;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              <span style="font-size:14px;font-weight:600;">Photo खींचें</span>
+            </button>
+          </div>
+          <button class="btn btn-primary" style="margin-top:4px;">Submit</button>
+        </form>
+      </section>
 
-      <!-- Preview -->
-      <div class="p-3 bg-blue-50 rounded-lg text-xs text-blue-900">
-        <b>Preview:</b> <span id="dig-preview">Daily digest of <b>open Incidents and Issues</b> from <b>last 24 hours</b>, sent to recipients at <b>08:00 IST</b>.</span>
-      </div>
-    </div>
+    </main>
 
-    <div class="px-6 py-4 border-t border-slate-100 flex justify-between gap-2 sticky bottom-0 bg-white">
-      <button class="text-xs text-slate-500 hover:underline" onclick="toast('Test digest sent')">Send test now</button>
-      <div class="flex gap-2">
-        <button class="btn btn-ghost" onclick="closeDigests()">Cancel</button>
-        <button class="btn btn-primary" onclick="saveDigests()">Save digest</button>
+    <!-- Bottom Nav — Fitts: large tap zones; Von Restorff: Report = distinct red -->
+    <nav style="position:absolute;inset-x:0;bottom:0;z-index:30;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-top:1px solid var(--line);">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);padding:6px 4px 4px;">
+        <button data-go="issues" class="tab" style="display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px;border-radius:10px;cursor:pointer;background:transparent;border:none;">
+          <span class="tab-pill" style="position:relative;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+            <span style="position:absolute;top:-3px;right:-3px;width:14px;height:14px;border-radius:50%;background:var(--crit);color:#fff;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;">2</span>
+          </span>
+          <span class="tab-label">Issues</span>
+        </button>
+        <button data-go="tasks" class="tab" style="display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px;border-radius:10px;cursor:pointer;background:transparent;border:none;">
+          <span class="tab-pill"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="m9 12 2 2 4-4"/></svg></span>
+          <span class="tab-label">Tasks</span>
+        </button>
+        <button data-go="plant" class="tab" style="display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px;border-radius:10px;cursor:pointer;background:transparent;border:none;">
+          <span class="tab-pill"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M6 8v4h12V8"/><path d="M12 12v4"/></svg></span>
+          <span class="tab-label">Plant</span>
+        </button>
+        <button data-go="report" class="tab" style="display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px;border-radius:10px;cursor:pointer;background:transparent;border:none;">
+          <span style="width:34px;height:34px;border-radius:50%;background:var(--crit);display:flex;align-items:center;justify-content:center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          </span>
+          <span class="tab-label" style="font-weight:700;color:var(--crit);">Report</span>
+        </button>
       </div>
-    </div>
+    </nav>
+
+    <!-- Doherty: < 400ms toast feedback -->
+    <div id="toast" style="position:absolute;bottom:92px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:12px;font-weight:500;padding:9px 18px;border-radius:9999px;opacity:0;transition:opacity .15s;z-index:50;pointer-events:none;white-space:nowrap;"></div>
   </div>
+  <div style="text-align:center;font-size:11px;color:#94a3b8;margin-top:10px;">390 × 844 · Operator · Hindi-first · v3</div>
 </div>
-
-<!-- ============== TOAST ============== -->
-<div id="toast-container" class="fixed bottom-6 right-6 z-50 space-y-2"></div>
+</div>
 
 <script>
-// ---------- Navigation ----------
-let currentPlant = '';
-function show(name) {
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('screen-'+name).classList.add('active');
-  ['plants','insights'].forEach(n=>{
-    const el = document.getElementById('nav-'+n);
-    el.style.background = n===name ? '#0F172A' : '';
-    el.style.color = n===name ? '#fff' : '';
-  });
-  if (name !== 'insights') {
-    currentPlant = '';
-    const fp = document.getElementById('f-plant');
-    if (fp) fp.value = '';
-  } else if (!currentPlant) {
-    document.getElementById('f-plant').value = '';
-    document.getElementById('insights-h1').innerHTML = `Insights <span id="insight-count" class="text-slate-400 font-normal text-lg">· 18</span>`;
-    if (typeof renderInsights === 'function') renderInsights();
-  }
-  window.scrollTo(0,0);
+const screens = document.querySelectorAll('[data-screen]');
+function go(name){
+  screens.forEach(s=>s.classList.toggle('active',s.dataset.screen===name));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.go===name));
+  const hl=name==='issue-flow'?'issues':name;
+  document.querySelectorAll('nav .tab').forEach(t=>t.classList.toggle('active',t.dataset.go===hl));
+  if(name!=='issue-flow') stopStepTimer();
 }
-function goPlants() { currentPlant=''; show('plants'); }
-function goInsights() {
-  currentPlant='';
-  document.getElementById('f-plant').value='';
-  document.getElementById('insights-h1').innerHTML = `Insights <span id="insight-count" class="text-slate-400 font-normal text-lg">· 18</span>`;
-  show('insights');
-  renderInsights();
-}
-show('plants');
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
 
-// ---------- Data ----------
-const insights = [
-  {id:1, name:'DO drop in aeration tank', plant:'Andheri Plant', equip:'Aerator A-1', sev:'incident', status:'Active', last:'2h 14m', on:true, users:['Ravi K.','Priya S.'], sensor:'DO-101', threshold:'< 2.0 mg/L', current:'1.4 mg/L'},
-  {id:2, name:'Inlet pump vibration high', plant:'Andheri Plant', equip:'Pump P-3', sev:'incident', status:'Active', last:'47m', on:true, users:['Ravi K.'], sensor:'VIB-203', threshold:'> 8 mm/s', current:'9.6 mm/s'},
-  {id:3, name:'pH out of range', plant:'Andheri Plant', equip:'Equalization tank', sev:'issue', status:'Active', last:'1h 02m', on:true, users:['Arjun M.'], sensor:'PH-505', threshold:'5.5–9.0', current:'9.4'},
-  {id:4, name:'Blower load high', plant:'Bandra Plant', equip:'Blower B-2', sev:'issue', status:'Active', last:'3h 11m', on:true, users:['Meera R.'], sensor:'AMP-B2', threshold:'> 80 A', current:'92 A'},
-  {id:5, name:'MLSS below target', plant:'Bandra Plant', equip:'Aeration tank', sev:'issue', status:'Active', last:'4h', on:true, users:[], sensor:'MLSS-1', threshold:'> 2500 mg/L', current:'2100 mg/L'},
-  {id:6, name:'Effluent turbidity rising', plant:'Powai Plant', equip:'Outlet', sev:'warning', status:'Active', last:'30m', on:true, users:['Operator'], sensor:'TURB-O', threshold:'> 5 NTU', current:'6.2 NTU'},
-  {id:7, name:'Sludge pump runtime over limit', plant:'Powai Plant', equip:'Sludge pump', sev:'warning', status:'Active', last:'1h 20m', on:true, users:[], sensor:'RT-SP', threshold:'> 8 hrs/day', current:'9.1 hrs'},
-  {id:8, name:'Chlorine dosing low', plant:'Thane Plant', equip:'Cl₂ doser', sev:'warning', status:'Resolved', last:'5h ago', on:false, users:['Meera R.'], sensor:'CL-1', threshold:'< 0.5 mg/L', current:'0.7 mg/L'},
+const sparkRed=`<svg class="sparkline" width="100%" height="48" viewBox="0 0 300 48" preserveAspectRatio="none"><defs><linearGradient id="gr" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#DC2626" stop-opacity=".2"/><stop offset="1" stop-color="#DC2626" stop-opacity="0"/></linearGradient></defs><path d="M0,8 L40,12 L80,18 L120,24 L160,30 L200,36 L240,42 L300,46" stroke="#DC2626"/><path d="M0,8 L40,12 L80,18 L120,24 L160,30 L200,36 L240,42 L300,46 L300,48 L0,48Z" fill="url(#gr)" stroke="none"/></svg>`;
+const sparkAmber=`<svg class="sparkline" width="100%" height="48" viewBox="0 0 300 48" preserveAspectRatio="none"><defs><linearGradient id="ga" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#D97706" stop-opacity=".2"/><stop offset="1" stop-color="#D97706" stop-opacity="0"/></linearGradient></defs><line x1="0" y1="24" x2="300" y2="24" stroke="#D97706" stroke-dasharray="3 3" stroke-width="1"/><path d="M0,44 L50,40 L100,34 L150,28 L200,22 L250,16 L300,10" stroke="#D97706"/><path d="M0,44 L50,40 L100,34 L150,28 L200,22 L250,16 L300,10 L300,48 L0,48Z" fill="url(#ga)" stroke="none"/></svg>`;
+
+const issuesData=[
+  {key:'dt006',severity:'crit',sevLabel:'Critical',equipment:'AT-01 एयरएशन टैंक',sinceMin:29,title:'एयरएशन टैंक में ऑक्सीजन कम हो रही है',sub:'पानी की सफाई प्रभावित हो सकती है',spark:{d:'M0,6 L20,8 L40,10 L60,12 L80,15 L100,19 L120,22 L140,24',color:'#DC2626'},steps:5},
+  {key:'blower',severity:'warn',sevLabel:'High',equipment:'BL-101 ब्लोअर',sinceMin:54,title:'ब्लोअर में वाइब्रेशन बढ़ रही है',sub:'5.8 mm/s · सीमा 4.5 mm/s',spark:{d:'M0,22 L20,20 L40,18 L60,16 L80,13 L100,10 L120,8 L140,6',color:'#D97706'},steps:4},
 ];
-const sevColors = {
-  incident:{bg:'#FEE2E2',fg:'#991B1B',dot:'#DC2626'},
-  issue:{bg:'#FEF3C7',fg:'#92400E',dot:'#F59E0B'},
-  warning:{bg:'#FEF9C3',fg:'#854D0E',dot:'#FBBF24'},
-};
-const selected = new Set();
-
-// ---------- Filters ----------
-function filterByPlant(p) {
-  currentPlant = p;
-  show('insights');
-  document.getElementById('f-plant').value = p;
-  document.getElementById('insights-h1').innerHTML = `Insights <span class="text-slate-400 font-normal text-lg">· ${p}</span>`;
-  renderInsights();
-}
-function clearAllFilters() {
-  ['search','f-plant','f-sev','f-equip','f-status'].forEach(id=>document.getElementById(id).value='');
-  renderInsights();
-}
-function getFiltered() {
-  const q = document.getElementById('search').value.toLowerCase();
-  const p = document.getElementById('f-plant').value;
-  const s = document.getElementById('f-sev').value;
-  const e = document.getElementById('f-equip').value;
-  const st = document.getElementById('f-status').value;
-  return insights.filter(i =>
-    (!q || (i.name+i.plant+i.equip+i.sensor).toLowerCase().includes(q)) &&
-    (!p || i.plant===p) &&
-    (!s || i.sev===s) &&
-    (!e || i.equip.toLowerCase().includes(e.toLowerCase())) &&
-    (!st || i.status===st)
-  );
-}
-
-// ---------- Render insights table ----------
-function renderInsights() {
-  const list = getFiltered();
-  document.getElementById('insight-count').textContent = `· ${list.length}`;
-  document.getElementById('insights-list').innerHTML = list.map(i => `
-    <div class="grid grid-cols-12 px-4 py-3 hover:bg-slate-50 items-center border-b border-slate-100 last:border-0 ${selected.has(i.id)?'bg-blue-50/50':''}" data-id="${i.id}">
-      <div class="col-span-1 py-2">
-        <input type="checkbox" class="row-cb" ${selected.has(i.id)?'checked':''} onclick="toggleSel(${i.id});event.stopPropagation()" onchange="event.stopPropagation()"/>
+function renderIssuesList(){
+  const el=document.getElementById('issuesList');
+  const brd={crit:'border-left:4px solid #DC2626',warn:'border-left:4px solid #D97706'};
+  const chp={crit:'background:rgba(220,38,38,.08);color:#DC2626',warn:'background:rgba(217,119,6,.08);color:#D97706'};
+  el.innerHTML=issuesData.map(i=>`
+    <button onclick="openIssue('${i.key}','collapsed')" style="width:100%;text-align:left;background:#fff;border-radius:16px;padding:14px;${brd[i.severity]};box-shadow:0 1px 3px rgba(15,23,42,.06),0 4px 16px rgba(15,23,42,.05);margin-bottom:8px;cursor:pointer;border:none;display:block;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:8px;"><span class="chip" style="${chp[i.severity]}">${i.sevLabel}</span><span style="font-size:11px;color:#64748B;">${i.equipment}</span></div>
+        <span style="font-size:11px;color:#94A3B8;">${i.sinceMin}m पहले</span>
       </div>
-      <div class="col-span-4 flex items-center gap-2 cursor-pointer" data-action="open">
-        <span class="chip" style="background:${sevColors[i.sev].bg};color:${sevColors[i.sev].fg}">● ${i.sev}</span>
-        <div>
-          <div class="text-sm font-medium">${i.name}</div>
-          <div class="text-[11px] text-slate-500">${i.sensor} · ${i.threshold}</div>
+      <div style="margin-top:8px;font-size:15px;font-weight:600;line-height:1.3;">${i.title}</div>
+      <div style="font-size:12px;color:#64748B;margin-top:2px;">${i.sub}</div>
+      <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:8px;"><svg class="sparkline" width="110" height="24" viewBox="0 0 140 28"><path d="${i.spark.d}" stroke="${i.spark.color}" stroke-width="2" fill="none"/></svg><span class="chip" style="background:#F1F5F9;color:#334155;">${i.steps} steps</span></div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+    </button>`).join('');
+}
+renderIssuesList();
+
+function ansCard(icon,iBg,iClr,title,sub,oc,sel=false){
+  return`<button class="ans-card${sel?' selected':''}" style="${sel?`border-color:${iClr};background:${iBg}18;`:''}" onclick="${oc}">
+    <div class="ans-icon" style="background:${iBg};color:${iClr};">${icon}</div>
+    <div style="flex:1;min-width:0;"><div class="ans-title">${title}</div>${sub?`<div class="ans-sub">${sub}</div>`:''}</div>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m9 18 6-6-6-6"/></svg>
+  </button>`;
+}
+
+const flows={
+  dt006:{
+    equipment:'AT-01 एयरएशन टैंक',title:'एयरएशन टैंक — ऑक्सीजन कम',totalSteps:5,
+    steps:{
+      collapsed:{badge:'Overview',pct:0,tone:'neutral',html:()=>`
+        <div style="display:flex;align-items:center;gap:8px;"><span class="chip" style="background:rgba(220,38,38,.08);color:#DC2626;">Critical</span><span style="font-size:11px;color:#64748B;">AT-01 एयरएशन टैंक</span></div>
+        <h2 class="t-head" style="margin-top:10px;font-size:20px;">एयरएशन टैंक में ऑक्सीजन कम हो रही है</h2>
+        <p class="t-sub" style="margin-top:4px;">2 घंटे से सीमा से ऊपर · पानी की सफाई प्रभावित</p>
+        <div style="margin-top:14px;border-radius:14px;background:#FAFAFA;border:1px solid #E8ECF0;padding:14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><div class="t-label">गंदलापन · 7 दिन</div><span class="chip" style="background:#F1F5F9;color:#334155;">7d</span></div>
+          ${sparkRed}
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:#64748B;margin-top:6px;"><span>10 NTU</span><span>12</span><span>13</span><span style="color:#DC2626;font-weight:700;">14 अभी</span></div>
+          <div style="margin-top:8px;font-size:12px;font-weight:600;color:#DC2626;">⚠ सीमा 10 NTU से ऊपर — 2 घंटे से बढ़ रहा है</div>
         </div>
-      </div>
-      <div class="col-span-2 text-sm text-slate-600 cursor-pointer" data-action="open">${i.plant}<div class="text-[11px] text-slate-400">${i.equip}</div></div>
-      <div class="col-span-2 text-sm">
-        ${i.users.length ?
-          `<div class="flex -space-x-1.5 cursor-pointer" data-action="open">${i.users.slice(0,3).map(s=>`<div class="w-6 h-6 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-semibold" title="${s}">${s.split(' ')[0][0]}${s.split(' ')[1]?s.split(' ')[1][0]:''}</div>`).join('')}${i.users.length>3?`<div class="w-6 h-6 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px]">+${i.users.length-3}</div>`:''}</div>` :
-          `<button class="text-xs text-blue-600 hover:underline" data-action="quick-add">+ Add</button>`
-        }
-      </div>
-      <div class="col-span-2 text-sm cursor-pointer" data-action="open">
-        ${i.status==='Active' ? `<span class="text-red-600 flex items-center gap-1.5 text-xs"><span class="w-1.5 h-1.5 rounded-full bg-red-500 pulse"></span>Active · ${i.last}</span>` : `<span class="text-slate-400 text-xs">Resolved · ${i.last}</span>`}
-      </div>
-      <div class="col-span-1 text-right" data-action="toggle-on">
-        <label class="inline-flex items-center cursor-pointer">
-          <input type="checkbox" ${i.on?'checked':''} onchange="toggleInsight(${i.id},this.checked)" class="sr-only peer"/>
-          <div class="w-9 h-5 bg-slate-200 peer-checked:bg-emerald-500 rounded-full transition relative">
-            <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition peer-checked:translate-x-4"></div>
-          </div>
-        </label>
-      </div>
-    </div>
-  `).join('') || `<div class="p-8 text-center text-slate-400 text-sm">No insights match these filters.</div>`;
-  updateSelectAll();
-}
+        <div style="margin-top:12px;display:flex;gap:8px;">
+          <div class="metric" style="background:#FEE2E2;"><div class="t-label" style="color:#DC2626;">गंदलापन</div><div class="metric-val" style="color:#DC2626;">14<span class="metric-unit">NTU</span></div><div class="metric-note" style="color:#DC2626;">+133%</div></div>
+          <div class="metric" style="background:#FEF3C7;"><div class="t-label" style="color:#92400E;">ऑक्सीजन DO</div><div class="metric-val" style="color:#92400E;">1.8<span class="metric-unit">mg/L</span></div><div class="metric-note" style="color:#92400E;">2.0 से कम</div></div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:16px;" onclick="openIssue('dt006','preflight')">जांच शुरू करें →</button>`},
 
-// ---------- Selection ----------
-function toggleSel(id) {
-  if (selected.has(id)) selected.delete(id); else selected.add(id);
-  renderInsights();
-  updateBulkBar();
-}
-function toggleAll() {
-  const list = getFiltered();
-  if (list.every(i=>selected.has(i.id))) list.forEach(i=>selected.delete(i.id));
-  else list.forEach(i=>selected.add(i.id));
-  renderInsights();
-  updateBulkBar();
-}
-function updateSelectAll() {
-  const list = getFiltered();
-  const cb = document.getElementById('cb-all');
-  if (!cb) return;
-  cb.indeterminate = false; cb.checked = false;
-  if (!list.length) return;
-  if (list.every(i=>selected.has(i.id))) cb.checked = true;
-  else if (list.some(i=>selected.has(i.id))) cb.indeterminate = true;
-}
-function updateBulkBar() {
-  const panel = document.getElementById('bulk-panel');
-  if (selected.size) {
-    if (panel.classList.contains('hidden')) {
-      panel.classList.remove('hidden');
-      // Initialize the assignment flow state on first reveal
-      initBulkPanel();
-    } else {
-      // Refresh count + summary pills as selection changes
-      refreshBulkPanelHeader();
+      preflight:{badge:'शुरू करें · 0/5',pct:0,tone:'neutral',html:()=>`
+        <div style="border-radius:10px;padding:10px 12px;background:rgba(37,99,235,.05);border:1.5px solid rgba(37,99,235,.15);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+          <div style="font-size:12px;color:#1d4ed8;font-weight:500;">AT-01 · 14 NTU · ऑक्सीजन 1.8 mg/L</div>
+        </div>
+        <h2 class="t-head" style="font-size:20px;">टैंक के पास क्या देखा?</h2>
+        <p class="t-sub" style="margin-top:4px;">एक tap में बताएं — यह diagnostic में use होगा</p>
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+          ${ansCard('✅','#DCFCE7','#16A34A','सब ठीक लग रहा है','पानी सामान्य, कोई असामान्य बदबू नहीं',"openIssue('dt006','step1')")}
+          ${ansCard('⚠️','#FEF3C7','#D97706','कुछ असामान्य है','पानी हल्का बदरंग या हल्की बदबू',"openIssue('dt006','step1')")}
+          ${ansCard('🚨','#FEE2E2','#DC2626','कुछ गंभीर दिखा','पानी काला या तेज़ H₂S बदबू',"openIssue('dt006','escalate')")}
+        </div>`},
+
+      step1:{badge:'Step 1 / 5',pct:20,tone:'neutral',html:()=>`
+        <div class="t-label">Manual Input · AT-01 एयरएशन टैंक</div>
+        <h2 class="t-head" style="margin-top:6px;font-size:19px;">DO रीडिंग लें · AT-01</h2>
+        <p class="t-sub" style="margin-top:4px;">DO Meter से एयरएशन टैंक की रीडिंग लें</p>
+        <div style="margin-top:14px;border-radius:14px;border:1.5px solid #E8ECF0;padding:14px;">
+          <div style="font-size:12px;color:#64748B;margin-bottom:8px;">रीडिंग डालें</div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <input id="doVal" type="number" step="0.1" value="1.8" style="flex:1;background:#FAFAFA;border:1.5px solid #E8ECF0;border-radius:10px;padding:13px;font-size:22px;font-weight:600;"/>
+            <span style="font-size:14px;color:#64748B;">mg/L</span>
+          </div>
+          <div style="margin-top:10px;height:6px;background:#F1F5F9;border-radius:9999px;overflow:hidden;position:relative;">
+            <div style="height:100%;width:45%;background:linear-gradient(to right,#DC2626,#D97706,#16A34A);border-radius:9999px;"></div>
+            <div style="position:absolute;left:45%;top:-4px;width:2px;height:14px;background:#0F172A;border-radius:1px;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:#64748B;margin-top:4px;"><span>0</span><span style="color:#DC2626;font-weight:600;">सही: 2–4 mg/L</span><span>4</span></div>
+          <div style="display:flex;gap:6px;margin-top:10px;">
+            ${['0.8','1.5','3.2','4.6'].map(v=>`<button onclick="document.getElementById('doVal').value='${v}'" style="flex:1;padding:9px;border-radius:8px;border:1.5px solid #E8ECF0;font-size:13px;font-weight:600;cursor:pointer;background:#fff;">${v}</button>`).join('')}
+          </div>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:#64748B;">मीटर नहीं है? <button onclick="showToast('Recorded — Supervisor को report हो गया')" style="color:#2563EB;font-weight:600;background:none;border:none;cursor:pointer;padding:0;">रिकॉर्ड करें →</button></div>
+        <button class="btn btn-primary" style="margin-top:14px;" onclick="(function(){const v=parseFloat(document.getElementById('doVal').value);openIssue('dt006',v<1?'escalate':'step2');})()">आगे बढ़ें</button>
+        <button class="btn btn-ghost" style="margin-top:8px;" onclick="openIssue('dt006','escalate')">सीधा Supervisor को बताएं</button>`},
+
+      step2:{badge:'Step 2 / 5',pct:40,tone:'neutral',html:()=>`
+        <div class="t-label">Operator · AT-01 एयरएशन टैंक</div>
+        <h2 class="t-head" style="margin-top:6px;font-size:19px;">पानी और MBBR की हलचल कैसी है?</h2>
+        <p class="t-sub" style="margin-top:4px;">टैंक के ऊपर खड़े होकर देखें</p>
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+          ${ansCard('✅','#DCFCE7','#16A34A','सामान्य','पूरे टैंक में uniform और ठीक है',"openIssue('dt006','step3')")}
+          ${ansCard('⚠️','#FEF3C7','#D97706','डेड ज़ोन दिखा','कुछ कोने में हलचल नहीं',"openIssue('dt006','step3')")}
+          ${ansCard('〰️','#FFF7ED','#EA580C','असामान्य हलचल','कुछ जगह ज़्यादा, कुछ जगह कम',"openIssue('dt006','step3')")}
+          ${ansCard('🔴','#FEE2E2','#DC2626','कोई हलचल नहीं','पूरे टैंक में कुछ नहीं',"openIssue('dt006','escalate')")}
+        </div>`},
+
+      step3:{badge:'Step 3 / 5',pct:60,tone:'neutral',html:()=>`
+        <div class="t-label">Operator · AT-01 एयरएशन टैंक</div>
+        <h2 class="t-head" style="margin-top:6px;font-size:19px;">बदबू · AT-01</h2>
+        <p style="font-size:14px;font-weight:500;color:#334155;margin-top:4px;">आपने क्या महसूस किया?</p>
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+          ${ansCard('✅','#DCFCE7','#16A34A','सामान्य / कोई बदबू नहीं','Normal सीवेज smell है',"openIssue('dt006','step4')")}
+          ${ansCard('⚠️','#FEF3C7','#D97706','हल्की बदबू','कुछ जगह से सड़ने की smell',"openIssue('dt006','step4')")}
+          ${ansCard('🚨','#FEE2E2','#DC2626','तेज़ H₂S बदबू','Septic / anaerobic condition',"openIssue('dt006','escalate')")}
+        </div>
+        <p style="margin-top:10px;font-size:11px;color:#94A3B8;">तेज़ H₂S → तुरंत escalate करें</p>`},
+
+      step4:{badge:'Step 4 / 5',pct:80,tone:'neutral',html:()=>`
+        <div class="t-label">Operator · BL-101 ब्लोअर</div>
+        <h2 class="t-head" style="margin-top:6px;font-size:19px;">ब्लोअर BL-101 चेक</h2>
+        <p class="t-sub" style="margin-top:4px;">प्रेशर और आवाज़ — लाइव रीडिंग नीचे</p>
+        <div style="margin-top:12px;display:flex;gap:8px;">
+          <div class="metric" style="background:#FEE2E2;"><div class="t-label" style="color:#DC2626;">Pressure</div><div class="metric-val" style="color:#DC2626;">0.3<span class="metric-unit">bar</span></div><div class="metric-note" style="color:#DC2626;">Design 0.5 से कम</div></div>
+          <div class="metric" style="background:#FEE2E2;"><div class="t-label" style="color:#DC2626;">Current</div><div class="metric-val" style="color:#DC2626;">11.4<span class="metric-unit">A</span></div><div class="metric-note" style="color:#DC2626;">14 A से कम</div></div>
+        </div>
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;">
+          ${ansCard('✅','#DCFCE7','#16A34A','प्रेशर नार्मल, आवाज़ ठीक','',"openIssue('dt006','step5')")}
+          ${ansCard('📉','#F1F5F9','#64748B','प्रेशर कम है','Capacity में दिक्कत',"openIssue('dt006','step5')")}
+          ${ansCard('🔊','#FEF3C7','#D97706','वाइब्रेशन ज़्यादा','Mechanical issue',"openIssue('dt006','escalate')")}
+          ${ansCard('⏻','#FEE2E2','#DC2626','ब्लोअर बंद है','Restart करें',"openIssue('dt006','escalate')")}
+        </div>`},
+
+      step5:{badge:'Step 5 / 5',pct:95,tone:'neutral',html:()=>`
+        <div class="t-label">Operator · AT-01 एयरएशन टैंक</div>
+        <h2 class="t-head" style="margin-top:6px;font-size:19px;">Diffuser का Air Pattern</h2>
+        <p class="t-sub" style="margin-top:4px;">Surface पर बुलबुले — uniform होने चाहिए</p>
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+          ${ansCard('🟢','#DCFCE7','#16A34A','सामान्य','बुलबुले एक जैसे हैं',"openIssue('dt006','resolved')")}
+          ${ansCard('🟡','#FEF3C7','#D97706','कम-ज़्यादा है','कुछ जगह कम, कुछ जगह ज़्यादा',"openIssue('dt006','resolved')")}
+          ${ansCard('🔴','#FEE2E2','#DC2626','बुलबुले बहुत कम','Major clog या damage',"openIssue('dt006','escalate')")}
+          ${ansCard('✖','#F1F5F9','#334155','कुछ नहीं दिखा','ऊपर से visible नहीं',"openIssue('dt006','escalate')")}
+        </div>`},
+
+      escalate:{badge:'Action Required',pct:100,tone:'crit',html:()=>`
+        <div style="border-radius:16px;background:linear-gradient(145deg,#FFF1F2,#FEE2E2);padding:22px;text-align:center;">
+          <div style="width:60px;height:60px;border-radius:50%;background:#DC2626;display:flex;align-items:center;justify-content:center;margin:0 auto;font-size:26px;">📞</div>
+          <div style="font-size:22px;font-weight:700;margin-top:12px;">Supervisor को बुलाएं</div>
+          <div style="font-size:13px;color:#64748B;margin-top:4px;">कारण की पुष्टि हो गई</div>
+        </div>
+        <div style="margin-top:12px;display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;background:#FFFBEB;border:1.5px solid #FDE68A;">
+          <span style="font-size:16px;">⚠</span>
+          <span style="font-size:13px;font-weight:600;color:#92400E;">BL-101 ब्लोअर में Mechanical issue</span>
+        </div>
+        <div style="margin-top:12px;border-radius:14px;border:1.5px solid #E8ECF0;padding:14px;">
+          <div class="t-label" style="margin-bottom:10px;">अभी यह करें</div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div class="action-row"><div class="action-num">1</div><div style="font-size:13px;font-weight:500;">ब्लोअर switch off करें — safety के लिए</div></div>
+            <div class="action-row"><div class="action-num">2</div><div style="font-size:13px;font-weight:500;">Bearing / coupling visually check करें</div></div>
+            <div class="action-row"><div class="action-num crit">3</div><div style="font-size:13px;font-weight:500;color:#DC2626;">Maintenance team को तुरंत call करें</div></div>
+          </div>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;">
+          <button class="btn btn-ghost btn-i" style="flex:1;" onclick="go('issues')">बाद में</button>
+          <button class="btn btn-danger btn-i" style="flex:1;" onclick="showToast('Call जा रहा है…')">📞 अभी Call</button>
+        </div>
+        <div class="sys-note" style="margin-top:12px;">
+          <div class="t-label" style="color:#15803D;margin-bottom:4px;">System</div>
+          <div style="font-size:12px;color:#15803D;">Supervisor Ashok Kumar को automatically सूचना भेजी गई · अभी</div>
+        </div>
+        <div style="margin-top:16px;display:flex;gap:10px;justify-content:center;">
+          ${[['😊','बहुत मदद'],['👍','थोड़ी मदद'],['👎','मदद नहीं']].map(([e,l])=>`<div style="text-align:center;cursor:pointer;" onclick="showToast('Feedback noted')"><div style="width:52px;height:52px;border-radius:12px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto;">${e}</div><div style="font-size:10px;margin-top:4px;color:var(--muted);">${l}</div></div>`).join('')}
+        </div>`},
+
+      resolved:{badge:'Resolved',pct:100,tone:'ok',html:()=>`
+        <div style="border-radius:16px;background:#16A34A;color:#fff;padding:20px;display:flex;align-items:center;gap:14px;">
+          <div style="width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+          <div><div style="font-size:11px;text-transform:uppercase;opacity:.8;font-weight:600;">Resolved</div><div style="font-size:20px;font-weight:700;">Issue Resolved</div><div style="font-size:12px;opacity:.9;margin-top:2px;">DO normalized · 48h monitor on</div></div>
+        </div>
+        <div style="margin-top:14px;border-radius:12px;background:var(--surface);padding:14px;">
+          <div class="t-label" style="margin-bottom:8px;">Auto-log</div>
+          <ul style="display:flex;flex-direction:column;gap:6px;padding-left:16px;font-size:13px;color:#334155;list-style:disc;"><li>Diffuser cleaning scheduled</li><li>DO checked every 4h for 48h</li><li>Supervisor informed</li></ul>
+        </div>
+        <button class="btn btn-ghost" style="margin-top:14px;" onclick="go('issues')">Issues पर वापस जाएं</button>`},
     }
-  } else {
-    panel.classList.add('hidden');
-  }
-}
-function refreshBulkPanelHeader() {
-  const n = selected.size;
-  document.getElementById('bulk-count').textContent = n;
-  document.getElementById('bulk-modal-count').textContent = n;
-  document.getElementById('bulk-confirm-count').textContent = n;
-  document.getElementById('bulk-count-s').textContent = n===1?'':'s';
-  document.getElementById('bulk-modal-count-s').textContent = n===1?'':'s';
-  document.getElementById('bulk-confirm-count-s').textContent = n===1?'':'s';
-  // Pills
-  const sels = [...selected].map(id=>insights.find(x=>x.id===id)).filter(Boolean);
-  const sevCounts = {}; const plantSet = new Set();
-  sels.forEach(i=>{ sevCounts[i.sev]=(sevCounts[i.sev]||0)+1; plantSet.add(i.plant); });
-  document.getElementById('bulk-summary-pills').innerHTML =
-    Object.entries(sevCounts).map(([sev,nn])=>`<span class="chip" style="background:${sevColors[sev].bg};color:${sevColors[sev].fg}">${nn} ${sev}</span>`).join('') +
-    [...plantSet].slice(0,3).map(p=>`<span class="chip bg-white/15 text-white">${p}</span>`).join('') +
-    (plantSet.size>3?`<span class="chip bg-white/15 text-white">+${plantSet.size-3} more</span>`:'');
-  updatePreview();
-}
-function clearSelection() { selected.clear(); renderInsights(); updateBulkBar(); }
-function bulkPause() {
-  selected.forEach(id=>{ const i = insights.find(x=>x.id===id); if(i) i.on=false; });
-  toast(`✓ Paused ${selected.size} insights · <button class="underline" onclick="bulkResume()">Undo</button>`);
-  clearSelection();
-}
-function bulkResume() {
-  insights.forEach(i=>i.on=true); renderInsights(); toast('✓ Resumed');
-}
-function toggleInsight(id, on){
-  const i = insights.find(x=>x.id===id); i.on = on;
-  toast(`Insight ${on?'resumed':'paused'} · <button class="underline" onclick="toggleInsight(${id},${!on});this.parentElement.remove()">Undo</button>`);
-}
+  },
 
-// ---------- Detail drawer ----------
-function openDetail(id) {
-  const i = insights.find(x=>x.id===id);
-  if (!i) return;
-  const c = sevColors[i.sev];
-  document.getElementById('detail-content').innerHTML = `
-    <div class="drawer-in">
-      <!-- Header -->
-      <div class="px-6 py-4 border-b border-slate-100 sticky top-0 bg-white z-10">
-        <div class="flex items-center justify-between mb-2">
-          <button class="text-slate-400 hover:text-slate-700 text-sm" onclick="closeDetail()">← Close</button>
-          <div class="flex gap-2">
-            <button class="btn btn-sm btn-ghost">Edit</button>
-            <button class="btn btn-sm btn-ghost">⋯</button>
-          </div>
-        </div>
-        <div class="flex items-center gap-2 mb-1">
-          <span class="chip" style="background:${c.bg};color:${c.fg}">● ${i.sev}</span>
-          ${i.status==='Active' ? `<span class="text-red-600 flex items-center gap-1.5 text-xs font-medium"><span class="w-1.5 h-1.5 rounded-full bg-red-500 pulse"></span>Active · ${i.last}</span>` : `<span class="text-slate-400 text-xs">Resolved</span>`}
-        </div>
-        <h2 class="font-bold text-xl">${i.name}</h2>
-        <p class="text-sm text-slate-500 mt-0.5">${i.plant} · ${i.equip}</p>
-      </div>
-
-      <div class="p-6 space-y-6">
-
-        <!-- Live reading + sparkline -->
-        <div class="card p-4 border border-slate-100">
-          <div class="flex items-center justify-between mb-3">
-            <div>
-              <div class="text-[11px] uppercase text-slate-500 font-semibold">Current reading · ${i.sensor}</div>
-              <div class="text-2xl font-bold mt-1" style="color:${c.dot}">${i.current}</div>
-              <div class="text-xs text-slate-500">Threshold: ${i.threshold}</div>
-            </div>
-            <svg viewBox="0 0 200 60" class="w-48 h-16">
-              <path class="sparkline" d="M0,40 L20,38 L40,42 L60,30 L80,32 L100,20 L120,18 L140,12 L160,10 L180,8 L200,6"/>
-              <circle cx="200" cy="6" r="3" fill="${c.dot}"/>
-            </svg>
-          </div>
-          <div class="flex gap-2 text-xs">
-            <button class="chip bg-slate-100">1H</button>
-            <button class="chip bg-slate-900 text-white">24H</button>
-            <button class="chip bg-slate-100">7D</button>
-            <button class="chip bg-slate-100">30D</button>
-          </div>
-        </div>
-
-        <!-- Conditions -->
-        <div>
-          <div class="text-[11px] uppercase text-slate-500 font-semibold mb-2">Conditions</div>
-          <div class="card p-4 border border-slate-100 text-sm space-y-2">
-            <div><span class="text-slate-500">Opens when</span> <code class="bg-slate-100 px-2 py-0.5 rounded text-[12px]">${i.sensor} ${i.threshold}</code> sustained 60s</div>
-            <div><span class="text-slate-500">Closes when</span> <code class="bg-slate-100 px-2 py-0.5 rounded text-[12px]">${i.sensor} back in range for 5 min</code> · or manual</div>
-          </div>
-        </div>
-
-        <!-- Equipment -->
-        <div>
-          <div class="text-[11px] uppercase text-slate-500 font-semibold mb-2">Equipment</div>
-          <div class="card p-4 border border-slate-100 text-sm grid grid-cols-2 gap-y-2">
-            <div><span class="text-slate-500">Tag</span> <span class="font-medium">${i.equip}</span></div>
-            <div><span class="text-slate-500">Sensor</span> <span class="font-medium">${i.sensor}</span></div>
-            <div><span class="text-slate-500">Installed</span> <span>2023-08-12</span></div>
-            <div><span class="text-slate-500">Last service</span> <span>2026-04-03</span></div>
-          </div>
-        </div>
-
-        <!-- Users / escalation timeline -->
-        <div>
-          <div class="flex items-center justify-between mb-2">
-            <div class="text-[11px] uppercase text-slate-500 font-semibold">Personnel monitoring · escalation</div>
-            <button class="text-xs text-blue-600 hover:underline" onclick="closeDetail();selected.clear();selected.add(${i.id});updateBulkBar();openBulkAssign()">+ Add user</button>
-          </div>
-          <div class="card p-4 border border-slate-100">
-            <div class="ml-2 pl-6 border-l-2 border-slate-200 space-y-3 py-1">
-              ${[
-                {t:'Immediate', user:i.users[0]||'Plant Manager', ch:'📞 ✉ WA', color:'#DC2626'},
-                {t:'10 min', user:i.users[1]||'Shift Lead', ch:'SMS', color:'#F59E0B'},
-                {t:'30 min', user:'Operations Head', ch:'📞', color:'#64748B'},
-              ].map(s=>`
-                <div class="relative">
-                  <div class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-white border-2" style="border-color:${s.color}"></div>
-                  <div class="text-sm flex items-center gap-3">
-                    <span class="chip bg-slate-100 w-20 justify-center">${s.t}</span>
-                    <span class="font-medium">${s.user}</span>
-                    <span class="text-slate-500 text-xs">${s.ch}</span>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        </div>
-
-        <!-- History timeline -->
-        <div>
-          <div class="text-[11px] uppercase text-slate-500 font-semibold mb-2">History</div>
-          <div class="card p-4 border border-slate-100 text-sm space-y-3">
-            <div class="flex gap-3"><span class="text-slate-400 text-xs w-32 shrink-0">2026-05-05 09:21</span><span><b>Opened</b> · ${i.sensor} = ${i.current}</span></div>
-            <div class="flex gap-3"><span class="text-slate-400 text-xs w-32 shrink-0">2026-05-05 09:21</span><span>Notified <b>${i.users[0]||'Plant Manager'}</b> via WhatsApp, Call</span></div>
-            <div class="flex gap-3"><span class="text-slate-400 text-xs w-32 shrink-0">2026-05-05 09:31</span><span>Escalated to <b>Shift Lead</b> · no acknowledgement</span></div>
-            <div class="flex gap-3"><span class="text-slate-400 text-xs w-32 shrink-0">2026-05-04 14:02</span><span>Last resolved · automatic close</span></div>
-            <button class="text-xs text-blue-600 hover:underline">View full history (24 events)</button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  `;
-  document.getElementById('detail-drawer').classList.remove('hidden');
-  document.getElementById('detail-overlay').classList.remove('hidden');
-}
-function closeDetail() {
-  document.getElementById('detail-drawer').classList.add('hidden');
-  document.getElementById('detail-overlay').classList.add('hidden');
-}
-
-// ---------- Bulk assign modal v2 ----------
-const allUsers = [
-  {n:'Priya Sharma', role:'Shift Lead · Andheri', count:5, color:'#0EA5E9'},
-  {n:'Arjun Mehta', role:'Plant Manager · Bandra', count:3, noaccess:['Andheri Plant'], color:'#8B5CF6'},
-  {n:'Meera Rao', role:'Operations Head · All plants', count:8, color:'#F59E0B'},
-  {n:'Vikas Patel', role:'Operator · Powai', count:2, color:'#10B981'},
-  {n:'Ravi Kumar', role:'Senior Operator · Andheri', count:6, color:'#EC4899'},
-  {n:'Anjali Verma', role:'Compliance · All plants', count:4, color:'#6366F1'},
-  {n:'Karan Bhatt', role:'Maintenance Engineer', count:7, color:'#EF4444'},
-  {n:'Neha Tandon', role:'Night Shift Lead', count:3, color:'#14B8A6'},
-];
-
-let bulkUsers = [];
-let bulkTiming = 'imm';
-let bulkChans = { wa:true };
-let recentUserNames = ['Priya Sharma','Meera Rao','Ravi Kumar'];
-
-// Initializes the inline bulk-assign panel state when it first becomes visible
-function initBulkPanel() {
-  bulkUsers = [];
-  bulkTiming = 'imm';
-  bulkChans = { wa:true };
-  refreshBulkPanelHeader();
-  // Reset UI state
-  const ss = document.getElementById('sup-search'); if (ss) ss.value = '';
-  document.getElementById('bulk-users-block').classList.add('hidden');
-  document.getElementById('bulk-helper').classList.add('hidden');
-  document.getElementById('step-timing').classList.add('hidden');
-  document.getElementById('step-channels').classList.add('hidden');
-  document.getElementById('custom-min-wrap').classList.add('hidden');
-  // Reset save-group
-  const cb = document.getElementById('save-group-cb'); if(cb) cb.checked = false;
-  const gn = document.getElementById('save-group-name'); if(gn) gn.value = '';
-  // Reset chip selections
-  document.querySelectorAll('#step-timing .time-chip').forEach(b=>b.classList.toggle('on', b.dataset.v==='imm'));
-  document.querySelectorAll('#step-channels .big-ch').forEach(b=>b.classList.toggle('on', b.dataset.v==='wa'));
-  // Hide suggestions until user focuses search
-  const sug = document.getElementById('sup-suggestions'); if (sug) sug.classList.add('hidden');
-  updateProgress();
-  updatePreview();
-}
-// Legacy entrypoints — kept for places that still call openBulkAssign() (e.g. quick-add link)
-function openBulkAssign() {
-  if (!selected.size) { toast('Select at least one insight first'); return; }
-  updateBulkBar();
-  document.getElementById('bulk-panel').scrollIntoView({behavior:'smooth', block:'start'});
-  setTimeout(()=>{ const s=document.getElementById('sup-search'); if (s) s.focus(); }, 250);
-}
-function closeBulkAssign() {
-  // Inline panel closes by clearing the selection
-  selected.clear(); renderInsights(); updateBulkBar();
-}
-
-function avatarHTML(user, size=22) {
-  const initials = user.n.split(' ').map(x=>x[0]).slice(0,2).join('');
-  const cls = size>=30 ? 'avatar' : 'chip-avatar';
-  return `<span class="${cls}" style="background:${user.color||'#64748B'};width:${size}px;height:${size}px">${initials}</span>`;
-}
-
-function searchUser(q) {
-  const box = document.getElementById('sup-suggestions');
-  q = (q||'').trim().toLowerCase();
-  let html = '';
-  const taken = new Set(bulkUsers.map(u=>u.name));
-  if (!q) {
-    // Show Recent + Groups when empty
-    const recent = allUsers.filter(u=>recentUserNames.includes(u.n) && !taken.has(u.n)).slice(0,3);
-    const moreGroups = (typeof groups !== 'undefined' ? groups : []).slice(0,3);
-    if (recent.length) {
-      html += `<div class="suggestion-section">Recent</div>`;
-      html += recent.map(u=>userSuggestionHTML(u)).join('');
+  biomass:{
+    equipment:'AT-01 एयरएशन टैंक',title:'एयरएशन टैंक — जीवाणु कम',totalSteps:5,
+    steps:{
+      collapsed:{badge:'Overview',pct:0,tone:'neutral',html:()=>`
+        <div style="display:flex;align-items:center;gap:8px;"><span class="chip" style="background:rgba(220,38,38,.08);color:#DC2626;">Critical</span><span style="font-size:11px;color:#64748B;">AT-01</span></div>
+        <h2 class="t-head" style="margin-top:10px;font-size:20px;">एयरएशन टैंक में जीवाणु कम हो रहे हैं</h2>
+        <p class="t-sub" style="margin-top:4px;">Low Biomass · SV30 ↓</p>
+        <div style="margin-top:14px;border-radius:14px;background:#FAFAFA;border:1px solid #E8ECF0;padding:14px;"><div class="t-label" style="margin-bottom:8px;">SV30 · 7 दिन</div>${sparkRed}<div style="display:flex;justify-content:space-between;font-size:11px;color:#64748B;margin-top:6px;"><span>320</span><span>280</span><span>240</span><span style="color:#DC2626;font-weight:700;">210 अभी</span></div></div>
+        <button class="btn btn-primary" style="margin-top:14px;" onclick="openIssue('biomass','step1')">जांच शुरू करें →</button>`},
+      step1:{badge:'Step 1 / 5',pct:20,tone:'neutral',html:()=>`
+        <div class="t-label">Operator · AT-01</div>
+        <h2 class="t-head" style="margin-top:6px;font-size:19px;">पानी का रंग</h2>
+        <p style="font-size:14px;font-weight:500;color:#334155;margin-top:4px;">AT-01 में क्या देखा?</p>
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+          ${ansCard('🟤','#FEF3C7','#92400E','भूरा / चाय जैसा','Normal appearance',"openIssue('biomass','step2')")}
+          ${ansCard('🟡','#FFFBEB','#D97706','हल्का / पीला','Low biomass suspected',"openIssue('biomass','step2')")}
+          ${ansCard('⚫','#FEE2E2','#DC2626','काला / बदबूदार','Septic — तुरंत Supervisor',"openIssue('biomass','septic')")}
+        </div>`},
+      septic:{badge:'Action Required',pct:100,tone:'crit',html:()=>`
+        <div style="border-radius:16px;background:#DC2626;color:#fff;padding:22px;text-align:center;"><div style="font-size:32px;">📞</div><div style="font-size:20px;font-weight:700;margin-top:8px;">Supervisor को बुलाएं</div><div style="font-size:13px;opacity:.9;margin-top:4px;">Septic condition — Black color + odor</div></div>
+        <div class="sys-note" style="margin-top:12px;"><div class="t-label" style="color:#15803D;margin-bottom:4px;">System</div><div style="font-size:12px;color:#15803D;">Supervisor Ashok Kumar को automatically सूचना · 09:42</div></div>
+        <button class="btn btn-ghost" style="margin-top:12px;" onclick="go('issues')">Issues पर वापस</button>`},
+      step2:{badge:'Step 2 / 5',pct:40,tone:'neutral',html:()=>`
+        <div style="border-radius:12px;background:#FFFBEB;border:1.5px solid #FDE68A;padding:12px;margin-bottom:14px;"><div class="t-label" style="color:#92400E;">System</div><div style="margin-top:4px;font-size:13px;">Sludge wasting 3 दिन: <b>4.2 m³/day</b> (target 2.5)</div><div style="margin-top:6px;font-size:12px;font-weight:600;color:#B45309;">⚠ Over-wasting detected</div></div>
+        <h2 class="t-head" style="font-size:19px;">Sludge wasting बंद करें</h2>
+        <p class="t-sub" style="margin-top:4px;">Auto task: हर 12h SV30 record करें</p>
+        <div style="margin-top:14px;display:flex;gap:8px;"><button class="btn btn-ghost btn-i" style="flex:1;" onclick="openIssue('biomass','step3')">आगे बढ़ें</button><button class="btn btn-primary btn-i" style="flex:1;" onclick="openIssue('biomass','step3')">Apply Action</button></div>`},
+      step3:{badge:'Step 3 / 5',pct:60,tone:'neutral',html:()=>`
+        <div class="t-label">Operator · Inlet</div>
+        <h2 class="t-head" style="margin-top:6px;font-size:19px;">Inlet पानी कैसा है?</h2>
+        <div style="margin-top:16px;display:flex;gap:8px;">
+          <button onclick="openIssue('biomass','step4')" class="ans-card" style="flex:1;justify-content:center;flex-direction:column;gap:6px;min-height:80px;"><div style="font-size:24px;">✅</div><div class="ans-title">सामान्य है</div></button>
+          <button onclick="openIssue('biomass','toxic')" class="ans-card" style="flex:1;justify-content:center;flex-direction:column;gap:6px;min-height:80px;border-color:rgba(220,38,38,.3);background:rgba(220,38,38,.03);"><div style="font-size:24px;">⚠️</div><div class="ans-title" style="color:#DC2626;">असामान्य</div></button>
+        </div>`},
+      toxic:{badge:'Action Required',pct:100,tone:'crit',html:()=>`
+        <div style="border-radius:16px;background:#DC2626;color:#fff;padding:22px;text-align:center;"><div style="font-size:32px;">📞</div><div style="font-size:20px;font-weight:700;margin-top:8px;">Supervisor को बुलाएं</div><div style="font-size:13px;opacity:.9;margin-top:4px;">Toxic shock suspected</div></div>
+        <div style="margin-top:12px;border-radius:12px;background:var(--surface);padding:14px;"><div class="t-label" style="margin-bottom:6px;">Action</div><div style="font-size:14px;font-weight:600;">Inlet Bypass खोलें</div></div>
+        <button class="btn btn-danger" style="margin-top:12px;" onclick="go('issues')">Acknowledged</button>`},
+      step4:{badge:'Step 4 / 5',pct:80,tone:'neutral',html:()=>`
+        <div class="t-label">Manual Input · AT-01</div>
+        <h2 class="t-head" style="margin-top:6px;font-size:19px;">ऑक्सीजन (DO) कितना है?</h2>
+        <div style="margin-top:12px;display:flex;align-items:center;gap:10px;"><input id="doVal2" type="number" step="0.1" value="0.8" style="flex:1;background:#FAFAFA;border:1.5px solid #E8ECF0;border-radius:10px;padding:13px;font-size:22px;font-weight:600;"/><span style="font-size:13px;color:#64748B;">mg/L</span></div>
+        <p class="t-sub" style="margin-top:6px;">पिछली reading: 2.4 mg/L · Target > 2.0</p>
+        <button class="btn btn-primary" style="margin-top:14px;" onclick="(function(){const v=parseFloat(document.getElementById('doVal2').value);openIssue('biomass',v<1?'lowDO':'step5');})()">आगे बढ़ें</button>`},
+      lowDO:{badge:'Action',pct:90,tone:'warn',html:()=>`
+        <div style="border-radius:14px;background:rgba(217,119,6,.08);border:1.5px solid rgba(217,119,6,.3);padding:16px;"><div class="t-label" style="color:#D97706;">Low DO detected</div><div style="font-size:18px;font-weight:700;margin-top:6px;">Aeration boost चाहिए</div></div>
+        <div style="margin-top:12px;border-radius:12px;background:var(--surface);padding:14px;"><div class="t-label" style="margin-bottom:6px;">Action</div><div style="font-size:14px;font-weight:600;">DT-008 खोलें</div></div>
+        <button class="btn btn-primary" style="margin-top:14px;" onclick="openIssue('biomass','step5')">Done · आगे बढ़ें</button>`},
+      step5:{badge:'Step 5 / 5',pct:100,tone:'neutral',html:()=>`
+        <div style="border-radius:14px;background:#FAFAFA;border:1px solid #E8ECF0;padding:14px;"><div class="t-label" style="margin-bottom:8px;">System · SV30 7 दिन</div>${sparkRed}</div>
+        <h2 class="t-head" style="margin-top:12px;font-size:19px;">Sludge Wasting 48 घंटे बंद करें</h2>
+        <p class="t-sub" style="margin-top:4px;">Auto Task: हर 8h SV30 record करें</p>
+        <div style="margin-top:14px;display:flex;gap:8px;"><button class="btn btn-ghost btn-i" style="flex:1;" onclick="openIssue('biomass','septic')">Supervisor को बुलाएं</button><button class="btn btn-primary btn-i" style="flex:1;" onclick="openIssue('biomass','resolved')">Apply · Monitor</button></div>`},
+      resolved:{badge:'Resolved',pct:100,tone:'ok',html:()=>`
+        <div style="border-radius:16px;background:#16A34A;color:#fff;padding:20px;display:flex;align-items:center;gap:14px;"><div style="width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div><div><div style="font-size:11px;text-transform:uppercase;opacity:.8;font-weight:600;">Resolved</div><div style="font-size:20px;font-weight:700;">Issue Resolved</div><div style="font-size:12px;opacity:.9;margin-top:2px;">SV30 normalized · 48h monitor</div></div></div>
+        <button class="btn btn-ghost" style="margin-top:14px;" onclick="go('issues')">Issues पर वापस</button>`},
     }
-    if (moreGroups.length) {
-      html += `<div class="suggestion-section">Saved groups</div>`;
-      html += moreGroups.map(g=>groupSuggestionHTML(g)).join('');
-    }
-    if (!html) html = `<div class="px-4 py-3 text-xs text-slate-400">Start typing to search users…</div>`;
-  } else {
-    const userMatches = allUsers.filter(s=>!taken.has(s.n) && (s.n+s.role).toLowerCase().includes(q));
-    const groupMatches = (typeof groups !== 'undefined' ? groups : []).filter(g=>(g.name+' '+g.desc).toLowerCase().includes(q));
-    if (groupMatches.length) {
-      html += `<div class="suggestion-section">Groups</div>`;
-      html += groupMatches.map(g=>groupSuggestionHTML(g)).join('');
-    }
-    if (userMatches.length) {
-      html += `<div class="suggestion-section">Users</div>`;
-      html += userMatches.map(u=>userSuggestionHTML(u)).join('');
-    }
-    if (!html) html = `<div class="px-4 py-3 text-xs text-slate-400">No match for "${q}"</div>`;
-  }
-  box.innerHTML = html;
-  box.classList.remove('hidden');
-}
-function userSuggestionHTML(u) {
-  return `
-    <button class="user-suggestion" onclick='addUserByName(${JSON.stringify(u.n)})'>
-      ${avatarHTML(u, 34)}
-      <div class="meta">
-        <div class="name">${u.n}</div>
-        <div class="role">${u.role} · on ${u.count} insights</div>
-      </div>
-      ${u.noaccess?`<span class="chip" style="background:#FEF3C7;color:#92400E">⚠ access</span>`:''}
-    </button>
-  `;
-}
-function groupSuggestionHTML(g) {
-  return `
-    <button class="user-suggestion" onclick="addGroupById('${g.id}')">
-      <span class="avatar" style="background:#3B82F6;width:34px;height:34px">👥</span>
-      <div class="meta">
-        <div class="name">${g.name}</div>
-        <div class="role">${g.members.length} members · ${g.desc}</div>
-      </div>
-    </button>
-  `;
-}
-function addUserByName(name) {
-  const u = allUsers.find(x=>x.n===name); if(!u) return;
-  if (bulkUsers.find(b=>b.name===name)) return;
-  bulkUsers.push({name:u.n, role:u.role, count:u.count, color:u.color, noaccess:[...(u.noaccess||[])]});
-  postAdd();
-}
-function addGroupById(gid) {
-  const g = (typeof groups !== 'undefined' ? groups : []).find(x=>x.id===gid); if(!g) return;
-  let added = 0;
-  g.members.forEach(m => {
-    if (!bulkUsers.find(u=>u.name===m)) {
-      const u = allUsers.find(x=>x.n===m);
-      bulkUsers.push({name:m, role:u?u.role:`From ${g.name}`, count:u?u.count:0, color:u?u.color:'#64748B', noaccess:u?[...(u.noaccess||[])]:[]});
-      added++;
-    }
-  });
-  toast(`Added ${added} from "${g.name}"`);
-  postAdd();
-}
-function postAdd() {
-  document.getElementById('sup-search').value = '';
-  searchUser('');
-  renderBulkUsers();
-  document.getElementById('step-timing').classList.remove('hidden');
-  updateHelper();
-  updateProgress();
-  updatePreview();
-}
-function clearSelectedUsers() { bulkUsers = []; renderBulkUsers(); updateHelper(); updateProgress(); updatePreview(); searchUser(''); document.getElementById('bulk-users-block').classList.add('hidden'); }
-function renderBulkUsers() {
-  const block = document.getElementById('bulk-users-block');
-  const box = document.getElementById('bulk-users');
-  document.getElementById('sel-count').textContent = bulkUsers.length;
-  if (!bulkUsers.length) { block.classList.add('hidden'); return; }
-  block.classList.remove('hidden');
-  box.innerHTML = bulkUsers.map((u,idx)=>`
-    <span class="user-chip ${u.noaccess && u.noaccess.length?'warn':''}">
-      <span class="chip-avatar" style="background:${u.color||'#64748B'}">${u.name.split(' ').map(x=>x[0]).slice(0,2).join('')}</span>
-      <span class="chip-name">${u.name}${u.noaccess && u.noaccess.length?' ⚠':''}</span>
-      <button class="chip-x" onclick="removeUser(${idx})" title="Remove">✕</button>
-    </span>
-  `).join('');
-}
-function removeUser(idx) { bulkUsers.splice(idx,1); renderBulkUsers(); updateHelper(); updateProgress(); updatePreview(); if(!bulkUsers.length){document.getElementById('step-timing').classList.add('hidden');document.getElementById('step-channels').classList.add('hidden');} }
-function updateHelper() {
-  const helper = document.getElementById('bulk-helper');
-  if (!bulkUsers.length) { helper.classList.add('hidden'); return; }
-  const access = bulkUsers.filter(u=>u.noaccess && u.noaccess.length);
-  if (access.length) {
-    helper.classList.remove('hidden'); helper.classList.add('warn'); helper.classList.remove('helper-card');
-    helper.className = 'mt-4 helper-card warn';
-    helper.innerHTML = `<b>Permission gap:</b> ${access.map(u=>`${u.name} (${u.noaccess.join(', ')})`).join('; ')}. <button class="grant-btn" onclick="grantAllAccess()">Grant access for all</button>`;
-  } else {
-    helper.classList.remove('hidden'); helper.classList.remove('warn');
-    helper.className = 'mt-4 helper-card';
-    const totalLoad = bulkUsers.reduce((s,u)=>s+(u.count||0),0);
-    helper.innerHTML = `${bulkUsers.length} user${bulkUsers.length>1?'s':''} · already on <b>${totalLoad}</b> existing insights combined.`;
-  }
-}
-function grantAllAccess() {
-  bulkUsers.forEach(u=>u.noaccess=[]);
-  toast(`✓ Access granted across ${bulkUsers.length} users`);
-  renderBulkUsers(); updateHelper();
-}
-function setTimingChip(btn) {
-  document.querySelectorAll('#step-timing .time-chip').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  bulkTiming = btn.dataset.v;
-  document.getElementById('custom-min-wrap').classList.toggle('hidden', bulkTiming!=='custom');
-  document.getElementById('step-channels').classList.remove('hidden');
-  updateProgress(); updatePreview();
-}
-function bulkToggleCh(btn) {
-  const v = btn.dataset.v;
-  bulkChans[v] = !bulkChans[v]; if (!bulkChans[v]) delete bulkChans[v];
-  btn.classList.toggle('on');
-  updatePreview();
-}
-function updateProgress() {
-  const ps1 = document.getElementById('ps-1');
-  const ps2 = document.getElementById('ps-2');
-  const ps3 = document.getElementById('ps-3');
-  const l1 = document.getElementById('line-1');
-  const l2 = document.getElementById('line-2');
-  ps1.classList.remove('active','done'); ps2.classList.remove('active','done'); ps3.classList.remove('active','done');
-  l1.classList.remove('done'); l2.classList.remove('done');
-  if (!bulkUsers.length) { ps1.classList.add('active'); return; }
-  ps1.classList.add('done'); l1.classList.add('done');
-  if (!document.querySelector('#step-channels:not(.hidden)')) { ps2.classList.add('active'); return; }
-  ps2.classList.add('done'); l2.classList.add('done');
-  ps3.classList.add('active');
-}
-function updatePreview() {
-  const btn = document.getElementById('assign-btn');
-  const preview = document.getElementById('assign-preview');
-  const ready = bulkUsers.length && Object.keys(bulkChans).length;
-  if (ready) {
-    btn.classList.remove('opacity-50','pointer-events-none');
-    const timeStr = bulkTiming==='imm' ? 'immediately' : bulkTiming==='custom' ? `+${document.getElementById('custom-min').value||'?'} min` : `+${bulkTiming} min`;
-    const chStr = Object.keys(bulkChans).map(c=>({wa:'WhatsApp',sms:'SMS',call:'Call',email:'Email'}[c])).join(', ');
-    preview.innerHTML = `<b>${bulkUsers.length}</b> user${bulkUsers.length>1?'s':''} → <b>${selected.size}</b> insight${selected.size>1?'s':''} · ${timeStr} · ${chStr}`;
-  } else {
-    btn.classList.add('opacity-50','pointer-events-none');
-    if (!bulkUsers.length) preview.textContent = 'Pick at least one user to continue';
-    else if (!Object.keys(bulkChans).length) preview.textContent = 'Pick at least one channel';
-    else preview.textContent = '';
-  }
-}
-function confirmBulkAssign() {
-  if (!bulkUsers.length || !Object.keys(bulkChans).length) return;
-  selected.forEach(id=>{
-    const i = insights.find(x=>x.id===id);
-    if (i) bulkUsers.forEach(u=>{ if(!i.users.includes(u.name)) i.users.push(u.name); });
-  });
-  // Update recents
-  bulkUsers.forEach(u=>{ if(!recentUserNames.includes(u.name)) recentUserNames.unshift(u.name); });
-  recentUserNames = recentUserNames.slice(0,5);
-  const n = selected.size;
-  let groupMsg = '';
-  const cb = document.getElementById('save-group-cb');
-  if (cb && cb.checked) {
-    const gname = document.getElementById('save-group-name').value.trim() || `Group ${(groups||[]).length+1}`;
-    if (typeof groups !== 'undefined') groups.push({id:'g'+(groups.length+1), name:gname, desc:'Custom group', members:bulkUsers.map(u=>u.name), channels:Object.keys(bulkChans).join(', '), steps:bulkTiming});
-    groupMsg = ` · saved as "<b>${gname}</b>"`;
-  }
-  closeBulkAssign();
-  clearSelection();
-  renderInsights();
-  toast(`✓ ${bulkUsers.length} user${bulkUsers.length>1?'s':''} assigned to ${n} insight${n>1?'s':''}${groupMsg}`);
-}
-// Click outside dropdown to close
-document.addEventListener('click', (e) => {
-  const wrap = document.getElementById('sup-suggestions');
-  if (!wrap || wrap.classList.contains('hidden')) return;
-  const inSearch = e.target.closest('#sup-search') || e.target.closest('#sup-suggestions');
-  if (!inSearch) wrap.classList.add('hidden');
-});
-// Reopen dropdown when search is focused
-document.addEventListener('DOMContentLoaded', () => {
-  const s = document.getElementById('sup-search');
-  if (s) s.addEventListener('focus', ()=>searchUser(s.value));
-});
+  },
 
-// ---------- Group assign modal ----------
-const groups = [
-  {id:'g1', name:'Andheri Day Shift', desc:'Operators on shift A · 06:00–14:00', members:['Priya Sharma','Vikas Patel','Rohan K.'], channels:'WA, SMS', steps:'Immediate → 10min → 30min'},
-  {id:'g2', name:'Operations Leadership', desc:'Cross-Plant managers, escalation pool', members:['Meera Rao','Arjun Mehta','Sanjay G.'], channels:'📞 ✉ WA', steps:'Immediate → 5min → 20min'},
-  {id:'g3', name:'On-call Engineers', desc:'Maintenance & instrumentation', members:['Karan B.','Anita D.'], channels:'📞 SMS', steps:'Immediate → 15min'},
-  {id:'g4', name:'Andheri Night Shift', desc:'Shift B · 22:00–06:00', members:['Vikas Patel','Rajesh M.','Neha T.'], channels:'📞 WA', steps:'Immediate → 5min'},
-  {id:'g5', name:'Compliance & Reporting', desc:'Digest only · no escalation', members:['Anjali V.','Priya Sharma'], channels:'✉', steps:'Daily digest'},
-];
-let selectedGroup = null;
-function openGroupAssign() {
-  if (!selected.size) { toast('Select at least one insight first'); return; }
-  selectedGroup = null;
-  document.getElementById('group-modal-count').textContent = selected.size;
-  document.getElementById('group-confirm-count').textContent = selected.size;
-  document.getElementById('group-search').value = '';
-  renderGroups('');
-  document.getElementById('modal-group').classList.remove('hidden');
-  document.getElementById('modal-group').classList.add('flex');
-}
-function closeGroupAssign() {
-  document.getElementById('modal-group').classList.add('hidden');
-  document.getElementById('modal-group').classList.remove('flex');
-}
-function renderGroups(q) {
-  const list = groups.filter(g => !q || (g.name+g.desc+g.members.join(' ')).toLowerCase().includes(q.toLowerCase()));
-  document.getElementById('group-list').innerHTML = list.map(g=>`
-    <button class="w-full text-left p-4 rounded-lg border ${selectedGroup===g.id?'border-blue-500 bg-blue-50':'border-slate-200 hover:bg-slate-50'} transition" onclick="pickGroup('${g.id}')">
-      <div class="flex items-start justify-between gap-3">
-        <div class="flex-1">
-          <div class="flex items-center gap-2">
-            <span class="font-semibold text-sm">${g.name}</span>
-            <span class="chip bg-slate-100 text-slate-600">${g.members.length} members</span>
-          </div>
-          <div class="text-xs text-slate-500 mt-0.5">${g.desc}</div>
-          <div class="flex -space-x-1.5 mt-2">
-            ${g.members.slice(0,4).map(m=>`<div class="w-6 h-6 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-semibold" title="${m}">${m.split(' ').map(x=>x[0]).join('').slice(0,2)}</div>`).join('')}
-            ${g.members.length>4?`<div class="w-6 h-6 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px]">+${g.members.length-4}</div>`:''}
-          </div>
-        </div>
-        <div class="text-right text-[11px] text-slate-500 shrink-0">
-          <div>${g.channels}</div>
-          <div class="mt-0.5">${g.steps}</div>
-        </div>
-      </div>
-    </button>
-  `).join('') || `<div class="p-4 text-center text-xs text-slate-400">No groups match.</div>`;
-}
-function pickGroup(id) { selectedGroup = id; renderGroups(document.getElementById('group-search').value); }
-function confirmGroupAssign() {
-  if (!selectedGroup) { toast('Pick a group first'); return; }
-  const g = groups.find(x=>x.id===selectedGroup);
-  selected.forEach(id=>{
-    const i = insights.find(x=>x.id===id);
-    if (i) g.members.forEach(m=>{ if(!i.users.includes(m)) i.users.push(m); });
-  });
-  const n = selected.size;
-  closeGroupAssign();
-  clearSelection();
-  renderInsights();
-  toast(`✓ Assigned <b>${g.name}</b> (${g.members.length} members) to ${n} insights`);
-}
-
-// ---------- New insight modal ----------
-function openNewInsight() {
-  document.getElementById('modal-new').classList.remove('hidden');
-  document.getElementById('modal-new').classList.add('flex');
-  renderModalTimeline();
-}
-function closeNewInsight() {
-  document.getElementById('modal-new').classList.add('hidden');
-  document.getElementById('modal-new').classList.remove('flex');
-}
-function renderModalTimeline() {
-  const steps = [
-    {t:'Immediate', user:'Plant Manager', ch:'📞 ✉ WA', color:'#DC2626'},
-    {t:'After 10 min', user:'Shift Lead', ch:'SMS', color:'#F59E0B'},
-    {t:'After 30 min', user:'Operations Head', ch:'📞', color:'#64748B'},
-  ];
-  document.getElementById('timeline').innerHTML = `
-    <div class="ml-2 pl-6 border-l-2 border-slate-300 space-y-4 pb-2">
-      ${steps.map(s=>`
-        <div class="relative slide-in">
-          <div class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-white border-2" style="border-color:${s.color}"></div>
-          <div class="flex items-center gap-3 text-sm">
-            <span class="chip bg-white border border-slate-200 w-24 justify-center">${s.t}</span>
-            <span class="editable-chip" contenteditable="true">${s.user}</span>
-            <span class="editable-chip" contenteditable="true">${s.ch}</span>
-            <button class="ml-auto text-xs text-slate-400 hover:text-red-600">✕</button>
-          </div>
-        </div>
-      `).join('')}
-      <button class="text-xs text-blue-600 hover:underline">+ Add step</button>
-    </div>
-  `;
-}
-function saveDraft() { toast('Draft saved'); closeNewInsight(); }
-function createInsight() {
-  closeNewInsight();
-  show('insights');
-  insights.unshift({id:99, name:'DO drop in aeration tank', plant:'Andheri Plant', equip:'Aerator A-1', sev:'incident', status:'Active', last:'just now', on:true, users:['Plant Manager','Shift Lead'], sensor:'DO-101', threshold:'< 2.0 mg/L', current:'1.4 mg/L'});
-  renderInsights();
-  toast('✓ Insight created');
-}
-
-// ---------- Escalations ----------
-const TIME_PRESETS = ['Immediate','+5 min','+10 min','+15 min','+30 min','+1 hour','+2 hours','Custom'];
-const CHANNELS = [
-  {id:'wa', label:'WhatsApp', icon:'WA'},
-  {id:'sms', label:'SMS', icon:'SMS'},
-  {id:'call', label:'Call', icon:'📞'},
-  {id:'email', label:'Email', icon:'✉'},
-];
-const DEFAULT_MSG = {
-  wa: 'Hi {{user}}, {{insight}} at {{plant}}. Sensor {{sensor}} = {{value}}. Please acknowledge.',
-  sms: '{{insight}} · {{plant}} · {{sensor}}={{value}}. Reply ACK.',
-  call: 'Spoken alert: {{insight}} at {{plant}}. Press 1 to acknowledge.',
-  email: 'A new {{severity}} has opened at {{plant}}.\n\n{{insight}}\nSensor: {{sensor}} = {{value}}\nThreshold: {{threshold}}\n\nView in dashboard: {{link}}',
+  blower:{
+    equipment:'BL-101 ब्लोअर',title:'ब्लोअर — वाइब्रेशन High',totalSteps:4,
+    steps:{
+      collapsed:{badge:'Overview',pct:0,tone:'neutral',html:()=>`
+        <div style="display:flex;align-items:center;gap:8px;"><span class="chip" style="background:rgba(217,119,6,.08);color:#D97706;">High</span><span style="font-size:11px;color:#64748B;">BL-101 ब्लोअर</span></div>
+        <h2 class="t-head" style="margin-top:10px;font-size:20px;">ब्लोअर में वाइब्रेशन बढ़ रही है</h2>
+        <p class="t-sub" style="margin-top:4px;">मोटर को नुकसान हो सकता है · अभी जांच करें</p>
+        <div style="margin-top:14px;border-radius:14px;background:#FAFAFA;border:1px solid #E8ECF0;padding:14px;"><div class="t-label" style="margin-bottom:8px;">वाइब्रेशन · 48h</div>${sparkAmber}<div style="display:flex;justify-content:space-between;font-size:11px;color:#64748B;margin-top:6px;"><span>2.1</span><span>3.4</span><span>4.5 सीमा</span><span style="color:#D97706;font-weight:700;">5.8 अभी</span></div></div>
+        <button class="btn btn-primary" style="margin-top:14px;" onclick="openIssue('blower','step1')">जांच शुरू करें →</button>`},
+      step1:{badge:'Step 1 / 4',pct:25,tone:'neutral',html:()=>`
+        <div class="t-label">Manual Input · BL-101</div>
+        <h2 class="t-head" style="margin-top:6px;font-size:19px;">अभी वाइब्रेशन कितना है?</h2>
+        <div style="margin-top:12px;display:flex;align-items:center;gap:10px;"><input id="vibVal" type="number" step="0.1" value="5.8" style="flex:1;background:#FAFAFA;border:1.5px solid #E8ECF0;border-radius:10px;padding:13px;font-size:22px;font-weight:600;"/><span style="font-size:13px;color:#64748B;">mm/s</span></div>
+        <p class="t-sub" style="margin-top:6px;">सीमा: 4.5 · Critical: 7.0 mm/s</p>
+        <button class="btn btn-primary" style="margin-top:14px;" onclick="(function(){const v=parseFloat(document.getElementById('vibVal').value);openIssue('blower',v>=7?'bearing':'step2');})()">आगे बढ़ें</button>`},
+      step2:{badge:'Step 2 / 4',pct:50,tone:'neutral',html:()=>`
+        <div class="t-label">Operator · BL-101 ब्लोअर</div>
+        <h2 class="t-head" style="margin-top:6px;font-size:19px;">आवाज़ कैसी है?</h2>
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+          ${ansCard('🔇','#F1F5F9','#334155','नहीं · सामान्य hum','Continue diagnostics',"openIssue('blower','step3')")}
+          ${ansCard('🔔','#FEF3C7','#D97706','हल्की humming','Possible imbalance',"openIssue('blower','step3')")}
+          ${ansCard('⚠️','#FEE2E2','#DC2626','Grinding / screeching','Bearing failure suspected',"openIssue('blower','bearing')")}
+        </div>`},
+      bearing:{badge:'Action Required',pct:100,tone:'crit',html:()=>`
+        <div style="border-radius:16px;background:#DC2626;color:#fff;padding:22px;text-align:center;"><div style="font-size:32px;">📞</div><div style="font-size:20px;font-weight:700;margin-top:8px;">Supervisor को बुलाएं</div><div style="font-size:13px;opacity:.9;margin-top:4px;">Bearing failure imminent · BL-101 बंद करें</div></div>
+        <div class="sys-note" style="margin-top:12px;"><div class="t-label" style="color:#15803D;margin-bottom:4px;">System</div><div style="font-size:12px;color:#15803D;">Supervisor Ashok Kumar को सूचना · WO-2041 created</div></div>
+        <button class="btn btn-danger" style="margin-top:12px;" onclick="go('issues')">Acknowledged · BL-101 बंद किया</button>`},
+      step3:{badge:'Step 3 / 4',pct:75,tone:'neutral',html:()=>`
+        <div class="t-label">Manual Input · BL-101</div>
+        <h2 class="t-head" style="margin-top:6px;font-size:19px;">Bearing temperature?</h2>
+        <div style="margin-top:12px;display:flex;align-items:center;gap:10px;"><input id="tempVal" type="number" step="1" value="68" style="flex:1;background:#FAFAFA;border:1.5px solid #E8ECF0;border-radius:10px;padding:13px;font-size:22px;font-weight:600;"/><span style="font-size:13px;color:#64748B;">°C</span></div>
+        <p class="t-sub" style="margin-top:6px;">Safe: &lt;70°C · Critical: &gt;80°C</p>
+        <button class="btn btn-primary" style="margin-top:14px;" onclick="(function(){const v=parseFloat(document.getElementById('tempVal').value);openIssue('blower',v>=80?'bearing':'step4');})()">आगे बढ़ें</button>`},
+      step4:{badge:'Step 4 / 4',pct:95,tone:'neutral',html:()=>`
+        <div style="border-radius:12px;background:#FFFBEB;border:1.5px solid #FDE68A;padding:12px;margin-bottom:14px;"><div class="t-label" style="color:#92400E;">System</div><div style="margin-top:4px;font-size:13px;">Last lubrication: <b>42 दिन पहले</b> (target 30)</div><div style="margin-top:6px;font-size:12px;font-weight:600;color:#B45309;">⚠ Overdue</div></div>
+        <h2 class="t-head" style="font-size:19px;">Greasing schedule करें</h2>
+        <p class="t-sub" style="margin-top:4px;">Auto Task: 2h बाद वाइब्रेशन check करें</p>
+        <div style="margin-top:14px;display:flex;gap:8px;"><button class="btn btn-ghost btn-i" style="flex:1;" onclick="openIssue('blower','bearing')">Supervisor</button><button class="btn btn-primary btn-i" style="flex:1;" onclick="openIssue('blower','resolved')">Apply · Monitor</button></div>`},
+      resolved:{badge:'Resolved',pct:100,tone:'ok',html:()=>`
+        <div style="border-radius:16px;background:#16A34A;color:#fff;padding:20px;display:flex;align-items:center;gap:14px;"><div style="width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div><div><div style="font-size:11px;text-transform:uppercase;opacity:.8;font-weight:600;">Resolved</div><div style="font-size:20px;font-weight:700;">Issue Resolved</div><div style="font-size:12px;opacity:.9;margin-top:2px;">Greasing done · vibration monitored</div></div></div>
+        <button class="btn btn-ghost" style="margin-top:14px;" onclick="go('issues')">Issues पर वापस</button>`},
+    }
+  },
 };
 
-let escState = { plant:'', sev:'incident', cfg:{} };
-function blankBlock(users, chans) { return { users, chans, msgs:{}, subjects:{} }; }
-function defaultCfg(sev) {
-  if (sev==='incident') return {
-    immediate: blankBlock(['Plant Manager'], {wa:true, call:true}),
-    steps: [
-      {time:'+5 min', ...blankBlock(['Shift Lead'], {sms:true})},
-      {time:'+15 min', ...blankBlock(['Operations Head'], {call:true})},
-    ],
-  };
-  if (sev==='issue') return {
-    immediate: blankBlock(['Shift Lead'], {wa:true, sms:true}),
-    steps: [{time:'+30 min', ...blankBlock(['Plant Manager'], {email:true})}],
-  };
-  return {
-    immediate: blankBlock(['Operator on duty'], {wa:true}),
-    steps: [],
-  };
-}
-function openEscalations(plant) {
-  escState = { plant, sev:'incident', cfg:{ incident:defaultCfg('incident'), issue:defaultCfg('issue'), warning:defaultCfg('warning') } };
-  document.getElementById('esc-plant').textContent = plant;
-  renderEsc();
-  document.getElementById('modal-esc').classList.remove('hidden');
-  document.getElementById('modal-esc').classList.add('flex');
-}
-function closeEscalations() {
-  document.getElementById('modal-esc').classList.add('hidden');
-  document.getElementById('modal-esc').classList.remove('flex');
-}
-function switchEscTab(btn) {
-  document.querySelectorAll('.esc-tab').forEach(t=>{
-    t.classList.remove('esc-tab-active','border-slate-900');
-    t.classList.add('text-slate-500','border-transparent');
-  });
-  btn.classList.add('esc-tab-active','border-slate-900');
-  btn.classList.remove('text-slate-500','border-transparent');
-  escState.sev = btn.dataset.sev;
-  renderEsc();
+function openIssue(key,step){
+  const flow=flows[key],s=flow.steps[step];
+  document.getElementById('flowEquipment').textContent=flow.equipment;
+  document.getElementById('flowTitle').textContent=flow.title;
+  document.getElementById('stepBadge').textContent=s.badge;
+  const bar=document.getElementById('stepBar');
+  bar.style.width=s.pct+'%';
+  bar.style.background=s.tone==='ok'?'#16A34A':s.tone==='crit'?'#DC2626':s.tone==='warn'?'#D97706':'#0F172A';
+  document.getElementById('flowContent').innerHTML=s.html();
+  document.getElementById('flowContent').scrollTop=0;
+  go('issue-flow');
+  startStepTimer(s.tone);
 }
 
-function renderEsc() {
-  const cfg = escState.cfg[escState.sev];
-  document.getElementById('esc-immediate').innerHTML = renderBlock(cfg.immediate, 'imm', null);
-  document.getElementById('esc-steps').innerHTML = cfg.steps.length
-    ? cfg.steps.map((s,idx)=>`
-        <div class="card p-4 border border-slate-100">
-          <div class="flex items-center gap-3 mb-3 pb-3 border-b border-slate-100">
-            <span class="chip bg-amber-100 text-amber-800">Step ${idx+1}</span>
-            <select class="border border-slate-200 rounded-lg px-2 py-1.5 text-sm" onchange="setStepTime(${idx},this.value)">
-              ${TIME_PRESETS.filter(t=>t!=='Immediate').map(t=>`<option ${t===s.time?'selected':''}>${t}</option>`).join('')}
-            </select>
-            ${s.time==='Custom' ? `<input type="number" placeholder="minutes" class="w-24 border border-slate-200 rounded-lg px-2 py-1.5 text-sm" oninput="setStepCustom(${idx},this.value)"/>` : ''}
-            <button class="ml-auto text-xs text-slate-400 hover:text-red-600" onclick="removeEscStep(${idx})">Remove step</button>
-          </div>
-          ${renderBlock(s, 'step', idx)}
-        </div>
-      `).join('')
-    : `<div class="card p-6 border border-dashed border-slate-200 text-center text-sm text-slate-400">No followup steps. Click <b>+ Add escalation step</b> to add one.</div>`;
+let timerId=null,startedAt=0;
+const timerEl=document.getElementById('stepTimer'),timerVal=document.getElementById('stepTimerVal');
+function fmt(s){const m=Math.floor(s/60),r=s%60;return String(m).padStart(2,'0')+':'+String(r).padStart(2,'0');}
+function startStepTimer(tone){
+  stopStepTimer();startedAt=Date.now();timerVal.textContent='00:00';
+  timerEl.style.background=tone==='ok'?'#16A34A':tone==='crit'?'#DC2626':tone==='warn'?'#D97706':'#0F172A';
+  if(tone==='ok'||tone==='crit')return;
+  timerId=setInterval(()=>{
+    const s=Math.floor((Date.now()-startedAt)/1000);
+    timerVal.textContent=fmt(s);
+    if(s>=120&&timerEl.style.background==='rgb(15, 23, 42)')timerEl.style.background='#D97706';
+  },500);
 }
+function stopStepTimer(){if(timerId){clearInterval(timerId);timerId=null;}}
 
-function renderBlock(b, kind, idx) {
-  const ref = kind==='imm' ? `imm` : `step-${idx}`;
-  return `
-    <!-- Users -->
-    <div class="mb-3">
-      <div class="text-[11px] uppercase text-slate-500 font-semibold mb-1.5">Notify users</div>
-      <div class="flex flex-wrap gap-1.5">
-        ${b.users.map((u,uIdx)=>`<span class="chip bg-slate-100 text-slate-800">${u} <button class="ml-1 hover:text-red-600" onclick="rmUser('${kind}',${idx},${uIdx})">✕</button></span>`).join('')}
-        <button class="chip bg-white border border-dashed border-slate-300 text-slate-500 hover:bg-slate-50" onclick="addUserPrompt('${kind}',${idx})">+ Add user</button>
-      </div>
-    </div>
-    <!-- Channels -->
-    <div class="mb-3">
-      <div class="text-[11px] uppercase text-slate-500 font-semibold mb-1.5">Channels <span class="text-slate-400 normal-case font-normal">· click to enable, opens a message editor below</span></div>
-      <div class="flex gap-2">
-        ${CHANNELS.map(c=>`
-          <button class="ch-toggle ${b.chans[c.id]?'on':'off'}" onclick="toggleCh('${kind}',${idx},'${c.id}')">
-            <span class="ch-icon">${c.icon}</span>
-            <span class="ch-label">${c.label}</span>
-            <span class="ch-state">${b.chans[c.id]?'On':'Off'}</span>
-          </button>
-        `).join('')}
-      </div>
-    </div>
-    <!-- Composers per active channel — skips Call (uses saved IVR template) -->
-    <div class="space-y-4">
-      ${CHANNELS.filter(c=>b.chans[c.id] && c.id!=='call').map(c=>renderComposer(b,c,kind,idx)).join('')}
-      ${b.chans.call ? `
-        <div class="card border border-slate-200 p-4 flex items-center gap-3 bg-slate-50">
-          <div class="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center">📞</div>
-          <div class="flex-1">
-            <div class="text-sm font-medium">Call</div>
-            <div class="text-xs text-slate-500">Voice call uses the saved IVR template — no per-step message needed.</div>
-          </div>
-          <button class="text-xs text-slate-500 hover:text-blue-600" onclick="toast('IVR template editor — coming soon')">Configure IVR</button>
-        </div>
-      ` : ''}
-    </div>
-  `;
-}
+document.getElementById('viewScada').addEventListener('click',()=>{document.getElementById('scadaView').style.display='block';document.getElementById('listView').style.display='none';});
+document.getElementById('viewList').addEventListener('click',()=>{document.getElementById('scadaView').style.display='none';document.getElementById('listView').style.display='block';});
+document.getElementById('sbrNode').addEventListener('click',()=>openIssue('dt006','collapsed'));
+document.getElementById('blowerNode').addEventListener('click',()=>openIssue('blower','collapsed'));
 
-function renderComposer(b, c, kind, idx) {
-  const msg = b.msgs[c.id] ?? DEFAULT_MSG[c.id];
-  const subj = b.subjects[c.id] ?? `[{{severity}}] {{insight}} at {{plant}}`;
-  const id = `msg-${kind}-${idx}-${c.id}`;
-  const note = c.id==='sms' ? '160 chars per segment' : c.id==='email' ? 'Plain text email' : 'Sent via WhatsApp Business';
-  return `
-    <div>
-      <div class="flex items-center justify-between mb-1.5">
-        <div class="flex items-center gap-2">
-          <span class="text-sm font-semibold">${c.icon} ${c.label} message</span>
-        </div>
-        <span class="text-[11px] text-slate-400">${note}</span>
-      </div>
-      <div class="composer-clean">
-        ${c.id==='email' ? `
-          <div class="composer-clean-subj">
-            <span class="text-[11px] text-slate-400 mr-2">Subject</span>
-            <input type="text" oninput="setSubj('${kind}',${idx},'${c.id}',this.value)" value="${subj}"/>
-          </div>` : ''}
-        <textarea id="${id}" rows="${c.id==='email'?6:4}" oninput="setMsg('${kind}',${idx},'${c.id}',this.value)" placeholder="Write text here…">${msg}</textarea>
-        <div class="composer-clean-footer">
-          <button class="composer-clean-btn" onclick="toast('Test ${c.label} sent')">
-            <span>↗</span> Send test
-          </button>
-          <div class="composer-clean-icons">
-            <button title="Insert variable" onclick="cycleVar('${id}')">{ }</button>
-            <button title="Reset to default" onclick="resetMsg('${kind}',${idx},'${c.id}')">↻</button>
-            <button title="Remove channel" onclick="toggleCh('${kind}',${idx},'${c.id}')">✕</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-const VAR_CYCLE = ['{{user}}','{{plant}}','{{insight}}','{{sensor}}','{{value}}','{{threshold}}','{{severity}}','{{link}}'];
-let varCycleIdx = 0;
-function cycleVar(textareaId) {
-  const v = VAR_CYCLE[varCycleIdx % VAR_CYCLE.length];
-  varCycleIdx++;
-  insertVar(textareaId, v);
-  toast(`Inserted ${v} · click again to insert next variable`);
-}
-
-function getBlock(kind, idx) {
-  const cfg = escState.cfg[escState.sev];
-  return kind==='imm' ? cfg.immediate : cfg.steps[idx];
-}
-function toggleCh(kind, idx, cid) {
-  const b = getBlock(kind, idx);
-  b.chans[cid] = !b.chans[cid]; if (!b.chans[cid]) delete b.chans[cid];
-  renderEsc();
-}
-function setMsg(kind, idx, cid, val) {
-  getBlock(kind, idx).msgs[cid] = val;
-  const cnt = document.getElementById(`msg-${kind}-${idx}-${cid}-count`);
-  if (cnt) cnt.textContent = val.length;
-}
-function setSubj(kind, idx, cid, val) { getBlock(kind, idx).subjects[cid] = val; }
-function resetMsg(kind, idx, cid) { delete getBlock(kind, idx).msgs[cid]; delete getBlock(kind, idx).subjects[cid]; renderEsc(); }
-function insertVar(textareaId, v) {
-  const t = document.getElementById(textareaId); if(!t) return;
-  const start = t.selectionStart, end = t.selectionEnd;
-  t.value = t.value.slice(0,start) + v + t.value.slice(end);
-  t.focus(); t.setSelectionRange(start+v.length, start+v.length);
-  t.dispatchEvent(new Event('input'));
-}
-function addUserPrompt(kind, idx) {
-  const name = prompt('User name (e.g. Plant Manager, Priya Sharma):');
-  if (!name || !name.trim()) return;
-  getBlock(kind, idx).users.push(name.trim());
-  renderEsc();
-}
-function rmUser(kind, idx, uIdx) {
-  getBlock(kind, idx).users.splice(uIdx,1); renderEsc();
-}
-function setStepTime(idx, val) { escState.cfg[escState.sev].steps[idx].time = val; renderEsc(); }
-function setStepCustom(idx, val) { if(val) escState.cfg[escState.sev].steps[idx].time = '+'+val+' min'; }
-function addEscStep() {
-  escState.cfg[escState.sev].steps.push({time:'+10 min', ...blankBlock([], {wa:true})});
-  renderEsc();
-}
-function removeEscStep(idx) { escState.cfg[escState.sev].steps.splice(idx,1); renderEsc(); }
-function saveEscalations() { closeEscalations(); toast(`✓ Escalations saved for ${escState.plant} · applies to all new insights`); }
-
-// ---------- Digests ----------
-let digRecipients = ['ops@andheri-stp.com'];
-let digState = { plant:'', status:'open', range:'24h', occ:'daily' };
-function openDigests(plant) {
-  digState.plant = plant;
-  digRecipients = ['client-ops@'+plant.toLowerCase().replace(/\s/g,'-')+'.com'];
-  document.getElementById('dig-plant').textContent = plant;
-  renderRecipients();
-  updateDigPreview();
-  document.getElementById('modal-digest').classList.remove('hidden');
-  document.getElementById('modal-digest').classList.add('flex');
-}
-function closeDigests() {
-  document.getElementById('modal-digest').classList.add('hidden');
-  document.getElementById('modal-digest').classList.remove('flex');
-}
-function renderRecipients() {
-  const box = document.getElementById('dig-recipients');
-  if (!digRecipients.length) { box.innerHTML = '<span class="text-xs text-slate-400">Add at least one recipient.</span>'; return; }
-  box.innerHTML = digRecipients.map((e,i)=>`<span class="chip bg-slate-100">${e} <button class="ml-1 hover:text-red-600" onclick="removeRecipient(${i})">✕</button></span>`).join('');
-}
-function addRecipient(v) { v=v.trim(); if(!v) return; digRecipients.push(v); renderRecipients(); }
-function removeRecipient(i) { digRecipients.splice(i,1); renderRecipients(); }
-function toggleSev(btn) { btn.classList.toggle('on'); updateDigPreview(); }
-function getSelectedSevs() {
-  return Array.from(document.querySelectorAll('#dig-sev .sev-pill.on')).map(b=>b.dataset.v);
-}
-function pickStatus(btn) { pickChip(btn, 'dig-status'); digState.status = btn.dataset.v; updateDigPreview(); }
-function pickRange(btn) { pickChip(btn, 'dig-range'); digState.range = btn.dataset.v; updateDigPreview(); }
-function pickOcc(btn) {
-  pickChip(btn, 'dig-occ'); digState.occ = btn.dataset.v;
-  document.getElementById('occ-day-wrap').classList.toggle('hidden', btn.dataset.v !== 'weekly');
-  document.getElementById('occ-hour').parentElement.querySelector('span').textContent = btn.dataset.v==='hourly' ? 'Send at the top of every hour' : 'Send at';
-  document.getElementById('occ-hour').classList.toggle('hidden', btn.dataset.v==='hourly');
-  updateDigPreview();
-}
-function pickChip(btn, groupId) {
-  document.getElementById(groupId).querySelectorAll('button').forEach(b=>{ b.classList.remove('bg-slate-900','text-white'); b.classList.add('bg-slate-100'); });
-  btn.classList.add('bg-slate-900','text-white'); btn.classList.remove('bg-slate-100');
-}
-function updateDigPreview() {
-  const rangeMap = {'6h':'last 6 hours','12h':'last 12 hours','24h':'last 24 hours','7d':'last 7 days'};
-  const occMap = {'hourly':'every hour','daily':'every day at 08:00 IST','weekly':'every week at 08:00 IST'};
-  const statusMap = {'open':'open','closed':'closed','both':'open and closed'};
-  const sevs = getSelectedSevs();
-  const sevText = sevs.length ? sevs.map(s=>s.charAt(0).toUpperCase()+s.slice(1)+'s').join(', ') : '(no severities selected)';
-  document.getElementById('dig-preview').innerHTML = `${(digState.occ||'daily').replace(/^./,c=>c.toUpperCase())} digest of <b>${statusMap[digState.status]} ${sevText}</b> from <b>${rangeMap[digState.range]}</b>, sent ${occMap[digState.occ]}.`;
-  document.getElementById('occ-summary').textContent = `Schedule: ${occMap[digState.occ]}`;
-}
-function saveDigests() { closeDigests(); toast(`✓ Digest saved for ${digState.plant} · ${digRecipients.length} recipient${digRecipients.length>1?'s':''}`); }
-
-// ---------- Toast ----------
-function toast(html) {
-  const el = document.createElement('div');
-  el.className = 'toast bg-slate-900 text-white text-sm px-4 py-3 rounded-lg shadow-lg max-w-sm';
-  el.innerHTML = html;
-  document.getElementById('toast-container').appendChild(el);
-  setTimeout(()=>el.remove(), 5000);
-}
-
-renderInsights();
-
-// Event delegation for insights list — separates row-click (open detail)
-// from checkbox-cell click (toggle selection) reliably
-document.getElementById('insights-list').addEventListener('click', (e) => {
-  const actionEl = e.target.closest('[data-action]');
-  if (!actionEl) return;
-  const row = actionEl.closest('[data-id]');
-  if (!row) return;
-  const id = parseInt(row.dataset.id, 10);
-  const action = actionEl.dataset.action;
-  if (action === 'toggle') { toggleSel(id); }
-  else if (action === 'open') { openDetail(id); }
-  else if (action === 'quick-add') { selected.clear(); selected.add(id); updateBulkBar(); openBulkAssign(); }
-  // 'toggle-on' is handled by the inner <input>'s onchange
+document.getElementById('toggleTask')?.addEventListener('click',()=>{
+  const b=document.getElementById('taskBody');
+  const show=b.style.display==='none'||b.style.display==='';
+  b.style.display=show?'flex':'none';
+  document.getElementById('toggleTask').textContent=show?'छुपाएं':'देखें';
 });
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.opacity='1';
+  setTimeout(()=>t.style.opacity='0',2000);
+}
+
+go('whatsapp');
 </script>
 </body>
 </html>
