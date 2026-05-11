@@ -1,0 +1,1114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Digital Paani — Diagnostic Flow Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ── Reset ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ── Tokens ── */
+  :root {
+    --ink:    #0F172A;
+    --ink2:   #334155;
+    --muted:  #64748B;
+    --line:   #E2E8F0;
+    --surface:#F8FAFC;
+    --crit:   #DC2626;
+    --warn:   #D97706;
+    --ok:     #16A34A;
+    --info:   #2563EB;
+    --page:   #FFFFFF;
+  }
+
+  /* ── Base ── */
+  body {
+    font-family: 'Inter', ui-sans-serif, sans-serif;
+    font-size: 11pt;
+    color: var(--ink);
+    background: #F0F2F5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Print wrapper ── */
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    background: var(--page);
+    padding: 18mm 18mm 18mm 18mm;
+  }
+
+  /* ── Cover page ── */
+  .cover {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 260mm;
+    page-break-after: always;
+  }
+  .cover-eyebrow {
+    font-size: 9pt;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .cover-title {
+    font-size: 32pt;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+  .cover-sub {
+    font-size: 13pt;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-bottom: 40px;
+  }
+  .cover-meta {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+  .cover-meta-item {
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+  }
+  .cover-meta-label { font-size: 8pt; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .cover-meta-val   { font-size: 16pt; font-weight: 700; color: var(--ink); margin-top: 4px; }
+  .cover-footer {
+    border-top: 1px solid var(--line);
+    padding-top: 16px;
+    font-size: 9pt;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* ── Section header (TOC / chapter) ── */
+  .section-break { page-break-before: always; }
+  .section-header {
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+  .section-header h2 { font-size: 16pt; font-weight: 800; }
+  .section-header span { font-size: 9pt; color: var(--muted); font-weight: 500; }
+
+  /* ── Equipment index table ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9.5pt;
+    margin-bottom: 20px;
+  }
+  thead th {
+    background: var(--ink);
+    color: #fff;
+    padding: 7px 10px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 9pt;
+  }
+  tbody tr:nth-child(even) { background: var(--surface); }
+  tbody td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+    line-height: 1.4;
+  }
+  .sev-crit { color: var(--crit); font-weight: 700; }
+  .sev-high { color: var(--warn); font-weight: 700; }
+  .sev-med  { color: #CA8A04;    font-weight: 700; }
+  .built    { color: var(--ok);  font-weight: 600; }
+  .pending  { color: var(--muted); }
+
+  /* ── Flow card ── */
+  .flow-card {
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    margin-bottom: 22px;
+    overflow: hidden;
+    page-break-inside: avoid;
+  }
+  .flow-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .flow-header-crit  { background: #FEF2F2; border-left: 5px solid var(--crit); }
+  .flow-header-high  { background: #FFFBEB; border-left: 5px solid var(--warn); }
+  .flow-header-med   { background: #FEFCE8; border-left: 5px solid #EAB308; }
+
+  .flow-id {
+    font-size: 9pt;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+  .flow-id-crit { background: var(--crit); color: #fff; }
+  .flow-id-high { background: var(--warn); color: #fff; }
+  .flow-id-med  { background: #EAB308;     color: #fff; }
+
+  .flow-title   { font-size: 12pt; font-weight: 700; color: var(--ink); }
+  .flow-equip   { font-size: 9pt;  font-weight: 500; color: var(--muted); margin-top: 1px; }
+
+  .flow-meta {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 8px;
+    border-radius: 9999px;
+    font-size: 8.5pt;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-steps { background: var(--surface); color: var(--ink2); border: 1px solid var(--line); }
+  .badge-built { background: #DCFCE7; color: #15803D; }
+
+  .flow-body { padding: 14px 16px; }
+
+  .trigger-row {
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 9.5pt;
+    color: var(--ink2);
+    margin-bottom: 12px;
+    border: 1px solid var(--line);
+    line-height: 1.5;
+  }
+  .trigger-row strong { color: var(--ink); }
+
+  /* ── Step table inside flow ── */
+  .step-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 9pt; }
+  .step-table thead th {
+    background: var(--surface);
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 8pt;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .step-table tbody td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+    line-height: 1.45;
+    font-size: 9pt;
+    background: #fff;
+  }
+  .step-table tbody tr:last-child td { border-bottom: none; }
+  .step-num {
+    font-weight: 700;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .step-type {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 7.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+  }
+  .type-observe { background: #EFF6FF; color: #1D4ED8; }
+  .type-input   { background: #F0FDF4; color: #15803D; }
+  .type-action  { background: #FFF7ED; color: #C2410C; }
+  .type-check   { background: #FAF5FF; color: #7C3AED; }
+
+  .outcome-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 2px;
+  }
+  .outcome {
+    border-radius: 7px;
+    padding: 8px 11px;
+    font-size: 9pt;
+    line-height: 1.4;
+  }
+  .outcome-ok  { background: #F0FDF4; border: 1px solid #BBF7D0; }
+  .outcome-esc { background: #FEF2F2; border: 1px solid #FECACA; }
+  .outcome-label { font-size: 8pt; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 3px; }
+  .outcome-ok  .outcome-label { color: var(--ok); }
+  .outcome-esc .outcome-label { color: var(--crit); }
+
+  /* ── Priority matrix ── */
+  .priority-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .priority-item {
+    border: 1.5px solid var(--line);
+    border-radius: 9px;
+    padding: 11px 13px;
+    page-break-inside: avoid;
+  }
+  .priority-item .p-num  { font-size: 22pt; font-weight: 800; color: var(--line); line-height: 1; }
+  .priority-item .p-id   { font-size: 8.5pt; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+  .priority-item .p-name { font-size: 10.5pt; font-weight: 700; color: var(--ink); margin-top: 2px; }
+  .priority-item .p-why  { font-size: 8.5pt; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+
+  /* ── Print rules ── */
+  @media print {
+    body { background: white; }
+    .page { padding: 15mm 16mm; box-shadow: none; margin: 0; width: 100%; }
+    .cover { min-height: 250mm; }
+    .no-break { page-break-inside: avoid; }
+    .section-break { page-break-before: always; }
+    a { color: inherit; text-decoration: none; }
+  }
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  /* ── Print button (screen only) ── */
+  .print-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 13px 22px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(15,23,42,.25);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 100;
+    font-family: 'Inter', sans-serif;
+  }
+  .print-btn:hover { background: #1E293B; }
+  @media print { .print-btn { display: none; } }
+</style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+  Save as PDF
+</button>
+
+<div class="page">
+
+  <!-- ══ COVER ══════════════════════════════════════════ -->
+  <div class="cover">
+    <div class="cover-eyebrow">Digital Paani · Honda Manesar STP · Operator App</div>
+    <div class="cover-title">Diagnostic<br>Flow Library</div>
+    <div class="cover-sub">Complete reference for all 25 operator diagnostic flows.<br>Use to build prototype screens in the app.</div>
+
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Total Flows</div>
+        <div class="cover-meta-val">25</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Already Built</div>
+        <div class="cover-meta-val" style="color:var(--ok);">3</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">To Build</div>
+        <div class="cover-meta-val" style="color:var(--warn);">22</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Critical Severity</div>
+        <div class="cover-meta-val" style="color:var(--crit);">12</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">High Severity</div>
+        <div class="cover-meta-val" style="color:var(--warn);">13</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Equipment Covered</div>
+        <div class="cover-meta-val">10</div>
+      </div>
+    </div>
+
+    <div class="cover-footer">
+      <span>Honda Manesar STP · Digital Paani Operator App</span>
+      <span>Prototype v3 · May 2026</span>
+    </div>
+  </div>
+
+  <!-- ══ EQUIPMENT MAP ═══════════════════════════════════ -->
+  <div class="section-break">
+    <div class="section-header">
+      <h2>Equipment Map</h2>
+      <span>Honda Manesar STP</span>
+    </div>
+    <table>
+      <thead><tr><th>ID</th><th>Equipment</th><th>Zone</th><th>Critical for</th></tr></thead>
+      <tbody>
+        <tr><td><strong>AT-01</strong></td><td>Aeration Tank (MBBR)</td><td>Biological Treatment</td><td>DO, MLSS, effluent quality</td></tr>
+        <tr><td><strong>BL-101</strong></td><td>Blower (primary)</td><td>Mechanical</td><td>Aeration — DO will crash within 20 min if fails</td></tr>
+        <tr><td><strong>BL-102</strong></td><td>Blower (standby)</td><td>Mechanical</td><td>Auto-backup for BL-101</td></tr>
+        <tr><td><strong>CL-01</strong></td><td>Secondary Clarifier</td><td>Settling</td><td>Effluent turbidity, sludge blanket</td></tr>
+        <tr><td><strong>EQ-01</strong></td><td>Equalization Tank</td><td>Pre-treatment</td><td>Flow balancing, level management</td></tr>
+        <tr><td><strong>SCR-01</strong></td><td>Bar Screen</td><td>Inlet</td><td>Solids removal, flow path clearance</td></tr>
+        <tr><td><strong>RAS</strong></td><td>Return Activated Sludge pump</td><td>Sludge Recycle</td><td>Sludge blanket in clarifier</td></tr>
+        <tr><td><strong>WAS</strong></td><td>Waste Activated Sludge pump</td><td>Sludge Disposal</td><td>Biomass / SRT control</td></tr>
+        <tr><td><strong>DOS-01</strong></td><td>Chlorine Dosing Pump</td><td>Tertiary / Disinfection</td><td>Effluent compliance (CPCB)</td></tr>
+        <tr><td><strong>SMP-01</strong></td><td>Sump Pump</td><td>Collection</td><td>Drainage, flooding prevention</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-header" style="margin-top:24px;">
+      <h2>Severity Levels</h2>
+    </div>
+    <table>
+      <thead><tr><th>Level</th><th>Colour</th><th>Response time</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td class="sev-crit">● Critical</td><td>Red</td><td>Immediate — act now</td><td>Effluent quality breach or imminent equipment failure</td></tr>
+        <tr><td class="sev-high">● High</td><td>Amber</td><td>Within 1–2 hours</td><td>Parameter trending out of range, action needed</td></tr>
+        <tr><td class="sev-med">● Medium</td><td>Yellow</td><td>Within same shift</td><td>Preventive — parameter drifting, monitor closely</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══ FLOW INDEX ══════════════════════════════════════ -->
+  <div class="section-break">
+    <div class="section-header">
+      <h2>Flow Index</h2>
+      <span>25 flows across 10 equipment</span>
+    </div>
+    <table>
+      <thead><tr><th>ID</th><th>Equipment</th><th>Issue</th><th>Severity</th><th>Steps</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><strong>DT-001</strong></td><td>SCR-01 Screen</td><td>Screen choked / Inlet blocked</td><td class="sev-high">High</td><td>3</td><td class="pending">To build</td></tr>
+        <tr><td><strong>DT-002</strong></td><td>EQ-01</td><td>Equalization tank level high</td><td class="sev-high">High</td><td>3</td><td class="pending">To build</td></tr>
+        <tr><td><strong>DT-003</strong></td><td>EQ-01</td><td>Level low / no inlet flow</td><td class="sev-med">Medium</td><td>3</td><td class="pending">To build</td></tr>
+        <tr><td><strong>DT-004</strong></td><td>AT-01 Outlet</td><td>Turbidity high</td><td class="sev-crit">Critical</td><td>5</td><td class="pending">To build</td></tr>
+        <tr><td><strong>DT-005</strong></td><td>AT-01</td><td>pH out of range</td><td class="sev-high">High</td><td>4</td><td class="pending">To build</td></tr>
+        <tr><td><strong>DT-006</strong></td><td>AT-01</td><td>DO Low</td><td class="sev-crit">Critical</td><td>5</td><td class="built">✓ Built</td></tr>
+        <tr><td><strong>DT-007</strong></td><td>AT-01</td><td>Biomass low / SV30 falling</td><td class="sev-crit">Critical</td><td>5</td><td class="built">✓ Built</td></tr>
+        <tr><td><strong>DT-008</strong></td><td>AT-01</td><td>Foam / Froth on surface</td><td class="sev-high">High</td><td>4</td><td class="pending">To build</td></tr>
+        <tr><td><strong>DT-009</strong></td><td>AT-01</td><td>Sludge bulking — SVI high</td><td class="sev-high">High</td><td>4</td><td class="pending">To build</td></tr>
+        <tr><td><strong>DT-010</strong></td><td>AT-01 / CL-01</td><td>Rising / floating sludge</td><td class="sev-crit">Critical</td><td>4</td><td class="pending">To build</td></tr>
+        <tr><td><strong>DT-011</strong></td><td>AT-01</td><td>MLSS sudden drop</td><td class="sev-crit">Critical</td><td>4</td><td class="pending">To build</td></tr>
+        <tr><td><strong>DT-012</strong></td><td>BL-101</td><td>Blower vibration high</td><td class="sev-high">High</td><td>4</td><td class="built">✓ Built</td></tr>
+        <tr><td><strong>DT-013</strong></td><td>BL-101</td><td>Blower trip / won't start</td><td class="sev-crit">Critical</td><td>4</td><td class="pending">To build</td></tr>
+        <tr><td><strong>DT-014</strong></td><td>BL-101</td><td>Blower overheating</td><td class="sev-high">High</td><td>3</td><td class="pending">To build</td></tr>
+        <tr><td><strong>DT-015</strong></td><td>BL-101/102</td><td>Air pressure low</td><td class="sev-high">High</td><td>4</td><td class="pending">To build</td></tr>
+        <tr><td><strong>DT-016</strong></td><td>BL-102</td><td>Standby blower auto-start failed</td><td class="sev-crit">Critical</td><td>3</td><td class="pending">To build</td></tr>
+        <tr><td><strong>DT-017</strong></td><td>CL-01</td><td>Sludge blanket rising</td><td class="sev-crit">Critical</td><td>4</td><td class="pending">To build</td></tr>
+        <tr><td><strong>DT-018</strong></td><td>CL-01</td><td>Clarifier effluent turbid</td><td class="sev-high">High</td><td>4</td><td class="pending">To build</td></tr>
+        <tr><td><strong>DT-019</strong></td><td>RAS Pump</td><td>RAS pump not running</td><td class="sev-crit">Critical</td><td>3</td><td class="pending">To build</td></tr>
+        <tr><td><strong>DT-020</strong></td><td>WAS Pump</td><td>Excess sludge wasting</td><td class="sev-high">High</td><td>3</td><td class="pending">To build</td></tr>
+        <tr><td><strong>DT-021</strong></td><td>DOS-01</td><td>Chlorine dosing stopped</td><td class="sev-crit">Critical</td><td>3</td><td class="pending">To build</td></tr>
+        <tr><td><strong>DT-022</strong></td><td>SMP-01</td><td>Sump pump failure</td><td class="sev-high">High</td><td>3</td><td class="pending">To build</td></tr>
+        <tr><td><strong>DT-023</strong></td><td>Outlet</td><td>BOD / COD high</td><td class="sev-crit">Critical</td><td>5</td><td class="pending">To build</td></tr>
+        <tr><td><strong>DT-024</strong></td><td>Full plant</td><td>Power failure / UPS alarm</td><td class="sev-crit">Critical</td><td>3</td><td class="pending">To build</td></tr>
+        <tr><td><strong>DT-025</strong></td><td>Inlet</td><td>Toxic shock — unusual inlet</td><td class="sev-crit">Critical</td><td>4</td><td class="pending">To build</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══ FLOWS — INLET / PRE-TREATMENT ══════════════════ -->
+  <div class="section-break">
+    <div class="section-header"><h2>Zone 1 — Inlet &amp; Pre-treatment</h2><span>DT-001 · DT-002 · DT-003 · DT-025</span></div>
+
+    <!-- DT-001 -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-high">
+        <span class="flow-id flow-id-high">DT-001</span>
+        <div><div class="flow-title">Screen Choked / Inlet Flow Blocked</div><div class="flow-equip">SCR-01 Bar Screen</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">3 steps</span><span class="badge" style="background:#FEF3C7;color:#92400E;">High</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> Differential pressure across screen &gt;150 mm OR operator notices inlet odour / standing water at screen area.</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">Pre-flight</td><td><span class="step-type type-observe">Observe</span></td><td>Screen area पर क्या दिख रहा है?</td><td>सामान्य → S1 · रुका हुआ पानी → S1 · Screen टूटा → Escalate</td></tr>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-observe">Observe</span></td><td>Screen पर कूड़ा कितना है?</td><td>हल्का → S2 · ज़्यादा (&gt;50%) → S2 · पूरी तरह बंद → Escalate</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-action">Action</span></td><td>Manual rake से screen साफ करें</td><td>साफ हो गया → Resolved · नहीं हटा → Escalate</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>Log cleaning time. Auto-generate next cleaning task in 4h.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>Maintenance — screen mechanism jam or structural damage.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DT-002 -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-high">
+        <span class="flow-id flow-id-high">DT-002</span>
+        <div><div class="flow-title">Equalization Tank Level High</div><div class="flow-equip">EQ-01</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">3 steps</span><span class="badge" style="background:#FEF3C7;color:#92400E;">High</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> EQ-01 level sensor &gt;85% OR operator observes overflow risk.</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">Pre-flight</td><td><span class="step-type type-observe">Observe</span></td><td>EQ-01 के पास क्या दिखा?</td><td>ठीक → S1 · पानी बह रहा है → Escalate immediately</td></tr>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-input">Input</span></td><td>Inlet flow meter reading?</td><td>Normal (&lt;150 m³/h) → S2 · High (&gt;150) → S3</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-check">Check</span></td><td>Transfer pump चल रही है?</td><td>हाँ → Wait 30 min, recheck · नहीं → Restart pump → Resolved</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-action">Action</span></td><td>Inlet divert valve खोलें (bypass)</td><td>Done → Escalate + Supervisor call</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>Level drops below 70% within 30 min.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>Supervisor — inlet surge event or pump failure.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DT-003 -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-med">
+        <span class="flow-id flow-id-med">DT-003</span>
+        <div><div class="flow-title">Equalization Tank Level Low / No Inlet</div><div class="flow-equip">EQ-01</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">3 steps</span><span class="badge" style="background:#FEFCE8;color:#854D0E;">Medium</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> EQ-01 level &lt;20% OR flow meter reads zero for &gt;30 min.</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-observe">Observe</span></td><td>Inlet channel में पानी है?</td><td>हाँ → S2 · नहीं → S3</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-check">Check</span></td><td>SCR-01 screen choked है?</td><td>हाँ → Run DT-001 · नहीं → S3</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-check">Check</span></td><td>Inlet valve खुला है?</td><td>बंद था → खोलें → Resolved · खुला है → Escalate (upstream)</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>Level rising, flow meter showing flow.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>Upstream line blockage or municipal supply cut — inform supervisor.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DT-025 -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-crit">
+        <span class="flow-id flow-id-crit">DT-025</span>
+        <div><div class="flow-title">Toxic Shock — Unusual Inlet Quality</div><div class="flow-equip">Inlet → EQ-01 → AT-01</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">4 steps</span><span class="badge" style="background:#FEE2E2;color:#991B1B;">Critical</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> Operator reports black colour, strong chemical smell, pH spike, or MLSS crash with no other cause found.</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">Pre-flight</td><td><span class="step-type type-observe">Observe</span></td><td>Inlet पर क्या दिखा / महसूस हुआ?</td><td>सामान्य → Re-evaluate · Chemical smell / unusual colour → S1</td></tr>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-action">Action</span></td><td>IMMEDIATE: Inlet valve close करें, bypass to holding</td><td>Done → S2 · Valve stuck → Escalate URGENT</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-check">Check</span></td><td>AT-01 में MLSS / DO check करें</td><td>Both crashing → Escalate + stop WAS · One crashing → Run that DT</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-action">Action</span></td><td>Supervisor call + CPCB log बनाएं। 1h बाद inlet recheck</td><td>Inlet normal → Slowly reopen, monitor · Still bad → Hold closed</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>Inlet quality normal on recheck. Slowly reopen, monitor AT-01 MLSS.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>IMMEDIATE — Supervisor + CPCB notification. Industrial discharge likely. Source tracing required.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FLOWS — AERATION ════════════════════════════════ -->
+  <div class="section-break">
+    <div class="section-header"><h2>Zone 2 — Aeration Tank AT-01</h2><span>DT-004 through DT-011</span></div>
+
+    <!-- DT-004 -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-crit">
+        <span class="flow-id flow-id-crit">DT-004</span>
+        <div><div class="flow-title">Outlet Turbidity High</div><div class="flow-equip">AT-01 → CL-01 Outlet</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">5 steps</span><span class="badge" style="background:#FEE2E2;color:#991B1B;">Critical</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> Outlet turbidity sensor &gt;10 NTU sustained for &gt;30 min.</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">Pre-flight</td><td><span class="step-type type-observe">Observe</span></td><td>Outlet sample का पानी कैसा दिखा?</td><td>हल्का धुंधला → S1 · काला/भूरा → Escalate · फोम → Run DT-008</td></tr>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-input">Input</span></td><td>DO reading AT-01?</td><td>&lt;2 mg/L → Run DT-006 · ≥2 → S2</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-input">Input</span></td><td>SV30 reading?</td><td>&lt;200 mL → Run DT-007 · ≥200 → S3</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-observe">Observe</span></td><td>Clarifier में sludge blanket कहाँ है?</td><td>½ से नीचे → S4 · ऊपर आ रहा है → Run DT-017</td></tr>
+            <tr><td class="step-num">S4</td><td><span class="step-type type-check">Check</span></td><td>RAS pump चल रही है?</td><td>नहीं → Run DT-019 · हाँ → Escalate (lab analysis)</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>Turbidity drops &lt;10 NTU within 1 hour.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>Lab COD/BOD sample. Supervisor + chemist. Log for CPCB.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DT-005 -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-high">
+        <span class="flow-id flow-id-high">DT-005</span>
+        <div><div class="flow-title">pH Out of Range</div><div class="flow-equip">AT-01 Aeration Tank</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">4 steps</span><span class="badge" style="background:#FEF3C7;color:#92400E;">High</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> pH sensor &lt;6.5 or &gt;8.5 for &gt;20 min.</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">Pre-flight</td><td><span class="step-type type-observe">Observe</span></td><td>AT-01 पानी का रंग?</td><td>सामान्य → S1 · नारंगी / काला → Escalate</td></tr>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-input">Input</span></td><td>pH meter से manual reading?</td><td>6.5–8.5 → Sensor fault, recalibrate · &lt;6.5 → S2 · &gt;8.5 → S3</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-check">Check</span></td><td>Inlet pH? (low = acidic shock from upstream)</td><td>Inlet भी low → Toxic shock → Run DT-025 · Inlet normal → S4</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-check">Check</span></td><td>Chemical dosing DOS-01 running?</td><td>नहीं → Restart dosing · हाँ → Dose rate check → Escalate</td></tr>
+            <tr><td class="step-num">S4</td><td><span class="step-type type-action">Action</span></td><td>Lime / NaOH dosing बढ़ाएं (SOP के अनुसार)</td><td>pH 6.5–8.5 आया → Resolved · नहीं आया → Escalate</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>pH stable in 6.5–8.5 for 30 min.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>Supervisor + chemist — potential toxic industrial discharge.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DT-006 (built) -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-crit">
+        <span class="flow-id flow-id-crit">DT-006</span>
+        <div><div class="flow-title">DO Low — Dissolved Oxygen</div><div class="flow-equip">AT-01 Aeration Tank</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">5 steps</span><span class="badge badge-built">✓ Built</span><span class="badge" style="background:#FEE2E2;color:#991B1B;">Critical</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> DO sensor &lt;2.0 mg/L sustained &gt;20 min OR turbidity rising alongside low DO.</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">Pre-flight</td><td><span class="step-type type-observe">Observe</span></td><td>टैंक के पास क्या देखा?</td><td>सामान्य → S1 · Serious → S1 · Critical (black water) → Escalate</td></tr>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-input">Input</span></td><td>DO Meter से रीडिंग लें</td><td>&lt;1 mg/L → Escalate · 1–2 → S2 · &gt;2 → Sensor recalibrate</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-observe">Observe</span></td><td>MBBR पानी की हलचल कैसी है?</td><td>सामान्य → S3 · Dead zones → S3 · No movement → Escalate</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-observe">Observe</span></td><td>बदबू क्या है?</td><td>Normal → S4 · Mild → S4 · H₂S तेज़ → Escalate</td></tr>
+            <tr><td class="step-num">S4</td><td><span class="step-type type-check">Check</span></td><td>BL-101 pressure और current check</td><td>Normal → S5 · Low pressure → Run DT-015 · Off → Run DT-013</td></tr>
+            <tr><td class="step-num">S5</td><td><span class="step-type type-observe">Observe</span></td><td>Diffuser air pattern (bubbles)</td><td>Uniform → Monitor, DO recovering · Uneven → Clean diffuser · None → Escalate</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>DO trending &gt;2.0 mg/L. Schedule diffuser cleaning task.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>Supervisor को बुलाएं — mechanical or process failure confirmed.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DT-007 (built) -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-crit">
+        <span class="flow-id flow-id-crit">DT-007</span>
+        <div><div class="flow-title">Biomass Low / SV30 Falling</div><div class="flow-equip">AT-01 Aeration Tank</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">5 steps</span><span class="badge badge-built">✓ Built</span><span class="badge" style="background:#FEE2E2;color:#991B1B;">Critical</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> SV30 &lt;250 mL (falling trend over 3+ days) OR MLSS &lt;2000 mg/L.</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-observe">Observe</span></td><td>पानी का रंग AT-01 में?</td><td>भूरा → S2 · हल्का/पीला → S2 · काला → Escalate (septic)</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-check">Check</span></td><td>WAS पिछले 3 दिन — over-wasting?</td><td>हाँ → Stop WAS, run S3 · नहीं → S3</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-observe">Observe</span></td><td>Inlet में कुछ unusual था?</td><td>हाँ → Toxic shock → Run DT-025 · नहीं → S4</td></tr>
+            <tr><td class="step-num">S4</td><td><span class="step-type type-input">Input</span></td><td>DO reading?</td><td>&lt;1 mg/L → Run DT-006 · 1–2 → S5 · &gt;2 → S5</td></tr>
+            <tr><td class="step-num">S5</td><td><span class="step-type type-action">Action</span></td><td>WAS बंद 48h, DO 2–3 mg/L hold, SV30 हर 8h record</td><td>Trend improving → Monitor · Falling → Escalate</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>SV30 &gt;250 mL and rising trend over 48h.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>Biomass washout — supervisor + possible external seeding needed.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DT-008 -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-high">
+        <span class="flow-id flow-id-high">DT-008</span>
+        <div><div class="flow-title">Foam / Froth in Aeration Tank</div><div class="flow-equip">AT-01 Aeration Tank</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">4 steps</span><span class="badge" style="background:#FEF3C7;color:#92400E;">High</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> Operator observes foam accumulation on AT-01 surface.</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">Pre-flight</td><td><span class="step-type type-observe">Observe</span></td><td>Foam कैसा दिखा?</td><td>सफेद और हल्का → S1 · भूरा और गाढ़ा → S2 · काला → Escalate</td></tr>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-check">Check</span></td><td>MLSS / SV30 — biomass low है?</td><td>हाँ → Run DT-007 · नहीं → S3</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-check">Check</span></td><td>भूरा foam = Nocardia bacteria। DO check करें।</td><td>DO low → Reduce aeration + wasting · DO normal → Escalate (lab)</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-action">Action</span></td><td>Anti-foam chemical dose करें (SOP के अनुसार)</td><td>Foam कम हुआ → Monitor · नहीं हुआ → Escalate</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>No foam visible. Document dosage and time.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>Persistent brown foam = Nocardia overgrowth. Chemist + lab intervention needed.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DT-009 -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-high">
+        <span class="flow-id flow-id-high">DT-009</span>
+        <div><div class="flow-title">Sludge Bulking — SVI High</div><div class="flow-equip">AT-01 Aeration Tank</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">4 steps</span><span class="badge" style="background:#FEF3C7;color:#92400E;">High</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> SV30 &gt;400 mL OR settling time &gt;40 min in 1L jar test.</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-observe">Observe</span></td><td>1L jar settle test (30 min) — sludge कैसे settle हुआ?</td><td>Compact → S2 · Fluffy / filamentous → S3 · No settle → Escalate</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-input">Input</span></td><td>DO reading?</td><td>Low → Run DT-006 · Normal → S3</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-check">Check</span></td><td>Inlet BOD load — पिछले 24h unusual?</td><td>हाँ → Escalate (industrial discharge) · नहीं → S4</td></tr>
+            <tr><td class="step-num">S4</td><td><span class="step-type type-action">Action</span></td><td>WAS rate बढ़ाएं temporarily + DO 3–4 mg/L maintain करें</td><td>SVI improving next day → Monitor · नहीं → Escalate</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>SV30 &lt;300 mL trend restored over 48h.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>Filamentous bulking — requires lab identification + chlorination of RAS.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DT-010 -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-crit">
+        <span class="flow-id flow-id-crit">DT-010</span>
+        <div><div class="flow-title">Rising / Floating Sludge</div><div class="flow-equip">AT-01 / CL-01</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">4 steps</span><span class="badge" style="background:#FEE2E2;color:#991B1B;">Critical</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> Operator sees dark sludge chunks rising to AT-01 or clarifier surface.</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">Pre-flight</td><td><span class="step-type type-observe">Observe</span></td><td>Sludge किस tank में rise कर रहा है?</td><td>AT-01 में → S1 · CL-01 में → Run DT-017</td></tr>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-input">Input</span></td><td>DO reading?</td><td>DO &lt;1 → Denitrification (N₂ gas lifting sludge) → S2 · DO normal → Escalate</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-action">Action</span></td><td>Aeration बढ़ाएं, DO 3+ mg/L target करें</td><td>Rising रुका → Monitor · नहीं → S3</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-action">Action</span></td><td>WAS pump manually चलाएं — sludge age कम करें</td><td>Improving → Monitor · नहीं → Escalate</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>No floating sludge visible. DO stable &gt;2.5 mg/L.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>Supervisor — nitrification/denitrification imbalance. Possible N₂ gas issue.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DT-011 -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-crit">
+        <span class="flow-id flow-id-crit">DT-011</span>
+        <div><div class="flow-title">MLSS Sudden Drop</div><div class="flow-equip">AT-01 Aeration Tank</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">4 steps</span><span class="badge" style="background:#FEE2E2;color:#991B1B;">Critical</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> MLSS reading &lt;1500 mg/L (normal 2500–4000) OR SV30 &lt;150 mL.</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-check">Check</span></td><td>WAS pump पिछले 24h कितना चली?</td><td>Over-wasting → Stop WAS + Run DT-007 · Normal → S2</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-check">Check</span></td><td>Inlet में कुछ unusual था — foam, colour, odour?</td><td>हाँ → Toxic shock → Run DT-025 · नहीं → S3</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-input">Input</span></td><td>pH + DO check करें</td><td>Both out of range → Escalate · One issue → Run that DT flow</td></tr>
+            <tr><td class="step-num">S4</td><td><span class="step-type type-action">Action</span></td><td>WAS बंद 48h, DO 2–3 mg/L, SV30 हर 8h record</td><td>MLSS trending up → Monitor · Falling → Escalate</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>MLSS trending upward. SV30 &gt;200 mL.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>Biomass washout — supervisor + possible seeding from external source.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FLOWS — BLOWERS ═════════════════════════════════ -->
+  <div class="section-break">
+    <div class="section-header"><h2>Zone 3 — Blowers BL-101 / BL-102</h2><span>DT-012 through DT-016</span></div>
+
+    <!-- DT-012 (built) -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-high">
+        <span class="flow-id flow-id-high">DT-012</span>
+        <div><div class="flow-title">Blower Vibration High</div><div class="flow-equip">BL-101 Blower</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">4 steps</span><span class="badge badge-built">✓ Built</span><span class="badge" style="background:#FEF3C7;color:#92400E;">High</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> Vibration sensor &gt;4.5 mm/s OR operator notices abnormal noise / shaking.</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-input">Input</span></td><td>Vibration meter reading अभी?</td><td>&lt;4.5 → Sensor check · 4.5–7 → S2 · ≥7 → Bearing failure → Escalate</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-observe">Observe</span></td><td>आवाज़ कैसी है?</td><td>Normal hum → S3 · Humming → S3 · Grinding/screeching → Escalate</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-input">Input</span></td><td>Bearing temperature?</td><td>&lt;70°C → S4 · 70–80 → S4 (urgent) · &gt;80 → Escalate</td></tr>
+            <tr><td class="step-num">S4</td><td><span class="step-type type-check">Check</span></td><td>Last greasing/lubrication कब था?</td><td>&gt;30 दिन → Grease करें, monitor · Recent → Escalate (mechanical fault)</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>Vibration &lt;4.5 mm/s after greasing. Schedule 30-day lubrication task.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>Bearing failure imminent — switch to BL-102, maintenance team.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DT-013 -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-crit">
+        <span class="flow-id flow-id-crit">DT-013</span>
+        <div><div class="flow-title">Blower Trip / Won't Start</div><div class="flow-equip">BL-101 (+ BL-102 standby)</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">4 steps</span><span class="badge" style="background:#FEE2E2;color:#991B1B;">Critical</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> BL-101 trip alarm OR current reading = 0A. ⚠ DO will crash within 20 min without aeration.</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">Pre-flight</td><td><span class="step-type type-check">Check</span></td><td>BL-102 standby auto-start हुआ?</td><td>हाँ, running → Log + escalate BL-101 repair · नहीं → S1 URGENT</td></tr>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-check">Check</span></td><td>BL-101 panel में क्या दिखा?</td><td>Overcurrent trip → S2 · Overtemp → Run DT-014 · No fault → S3</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-action">Action</span></td><td>Trip reset करें, manual restart try</td><td>Started → Monitor closely · Trip again → Escalate</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-check">Check</span></td><td>Main breaker / MCB check करें</td><td>Tripped → Reset · Normal → Wiring/motor fault → Escalate</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>BL-101 or BL-102 running. DO restoring.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>URGENT — Supervisor + electrical team immediately. DO crash risk.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DT-014 -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-high">
+        <span class="flow-id flow-id-high">DT-014</span>
+        <div><div class="flow-title">Blower Overheating</div><div class="flow-equip">BL-101 Blower</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">3 steps</span><span class="badge" style="background:#FEF3C7;color:#92400E;">High</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> BL-101 body temperature &gt;85°C OR thermal protection alarm on panel.</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-observe">Observe</span></td><td>Blower room का ambient temperature?</td><td>&gt;40°C → Room ventilation issue → S2 · Normal → S3</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-action">Action</span></td><td>Exhaust fan / louvers खोलें, room cool करें</td><td>Temperature गिरी → Monitor · नहीं → Escalate</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-check">Check</span></td><td>Inlet air filter choked? (pressure drop check)</td><td>Filter dirty → Clean filter, monitor · Filter clean → Escalate</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>Body temp &lt;75°C, running normally.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>Motor winding or bearing fault — electrical team.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DT-015 -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-high">
+        <span class="flow-id flow-id-high">DT-015</span>
+        <div><div class="flow-title">Air Pressure Low</div><div class="flow-equip">BL-101 / BL-102 + Air Header</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">4 steps</span><span class="badge" style="background:#FEF3C7;color:#92400E;">High</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> Air header pressure &lt;0.4 bar (design 0.5–0.6 bar) for &gt;15 min.</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-input">Input</span></td><td>BL-101 outlet pressure gauge reading?</td><td>&lt;0.4 → S2 · 0.4–0.5 → Possible leak → S3</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-check">Check</span></td><td>Blower current — normal या low?</td><td>Current low → Mechanical slip · Normal current → Impeller wear → Escalate</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-observe">Observe</span></td><td>Air header और distribution pipes पर leak?</td><td>हाँ → Isolate + patch → Escalate · नहीं → Diffuser clog → Run DT-006 step 5</td></tr>
+            <tr><td class="step-num">S4</td><td><span class="step-type type-action">Action</span></td><td>BL-102 standby को parallel चलाएं</td><td>Pressure restored → Monitor + schedule BL-101 maintenance · नहीं → Escalate</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>Pressure &gt;0.45 bar, DO recovering.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>Impeller wear or major leak — maintenance team.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DT-016 -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-crit">
+        <span class="flow-id flow-id-crit">DT-016</span>
+        <div><div class="flow-title">Standby Blower Auto-Start Failed</div><div class="flow-equip">BL-102 Standby Blower</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">3 steps</span><span class="badge" style="background:#FEE2E2;color:#991B1B;">Critical</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> BL-101 tripped + BL-102 did NOT auto-start (SCADA alarm or operator notices silence).</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-check">Check</span></td><td>BL-102 selector switch किस position पर है?</td><td>Manual/Off → Switch to Auto + manual start · Auto → S2</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-check">Check</span></td><td>BL-102 control panel fault light?</td><td>Fault → Escalate immediately · No fault → Manual start</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-action">Action</span></td><td>Manual start BL-102 करें</td><td>Started → Log + escalate auto-start failure for repair · नहीं → Escalate both</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>BL-102 running, DO being restored. Log auto-start failure for repair.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>CRITICAL — both blowers down = complete aeration loss. Emergency team NOW.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FLOWS — CLARIFIER / SLUDGE ══════════════════════ -->
+  <div class="section-break">
+    <div class="section-header"><h2>Zone 4 — Clarifier, RAS &amp; WAS</h2><span>DT-017 · DT-018 · DT-019 · DT-020</span></div>
+
+    <!-- DT-017 -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-crit">
+        <span class="flow-id flow-id-crit">DT-017</span>
+        <div><div class="flow-title">Sludge Blanket Rising in Clarifier</div><div class="flow-equip">CL-01 Secondary Clarifier</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">4 steps</span><span class="badge" style="background:#FEE2E2;color:#991B1B;">Critical</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> Sludge blanket &lt;0.5m from surface OR effluent turbid with sludge chunks visible.</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">Pre-flight</td><td><span class="step-type type-observe">Observe</span></td><td>Clarifier surface पर क्या दिखा?</td><td>Dark sludge chunks → S1 · Frothy → Run DT-008 · Clear → Sensor fault</td></tr>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-check">Check</span></td><td>RAS pump चल रही है?</td><td>नहीं → Start RAS → Run DT-019 · हाँ → S2</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-input">Input</span></td><td>RAS flow rate?</td><td>Low → Increase RAS rate → Monitor · Normal → S3</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-input">Input</span></td><td>AT-01 DO reading?</td><td>Low → Denitrification lifting sludge → Run DT-006 · Normal → Escalate</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>Sludge blanket depth &gt;1m from surface. Effluent clearing.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>Supervisor — bulk sludge removal or mechanical desludging may be needed.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DT-018 -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-high">
+        <span class="flow-id flow-id-high">DT-018</span>
+        <div><div class="flow-title">Clarifier Effluent Turbid</div><div class="flow-equip">CL-01 Secondary Clarifier</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">4 steps</span><span class="badge" style="background:#FEF3C7;color:#92400E;">High</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> Clarifier outlet turbidity &gt;20 NTU (worse than AT-01 outlet).</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-observe">Observe</span></td><td>Clarifier outlet sample — colour?</td><td>Milky white → Pin floc / poor settling → S2 · Brown/dark → S3</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-check">Check</span></td><td>MLSS बहुत low तो नहीं?</td><td>Low → Run DT-011 · Normal → Check hydraulic load → Escalate</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-check">Check</span></td><td>Sludge blanket rising?</td><td>हाँ → Run DT-017 · नहीं → Scum baffle blocked → S4</td></tr>
+            <tr><td class="step-num">S4</td><td><span class="step-type type-action">Action</span></td><td>Scum baffle और weir check + clean करें</td><td>Resolved → Log · नहीं → Escalate</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>Clarifier effluent &lt;15 NTU and clearing.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>Supervisor + lab sample. May indicate hydraulic overloading or structural issue.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DT-019 -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-crit">
+        <span class="flow-id flow-id-crit">DT-019</span>
+        <div><div class="flow-title">RAS Pump Not Running</div><div class="flow-equip">Return Activated Sludge Pump</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">3 steps</span><span class="badge" style="background:#FEE2E2;color:#991B1B;">Critical</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> RAS pump current = 0A OR SCADA alarm OR sludge blanket rising in CL-01.</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-check">Check</span></td><td>Control panel में क्या दिखा?</td><td>Trip / fault → S2 · Power off → Check breaker → S3</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-action">Action</span></td><td>Trip reset, manual restart try</td><td>Started → Monitor + escalate for inspection · नहीं → Escalate</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-check">Check</span></td><td>MCB / isolator check करें</td><td>Tripped → Reset · Normal → Wiring fault → Escalate</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>RAS running. Sludge blanket stabilising in clarifier.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>Pump motor fault. Risk of clarifier blanket overflow if not resolved quickly.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DT-020 -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-high">
+        <span class="flow-id flow-id-high">DT-020</span>
+        <div><div class="flow-title">Excess Sludge Wasting</div><div class="flow-equip">WAS Pump</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">3 steps</span><span class="badge" style="background:#FEF3C7;color:#92400E;">High</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> SV30 declining daily trend + WAS meter shows wasting &gt;target rate (typically &gt;2.5 m³/day).</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-input">Input</span></td><td>आज WAS कितना चला? (hours + flow rate)</td><td>&gt;target by 20% → S2 · Normal → Instrument check</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-check">Check</span></td><td>WAS control — auto या manual mode?</td><td>Manual (left on) → Stop + log · Auto → Set point check → S3</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-action">Action</span></td><td>WAS set point को target SRT (15–20 days) पर set करें</td><td>Confirmed → Log, monitor SV30 daily → Resolved</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>WAS at correct rate. SV30 monitored daily.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>If SV30 continues to fall despite correcting WAS — biomass damage suspected.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FLOWS — TERTIARY / DOSING / UTILITIES ═══════════ -->
+  <div class="section-break">
+    <div class="section-header"><h2>Zone 5 — Dosing, Utilities &amp; Plant-wide</h2><span>DT-021 · DT-022 · DT-023 · DT-024</span></div>
+
+    <!-- DT-021 -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-crit">
+        <span class="flow-id flow-id-crit">DT-021</span>
+        <div><div class="flow-title">Chlorine Dosing Stopped</div><div class="flow-equip">DOS-01 Dosing Pump</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">3 steps</span><span class="badge" style="background:#FEE2E2;color:#991B1B;">Critical</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> Residual chlorine at outlet = 0 mg/L for &gt;30 min OR DOS-01 alarm. ⚠ Regulatory risk — CPCB compliance.</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-check">Check</span></td><td>Chemical tank (chlorine solution) — level?</td><td>Empty → Refill immediately → Resolved · Level OK → S2</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-check">Check</span></td><td>DOS-01 pump running? (sound / indicator light)</td><td>नहीं → Restart manually · हाँ but no flow → S3</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-check">Check</span></td><td>Dosing tube / foot valve choked?</td><td>हाँ → Clean/replace tube → Restart · नहीं → Pump head fault → Escalate</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>Residual chlorine 0.5–1.0 mg/L at outlet restored.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>Effluent discharged without disinfection = CPCB violation. Supervisor + log immediately.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DT-022 -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-high">
+        <span class="flow-id flow-id-high">DT-022</span>
+        <div><div class="flow-title">Sump Pump Failure</div><div class="flow-equip">SMP-01</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">3 steps</span><span class="badge" style="background:#FEF3C7;color:#92400E;">High</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> Sump level high alarm OR pump current = 0 OR visible water accumulation.</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-observe">Observe</span></td><td>Sump में पानी कितना है?</td><td>Low → Level sensor fault · High / overflow risk → S2</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-check">Check</span></td><td>Pump control — auto/manual switch position?</td><td>Manual/Off → Switch to auto + restart · Auto → S3</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-action">Action</span></td><td>Manual override — pump start करें</td><td>Started → Monitor · नहीं → Escalate + cordon area</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>Sump level dropping, pump running normally.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>Pump motor failure. Block area, maintenance team.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DT-023 -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-crit">
+        <span class="flow-id flow-id-crit">DT-023</span>
+        <div><div class="flow-title">Outlet BOD / COD High</div><div class="flow-equip">Outlet — Full Treatment Chain</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">5 steps</span><span class="badge" style="background:#FEE2E2;color:#991B1B;">Critical</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> Lab result or online sensor: BOD &gt;30 mg/L or COD &gt;250 mg/L (CPCB discharge limits).</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">Pre-flight</td><td><span class="step-type type-check">Check</span></td><td>क्या effluent discharge अभी हो रही है?</td><td>हाँ → Stop discharge if possible + inform supervisor · नहीं → S1</td></tr>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-input">Input</span></td><td>DO reading AT-01?</td><td>&lt;2 mg/L → Run DT-006 · ≥2 → S2</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-input">Input</span></td><td>SV30 / MLSS?</td><td>Low biomass → Run DT-007 or DT-011 · Normal → S3</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-check">Check</span></td><td>Inlet load — क्या BOD surge था (industrial flush)?</td><td>हाँ → Run DT-025 · नहीं → S4</td></tr>
+            <tr><td class="step-num">S4</td><td><span class="step-type type-check">Check</span></td><td>HRT adequate? (inlet flow vs. tank volume)</td><td>High flow → Reduce WAS + increase DO · Normal → Escalate lab + CPCB</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>BOD &lt;30 mg/L and COD &lt;250 mg/L confirmed on re-test.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>Regulatory breach — supervisor + CPCB notification protocol. Lab records mandatory.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DT-024 -->
+    <div class="flow-card">
+      <div class="flow-header flow-header-crit">
+        <span class="flow-id flow-id-crit">DT-024</span>
+        <div><div class="flow-title">Power Failure / UPS Alarm</div><div class="flow-equip">Full Plant</div></div>
+        <div class="flow-meta"><span class="badge badge-steps">3 steps</span><span class="badge" style="background:#FEE2E2;color:#991B1B;">Critical</span></div>
+      </div>
+      <div class="flow-body">
+        <div class="trigger-row"><strong>Trigger:</strong> Power outage detected OR UPS battery low alarm. ⚠ All aeration stops unless DG starts.</div>
+        <table class="step-table">
+          <thead><tr><th>Step</th><th>Type</th><th>Question / Check</th><th>Answer → Next</th></tr></thead>
+          <tbody>
+            <tr><td class="step-num">S1</td><td><span class="step-type type-check">Check</span></td><td>DG Set (generator) auto-start हुआ?</td><td>हाँ, running → Check critical equipment S2 · नहीं → S2 manual start</td></tr>
+            <tr><td class="step-num">S2</td><td><span class="step-type type-action">Action</span></td><td>DG Set manually start करें</td><td>Started → S3 · नहीं → Escalate URGENT</td></tr>
+            <tr><td class="step-num">S3</td><td><span class="step-type type-check">Check</span></td><td>Critical loads: Blowers + RAS + Dosing — all running?</td><td>All running → Log + monitor DO · Any not running → Run respective DT flow</td></tr>
+          </tbody>
+        </table>
+        <div class="outcome-row">
+          <div class="outcome outcome-ok"><div class="outcome-label">✓ Resolved</div>DG running, critical loads on. Monitor DO closely — may take 30 min to recover.</div>
+          <div class="outcome outcome-esc"><div class="outcome-label">↑ Escalate</div>DG won't start + grid out = full aeration loss within 20–30 min. Emergency team.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PRIORITY BUILD ORDER ════════════════════════════ -->
+  <div class="section-break">
+    <div class="section-header"><h2>Priority Build Order</h2><span>Recommended sequence for prototyping</span></div>
+    <p style="font-size:9.5pt;color:var(--muted);margin-bottom:16px;">Ranked by operator impact: frequency × consequence of missing the issue.</p>
+    <div class="priority-grid">
+      <div class="priority-item"><div class="p-num">01</div><div class="p-id">DT-013</div><div class="p-name">Blower Trip</div><div class="p-why">Most urgent. DO crashes within 20 min without aeration. Operators need instant, clear steps.</div></div>
+      <div class="priority-item"><div class="p-num">02</div><div class="p-id">DT-004</div><div class="p-name">Turbidity High</div><div class="p-why">Direct effluent quality breach. CPCB risk. Operators see this weekly. Links to 4 other flows.</div></div>
+      <div class="priority-item"><div class="p-num">03</div><div class="p-id">DT-017</div><div class="p-name">Clarifier Sludge Rising</div><div class="p-why">Visually obvious. Operators encounter it frequently. Leads to instant effluent turbidity problem.</div></div>
+      <div class="priority-item"><div class="p-num">04</div><div class="p-id">DT-025</div><div class="p-name">Toxic Shock</div><div class="p-why">Rare but catastrophic. Operators unsure what to do. High confusion = high damage.</div></div>
+      <div class="priority-item"><div class="p-num">05</div><div class="p-id">DT-008</div><div class="p-name">Foam in Tank</div><div class="p-why">Very common — operators see it daily. Currently no standard response. Quick win.</div></div>
+      <div class="priority-item"><div class="p-num">06</div><div class="p-id">DT-001</div><div class="p-name">Screen Choked</div><div class="p-why">High frequency, routine. Easy to build. Good for testing simple 3-step flows.</div></div>
+      <div class="priority-item"><div class="p-num">07</div><div class="p-id">DT-021</div><div class="p-name">Chlorine Dosing Stopped</div><div class="p-why">Regulatory risk. Operators may not realise it stopped until lab test next day.</div></div>
+      <div class="priority-item"><div class="p-num">08</div><div class="p-id">DT-005</div><div class="p-name">pH Out of Range</div><div class="p-why">Operator can self-resolve with SOP. Good flow to demonstrate decision branching.</div></div>
+      <div class="priority-item"><div class="p-num">09</div><div class="p-id">DT-023</div><div class="p-name">BOD / COD High</div><div class="p-why">Lab-triggered, high stakes. Tests the multi-equipment diagnostic chain concept.</div></div>
+      <div class="priority-item"><div class="p-num">10</div><div class="p-id">DT-019</div><div class="p-name">RAS Pump Failure</div><div class="p-why">Directly causes DT-017 if missed for &gt;30 min. Critical interdependency to show.</div></div>
+    </div>
+
+    <div style="margin-top:28px;border-top:1px solid var(--line);padding-top:16px;font-size:9pt;color:var(--muted);display:flex;justify-content:space-between;">
+      <span>Digital Paani · Honda Manesar STP · Operator Diagnostic Flow Library</span>
+      <span>v1.0 · May 2026 · For internal prototype use only</span>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
