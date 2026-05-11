@@ -6,41 +6,41 @@
 <title>Digital Paani — Operator v3</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --ink:     #0F172A;
-  --ink2:    #334155;
-  --muted:   #64748B;
-  --line:    #E8ECF0;
-  --surface: #F7F8FA;
-  --crit:    #DC2626;
-  --warn:    #D97706;
-  --ok:      #16A34A;
-  --info:    #2563EB;
-  --r:       16px;
-  --r-sm:    12px;
-  --shadow:  0 1px 3px rgba(15,23,42,.06),0 4px 16px rgba(15,23,42,.05);
+  --ink:     #1C1916;
+  --ink2:    #3D3830;
+  --muted:   #8C7E72;
+  --line:    #E0D9D0;
+  --surface: #F5F1EB;
+  --crit:    #A83220;
+  --warn:    #9C6B1A;
+  --ok:      #3D6B44;
+  --info:    #3A5F7D;
+  --r:       8px;
+  --r-sm:    8px;
+  --shadow:  none;
 }
-html,body{background:#EFEFEF;font-family:'Inter','Noto Sans Devanagari',ui-sans-serif,sans-serif;-webkit-font-smoothing:antialiased;color:var(--ink);}
+html,body{background:#F2EEE8;font-family:'DM Sans','Noto Sans Devanagari',ui-sans-serif,sans-serif;-webkit-font-smoothing:antialiased;color:var(--ink);}
 .screen{display:none;}.screen.active{display:flex;}
-.t-label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;}
-.t-head{font-size:20px;font-weight:700;line-height:1.25;color:var(--ink);}
+.t-label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;}
+.t-head{font-size:20px;font-weight:600;line-height:1.25;color:var(--ink);}
 .t-sub{font-size:13px;color:var(--muted);line-height:1.5;}
 .chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:9999px;font-size:11px;font-weight:600;}
 /* Fitts: min 52px height, full-width */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:var(--r-sm);padding:15px 20px;font-size:15px;font-weight:600;border:none;cursor:pointer;transition:opacity .1s,transform .08s;width:100%;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:8px;padding:15px 20px;font-size:15px;font-weight:600;border:none;cursor:pointer;transition:opacity .1s,transform .08s;width:100%;}
 .btn:active{opacity:.82;transform:scale(.985);}
 .btn-primary{background:var(--ink);color:#fff;}
 .btn-ghost{background:var(--surface);color:var(--ink);}
 .btn-danger{background:var(--crit);color:#fff;}
 .btn-ok{background:var(--ok);color:#fff;}
-.btn-i{width:auto;padding:10px 18px;font-size:13px;border-radius:10px;}
-.card{background:#fff;border-radius:var(--r);box-shadow:var(--shadow);}
+.btn-i{width:auto;padding:10px 18px;font-size:13px;border-radius:8px;}
+.card{background:#FDFCFA;border-radius:var(--r);border:1px solid var(--line);}
 /* Fitts + Von Restorff: large icon-anchored answer cards */
-.ans-card{width:100%;text-align:left;border:1.5px solid var(--line);border-radius:var(--r-sm);padding:15px 16px;min-height:68px;display:flex;align-items:center;gap:14px;cursor:pointer;background:#fff;transition:border-color .12s,background .1s,transform .08s;border:1.5px solid var(--line);}
+.ans-card{width:100%;text-align:left;border:1px solid var(--line);border-radius:var(--r-sm);padding:15px 16px;min-height:68px;display:flex;align-items:center;gap:14px;cursor:pointer;background:#FDFCFA;transition:border-color .12s,background .1s,transform .08s;}
 .ans-card:active{transform:scale(.99);background:var(--surface);}
-.ans-card:hover{background:#FAFAFA;}
+.ans-card:hover{background:#F5F1EB;}
 .ans-icon{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;}
 .ans-title{font-size:14px;font-weight:600;line-height:1.3;}
 .ans-sub{font-size:12px;color:var(--muted);line-height:1.4;margin-top:2px;}
@@ -49,18 +49,18 @@ html,body{background:#EFEFEF;font-family:'Inter','Noto Sans Devanagari',ui-sans-
 /* Bottom nav */
 nav .tab{transition:color .12s;color:var(--muted);}
 nav .tab.active{color:var(--ink);}
-nav .tab.active .tab-pill{background:rgba(15,23,42,.07);}
+nav .tab.active .tab-pill{background:rgba(28,25,22,.07);}
 nav .tab .tab-pill{border-radius:9999px;padding:4px 10px;}
 nav .tab .tab-label{font-size:10px;font-weight:500;}
 nav .tab.active .tab-label{font-weight:700;}
 .nav-btn{transition:background .1s;}
-.nav-btn.active{background:#F1F5F9;font-weight:600;}
+.nav-btn.active{background:#F5F1EB;font-weight:600;}
 .metric{flex:1;border-radius:var(--r-sm);padding:12px;text-align:center;}
 .metric-val{font-size:22px;font-weight:700;line-height:1;margin-top:4px;}
 .metric-unit{font-size:12px;font-weight:500;margin-left:2px;}
 .metric-note{font-size:10px;margin-top:4px;}
-.sys-note{border-radius:10px;padding:10px 12px;background:#F0FDF4;border:1.5px solid #DCFCE7;}
-.action-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--surface);border-radius:10px;}
+.sys-note{border-radius:8px;padding:10px 12px;background:#EBF0EC;border:1px solid #C8D9CA;}
+.action-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--surface);border-radius:8px;}
 .action-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;background:var(--ink);color:#fff;}
 .action-num.crit{background:var(--crit);}
 </style>
@@ -72,30 +72,30 @@ nav .tab.active .tab-label{font-weight:700;}
 <aside class="lg:w-52 w-full lg:sticky lg:top-8 shrink-0">
   <div class="card p-4">
     <div class="t-label" style="margin-bottom:2px;">Prototype v3</div>
-    <div style="font-size:17px;font-weight:700;">Digital Paani</div>
+    <div style="font-size:17px;font-weight:600;">Digital Paani</div>
     <div class="t-sub" style="font-size:11px;">Honda Manesar STP</div>
     <div class="divider" style="margin:12px 0;"></div>
     <div class="t-label" style="margin-bottom:6px;">Screens</div>
     <nav style="display:flex;flex-direction:column;gap:2px;font-size:13px;">
-      <button data-go="whatsapp" class="nav-btn text-left px-3 py-2 rounded-lg hover:bg-slate-50">📱 WhatsApp Alert</button>
-      <button data-go="issues"   class="nav-btn text-left px-3 py-2 rounded-lg hover:bg-slate-50">⚠️ Issues</button>
-      <button data-go="tasks"    class="nav-btn text-left px-3 py-2 rounded-lg hover:bg-slate-50">✅ Tasks</button>
-      <button data-go="plant"    class="nav-btn text-left px-3 py-2 rounded-lg hover:bg-slate-50">🏭 Plant</button>
-      <button data-go="report"   class="nav-btn text-left px-3 py-2 rounded-lg hover:bg-slate-50">＋ Report</button>
+      <button data-go="whatsapp" class="nav-btn text-left px-3 py-2 rounded-lg hover:bg-[#F5F1EB]">📱 WhatsApp Alert</button>
+      <button data-go="issues"   class="nav-btn text-left px-3 py-2 rounded-lg hover:bg-[#F5F1EB]">⚠️ Issues</button>
+      <button data-go="tasks"    class="nav-btn text-left px-3 py-2 rounded-lg hover:bg-[#F5F1EB]">✅ Tasks</button>
+      <button data-go="plant"    class="nav-btn text-left px-3 py-2 rounded-lg hover:bg-[#F5F1EB]">🏭 Plant</button>
+      <button data-go="report"   class="nav-btn text-left px-3 py-2 rounded-lg hover:bg-[#F5F1EB]">＋ Report</button>
     </nav>
     <div class="divider" style="margin:12px 0;"></div>
     <div class="t-label" style="margin-bottom:6px;">Diagnostic Flows</div>
     <div style="display:flex;flex-direction:column;gap:2px;font-size:12px;">
-      <button onclick="openIssue('dt006','collapsed')"  class="text-left px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-500">DO Low · overview</button>
-      <button onclick="openIssue('dt006','preflight')"  class="text-left px-3 py-2 rounded-lg hover:bg-slate-50 font-semibold" style="color:var(--info);">✦ Pre-flight</button>
-      <button onclick="openIssue('dt006','step1')"      class="text-left px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-500">Step 1 · DO reading</button>
-      <button onclick="openIssue('dt006','step2')"      class="text-left px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-500">Step 2 · movement</button>
-      <button onclick="openIssue('dt006','step3')"      class="text-left px-3 py-2 rounded-lg hover:bg-slate-50 font-semibold" style="color:var(--info);">✦ Step 3 · smell</button>
-      <button onclick="openIssue('dt006','step4')"      class="text-left px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-500">Step 4 · blower</button>
-      <button onclick="openIssue('dt006','step5')"      class="text-left px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-500">Step 5 · diffuser</button>
-      <button onclick="openIssue('dt006','escalate')"   class="text-left px-3 py-2 rounded-lg hover:bg-slate-50 font-semibold" style="color:var(--info);">✦ Escalation</button>
-      <button onclick="openIssue('biomass','collapsed')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-500 mt-1">Biomass Low</button>
-      <button onclick="openIssue('blower','collapsed')"  class="text-left px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-500">Blower Vibration</button>
+      <button onclick="openIssue('dt006','collapsed')"  class="text-left px-3 py-2 rounded-lg hover:bg-[#F5F1EB]" style="color:var(--muted);">DO Low · overview</button>
+      <button onclick="openIssue('dt006','preflight')"  class="text-left px-3 py-2 rounded-lg hover:bg-[#F5F1EB] font-semibold" style="color:var(--info);">✦ Pre-flight</button>
+      <button onclick="openIssue('dt006','step1')"      class="text-left px-3 py-2 rounded-lg hover:bg-[#F5F1EB]" style="color:var(--muted);">Step 1 · DO reading</button>
+      <button onclick="openIssue('dt006','step2')"      class="text-left px-3 py-2 rounded-lg hover:bg-[#F5F1EB]" style="color:var(--muted);">Step 2 · movement</button>
+      <button onclick="openIssue('dt006','step3')"      class="text-left px-3 py-2 rounded-lg hover:bg-[#F5F1EB] font-semibold" style="color:var(--info);">✦ Step 3 · smell</button>
+      <button onclick="openIssue('dt006','step4')"      class="text-left px-3 py-2 rounded-lg hover:bg-[#F5F1EB]" style="color:var(--muted);">Step 4 · blower</button>
+      <button onclick="openIssue('dt006','step5')"      class="text-left px-3 py-2 rounded-lg hover:bg-[#F5F1EB]" style="color:var(--muted);">Step 5 · diffuser</button>
+      <button onclick="openIssue('dt006','escalate')"   class="text-left px-3 py-2 rounded-lg hover:bg-[#F5F1EB] font-semibold" style="color:var(--info);">✦ Escalation</button>
+      <button onclick="openIssue('biomass','collapsed')" class="text-left px-3 py-2 rounded-lg hover:bg-[#F5F1EB] mt-1" style="color:var(--muted);">Biomass Low</button>
+      <button onclick="openIssue('blower','collapsed')"  class="text-left px-3 py-2 rounded-lg hover:bg-[#F5F1EB]" style="color:var(--muted);">Blower Vibration</button>
     </div>
     <div class="divider" style="margin:12px 0;"></div>
     <div style="font-size:10px;color:var(--muted);line-height:1.8;">
@@ -108,10 +108,10 @@ nav .tab.active .tab-label{font-weight:700;}
   </div>
 </aside>
 
-<!-- Phone Shell — pure white, no grid (Cognitive Load: zero visual noise) -->
+<!-- Phone Shell — warm white, no grid (Cognitive Load: zero visual noise) -->
 <div>
   <div class="relative w-[390px] h-[844px] rounded-[44px] overflow-hidden"
-       style="background:#fff;box-shadow:0 24px 64px rgba(15,23,42,.16),0 0 0 1px rgba(15,23,42,.08);">
+       style="background:#FDFCFA;box-shadow:0 0 0 1px #E0D9D0,0 24px 64px rgba(28,25,22,.10);">
 
     <!-- Status bar -->
     <div class="absolute top-0 inset-x-0 h-10 flex items-center justify-between px-6 z-40"
@@ -126,46 +126,46 @@ nav .tab.active .tab-label{font-weight:700;}
     <main class="absolute inset-0 pt-10 pb-[76px] overflow-hidden">
 
       <!-- WHATSAPP — Jakob's: familiar dark chat UI operators already know -->
-      <section data-screen="whatsapp" class="screen active h-full flex-col" style="background:#0d1117;">
-        <div style="padding:12px 16px;background:#161d27;border-bottom:1px solid #1f2937;display:flex;align-items:center;gap:10px;">
-          <div style="width:38px;height:38px;border-radius:50%;background:#15803d;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">💧</div>
+      <section data-screen="whatsapp" class="screen active h-full flex-col" style="background:#12100E;">
+        <div style="padding:12px 16px;background:#1A1714;border-bottom:1px solid #2A2520;display:flex;align-items:center;gap:10px;">
+          <div style="width:38px;height:38px;border-radius:50%;background:#3D6B44;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">💧</div>
           <div>
-            <div style="font-size:14px;font-weight:600;color:#fff;">Digital Paani Alerts</div>
-            <div style="font-size:11px;color:#6b7280;">Honda Manesar STP</div>
+            <div style="font-size:14px;font-weight:600;color:#F2EEE8;">Digital Paani Alerts</div>
+            <div style="font-size:11px;color:#8C7E72;">Honda Manesar STP</div>
           </div>
         </div>
         <div class="flex-1 overflow-y-auto" style="padding:16px;display:flex;flex-direction:column;gap:12px;">
-          <div style="background:#0f2918;border:1.5px solid #166534;border-radius:14px;padding:16px;max-width:88%;">
-            <div style="font-size:10px;font-weight:700;color:#4ade80;letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px;">⚠ ALERT</div>
-            <div style="font-size:14px;font-weight:600;color:#fff;line-height:1.5;">एयरएशन टैंक (AT-01) में ऑक्सीजन कम हो रही है।</div>
-            <div style="font-size:12px;color:#9ca3af;margin-top:6px;line-height:1.5;">पानी की सफाई प्रभावित हो सकती है।<br>अभी जांच करें।</div>
+          <div style="background:#1A2416;border:1px solid #2D4028;border-radius:8px;padding:16px;max-width:88%;">
+            <div style="font-size:10px;font-weight:700;color:#7CB87F;letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px;">⚠ ALERT</div>
+            <div style="font-size:14px;font-weight:600;color:#F2EEE8;line-height:1.5;">एयरएशन टैंक (AT-01) में ऑक्सीजन कम हो रही है।</div>
+            <div style="font-size:12px;color:#8C7E72;margin-top:6px;line-height:1.5;">पानी की सफाई प्रभावित हो सकती है।<br>अभी जांच करें।</div>
           </div>
           <!-- Fitts: primary action full-width, secondary minimal -->
           <div style="display:flex;gap:8px;max-width:88%;">
-            <button class="btn btn-i" style="background:rgba(255,255,255,.07);color:#9ca3af;" onclick="go('issues')">बाद में</button>
-            <button class="btn btn-i" style="flex:1;background:#16a34a;color:#fff;" onclick="openIssue('dt006','preflight')">देखें क्या हुआ →</button>
+            <button class="btn btn-i" style="background:rgba(255,255,255,.06);color:#8C7E72;" onclick="go('issues')">बाद में</button>
+            <button class="btn btn-i" style="flex:1;background:#3D6B44;color:#fff;" onclick="openIssue('dt006','preflight')">देखें क्या हुआ →</button>
           </div>
-          <div style="background:#111827;border:1px solid #1f2937;border-radius:12px;padding:12px 14px;max-width:88%;opacity:.5;">
-            <div style="font-size:10px;font-weight:600;color:#6b7280;text-transform:uppercase;margin-bottom:4px;">पहले का alert</div>
-            <div style="font-size:12px;color:#9ca3af;">ब्लोअर BL-101 का प्रेशर कम — जांच होने पर बंद हुआ</div>
-            <div style="font-size:10px;color:#4ade80;margin-top:4px;font-weight:600;">✓ Resolved</div>
+          <div style="background:#1A1714;border:1px solid #2A2520;border-radius:8px;padding:12px 14px;max-width:88%;opacity:.5;">
+            <div style="font-size:10px;font-weight:600;color:#8C7E72;text-transform:uppercase;margin-bottom:4px;">पहले का alert</div>
+            <div style="font-size:12px;color:#8C7E72;">ब्लोअर BL-101 का प्रेशर कम — जांच होने पर बंद हुआ</div>
+            <div style="font-size:10px;color:#7CB87F;margin-top:4px;font-weight:600;">✓ Resolved</div>
           </div>
         </div>
-        <div style="padding:10px 16px;background:#161d27;border-top:1px solid #1f2937;display:flex;align-items:center;gap:8px;">
-          <div style="flex:1;background:#1f2937;border-radius:20px;padding:10px 14px;font-size:14px;color:#374151;">Message</div>
-          <div style="width:38px;height:38px;border-radius:50%;background:#15803d;display:flex;align-items:center;justify-content:center;font-size:18px;">🎤</div>
+        <div style="padding:10px 16px;background:#1A1714;border-top:1px solid #2A2520;display:flex;align-items:center;gap:8px;">
+          <div style="flex:1;background:#2A2520;border-radius:20px;padding:10px 14px;font-size:14px;color:#3D3830;">Message</div>
+          <div style="width:38px;height:38px;border-radius:50%;background:#3D6B44;display:flex;align-items:center;justify-content:center;font-size:18px;">🎤</div>
         </div>
       </section>
 
       <!-- ISSUES — Miller: only 2 grouped by severity -->
       <section data-screen="issues" class="screen h-full flex-col" style="background:var(--surface);">
-        <div style="padding:16px 16px 0;background:#fff;border-bottom:1px solid var(--line);">
+        <div style="padding:16px 16px 0;background:#FDFCFA;border-bottom:1px solid var(--line);">
           <div class="t-label">Honda Manesar STP</div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px;">
             <h1 class="t-head" style="font-size:22px;">Issues</h1>
             <div style="display:flex;gap:6px;">
-              <span class="chip" style="background:rgba(220,38,38,.08);color:var(--crit);">● 1 Critical</span>
-              <span class="chip" style="background:rgba(217,119,6,.08);color:var(--warn);">● 1 High</span>
+              <span class="chip" style="background:#F5EAE8;color:var(--crit);">● 1 Critical</span>
+              <span class="chip" style="background:#F5EDDF;color:var(--warn);">● 1 High</span>
             </div>
           </div>
           <div style="height:3px;"></div>
@@ -176,8 +176,8 @@ nav .tab.active .tab-label{font-weight:700;}
       </section>
 
       <!-- ISSUE FLOW — Parkinson: timer; Doherty: instant render -->
-      <section data-screen="issue-flow" class="screen h-full flex-col" style="background:#fff;">
-        <div style="padding:10px 14px;background:#fff;border-bottom:1px solid var(--line);">
+      <section data-screen="issue-flow" class="screen h-full flex-col" style="background:#FDFCFA;">
+        <div style="padding:10px 14px;background:#FDFCFA;border-bottom:1px solid var(--line);">
           <div style="display:flex;align-items:center;gap:10px;">
             <!-- Fitts: 40px circular back button -->
             <button onclick="go('issues')" style="width:40px;height:40px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;flex-shrink:0;">
@@ -205,13 +205,13 @@ nav .tab.active .tab-label{font-weight:700;}
 
       <!-- TASKS — Miller: chunked by status tab -->
       <section data-screen="tasks" class="screen h-full flex-col" style="background:var(--surface);">
-        <div style="padding:16px 16px 0;background:#fff;border-bottom:1px solid var(--line);">
+        <div style="padding:16px 16px 0;background:#FDFCFA;border-bottom:1px solid var(--line);">
           <h1 class="t-head" style="font-size:22px;">Tasks</h1>
           <div class="t-sub" style="margin-top:2px;">आज की पाली · 7 काम</div>
-          <div style="margin-top:12px;display:flex;padding:4px;background:var(--surface);border-radius:12px;">
-            <button style="flex:1;padding:8px;border-radius:10px;background:#fff;font-weight:700;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.06);">आज</button>
-            <button style="flex:1;padding:8px;border-radius:10px;font-size:13px;color:var(--muted);">बाकी</button>
-            <button style="flex:1;padding:8px;border-radius:10px;font-size:13px;color:var(--muted);">हो गए</button>
+          <div style="margin-top:12px;display:flex;padding:4px;background:var(--surface);border-radius:8px;">
+            <button style="flex:1;padding:8px;border-radius:6px;background:#FDFCFA;font-weight:700;font-size:13px;border:1px solid var(--line);">आज</button>
+            <button style="flex:1;padding:8px;border-radius:6px;font-size:13px;color:var(--muted);">बाकी</button>
+            <button style="flex:1;padding:8px;border-radius:6px;font-size:13px;color:var(--muted);">हो गए</button>
           </div>
           <div style="height:4px;"></div>
         </div>
@@ -219,7 +219,7 @@ nav .tab.active .tab-label{font-weight:700;}
           <!-- Von Restorff: red border = overdue, impossible to miss -->
           <div class="card" style="padding:14px;border-left:4px solid var(--crit);">
             <div style="display:flex;align-items:center;gap:8px;">
-              <span class="chip" style="background:rgba(220,38,38,.08);color:var(--crit);">बाकी है</span>
+              <span class="chip" style="background:#F5EAE8;color:var(--crit);">बाकी है</span>
               <span style="font-size:11px;color:var(--muted);">AT-01 · 06:00 बजे था</span>
             </div>
             <div style="margin-top:6px;font-size:14px;font-weight:600;">SV30 जीवाणु टेस्ट</div>
@@ -227,40 +227,40 @@ nav .tab.active .tab-label{font-weight:700;}
           <div class="card" style="padding:14px;border-left:4px solid var(--info);" id="expandTaskCard">
             <div style="display:flex;align-items:center;justify-content:space-between;">
               <div style="display:flex;align-items:center;gap:8px;">
-                <span class="chip" style="background:rgba(37,99,235,.08);color:var(--info);">जारी है</span>
+                <span class="chip" style="background:#E5EDF3;color:var(--info);">जारी है</span>
                 <span style="font-size:11px;color:var(--muted);">BL-101 · 08:00</span>
               </div>
               <button style="font-size:12px;color:var(--info);font-weight:600;background:none;border:none;cursor:pointer;" id="toggleTask">देखें</button>
             </div>
             <div style="margin-top:6px;font-size:14px;font-weight:600;">ब्लोअर वाइब्रेशन चेकलिस्ट</div>
             <div id="taskBody" style="display:none;margin-top:12px;flex-direction:column;gap:8px;">
-              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface);border-radius:10px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface);border-radius:8px;">
                 <div style="font-size:13px;">बेअरिंग तापमान &lt; 70°C</div>
                 <div style="display:flex;gap:6px;">
-                  <button class="chip" style="background:rgba(22,163,74,.1);color:var(--ok);">✓ ठीक</button>
+                  <button class="chip" style="background:#E8EFE9;color:var(--ok);">✓ ठीक</button>
                   <button class="chip" style="background:var(--surface);color:var(--ink2);">✗ नहीं</button>
                 </div>
               </div>
-              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface);border-radius:10px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface);border-radius:8px;">
                 <div style="font-size:13px;">वाइब्रेशन &lt; 4.5 mm/s</div>
                 <div style="display:flex;gap:6px;">
                   <button class="chip" style="background:var(--surface);color:var(--ink2);">✓ ठीक</button>
-                  <button class="chip" style="background:rgba(220,38,38,.08);color:var(--crit);">✗ नहीं</button>
+                  <button class="chip" style="background:#F5EAE8;color:var(--crit);">✗ नहीं</button>
                 </div>
               </div>
               <button class="btn btn-danger" style="margin-top:4px;font-size:13px;" onclick="openIssue('blower','collapsed')">Issue बनाएं (1 समस्या)</button>
             </div>
           </div>
-          <div class="card" style="padding:14px;border-left:4px solid #CBD5E1;">
+          <div class="card" style="padding:14px;border-left:4px solid #C8C0B4;">
             <div style="display:flex;align-items:center;gap:8px;">
-              <span class="chip" style="background:var(--surface);color:var(--ink2);">बाकी है</span>
+              <span class="chip" style="background:#EFEBE5;color:var(--ink2);">बाकी है</span>
               <span style="font-size:11px;color:var(--muted);">11:30 बजे</span>
             </div>
             <div style="margin-top:6px;font-size:14px;font-weight:600;">ऑक्सीजन माप · AT-01</div>
           </div>
           <div class="card" style="padding:14px;border-left:4px solid var(--ok);">
             <div style="display:flex;align-items:center;gap:8px;">
-              <span class="chip" style="background:rgba(22,163,74,.08);color:var(--ok);">✓ हो गया</span>
+              <span class="chip" style="background:#E8EFE9;color:var(--ok);">✓ हो गया</span>
               <span style="font-size:11px;color:var(--muted);">07:12</span>
             </div>
             <div style="margin-top:6px;font-size:14px;font-weight:600;">Clarifier कीचड़ जांच</div>
@@ -270,23 +270,23 @@ nav .tab.active .tab-label{font-weight:700;}
 
       <!-- PLANT -->
       <section data-screen="plant" class="screen h-full flex-col" style="background:var(--surface);">
-        <div style="padding:16px 16px 0;background:#fff;border-bottom:1px solid var(--line);">
+        <div style="padding:16px 16px 0;background:#FDFCFA;border-bottom:1px solid var(--line);">
           <div style="display:flex;align-items:flex-end;justify-content:space-between;">
             <div>
               <div class="t-label">Honda Manesar STP</div>
               <h1 class="t-head" style="font-size:22px;margin-top:2px;">Plant</h1>
             </div>
             <div style="display:flex;gap:5px;">
-              <span class="chip" style="background:rgba(220,38,38,.08);color:var(--crit);">● 1</span>
-              <span class="chip" style="background:rgba(217,119,6,.08);color:var(--warn);">● 1</span>
-              <span class="chip" style="background:rgba(22,163,74,.08);color:var(--ok);">● 3</span>
+              <span class="chip" style="background:#F5EAE8;color:var(--crit);">● 1</span>
+              <span class="chip" style="background:#F5EDDF;color:var(--warn);">● 1</span>
+              <span class="chip" style="background:#E8EFE9;color:var(--ok);">● 3</span>
             </div>
           </div>
-          <div style="margin-top:12px;display:flex;padding:4px;background:var(--surface);border-radius:12px;">
-            <button id="viewScada" style="flex:1;padding:8px;border-radius:10px;background:#fff;font-weight:700;font-size:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;gap:5px;border:none;cursor:pointer;">
+          <div style="margin-top:12px;display:flex;padding:4px;background:var(--surface);border-radius:8px;">
+            <button id="viewScada" style="flex:1;padding:8px;border-radius:6px;background:#FDFCFA;font-weight:700;font-size:12px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer;">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M6 8v4h12V8"/><path d="M12 12v4"/></svg>SCADA
             </button>
-            <button id="viewList" style="flex:1;padding:8px;border-radius:10px;font-size:12px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:5px;border:none;cursor:pointer;background:transparent;">
+            <button id="viewList" style="flex:1;padding:8px;border-radius:6px;font-size:12px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:5px;border:none;cursor:pointer;background:transparent;">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>List
             </button>
           </div>
@@ -295,19 +295,19 @@ nav .tab.active .tab-label{font-weight:700;}
         <div id="scadaView" class="flex-1 overflow-y-auto" style="padding:12px 16px;">
           <div class="card" style="overflow:hidden;position:relative;height:380px;">
             <svg viewBox="0 0 360 350" style="width:100%;height:100%;">
-              <g stroke="#CBD5E1" stroke-width="5" fill="none" stroke-linecap="round">
+              <g stroke="#C8C0B4" stroke-width="5" fill="none" stroke-linecap="round">
                 <path d="M40 80 H120"/><path d="M160 80 H230"/><path d="M270 80 V180"/>
                 <path d="M270 200 H180"/><path d="M140 200 V280"/><path d="M140 300 H240"/><path d="M280 300 H320"/>
               </g>
-              <g stroke="#E2E8F0" stroke-width="1.5" fill="none" stroke-dasharray="4 4"><path d="M140 80 V200"/></g>
-              <g><rect x="12" y="60" width="34" height="40" rx="6" fill="#F1F5F9" stroke="#CBD5E1"/><text x="29" y="115" text-anchor="middle" font-size="10" fill="#334155" font-weight="600">Inlet</text></g>
-              <g><circle cx="140" cy="80" r="22" fill="#DCFCE7" stroke="#16A34A" stroke-width="2"/><text x="140" y="84" text-anchor="middle" font-size="9" fill="#166534" font-weight="700">EQ-01</text><text x="140" y="110" text-anchor="middle" font-size="9" fill="#16A34A" font-weight="600">Equal.</text></g>
-              <g id="blowerNode" style="cursor:pointer;"><rect x="230" y="52" width="50" height="38" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/><text x="255" y="76" text-anchor="middle" font-size="9" fill="#92400E" font-weight="700">BL-101</text><circle cx="274" cy="58" r="6" fill="#D97706"/><text x="274" y="61.5" text-anchor="middle" font-size="8" fill="white" font-weight="700">!</text><text x="255" y="104" text-anchor="middle" font-size="9" fill="#B45309" font-weight="600">Warning</text></g>
-              <g id="sbrNode" style="cursor:pointer;"><circle cx="270" cy="190" r="32" fill="#DC2626" opacity=".1"/><circle cx="270" cy="190" r="32" fill="none" stroke="#DC2626" stroke-width="2"><animate attributeName="r" values="32;38;32" dur="1.6s" repeatCount="indefinite"/><animate attributeName="opacity" values=".8;0;.8" dur="1.6s" repeatCount="indefinite"/></circle><circle cx="270" cy="190" r="26" fill="#FEE2E2" stroke="#DC2626" stroke-width="2.5"/><text x="270" y="188" text-anchor="middle" font-size="9" fill="#991B1B" font-weight="700">AT-01</text><text x="270" y="200" text-anchor="middle" font-size="9" fill="#991B1B" font-weight="700">एयरएशन</text><circle cx="290" cy="170" r="9" fill="#DC2626"/><text x="290" y="174" text-anchor="middle" font-size="11" fill="white" font-weight="700">!</text><text x="270" y="234" text-anchor="middle" font-size="9" fill="#DC2626" font-weight="700">Aeration</text></g>
-              <g><rect x="110" y="260" width="60" height="34" rx="8" fill="#DCFCE7" stroke="#16A34A" stroke-width="2"/><text x="140" y="281" text-anchor="middle" font-size="9" fill="#166534" font-weight="700">Clarifier</text><text x="140" y="309" text-anchor="middle" font-size="9" fill="#16A34A" font-weight="600">ठीक है</text></g>
-              <g fill="#94A3B8"><circle cx="80" cy="80" r="5"/><circle cx="200" cy="190" r="5"/></g>
+              <g stroke="#E0D9D0" stroke-width="1.5" fill="none" stroke-dasharray="4 4"><path d="M140 80 V200"/></g>
+              <g><rect x="12" y="60" width="34" height="40" rx="6" fill="#F5F1EB" stroke="#C8C0B4"/><text x="29" y="115" text-anchor="middle" font-size="10" fill="#3D3830" font-weight="600">Inlet</text></g>
+              <g><circle cx="140" cy="80" r="22" fill="#E8EFE9" stroke="#3D6B44" stroke-width="2"/><text x="140" y="84" text-anchor="middle" font-size="9" fill="#2A4D30" font-weight="700">EQ-01</text><text x="140" y="110" text-anchor="middle" font-size="9" fill="#3D6B44" font-weight="600">Equal.</text></g>
+              <g id="blowerNode" style="cursor:pointer;"><rect x="230" y="52" width="50" height="38" rx="8" fill="#F5EDDF" stroke="#9C6B1A" stroke-width="2"/><text x="255" y="76" text-anchor="middle" font-size="9" fill="#6B4710" font-weight="700">BL-101</text><circle cx="274" cy="58" r="6" fill="#9C6B1A"/><text x="274" y="61.5" text-anchor="middle" font-size="8" fill="white" font-weight="700">!</text><text x="255" y="104" text-anchor="middle" font-size="9" fill="#9C6B1A" font-weight="600">Warning</text></g>
+              <g id="sbrNode" style="cursor:pointer;"><circle cx="270" cy="190" r="32" fill="#A83220" opacity=".08"/><circle cx="270" cy="190" r="32" fill="none" stroke="#A83220" stroke-width="2"><animate attributeName="r" values="32;38;32" dur="1.6s" repeatCount="indefinite"/><animate attributeName="opacity" values=".8;0;.8" dur="1.6s" repeatCount="indefinite"/></circle><circle cx="270" cy="190" r="26" fill="#F5EAE8" stroke="#A83220" stroke-width="2.5"/><text x="270" y="188" text-anchor="middle" font-size="9" fill="#6B1F14" font-weight="700">AT-01</text><text x="270" y="200" text-anchor="middle" font-size="9" fill="#6B1F14" font-weight="700">एयरएशन</text><circle cx="290" cy="170" r="9" fill="#A83220"/><text x="290" y="174" text-anchor="middle" font-size="11" fill="white" font-weight="700">!</text><text x="270" y="234" text-anchor="middle" font-size="9" fill="#A83220" font-weight="700">Aeration</text></g>
+              <g><rect x="110" y="260" width="60" height="34" rx="8" fill="#E8EFE9" stroke="#3D6B44" stroke-width="2"/><text x="140" y="281" text-anchor="middle" font-size="9" fill="#2A4D30" font-weight="700">Clarifier</text><text x="140" y="309" text-anchor="middle" font-size="9" fill="#3D6B44" font-weight="600">ठीक है</text></g>
+              <g fill="#C8C0B4"><circle cx="80" cy="80" r="5"/><circle cx="200" cy="190" r="5"/></g>
             </svg>
-            <div style="position:absolute;top:10px;left:10px;background:rgba(255,255,255,.92);backdrop-filter:blur(4px);border:1px solid var(--line);border-radius:8px;padding:4px 10px;font-size:11px;color:var(--muted);">लाल/पीले node पर tap करें</div>
+            <div style="position:absolute;top:10px;left:10px;background:rgba(253,252,250,.92);border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--muted);">लाल/पीले node पर tap करें</div>
           </div>
         </div>
         <div id="listView" class="flex-1 overflow-y-auto" style="padding:12px 16px;display:none;">
@@ -316,14 +316,14 @@ nav .tab.active .tab-label{font-weight:700;}
               <div class="t-label">AT-01 एयरएशन टैंक</div>
               <button style="display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;padding:10px 0;background:none;border:none;cursor:pointer;" onclick="openIssue('dt006','collapsed')">
                 <div><div style="font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;">AT-01 <span class="chip" style="background:var(--crit);color:#fff;">1 critical</span></div><div style="font-size:11px;color:var(--muted);margin-top:2px;">ऑक्सीजन 1.8 mg/L ↓ · गंदलापन 14 NTU</div></div>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C8C0B4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
               </button>
             </div>
             <div style="padding:10px 14px;">
               <div class="t-label">BL-101 ब्लोअर</div>
               <button style="display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;padding:10px 0;background:none;border:none;cursor:pointer;" onclick="openIssue('blower','collapsed')">
                 <div><div style="font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;">BL-101 <span class="chip" style="background:var(--warn);color:#fff;">1 high</span></div><div style="font-size:11px;color:var(--muted);margin-top:2px;">वाइब्रेशन 5.8 mm/s · तापमान 68°C</div></div>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C8C0B4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
               </button>
             </div>
           </div>
@@ -332,24 +332,24 @@ nav .tab.active .tab-label{font-weight:700;}
 
       <!-- REPORT — Cognitive Load: one field at a time -->
       <section data-screen="report" class="screen h-full flex-col" style="background:var(--surface);">
-        <div style="padding:16px 16px 12px;background:#fff;border-bottom:1px solid var(--line);">
+        <div style="padding:16px 16px 12px;background:#FDFCFA;border-bottom:1px solid var(--line);">
           <h1 class="t-head" style="font-size:22px;">Issue बताएं</h1>
           <div class="t-sub" style="margin-top:2px;">Supervisor को सूचना जाएगी</div>
         </div>
         <form class="flex-1 overflow-y-auto" style="padding:14px 16px;display:flex;flex-direction:column;gap:14px;" onsubmit="event.preventDefault();showToast('Issue भेजा गया');">
           <div>
             <label class="t-label" style="display:block;margin-bottom:6px;">Equipment</label>
-            <select style="width:100%;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font-size:14px;color:var(--ink);">
+            <select style="width:100%;background:#FDFCFA;border:1px solid var(--line);border-radius:8px;padding:13px 14px;font-size:14px;color:var(--ink);">
               <option>AT-01 एयरएशन टैंक</option><option>BL-101 ब्लोअर</option><option>Clarifier</option><option>EQ-01</option>
             </select>
           </div>
           <div>
             <label class="t-label" style="display:block;margin-bottom:6px;">क्या दिख रहा है?</label>
-            <textarea rows="3" style="width:100%;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font-size:14px;color:var(--ink);resize:none;" placeholder="जो भी असामान्य लगा…"></textarea>
+            <textarea rows="3" style="width:100%;background:#FDFCFA;border:1px solid var(--line);border-radius:8px;padding:13px 14px;font-size:14px;color:var(--ink);resize:none;" placeholder="जो भी असामान्य लगा…"></textarea>
           </div>
           <div>
             <label class="t-label" style="display:block;margin-bottom:6px;">Photo</label>
-            <button type="button" style="width:100%;border:2px dashed #CBD5E1;border-radius:12px;padding:22px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted);cursor:pointer;background:transparent;">
+            <button type="button" style="width:100%;border:1.5px dashed #C8C0B4;border-radius:8px;padding:22px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted);cursor:pointer;background:transparent;">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
               <span style="font-size:14px;font-weight:600;">Photo खींचें</span>
             </button>
@@ -361,24 +361,24 @@ nav .tab.active .tab-label{font-weight:700;}
     </main>
 
     <!-- Bottom Nav — Fitts: large tap zones; Von Restorff: Report = distinct red -->
-    <nav style="position:absolute;inset-x:0;bottom:0;z-index:30;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-top:1px solid var(--line);">
+    <nav style="position:absolute;inset-x:0;bottom:0;z-index:30;background:#FDFCFA;border-top:1px solid var(--line);">
       <div style="display:grid;grid-template-columns:repeat(4,1fr);padding:6px 4px 4px;">
-        <button data-go="issues" class="tab" style="display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px;border-radius:10px;cursor:pointer;background:transparent;border:none;">
+        <button data-go="issues" class="tab" style="display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px;border-radius:8px;cursor:pointer;background:transparent;border:none;">
           <span class="tab-pill" style="position:relative;">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
             <span style="position:absolute;top:-3px;right:-3px;width:14px;height:14px;border-radius:50%;background:var(--crit);color:#fff;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;">2</span>
           </span>
           <span class="tab-label">Issues</span>
         </button>
-        <button data-go="tasks" class="tab" style="display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px;border-radius:10px;cursor:pointer;background:transparent;border:none;">
+        <button data-go="tasks" class="tab" style="display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px;border-radius:8px;cursor:pointer;background:transparent;border:none;">
           <span class="tab-pill"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="m9 12 2 2 4-4"/></svg></span>
           <span class="tab-label">Tasks</span>
         </button>
-        <button data-go="plant" class="tab" style="display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px;border-radius:10px;cursor:pointer;background:transparent;border:none;">
+        <button data-go="plant" class="tab" style="display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px;border-radius:8px;cursor:pointer;background:transparent;border:none;">
           <span class="tab-pill"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M6 8v4h12V8"/><path d="M12 12v4"/></svg></span>
           <span class="tab-label">Plant</span>
         </button>
-        <button data-go="report" class="tab" style="display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px;border-radius:10px;cursor:pointer;background:transparent;border:none;">
+        <button data-go="report" class="tab" style="display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px;border-radius:8px;cursor:pointer;background:transparent;border:none;">
           <span style="width:34px;height:34px;border-radius:50%;background:var(--crit);display:flex;align-items:center;justify-content:center;">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
           </span>
@@ -390,7 +390,7 @@ nav .tab.active .tab-label{font-weight:700;}
     <!-- Doherty: < 400ms toast feedback -->
     <div id="toast" style="position:absolute;bottom:92px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:12px;font-weight:500;padding:9px 18px;border-radius:9999px;opacity:0;transition:opacity .15s;z-index:50;pointer-events:none;white-space:nowrap;"></div>
   </div>
-  <div style="text-align:center;font-size:11px;color:#94a3b8;margin-top:10px;">390 × 844 · Operator · Hindi-first · v3</div>
+  <div style="text-align:center;font-size:11px;color:#8C7E72;margin-top:10px;">390 × 844 · Operator · Hindi-first · v3</div>
 </div>
 </div>
 
@@ -405,28 +405,28 @@ function go(name){
 }
 document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
 
-const sparkRed=`<svg class="sparkline" width="100%" height="48" viewBox="0 0 300 48" preserveAspectRatio="none"><defs><linearGradient id="gr" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#DC2626" stop-opacity=".2"/><stop offset="1" stop-color="#DC2626" stop-opacity="0"/></linearGradient></defs><path d="M0,8 L40,12 L80,18 L120,24 L160,30 L200,36 L240,42 L300,46" stroke="#DC2626"/><path d="M0,8 L40,12 L80,18 L120,24 L160,30 L200,36 L240,42 L300,46 L300,48 L0,48Z" fill="url(#gr)" stroke="none"/></svg>`;
-const sparkAmber=`<svg class="sparkline" width="100%" height="48" viewBox="0 0 300 48" preserveAspectRatio="none"><defs><linearGradient id="ga" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#D97706" stop-opacity=".2"/><stop offset="1" stop-color="#D97706" stop-opacity="0"/></linearGradient></defs><line x1="0" y1="24" x2="300" y2="24" stroke="#D97706" stroke-dasharray="3 3" stroke-width="1"/><path d="M0,44 L50,40 L100,34 L150,28 L200,22 L250,16 L300,10" stroke="#D97706"/><path d="M0,44 L50,40 L100,34 L150,28 L200,22 L250,16 L300,10 L300,48 L0,48Z" fill="url(#ga)" stroke="none"/></svg>`;
+const sparkRed=`<svg class="sparkline" width="100%" height="48" viewBox="0 0 300 48" preserveAspectRatio="none"><defs><linearGradient id="gr" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#A83220" stop-opacity=".2"/><stop offset="1" stop-color="#A83220" stop-opacity="0"/></linearGradient></defs><path d="M0,8 L40,12 L80,18 L120,24 L160,30 L200,36 L240,42 L300,46" stroke="#A83220"/><path d="M0,8 L40,12 L80,18 L120,24 L160,30 L200,36 L240,42 L300,46 L300,48 L0,48Z" fill="url(#gr)" stroke="none"/></svg>`;
+const sparkAmber=`<svg class="sparkline" width="100%" height="48" viewBox="0 0 300 48" preserveAspectRatio="none"><defs><linearGradient id="ga" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#9C6B1A" stop-opacity=".2"/><stop offset="1" stop-color="#9C6B1A" stop-opacity="0"/></linearGradient></defs><line x1="0" y1="24" x2="300" y2="24" stroke="#9C6B1A" stroke-dasharray="3 3" stroke-width="1"/><path d="M0,44 L50,40 L100,34 L150,28 L200,22 L250,16 L300,10" stroke="#9C6B1A"/><path d="M0,44 L50,40 L100,34 L150,28 L200,22 L250,16 L300,10 L300,48 L0,48Z" fill="url(#ga)" stroke="none"/></svg>`;
 
 const issuesData=[
-  {key:'dt006',severity:'crit',sevLabel:'Critical',equipment:'AT-01 एयरएशन टैंक',sinceMin:29,title:'एयरएशन टैंक में ऑक्सीजन कम हो रही है',sub:'पानी की सफाई प्रभावित हो सकती है',spark:{d:'M0,6 L20,8 L40,10 L60,12 L80,15 L100,19 L120,22 L140,24',color:'#DC2626'},steps:5},
-  {key:'blower',severity:'warn',sevLabel:'High',equipment:'BL-101 ब्लोअर',sinceMin:54,title:'ब्लोअर में वाइब्रेशन बढ़ रही है',sub:'5.8 mm/s · सीमा 4.5 mm/s',spark:{d:'M0,22 L20,20 L40,18 L60,16 L80,13 L100,10 L120,8 L140,6',color:'#D97706'},steps:4},
+  {key:'dt006',severity:'crit',sevLabel:'Critical',equipment:'AT-01 एयरएशन टैंक',sinceMin:29,title:'एयरएशन टैंक में ऑक्सीजन कम हो रही है',sub:'पानी की सफाई प्रभावित हो सकती है',spark:{d:'M0,6 L20,8 L40,10 L60,12 L80,15 L100,19 L120,22 L140,24',color:'#A83220'},steps:5},
+  {key:'blower',severity:'warn',sevLabel:'High',equipment:'BL-101 ब्लोअर',sinceMin:54,title:'ब्लोअर में वाइब्रेशन बढ़ रही है',sub:'5.8 mm/s · सीमा 4.5 mm/s',spark:{d:'M0,22 L20,20 L40,18 L60,16 L80,13 L100,10 L120,8 L140,6',color:'#9C6B1A'},steps:4},
 ];
 function renderIssuesList(){
   const el=document.getElementById('issuesList');
-  const brd={crit:'border-left:4px solid #DC2626',warn:'border-left:4px solid #D97706'};
-  const chp={crit:'background:rgba(220,38,38,.08);color:#DC2626',warn:'background:rgba(217,119,6,.08);color:#D97706'};
+  const brd={crit:'border-left:4px solid #A83220',warn:'border-left:4px solid #9C6B1A'};
+  const chp={crit:'background:#F5EAE8;color:#A83220',warn:'background:#F5EDDF;color:#9C6B1A'};
   el.innerHTML=issuesData.map(i=>`
-    <button onclick="openIssue('${i.key}','collapsed')" style="width:100%;text-align:left;background:#fff;border-radius:16px;padding:14px;${brd[i.severity]};box-shadow:0 1px 3px rgba(15,23,42,.06),0 4px 16px rgba(15,23,42,.05);margin-bottom:8px;cursor:pointer;border:none;display:block;">
+    <button onclick="openIssue('${i.key}','collapsed')" style="width:100%;text-align:left;background:#FDFCFA;border-radius:8px;padding:14px;${brd[i.severity]};border:1px solid #E0D9D0;margin-bottom:8px;cursor:pointer;display:block;">
       <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div style="display:flex;align-items:center;gap:8px;"><span class="chip" style="${chp[i.severity]}">${i.sevLabel}</span><span style="font-size:11px;color:#64748B;">${i.equipment}</span></div>
-        <span style="font-size:11px;color:#94A3B8;">${i.sinceMin}m पहले</span>
+        <div style="display:flex;align-items:center;gap:8px;"><span class="chip" style="${chp[i.severity]}">${i.sevLabel}</span><span style="font-size:11px;color:#8C7E72;">${i.equipment}</span></div>
+        <span style="font-size:11px;color:#8C7E72;">${i.sinceMin}m पहले</span>
       </div>
       <div style="margin-top:8px;font-size:15px;font-weight:600;line-height:1.3;">${i.title}</div>
-      <div style="font-size:12px;color:#64748B;margin-top:2px;">${i.sub}</div>
+      <div style="font-size:12px;color:#8C7E72;margin-top:2px;">${i.sub}</div>
       <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;">
-        <div style="display:flex;align-items:center;gap:8px;"><svg class="sparkline" width="110" height="24" viewBox="0 0 140 28"><path d="${i.spark.d}" stroke="${i.spark.color}" stroke-width="2" fill="none"/></svg><span class="chip" style="background:#F1F5F9;color:#334155;">${i.steps} steps</span></div>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <div style="display:flex;align-items:center;gap:8px;"><svg class="sparkline" width="110" height="24" viewBox="0 0 140 28"><path d="${i.spark.d}" stroke="${i.spark.color}" stroke-width="2" fill="none"/></svg><span class="chip" style="background:#EFEBE5;color:#3D3830;">${i.steps} steps</span></div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C8C0B4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
       </div>
     </button>`).join('');
 }
@@ -436,7 +436,7 @@ function ansCard(icon,iBg,iClr,title,sub,oc,sel=false){
   return`<button class="ans-card${sel?' selected':''}" style="${sel?`border-color:${iClr};background:${iBg}18;`:''}" onclick="${oc}">
     <div class="ans-icon" style="background:${iBg};color:${iClr};">${icon}</div>
     <div style="flex:1;min-width:0;"><div class="ans-title">${title}</div>${sub?`<div class="ans-sub">${sub}</div>`:''}</div>
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m9 18 6-6-6-6"/></svg>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C8C0B4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="m9 18 6-6-6-6"/></svg>
   </button>`;
 }
 
@@ -445,54 +445,54 @@ const flows={
     equipment:'AT-01 एयरएशन टैंक',title:'एयरएशन टैंक — ऑक्सीजन कम',totalSteps:5,
     steps:{
       collapsed:{badge:'Overview',pct:0,tone:'neutral',html:()=>`
-        <div style="display:flex;align-items:center;gap:8px;"><span class="chip" style="background:rgba(220,38,38,.08);color:#DC2626;">Critical</span><span style="font-size:11px;color:#64748B;">AT-01 एयरएशन टैंक</span></div>
+        <div style="display:flex;align-items:center;gap:8px;"><span class="chip" style="background:#F5EAE8;color:#A83220;">Critical</span><span style="font-size:11px;color:#8C7E72;">AT-01 एयरएशन टैंक</span></div>
         <h2 class="t-head" style="margin-top:10px;font-size:20px;">एयरएशन टैंक में ऑक्सीजन कम हो रही है</h2>
         <p class="t-sub" style="margin-top:4px;">2 घंटे से सीमा से ऊपर · पानी की सफाई प्रभावित</p>
-        <div style="margin-top:14px;border-radius:14px;background:#FAFAFA;border:1px solid #E8ECF0;padding:14px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><div class="t-label">गंदलापन · 7 दिन</div><span class="chip" style="background:#F1F5F9;color:#334155;">7d</span></div>
+        <div style="margin-top:14px;border-radius:8px;background:#F5F1EB;border:1px solid #E0D9D0;padding:14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><div class="t-label">गंदलापन · 7 दिन</div><span class="chip" style="background:#EFEBE5;color:#3D3830;">7d</span></div>
           ${sparkRed}
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:#64748B;margin-top:6px;"><span>10 NTU</span><span>12</span><span>13</span><span style="color:#DC2626;font-weight:700;">14 अभी</span></div>
-          <div style="margin-top:8px;font-size:12px;font-weight:600;color:#DC2626;">⚠ सीमा 10 NTU से ऊपर — 2 घंटे से बढ़ रहा है</div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:#8C7E72;margin-top:6px;"><span>10 NTU</span><span>12</span><span>13</span><span style="color:#A83220;font-weight:700;">14 अभी</span></div>
+          <div style="margin-top:8px;font-size:12px;font-weight:600;color:#A83220;">⚠ सीमा 10 NTU से ऊपर — 2 घंटे से बढ़ रहा है</div>
         </div>
         <div style="margin-top:12px;display:flex;gap:8px;">
-          <div class="metric" style="background:#FEE2E2;"><div class="t-label" style="color:#DC2626;">गंदलापन</div><div class="metric-val" style="color:#DC2626;">14<span class="metric-unit">NTU</span></div><div class="metric-note" style="color:#DC2626;">+133%</div></div>
-          <div class="metric" style="background:#FEF3C7;"><div class="t-label" style="color:#92400E;">ऑक्सीजन DO</div><div class="metric-val" style="color:#92400E;">1.8<span class="metric-unit">mg/L</span></div><div class="metric-note" style="color:#92400E;">2.0 से कम</div></div>
+          <div class="metric" style="background:#F5EAE8;"><div class="t-label" style="color:#A83220;">गंदलापन</div><div class="metric-val" style="color:#A83220;">14<span class="metric-unit">NTU</span></div><div class="metric-note" style="color:#A83220;">+133%</div></div>
+          <div class="metric" style="background:#F5EDDF;"><div class="t-label" style="color:#6B4710;">ऑक्सीजन DO</div><div class="metric-val" style="color:#6B4710;">1.8<span class="metric-unit">mg/L</span></div><div class="metric-note" style="color:#6B4710;">2.0 से कम</div></div>
         </div>
         <button class="btn btn-primary" style="margin-top:16px;" onclick="openIssue('dt006','preflight')">जांच शुरू करें →</button>`},
 
       preflight:{badge:'शुरू करें · 0/5',pct:0,tone:'neutral',html:()=>`
-        <div style="border-radius:10px;padding:10px 12px;background:rgba(37,99,235,.05);border:1.5px solid rgba(37,99,235,.15);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
-          <div style="font-size:12px;color:#1d4ed8;font-weight:500;">AT-01 · 14 NTU · ऑक्सीजन 1.8 mg/L</div>
+        <div style="border-radius:8px;padding:10px 12px;background:rgba(58,95,125,.05);border:1px solid rgba(58,95,125,.2);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3A5F7D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+          <div style="font-size:12px;color:#2A4560;font-weight:500;">AT-01 · 14 NTU · ऑक्सीजन 1.8 mg/L</div>
         </div>
         <h2 class="t-head" style="font-size:20px;">टैंक के पास क्या देखा?</h2>
         <p class="t-sub" style="margin-top:4px;">एक tap में बताएं — यह diagnostic में use होगा</p>
         <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
-          ${ansCard('✅','#DCFCE7','#16A34A','सब ठीक लग रहा है','पानी सामान्य, कोई असामान्य बदबू नहीं',"openIssue('dt006','step1')")}
-          ${ansCard('⚠️','#FEF3C7','#D97706','कुछ असामान्य है','पानी हल्का बदरंग या हल्की बदबू',"openIssue('dt006','step1')")}
-          ${ansCard('🚨','#FEE2E2','#DC2626','कुछ गंभीर दिखा','पानी काला या तेज़ H₂S बदबू',"openIssue('dt006','escalate')")}
+          ${ansCard('✅','#E8EFE9','#3D6B44','सब ठीक लग रहा है','पानी सामान्य, कोई असामान्य बदबू नहीं',"openIssue('dt006','step1')")}
+          ${ansCard('⚠️','#F5EDDF','#9C6B1A','कुछ असामान्य है','पानी हल्का बदरंग या हल्की बदबू',"openIssue('dt006','step1')")}
+          ${ansCard('🚨','#F5EAE8','#A83220','कुछ गंभीर दिखा','पानी काला या तेज़ H₂S बदबू',"openIssue('dt006','escalate')")}
         </div>`},
 
       step1:{badge:'Step 1 / 5',pct:20,tone:'neutral',html:()=>`
         <div class="t-label">Manual Input · AT-01 एयरएशन टैंक</div>
         <h2 class="t-head" style="margin-top:6px;font-size:19px;">DO रीडिंग लें · AT-01</h2>
         <p class="t-sub" style="margin-top:4px;">DO Meter से एयरएशन टैंक की रीडिंग लें</p>
-        <div style="margin-top:14px;border-radius:14px;border:1.5px solid #E8ECF0;padding:14px;">
-          <div style="font-size:12px;color:#64748B;margin-bottom:8px;">रीडिंग डालें</div>
+        <div style="margin-top:14px;border-radius:8px;border:1px solid #E0D9D0;padding:14px;">
+          <div style="font-size:12px;color:#8C7E72;margin-bottom:8px;">रीडिंग डालें</div>
           <div style="display:flex;align-items:center;gap:10px;">
-            <input id="doVal" type="number" step="0.1" value="1.8" style="flex:1;background:#FAFAFA;border:1.5px solid #E8ECF0;border-radius:10px;padding:13px;font-size:22px;font-weight:600;"/>
-            <span style="font-size:14px;color:#64748B;">mg/L</span>
+            <input id="doVal" type="number" step="0.1" value="1.8" style="flex:1;background:#F5F1EB;border:1px solid #E0D9D0;border-radius:8px;padding:13px;font-size:22px;font-weight:600;"/>
+            <span style="font-size:14px;color:#8C7E72;">mg/L</span>
           </div>
-          <div style="margin-top:10px;height:6px;background:#F1F5F9;border-radius:9999px;overflow:hidden;position:relative;">
-            <div style="height:100%;width:45%;background:linear-gradient(to right,#DC2626,#D97706,#16A34A);border-radius:9999px;"></div>
-            <div style="position:absolute;left:45%;top:-4px;width:2px;height:14px;background:#0F172A;border-radius:1px;"></div>
+          <div style="margin-top:10px;height:6px;background:#F5F1EB;border-radius:9999px;overflow:hidden;position:relative;">
+            <div style="height:100%;width:45%;background:linear-gradient(to right,#A83220,#9C6B1A,#3D6B44);border-radius:9999px;"></div>
+            <div style="position:absolute;left:45%;top:-4px;width:2px;height:14px;background:#1C1916;border-radius:1px;"></div>
           </div>
-          <div style="display:flex;justify-content:space-between;font-size:10px;color:#64748B;margin-top:4px;"><span>0</span><span style="color:#DC2626;font-weight:600;">सही: 2–4 mg/L</span><span>4</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:#8C7E72;margin-top:4px;"><span>0</span><span style="color:#A83220;font-weight:600;">सही: 2–4 mg/L</span><span>4</span></div>
           <div style="display:flex;gap:6px;margin-top:10px;">
-            ${['0.8','1.5','3.2','4.6'].map(v=>`<button onclick="document.getElementById('doVal').value='${v}'" style="flex:1;padding:9px;border-radius:8px;border:1.5px solid #E8ECF0;font-size:13px;font-weight:600;cursor:pointer;background:#fff;">${v}</button>`).join('')}
+            ${['0.8','1.5','3.2','4.6'].map(v=>`<button onclick="document.getElementById('doVal').value='${v}'" style="flex:1;padding:9px;border-radius:6px;border:1px solid #E0D9D0;font-size:13px;font-weight:600;cursor:pointer;background:#FDFCFA;">${v}</button>`).join('')}
           </div>
         </div>
-        <div style="margin-top:10px;font-size:12px;color:#64748B;">मीटर नहीं है? <button onclick="showToast('Recorded — Supervisor को report हो गया')" style="color:#2563EB;font-weight:600;background:none;border:none;cursor:pointer;padding:0;">रिकॉर्ड करें →</button></div>
+        <div style="margin-top:10px;font-size:12px;color:#8C7E72;">मीटर नहीं है? <button onclick="showToast('Recorded — Supervisor को report हो गया')" style="color:#3A5F7D;font-weight:600;background:none;border:none;cursor:pointer;padding:0;">रिकॉर्ड करें →</button></div>
         <button class="btn btn-primary" style="margin-top:14px;" onclick="(function(){const v=parseFloat(document.getElementById('doVal').value);openIssue('dt006',v<1?'escalate':'step2');})()">आगे बढ़ें</button>
         <button class="btn btn-ghost" style="margin-top:8px;" onclick="openIssue('dt006','escalate')">सीधा Supervisor को बताएं</button>`},
 
@@ -501,36 +501,36 @@ const flows={
         <h2 class="t-head" style="margin-top:6px;font-size:19px;">पानी और MBBR की हलचल कैसी है?</h2>
         <p class="t-sub" style="margin-top:4px;">टैंक के ऊपर खड़े होकर देखें</p>
         <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
-          ${ansCard('✅','#DCFCE7','#16A34A','सामान्य','पूरे टैंक में uniform और ठीक है',"openIssue('dt006','step3')")}
-          ${ansCard('⚠️','#FEF3C7','#D97706','डेड ज़ोन दिखा','कुछ कोने में हलचल नहीं',"openIssue('dt006','step3')")}
-          ${ansCard('〰️','#FFF7ED','#EA580C','असामान्य हलचल','कुछ जगह ज़्यादा, कुछ जगह कम',"openIssue('dt006','step3')")}
-          ${ansCard('🔴','#FEE2E2','#DC2626','कोई हलचल नहीं','पूरे टैंक में कुछ नहीं',"openIssue('dt006','escalate')")}
+          ${ansCard('✅','#E8EFE9','#3D6B44','सामान्य','पूरे टैंक में uniform और ठीक है',"openIssue('dt006','step3')")}
+          ${ansCard('⚠️','#F5EDDF','#9C6B1A','डेड ज़ोन दिखा','कुछ कोने में हलचल नहीं',"openIssue('dt006','step3')")}
+          ${ansCard('〰️','#FFF4EC','#8B4513','असामान्य हलचल','कुछ जगह ज़्यादा, कुछ जगह कम',"openIssue('dt006','step3')")}
+          ${ansCard('🔴','#F5EAE8','#A83220','कोई हलचल नहीं','पूरे टैंक में कुछ नहीं',"openIssue('dt006','escalate')")}
         </div>`},
 
       step3:{badge:'Step 3 / 5',pct:60,tone:'neutral',html:()=>`
         <div class="t-label">Operator · AT-01 एयरएशन टैंक</div>
         <h2 class="t-head" style="margin-top:6px;font-size:19px;">बदबू · AT-01</h2>
-        <p style="font-size:14px;font-weight:500;color:#334155;margin-top:4px;">आपने क्या महसूस किया?</p>
+        <p style="font-size:14px;font-weight:500;color:#3D3830;margin-top:4px;">आपने क्या महसूस किया?</p>
         <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
-          ${ansCard('✅','#DCFCE7','#16A34A','सामान्य / कोई बदबू नहीं','Normal सीवेज smell है',"openIssue('dt006','step4')")}
-          ${ansCard('⚠️','#FEF3C7','#D97706','हल्की बदबू','कुछ जगह से सड़ने की smell',"openIssue('dt006','step4')")}
-          ${ansCard('🚨','#FEE2E2','#DC2626','तेज़ H₂S बदबू','Septic / anaerobic condition',"openIssue('dt006','escalate')")}
+          ${ansCard('✅','#E8EFE9','#3D6B44','सामान्य / कोई बदबू नहीं','Normal सीवेज smell है',"openIssue('dt006','step4')")}
+          ${ansCard('⚠️','#F5EDDF','#9C6B1A','हल्की बदबू','कुछ जगह से सड़ने की smell',"openIssue('dt006','step4')")}
+          ${ansCard('🚨','#F5EAE8','#A83220','तेज़ H₂S बदबू','Septic / anaerobic condition',"openIssue('dt006','escalate')")}
         </div>
-        <p style="margin-top:10px;font-size:11px;color:#94A3B8;">तेज़ H₂S → तुरंत escalate करें</p>`},
+        <p style="margin-top:10px;font-size:11px;color:#8C7E72;">तेज़ H₂S → तुरंत escalate करें</p>`},
 
       step4:{badge:'Step 4 / 5',pct:80,tone:'neutral',html:()=>`
         <div class="t-label">Operator · BL-101 ब्लोअर</div>
         <h2 class="t-head" style="margin-top:6px;font-size:19px;">ब्लोअर BL-101 चेक</h2>
         <p class="t-sub" style="margin-top:4px;">प्रेशर और आवाज़ — लाइव रीडिंग नीचे</p>
         <div style="margin-top:12px;display:flex;gap:8px;">
-          <div class="metric" style="background:#FEE2E2;"><div class="t-label" style="color:#DC2626;">Pressure</div><div class="metric-val" style="color:#DC2626;">0.3<span class="metric-unit">bar</span></div><div class="metric-note" style="color:#DC2626;">Design 0.5 से कम</div></div>
-          <div class="metric" style="background:#FEE2E2;"><div class="t-label" style="color:#DC2626;">Current</div><div class="metric-val" style="color:#DC2626;">11.4<span class="metric-unit">A</span></div><div class="metric-note" style="color:#DC2626;">14 A से कम</div></div>
+          <div class="metric" style="background:#F5EAE8;"><div class="t-label" style="color:#A83220;">Pressure</div><div class="metric-val" style="color:#A83220;">0.3<span class="metric-unit">bar</span></div><div class="metric-note" style="color:#A83220;">Design 0.5 से कम</div></div>
+          <div class="metric" style="background:#F5EAE8;"><div class="t-label" style="color:#A83220;">Current</div><div class="metric-val" style="color:#A83220;">11.4<span class="metric-unit">A</span></div><div class="metric-note" style="color:#A83220;">14 A से कम</div></div>
         </div>
         <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;">
-          ${ansCard('✅','#DCFCE7','#16A34A','प्रेशर नार्मल, आवाज़ ठीक','',"openIssue('dt006','step5')")}
-          ${ansCard('📉','#F1F5F9','#64748B','प्रेशर कम है','Capacity में दिक्कत',"openIssue('dt006','step5')")}
-          ${ansCard('🔊','#FEF3C7','#D97706','वाइब्रेशन ज़्यादा','Mechanical issue',"openIssue('dt006','escalate')")}
-          ${ansCard('⏻','#FEE2E2','#DC2626','ब्लोअर बंद है','Restart करें',"openIssue('dt006','escalate')")}
+          ${ansCard('✅','#E8EFE9','#3D6B44','प्रेशर नार्मल, आवाज़ ठीक','',"openIssue('dt006','step5')")}
+          ${ansCard('📉','#F5F1EB','#8C7E72','प्रेशर कम है','Capacity में दिक्कत',"openIssue('dt006','step5')")}
+          ${ansCard('🔊','#F5EDDF','#9C6B1A','वाइब्रेशन ज़्यादा','Mechanical issue',"openIssue('dt006','escalate')")}
+          ${ansCard('⏻','#F5EAE8','#A83220','ब्लोअर बंद है','Restart करें',"openIssue('dt006','escalate')")}
         </div>`},
 
       step5:{badge:'Step 5 / 5',pct:95,tone:'neutral',html:()=>`
@@ -538,28 +538,28 @@ const flows={
         <h2 class="t-head" style="margin-top:6px;font-size:19px;">Diffuser का Air Pattern</h2>
         <p class="t-sub" style="margin-top:4px;">Surface पर बुलबुले — uniform होने चाहिए</p>
         <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
-          ${ansCard('🟢','#DCFCE7','#16A34A','सामान्य','बुलबुले एक जैसे हैं',"openIssue('dt006','resolved')")}
-          ${ansCard('🟡','#FEF3C7','#D97706','कम-ज़्यादा है','कुछ जगह कम, कुछ जगह ज़्यादा',"openIssue('dt006','resolved')")}
-          ${ansCard('🔴','#FEE2E2','#DC2626','बुलबुले बहुत कम','Major clog या damage',"openIssue('dt006','escalate')")}
-          ${ansCard('✖','#F1F5F9','#334155','कुछ नहीं दिखा','ऊपर से visible नहीं',"openIssue('dt006','escalate')")}
+          ${ansCard('🟢','#E8EFE9','#3D6B44','सामान्य','बुलबुले एक जैसे हैं',"openIssue('dt006','resolved')")}
+          ${ansCard('🟡','#F5EDDF','#9C6B1A','कम-ज़्यादा है','कुछ जगह कम, कुछ जगह ज़्यादा',"openIssue('dt006','resolved')")}
+          ${ansCard('🔴','#F5EAE8','#A83220','बुलबुले बहुत कम','Major clog या damage',"openIssue('dt006','escalate')")}
+          ${ansCard('✖','#F5F1EB','#3D3830','कुछ नहीं दिखा','ऊपर से visible नहीं',"openIssue('dt006','escalate')")}
         </div>`},
 
       escalate:{badge:'Action Required',pct:100,tone:'crit',html:()=>`
-        <div style="border-radius:16px;background:linear-gradient(145deg,#FFF1F2,#FEE2E2);padding:22px;text-align:center;">
-          <div style="width:60px;height:60px;border-radius:50%;background:#DC2626;display:flex;align-items:center;justify-content:center;margin:0 auto;font-size:26px;">📞</div>
-          <div style="font-size:22px;font-weight:700;margin-top:12px;">Supervisor को बुलाएं</div>
-          <div style="font-size:13px;color:#64748B;margin-top:4px;">कारण की पुष्टि हो गई</div>
+        <div style="border-radius:8px;background:#F5EAE8;padding:22px;text-align:center;">
+          <div style="width:60px;height:60px;border-radius:50%;background:#A83220;display:flex;align-items:center;justify-content:center;margin:0 auto;font-size:26px;">📞</div>
+          <div style="font-size:22px;font-weight:600;margin-top:12px;">Supervisor को बुलाएं</div>
+          <div style="font-size:13px;color:#8C7E72;margin-top:4px;">कारण की पुष्टि हो गई</div>
         </div>
-        <div style="margin-top:12px;display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;background:#FFFBEB;border:1.5px solid #FDE68A;">
+        <div style="margin-top:12px;display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:8px;background:#F5EDDF;border:1px solid #DEC48A;">
           <span style="font-size:16px;">⚠</span>
-          <span style="font-size:13px;font-weight:600;color:#92400E;">BL-101 ब्लोअर में Mechanical issue</span>
+          <span style="font-size:13px;font-weight:600;color:#6B4710;">BL-101 ब्लोअर में Mechanical issue</span>
         </div>
-        <div style="margin-top:12px;border-radius:14px;border:1.5px solid #E8ECF0;padding:14px;">
+        <div style="margin-top:12px;border-radius:8px;border:1px solid #E0D9D0;padding:14px;">
           <div class="t-label" style="margin-bottom:10px;">अभी यह करें</div>
           <div style="display:flex;flex-direction:column;gap:6px;">
             <div class="action-row"><div class="action-num">1</div><div style="font-size:13px;font-weight:500;">ब्लोअर switch off करें — safety के लिए</div></div>
             <div class="action-row"><div class="action-num">2</div><div style="font-size:13px;font-weight:500;">Bearing / coupling visually check करें</div></div>
-            <div class="action-row"><div class="action-num crit">3</div><div style="font-size:13px;font-weight:500;color:#DC2626;">Maintenance team को तुरंत call करें</div></div>
+            <div class="action-row"><div class="action-num crit">3</div><div style="font-size:13px;font-weight:500;color:#A83220;">Maintenance team को तुरंत call करें</div></div>
           </div>
         </div>
         <div style="margin-top:12px;display:flex;gap:8px;">
@@ -567,21 +567,21 @@ const flows={
           <button class="btn btn-danger btn-i" style="flex:1;" onclick="showToast('Call जा रहा है…')">📞 अभी Call</button>
         </div>
         <div class="sys-note" style="margin-top:12px;">
-          <div class="t-label" style="color:#15803D;margin-bottom:4px;">System</div>
-          <div style="font-size:12px;color:#15803D;">Supervisor Ashok Kumar को automatically सूचना भेजी गई · अभी</div>
+          <div class="t-label" style="color:#3D6B44;margin-bottom:4px;">System</div>
+          <div style="font-size:12px;color:#3D6B44;">Supervisor Ashok Kumar को automatically सूचना भेजी गई · अभी</div>
         </div>
         <div style="margin-top:16px;display:flex;gap:10px;justify-content:center;">
-          ${[['😊','बहुत मदद'],['👍','थोड़ी मदद'],['👎','मदद नहीं']].map(([e,l])=>`<div style="text-align:center;cursor:pointer;" onclick="showToast('Feedback noted')"><div style="width:52px;height:52px;border-radius:12px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto;">${e}</div><div style="font-size:10px;margin-top:4px;color:var(--muted);">${l}</div></div>`).join('')}
+          ${[['😊','बहुत मदद'],['👍','थोड़ी मदद'],['👎','मदद नहीं']].map(([e,l])=>`<div style="text-align:center;cursor:pointer;" onclick="showToast('Feedback noted')"><div style="width:52px;height:52px;border-radius:8px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto;">${e}</div><div style="font-size:10px;margin-top:4px;color:var(--muted);">${l}</div></div>`).join('')}
         </div>`},
 
       resolved:{badge:'Resolved',pct:100,tone:'ok',html:()=>`
-        <div style="border-radius:16px;background:#16A34A;color:#fff;padding:20px;display:flex;align-items:center;gap:14px;">
+        <div style="border-radius:8px;background:#3D6B44;color:#fff;padding:20px;display:flex;align-items:center;gap:14px;">
           <div style="width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
-          <div><div style="font-size:11px;text-transform:uppercase;opacity:.8;font-weight:600;">Resolved</div><div style="font-size:20px;font-weight:700;">Issue Resolved</div><div style="font-size:12px;opacity:.9;margin-top:2px;">DO normalized · 48h monitor on</div></div>
+          <div><div style="font-size:11px;text-transform:uppercase;opacity:.8;font-weight:600;">Resolved</div><div style="font-size:20px;font-weight:600;">Issue Resolved</div><div style="font-size:12px;opacity:.9;margin-top:2px;">DO normalized · 48h monitor on</div></div>
         </div>
-        <div style="margin-top:14px;border-radius:12px;background:var(--surface);padding:14px;">
+        <div style="margin-top:14px;border-radius:8px;background:var(--surface);padding:14px;">
           <div class="t-label" style="margin-bottom:8px;">Auto-log</div>
-          <ul style="display:flex;flex-direction:column;gap:6px;padding-left:16px;font-size:13px;color:#334155;list-style:disc;"><li>Diffuser cleaning scheduled</li><li>DO checked every 4h for 48h</li><li>Supervisor informed</li></ul>
+          <ul style="display:flex;flex-direction:column;gap:6px;padding-left:16px;font-size:13px;color:#3D3830;list-style:disc;"><li>Diffuser cleaning scheduled</li><li>DO checked every 4h for 48h</li><li>Supervisor informed</li></ul>
         </div>
         <button class="btn btn-ghost" style="margin-top:14px;" onclick="go('issues')">Issues पर वापस जाएं</button>`},
     }
@@ -591,26 +591,26 @@ const flows={
     equipment:'AT-01 एयरएशन टैंक',title:'एयरएशन टैंक — जीवाणु कम',totalSteps:5,
     steps:{
       collapsed:{badge:'Overview',pct:0,tone:'neutral',html:()=>`
-        <div style="display:flex;align-items:center;gap:8px;"><span class="chip" style="background:rgba(220,38,38,.08);color:#DC2626;">Critical</span><span style="font-size:11px;color:#64748B;">AT-01</span></div>
+        <div style="display:flex;align-items:center;gap:8px;"><span class="chip" style="background:#F5EAE8;color:#A83220;">Critical</span><span style="font-size:11px;color:#8C7E72;">AT-01</span></div>
         <h2 class="t-head" style="margin-top:10px;font-size:20px;">एयरएशन टैंक में जीवाणु कम हो रहे हैं</h2>
         <p class="t-sub" style="margin-top:4px;">Low Biomass · SV30 ↓</p>
-        <div style="margin-top:14px;border-radius:14px;background:#FAFAFA;border:1px solid #E8ECF0;padding:14px;"><div class="t-label" style="margin-bottom:8px;">SV30 · 7 दिन</div>${sparkRed}<div style="display:flex;justify-content:space-between;font-size:11px;color:#64748B;margin-top:6px;"><span>320</span><span>280</span><span>240</span><span style="color:#DC2626;font-weight:700;">210 अभी</span></div></div>
+        <div style="margin-top:14px;border-radius:8px;background:#F5F1EB;border:1px solid #E0D9D0;padding:14px;"><div class="t-label" style="margin-bottom:8px;">SV30 · 7 दिन</div>${sparkRed}<div style="display:flex;justify-content:space-between;font-size:11px;color:#8C7E72;margin-top:6px;"><span>320</span><span>280</span><span>240</span><span style="color:#A83220;font-weight:700;">210 अभी</span></div></div>
         <button class="btn btn-primary" style="margin-top:14px;" onclick="openIssue('biomass','step1')">जांच शुरू करें →</button>`},
       step1:{badge:'Step 1 / 5',pct:20,tone:'neutral',html:()=>`
         <div class="t-label">Operator · AT-01</div>
         <h2 class="t-head" style="margin-top:6px;font-size:19px;">पानी का रंग</h2>
-        <p style="font-size:14px;font-weight:500;color:#334155;margin-top:4px;">AT-01 में क्या देखा?</p>
+        <p style="font-size:14px;font-weight:500;color:#3D3830;margin-top:4px;">AT-01 में क्या देखा?</p>
         <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
-          ${ansCard('🟤','#FEF3C7','#92400E','भूरा / चाय जैसा','Normal appearance',"openIssue('biomass','step2')")}
-          ${ansCard('🟡','#FFFBEB','#D97706','हल्का / पीला','Low biomass suspected',"openIssue('biomass','step2')")}
-          ${ansCard('⚫','#FEE2E2','#DC2626','काला / बदबूदार','Septic — तुरंत Supervisor',"openIssue('biomass','septic')")}
+          ${ansCard('🟤','#F5EDDF','#6B4710','भूरा / चाय जैसा','Normal appearance',"openIssue('biomass','step2')")}
+          ${ansCard('🟡','#FEFAEF','#9C6B1A','हल्का / पीला','Low biomass suspected',"openIssue('biomass','step2')")}
+          ${ansCard('⚫','#F5EAE8','#A83220','काला / बदबूदार','Septic — तुरंत Supervisor',"openIssue('biomass','septic')")}
         </div>`},
       septic:{badge:'Action Required',pct:100,tone:'crit',html:()=>`
-        <div style="border-radius:16px;background:#DC2626;color:#fff;padding:22px;text-align:center;"><div style="font-size:32px;">📞</div><div style="font-size:20px;font-weight:700;margin-top:8px;">Supervisor को बुलाएं</div><div style="font-size:13px;opacity:.9;margin-top:4px;">Septic condition — Black color + odor</div></div>
-        <div class="sys-note" style="margin-top:12px;"><div class="t-label" style="color:#15803D;margin-bottom:4px;">System</div><div style="font-size:12px;color:#15803D;">Supervisor Ashok Kumar को automatically सूचना · 09:42</div></div>
+        <div style="border-radius:8px;background:#A83220;color:#fff;padding:22px;text-align:center;"><div style="font-size:32px;">📞</div><div style="font-size:20px;font-weight:600;margin-top:8px;">Supervisor को बुलाएं</div><div style="font-size:13px;opacity:.9;margin-top:4px;">Septic condition — Black color + odor</div></div>
+        <div class="sys-note" style="margin-top:12px;"><div class="t-label" style="color:#3D6B44;margin-bottom:4px;">System</div><div style="font-size:12px;color:#3D6B44;">Supervisor Ashok Kumar को automatically सूचना · 09:42</div></div>
         <button class="btn btn-ghost" style="margin-top:12px;" onclick="go('issues')">Issues पर वापस</button>`},
       step2:{badge:'Step 2 / 5',pct:40,tone:'neutral',html:()=>`
-        <div style="border-radius:12px;background:#FFFBEB;border:1.5px solid #FDE68A;padding:12px;margin-bottom:14px;"><div class="t-label" style="color:#92400E;">System</div><div style="margin-top:4px;font-size:13px;">Sludge wasting 3 दिन: <b>4.2 m³/day</b> (target 2.5)</div><div style="margin-top:6px;font-size:12px;font-weight:600;color:#B45309;">⚠ Over-wasting detected</div></div>
+        <div style="border-radius:8px;background:#F5EDDF;border:1px solid #DEC48A;padding:12px;margin-bottom:14px;"><div class="t-label" style="color:#6B4710;">System</div><div style="margin-top:4px;font-size:13px;">Sludge wasting 3 दिन: <b>4.2 m³/day</b> (target 2.5)</div><div style="margin-top:6px;font-size:12px;font-weight:600;color:#9C6B1A;">⚠ Over-wasting detected</div></div>
         <h2 class="t-head" style="font-size:19px;">Sludge wasting बंद करें</h2>
         <p class="t-sub" style="margin-top:4px;">Auto task: हर 12h SV30 record करें</p>
         <div style="margin-top:14px;display:flex;gap:8px;"><button class="btn btn-ghost btn-i" style="flex:1;" onclick="openIssue('biomass','step3')">आगे बढ़ें</button><button class="btn btn-primary btn-i" style="flex:1;" onclick="openIssue('biomass','step3')">Apply Action</button></div>`},
@@ -619,29 +619,29 @@ const flows={
         <h2 class="t-head" style="margin-top:6px;font-size:19px;">Inlet पानी कैसा है?</h2>
         <div style="margin-top:16px;display:flex;gap:8px;">
           <button onclick="openIssue('biomass','step4')" class="ans-card" style="flex:1;justify-content:center;flex-direction:column;gap:6px;min-height:80px;"><div style="font-size:24px;">✅</div><div class="ans-title">सामान्य है</div></button>
-          <button onclick="openIssue('biomass','toxic')" class="ans-card" style="flex:1;justify-content:center;flex-direction:column;gap:6px;min-height:80px;border-color:rgba(220,38,38,.3);background:rgba(220,38,38,.03);"><div style="font-size:24px;">⚠️</div><div class="ans-title" style="color:#DC2626;">असामान्य</div></button>
+          <button onclick="openIssue('biomass','toxic')" class="ans-card" style="flex:1;justify-content:center;flex-direction:column;gap:6px;min-height:80px;border-color:rgba(168,50,32,.3);background:rgba(168,50,32,.03);"><div style="font-size:24px;">⚠️</div><div class="ans-title" style="color:#A83220;">असामान्य</div></button>
         </div>`},
       toxic:{badge:'Action Required',pct:100,tone:'crit',html:()=>`
-        <div style="border-radius:16px;background:#DC2626;color:#fff;padding:22px;text-align:center;"><div style="font-size:32px;">📞</div><div style="font-size:20px;font-weight:700;margin-top:8px;">Supervisor को बुलाएं</div><div style="font-size:13px;opacity:.9;margin-top:4px;">Toxic shock suspected</div></div>
-        <div style="margin-top:12px;border-radius:12px;background:var(--surface);padding:14px;"><div class="t-label" style="margin-bottom:6px;">Action</div><div style="font-size:14px;font-weight:600;">Inlet Bypass खोलें</div></div>
+        <div style="border-radius:8px;background:#A83220;color:#fff;padding:22px;text-align:center;"><div style="font-size:32px;">📞</div><div style="font-size:20px;font-weight:600;margin-top:8px;">Supervisor को बुलाएं</div><div style="font-size:13px;opacity:.9;margin-top:4px;">Toxic shock suspected</div></div>
+        <div style="margin-top:12px;border-radius:8px;background:var(--surface);padding:14px;"><div class="t-label" style="margin-bottom:6px;">Action</div><div style="font-size:14px;font-weight:600;">Inlet Bypass खोलें</div></div>
         <button class="btn btn-danger" style="margin-top:12px;" onclick="go('issues')">Acknowledged</button>`},
       step4:{badge:'Step 4 / 5',pct:80,tone:'neutral',html:()=>`
         <div class="t-label">Manual Input · AT-01</div>
         <h2 class="t-head" style="margin-top:6px;font-size:19px;">ऑक्सीजन (DO) कितना है?</h2>
-        <div style="margin-top:12px;display:flex;align-items:center;gap:10px;"><input id="doVal2" type="number" step="0.1" value="0.8" style="flex:1;background:#FAFAFA;border:1.5px solid #E8ECF0;border-radius:10px;padding:13px;font-size:22px;font-weight:600;"/><span style="font-size:13px;color:#64748B;">mg/L</span></div>
+        <div style="margin-top:12px;display:flex;align-items:center;gap:10px;"><input id="doVal2" type="number" step="0.1" value="0.8" style="flex:1;background:#F5F1EB;border:1px solid #E0D9D0;border-radius:8px;padding:13px;font-size:22px;font-weight:600;"/><span style="font-size:13px;color:#8C7E72;">mg/L</span></div>
         <p class="t-sub" style="margin-top:6px;">पिछली reading: 2.4 mg/L · Target > 2.0</p>
         <button class="btn btn-primary" style="margin-top:14px;" onclick="(function(){const v=parseFloat(document.getElementById('doVal2').value);openIssue('biomass',v<1?'lowDO':'step5');})()">आगे बढ़ें</button>`},
       lowDO:{badge:'Action',pct:90,tone:'warn',html:()=>`
-        <div style="border-radius:14px;background:rgba(217,119,6,.08);border:1.5px solid rgba(217,119,6,.3);padding:16px;"><div class="t-label" style="color:#D97706;">Low DO detected</div><div style="font-size:18px;font-weight:700;margin-top:6px;">Aeration boost चाहिए</div></div>
-        <div style="margin-top:12px;border-radius:12px;background:var(--surface);padding:14px;"><div class="t-label" style="margin-bottom:6px;">Action</div><div style="font-size:14px;font-weight:600;">DT-008 खोलें</div></div>
+        <div style="border-radius:8px;background:#F5EDDF;border:1px solid rgba(156,107,26,.3);padding:16px;"><div class="t-label" style="color:#9C6B1A;">Low DO detected</div><div style="font-size:18px;font-weight:600;margin-top:6px;">Aeration boost चाहिए</div></div>
+        <div style="margin-top:12px;border-radius:8px;background:var(--surface);padding:14px;"><div class="t-label" style="margin-bottom:6px;">Action</div><div style="font-size:14px;font-weight:600;">DT-008 खोलें</div></div>
         <button class="btn btn-primary" style="margin-top:14px;" onclick="openIssue('biomass','step5')">Done · आगे बढ़ें</button>`},
       step5:{badge:'Step 5 / 5',pct:100,tone:'neutral',html:()=>`
-        <div style="border-radius:14px;background:#FAFAFA;border:1px solid #E8ECF0;padding:14px;"><div class="t-label" style="margin-bottom:8px;">System · SV30 7 दिन</div>${sparkRed}</div>
+        <div style="border-radius:8px;background:#F5F1EB;border:1px solid #E0D9D0;padding:14px;"><div class="t-label" style="margin-bottom:8px;">System · SV30 7 दिन</div>${sparkRed}</div>
         <h2 class="t-head" style="margin-top:12px;font-size:19px;">Sludge Wasting 48 घंटे बंद करें</h2>
         <p class="t-sub" style="margin-top:4px;">Auto Task: हर 8h SV30 record करें</p>
         <div style="margin-top:14px;display:flex;gap:8px;"><button class="btn btn-ghost btn-i" style="flex:1;" onclick="openIssue('biomass','septic')">Supervisor को बुलाएं</button><button class="btn btn-primary btn-i" style="flex:1;" onclick="openIssue('biomass','resolved')">Apply · Monitor</button></div>`},
       resolved:{badge:'Resolved',pct:100,tone:'ok',html:()=>`
-        <div style="border-radius:16px;background:#16A34A;color:#fff;padding:20px;display:flex;align-items:center;gap:14px;"><div style="width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div><div><div style="font-size:11px;text-transform:uppercase;opacity:.8;font-weight:600;">Resolved</div><div style="font-size:20px;font-weight:700;">Issue Resolved</div><div style="font-size:12px;opacity:.9;margin-top:2px;">SV30 normalized · 48h monitor</div></div></div>
+        <div style="border-radius:8px;background:#3D6B44;color:#fff;padding:20px;display:flex;align-items:center;gap:14px;"><div style="width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div><div><div style="font-size:11px;text-transform:uppercase;opacity:.8;font-weight:600;">Resolved</div><div style="font-size:20px;font-weight:600;">Issue Resolved</div><div style="font-size:12px;opacity:.9;margin-top:2px;">SV30 normalized · 48h monitor</div></div></div>
         <button class="btn btn-ghost" style="margin-top:14px;" onclick="go('issues')">Issues पर वापस</button>`},
     }
   },
@@ -650,42 +650,42 @@ const flows={
     equipment:'BL-101 ब्लोअर',title:'ब्लोअर — वाइब्रेशन High',totalSteps:4,
     steps:{
       collapsed:{badge:'Overview',pct:0,tone:'neutral',html:()=>`
-        <div style="display:flex;align-items:center;gap:8px;"><span class="chip" style="background:rgba(217,119,6,.08);color:#D97706;">High</span><span style="font-size:11px;color:#64748B;">BL-101 ब्लोअर</span></div>
+        <div style="display:flex;align-items:center;gap:8px;"><span class="chip" style="background:#F5EDDF;color:#9C6B1A;">High</span><span style="font-size:11px;color:#8C7E72;">BL-101 ब्लोअर</span></div>
         <h2 class="t-head" style="margin-top:10px;font-size:20px;">ब्लोअर में वाइब्रेशन बढ़ रही है</h2>
         <p class="t-sub" style="margin-top:4px;">मोटर को नुकसान हो सकता है · अभी जांच करें</p>
-        <div style="margin-top:14px;border-radius:14px;background:#FAFAFA;border:1px solid #E8ECF0;padding:14px;"><div class="t-label" style="margin-bottom:8px;">वाइब्रेशन · 48h</div>${sparkAmber}<div style="display:flex;justify-content:space-between;font-size:11px;color:#64748B;margin-top:6px;"><span>2.1</span><span>3.4</span><span>4.5 सीमा</span><span style="color:#D97706;font-weight:700;">5.8 अभी</span></div></div>
+        <div style="margin-top:14px;border-radius:8px;background:#F5F1EB;border:1px solid #E0D9D0;padding:14px;"><div class="t-label" style="margin-bottom:8px;">वाइब्रेशन · 48h</div>${sparkAmber}<div style="display:flex;justify-content:space-between;font-size:11px;color:#8C7E72;margin-top:6px;"><span>2.1</span><span>3.4</span><span>4.5 सीमा</span><span style="color:#9C6B1A;font-weight:700;">5.8 अभी</span></div></div>
         <button class="btn btn-primary" style="margin-top:14px;" onclick="openIssue('blower','step1')">जांच शुरू करें →</button>`},
       step1:{badge:'Step 1 / 4',pct:25,tone:'neutral',html:()=>`
         <div class="t-label">Manual Input · BL-101</div>
         <h2 class="t-head" style="margin-top:6px;font-size:19px;">अभी वाइब्रेशन कितना है?</h2>
-        <div style="margin-top:12px;display:flex;align-items:center;gap:10px;"><input id="vibVal" type="number" step="0.1" value="5.8" style="flex:1;background:#FAFAFA;border:1.5px solid #E8ECF0;border-radius:10px;padding:13px;font-size:22px;font-weight:600;"/><span style="font-size:13px;color:#64748B;">mm/s</span></div>
+        <div style="margin-top:12px;display:flex;align-items:center;gap:10px;"><input id="vibVal" type="number" step="0.1" value="5.8" style="flex:1;background:#F5F1EB;border:1px solid #E0D9D0;border-radius:8px;padding:13px;font-size:22px;font-weight:600;"/><span style="font-size:13px;color:#8C7E72;">mm/s</span></div>
         <p class="t-sub" style="margin-top:6px;">सीमा: 4.5 · Critical: 7.0 mm/s</p>
         <button class="btn btn-primary" style="margin-top:14px;" onclick="(function(){const v=parseFloat(document.getElementById('vibVal').value);openIssue('blower',v>=7?'bearing':'step2');})()">आगे बढ़ें</button>`},
       step2:{badge:'Step 2 / 4',pct:50,tone:'neutral',html:()=>`
         <div class="t-label">Operator · BL-101 ब्लोअर</div>
         <h2 class="t-head" style="margin-top:6px;font-size:19px;">आवाज़ कैसी है?</h2>
         <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
-          ${ansCard('🔇','#F1F5F9','#334155','नहीं · सामान्य hum','Continue diagnostics',"openIssue('blower','step3')")}
-          ${ansCard('🔔','#FEF3C7','#D97706','हल्की humming','Possible imbalance',"openIssue('blower','step3')")}
-          ${ansCard('⚠️','#FEE2E2','#DC2626','Grinding / screeching','Bearing failure suspected',"openIssue('blower','bearing')")}
+          ${ansCard('🔇','#F5F1EB','#3D3830','नहीं · सामान्य hum','Continue diagnostics',"openIssue('blower','step3')")}
+          ${ansCard('🔔','#F5EDDF','#9C6B1A','हल्की humming','Possible imbalance',"openIssue('blower','step3')")}
+          ${ansCard('⚠️','#F5EAE8','#A83220','Grinding / screeching','Bearing failure suspected',"openIssue('blower','bearing')")}
         </div>`},
       bearing:{badge:'Action Required',pct:100,tone:'crit',html:()=>`
-        <div style="border-radius:16px;background:#DC2626;color:#fff;padding:22px;text-align:center;"><div style="font-size:32px;">📞</div><div style="font-size:20px;font-weight:700;margin-top:8px;">Supervisor को बुलाएं</div><div style="font-size:13px;opacity:.9;margin-top:4px;">Bearing failure imminent · BL-101 बंद करें</div></div>
-        <div class="sys-note" style="margin-top:12px;"><div class="t-label" style="color:#15803D;margin-bottom:4px;">System</div><div style="font-size:12px;color:#15803D;">Supervisor Ashok Kumar को सूचना · WO-2041 created</div></div>
+        <div style="border-radius:8px;background:#A83220;color:#fff;padding:22px;text-align:center;"><div style="font-size:32px;">📞</div><div style="font-size:20px;font-weight:600;margin-top:8px;">Supervisor को बुलाएं</div><div style="font-size:13px;opacity:.9;margin-top:4px;">Bearing failure imminent · BL-101 बंद करें</div></div>
+        <div class="sys-note" style="margin-top:12px;"><div class="t-label" style="color:#3D6B44;margin-bottom:4px;">System</div><div style="font-size:12px;color:#3D6B44;">Supervisor Ashok Kumar को सूचना · WO-2041 created</div></div>
         <button class="btn btn-danger" style="margin-top:12px;" onclick="go('issues')">Acknowledged · BL-101 बंद किया</button>`},
       step3:{badge:'Step 3 / 4',pct:75,tone:'neutral',html:()=>`
         <div class="t-label">Manual Input · BL-101</div>
         <h2 class="t-head" style="margin-top:6px;font-size:19px;">Bearing temperature?</h2>
-        <div style="margin-top:12px;display:flex;align-items:center;gap:10px;"><input id="tempVal" type="number" step="1" value="68" style="flex:1;background:#FAFAFA;border:1.5px solid #E8ECF0;border-radius:10px;padding:13px;font-size:22px;font-weight:600;"/><span style="font-size:13px;color:#64748B;">°C</span></div>
+        <div style="margin-top:12px;display:flex;align-items:center;gap:10px;"><input id="tempVal" type="number" step="1" value="68" style="flex:1;background:#F5F1EB;border:1px solid #E0D9D0;border-radius:8px;padding:13px;font-size:22px;font-weight:600;"/><span style="font-size:13px;color:#8C7E72;">°C</span></div>
         <p class="t-sub" style="margin-top:6px;">Safe: &lt;70°C · Critical: &gt;80°C</p>
         <button class="btn btn-primary" style="margin-top:14px;" onclick="(function(){const v=parseFloat(document.getElementById('tempVal').value);openIssue('blower',v>=80?'bearing':'step4');})()">आगे बढ़ें</button>`},
       step4:{badge:'Step 4 / 4',pct:95,tone:'neutral',html:()=>`
-        <div style="border-radius:12px;background:#FFFBEB;border:1.5px solid #FDE68A;padding:12px;margin-bottom:14px;"><div class="t-label" style="color:#92400E;">System</div><div style="margin-top:4px;font-size:13px;">Last lubrication: <b>42 दिन पहले</b> (target 30)</div><div style="margin-top:6px;font-size:12px;font-weight:600;color:#B45309;">⚠ Overdue</div></div>
+        <div style="border-radius:8px;background:#F5EDDF;border:1px solid #DEC48A;padding:12px;margin-bottom:14px;"><div class="t-label" style="color:#6B4710;">System</div><div style="margin-top:4px;font-size:13px;">Last lubrication: <b>42 दिन पहले</b> (target 30)</div><div style="margin-top:6px;font-size:12px;font-weight:600;color:#9C6B1A;">⚠ Overdue</div></div>
         <h2 class="t-head" style="font-size:19px;">Greasing schedule करें</h2>
         <p class="t-sub" style="margin-top:4px;">Auto Task: 2h बाद वाइब्रेशन check करें</p>
         <div style="margin-top:14px;display:flex;gap:8px;"><button class="btn btn-ghost btn-i" style="flex:1;" onclick="openIssue('blower','bearing')">Supervisor</button><button class="btn btn-primary btn-i" style="flex:1;" onclick="openIssue('blower','resolved')">Apply · Monitor</button></div>`},
       resolved:{badge:'Resolved',pct:100,tone:'ok',html:()=>`
-        <div style="border-radius:16px;background:#16A34A;color:#fff;padding:20px;display:flex;align-items:center;gap:14px;"><div style="width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div><div><div style="font-size:11px;text-transform:uppercase;opacity:.8;font-weight:600;">Resolved</div><div style="font-size:20px;font-weight:700;">Issue Resolved</div><div style="font-size:12px;opacity:.9;margin-top:2px;">Greasing done · vibration monitored</div></div></div>
+        <div style="border-radius:8px;background:#3D6B44;color:#fff;padding:20px;display:flex;align-items:center;gap:14px;"><div style="width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div><div><div style="font-size:11px;text-transform:uppercase;opacity:.8;font-weight:600;">Resolved</div><div style="font-size:20px;font-weight:600;">Issue Resolved</div><div style="font-size:12px;opacity:.9;margin-top:2px;">Greasing done · vibration monitored</div></div></div>
         <button class="btn btn-ghost" style="margin-top:14px;" onclick="go('issues')">Issues पर वापस</button>`},
     }
   },
@@ -698,7 +698,7 @@ function openIssue(key,step){
   document.getElementById('stepBadge').textContent=s.badge;
   const bar=document.getElementById('stepBar');
   bar.style.width=s.pct+'%';
-  bar.style.background=s.tone==='ok'?'#16A34A':s.tone==='crit'?'#DC2626':s.tone==='warn'?'#D97706':'#0F172A';
+  bar.style.background=s.tone==='ok'?'#3D6B44':s.tone==='crit'?'#A83220':s.tone==='warn'?'#9C6B1A':'#1C1916';
   document.getElementById('flowContent').innerHTML=s.html();
   document.getElementById('flowContent').scrollTop=0;
   go('issue-flow');
@@ -710,12 +710,12 @@ const timerEl=document.getElementById('stepTimer'),timerVal=document.getElementB
 function fmt(s){const m=Math.floor(s/60),r=s%60;return String(m).padStart(2,'0')+':'+String(r).padStart(2,'0');}
 function startStepTimer(tone){
   stopStepTimer();startedAt=Date.now();timerVal.textContent='00:00';
-  timerEl.style.background=tone==='ok'?'#16A34A':tone==='crit'?'#DC2626':tone==='warn'?'#D97706':'#0F172A';
+  timerEl.style.background=tone==='ok'?'#3D6B44':tone==='crit'?'#A83220':tone==='warn'?'#9C6B1A':'#1C1916';
   if(tone==='ok'||tone==='crit')return;
   timerId=setInterval(()=>{
     const s=Math.floor((Date.now()-startedAt)/1000);
     timerVal.textContent=fmt(s);
-    if(s>=120&&timerEl.style.background==='rgb(15, 23, 42)')timerEl.style.background='#D97706';
+    if(s>=120&&timerEl.style.background==='rgb(28, 25, 22)')timerEl.style.background='#9C6B1A';
   },500);
 }
 function stopStepTimer(){if(timerId){clearInterval(timerId);timerId=null;}}
