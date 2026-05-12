@@ -145,6 +145,12 @@
   .big-ch.on .big-ch-icon { background:rgba(255,255,255,.15); color:#fff; }
   .big-ch-label { font-size:13px; font-weight:600; }
 
+  /* Bulk-create template card */
+  .bc-tpl { background:#fff; border:1.5px solid #E2E8F0; border-radius:10px; padding:10px 12px; cursor:pointer; transition:all .15s; text-align:left; position:relative; }
+  .bc-tpl:hover { border-color:#94A3B8; }
+  .bc-tpl.on { background:#0F172A; border-color:#0F172A; }
+  .bc-tpl.on .text-sm, .bc-tpl.on .text-slate-500, .bc-tpl.on .text-slate-400 { color:#fff !important; }
+  .bc-tpl.on::after { content:'✓'; position:absolute; top:8px; right:10px; width:18px; height:18px; background:#10B981; color:#fff; border-radius:9999px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
   /* Real checkbox styling */
   .row-cb { width:18px; height:18px; cursor:pointer; accent-color:#0F172A; margin-left:4px; }
   /* Custom checkbox */
@@ -272,6 +278,7 @@
         <p class="text-sm text-slate-500 mt-1" id="insights-sub">Click any row to see history, sensor readings, and users.</p>
       </div>
       <div class="flex gap-2">
+        <button class="btn btn-ghost" onclick="toggleBulkCreate()">+ Bulk add</button>
         <button class="btn btn-primary" onclick="openNewInsight()">+ New insight</button>
       </div>
     </div>
@@ -299,6 +306,41 @@
     </div>
 
     <!-- Bulk action panel (inline, expands when selections exist) -->
+    <!-- Bulk-create panel (inline, opens via + Bulk add) -->
+    <section id="bulk-create-panel" class="hidden card mb-3 overflow-hidden slide-in">
+      <div class="px-6 py-3 bg-slate-900 text-white flex items-center gap-3">
+        <span class="text-sm">➕ <b>Bulk add insights</b></span>
+        <span class="text-xs text-slate-400">Create multiple insights for a plant from common templates</span>
+        <button class="text-xs underline ml-auto" onclick="toggleBulkCreate()">Close</button>
+      </div>
+      <div class="px-7 py-5 border-b border-slate-100">
+        <h3 class="font-semibold text-[14px] mb-1">Which plant?</h3>
+        <p class="text-xs text-slate-500 mb-3">All selected templates will be created in this plant.</p>
+        <select id="bc-plant" class="w-full max-w-sm border border-slate-200 rounded-lg px-3 py-2 text-sm" onchange="updateBcPreview()">
+          <option>Andheri Plant</option>
+          <option>Bandra Plant</option>
+          <option>Powai Plant</option>
+          <option>Thane Plant</option>
+          <option>Vashi Plant</option>
+        </select>
+      </div>
+      <div class="px-7 py-5">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="font-semibold text-[14px]">Which insights to add?</h3>
+          <button class="text-xs text-blue-600 hover:underline" onclick="bcToggleAll()">Select all</button>
+        </div>
+        <p class="text-xs text-slate-500 mb-3">Tap any template to include it. Threshold + severity are pre-filled — edit later from the insight detail.</p>
+        <div id="bc-templates" class="grid grid-cols-2 gap-2"></div>
+      </div>
+      <div class="px-7 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between gap-3">
+        <div class="text-xs text-slate-600" id="bc-preview">Pick at least one template to continue</div>
+        <div class="flex gap-2">
+          <button class="btn btn-ghost" onclick="toggleBulkCreate()">Cancel</button>
+          <button id="bc-confirm" class="btn btn-primary opacity-50 pointer-events-none" onclick="confirmBulkCreate()">Create <span id="bc-count">0</span> insights</button>
+        </div>
+      </div>
+    </section>
+
     <section id="bulk-panel" class="hidden card mb-3 overflow-hidden slide-in">
       <!-- Compact selection header -->
       <div class="px-6 py-3 bg-slate-900 text-white flex flex-wrap items-center gap-3">
@@ -1234,6 +1276,92 @@ function confirmGroupAssign() {
   clearSelection();
   renderInsights();
   toast(`✓ Assigned <b>${g.name}</b> (${g.members.length} members) to ${n} insights`);
+}
+
+// ---------- Bulk create insights ----------
+const BC_TEMPLATES = [
+  {key:'do',  name:'DO drop in aeration tank',      sensor:'DO-101',  threshold:'< 2.0 mg/L',   sev:'incident', equip:'Aerator A-1',     current:'1.4 mg/L'},
+  {key:'vib', name:'Inlet pump vibration high',     sensor:'VIB-203', threshold:'> 8 mm/s',     sev:'incident', equip:'Pump P-3',         current:'9.6 mm/s'},
+  {key:'ph',  name:'pH out of range',               sensor:'PH-505',  threshold:'5.5–9.0',      sev:'issue',    equip:'Equalization tank',current:'9.4'},
+  {key:'amp', name:'Blower load high',              sensor:'AMP-B2',  threshold:'> 80 A',       sev:'issue',    equip:'Blower B-2',       current:'92 A'},
+  {key:'mlss',name:'MLSS below target',             sensor:'MLSS-1',  threshold:'< 2500 mg/L',  sev:'issue',    equip:'Aeration tank',    current:'2100 mg/L'},
+  {key:'tur', name:'Effluent turbidity rising',     sensor:'TURB-O',  threshold:'> 5 NTU',      sev:'warning',  equip:'Outlet',           current:'6.2 NTU'},
+  {key:'rt',  name:'Sludge pump runtime over limit',sensor:'RT-SP',   threshold:'> 8 hrs/day',  sev:'warning',  equip:'Sludge pump',      current:'9.1 hrs'},
+  {key:'cl',  name:'Chlorine dosing low',           sensor:'CL-1',    threshold:'< 0.5 mg/L',   sev:'warning',  equip:'Cl₂ doser',        current:'0.7 mg/L'},
+];
+const bcSelected = new Set();
+function toggleBulkCreate() {
+  const p = document.getElementById('bulk-create-panel');
+  const isHidden = p.classList.contains('hidden');
+  if (isHidden) {
+    // Auto-close bulk-assign panel if open
+    selected.clear(); updateBulkBar();
+    bcSelected.clear();
+    renderBcTemplates();
+    updateBcPreview();
+    p.classList.remove('hidden');
+    setTimeout(()=>p.scrollIntoView({behavior:'smooth', block:'start'}), 30);
+  } else {
+    p.classList.add('hidden');
+  }
+}
+function renderBcTemplates() {
+  document.getElementById('bc-templates').innerHTML = BC_TEMPLATES.map(t=>`
+    <button class="bc-tpl ${bcSelected.has(t.key)?'on':''}" onclick="bcToggle('${t.key}')">
+      <div class="flex items-center justify-between mb-1">
+        <span class="chip" style="background:${sevColors[t.sev].bg};color:${sevColors[t.sev].fg}">● ${t.sev}</span>
+        <span class="text-[10px] text-slate-400 font-mono">${t.sensor}</span>
+      </div>
+      <div class="text-sm font-semibold text-left">${t.name}</div>
+      <div class="text-[11px] text-slate-500 text-left mt-0.5">${t.equip} · ${t.threshold}</div>
+    </button>
+  `).join('');
+}
+function bcToggle(key) {
+  if (bcSelected.has(key)) bcSelected.delete(key); else bcSelected.add(key);
+  renderBcTemplates();
+  updateBcPreview();
+}
+function bcToggleAll() {
+  if (bcSelected.size === BC_TEMPLATES.length) bcSelected.clear();
+  else BC_TEMPLATES.forEach(t=>bcSelected.add(t.key));
+  renderBcTemplates();
+  updateBcPreview();
+}
+function updateBcPreview() {
+  const n = bcSelected.size;
+  const plant = document.getElementById('bc-plant').value;
+  document.getElementById('bc-count').textContent = n;
+  document.getElementById('bc-preview').innerHTML = n
+    ? `<b>${n}</b> insight${n===1?'':'s'} will be created in <b>${plant}</b> · inheriting that plant's escalation defaults`
+    : 'Pick at least one template to continue';
+  const btn = document.getElementById('bc-confirm');
+  if (n) btn.classList.remove('opacity-50','pointer-events-none');
+  else btn.classList.add('opacity-50','pointer-events-none');
+}
+function confirmBulkCreate() {
+  const plant = document.getElementById('bc-plant').value;
+  const tpls = BC_TEMPLATES.filter(t=>bcSelected.has(t.key));
+  if (!tpls.length) return;
+  let nextId = Math.max(...insights.map(i=>i.id)) + 1;
+  const created = tpls.map(t => ({
+    id: nextId++, name: t.name, plant, equip: t.equip, sev: t.sev,
+    status: 'Active', last: 'just now', on: true, users: [],
+    sensor: t.sensor, threshold: t.threshold, current: t.current,
+    _justCreated: true,
+  }));
+  insights.unshift(...created);
+  toggleBulkCreate();
+  // If user is filtered to a different plant, switch to that plant so they see results
+  const fp = document.getElementById('f-plant');
+  if (fp && fp.value && fp.value !== plant) fp.value = plant;
+  renderInsights();
+  toast(`✓ Created ${created.length} insight${created.length===1?'':'s'} in ${plant} · <button class="underline" onclick="undoBulkCreate(${JSON.stringify(created.map(c=>c.id))})">Undo</button>`);
+}
+function undoBulkCreate(ids) {
+  ids.forEach(id => { const i = insights.findIndex(x=>x.id===id); if (i>=0) insights.splice(i,1); });
+  renderInsights();
+  toast('Bulk add undone');
 }
 
 // ---------- New insight modal ----------
