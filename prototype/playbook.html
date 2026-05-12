@@ -1,0 +1,1688 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Digital Paani — Plant Insights Prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  html,body { font-family:Inter,ui-sans-serif,system-ui,sans-serif; background:#F1F5F9; color:#0F172A; }
+  .screen { display:none; }
+  .screen.active { display:block; }
+  .chip { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:9999px; font-size:11px; font-weight:500; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; border-radius:10px; padding:8px 14px; font-size:13px; font-weight:600; transition:all .15s; cursor:pointer; }
+  .btn-primary { background:#0F172A; color:#fff; }
+  .btn-primary:hover { background:#1e293b; }
+  .btn-ghost { background:#F1F5F9; color:#0F172A; }
+  .btn-ghost:hover { background:#e2e8f0; }
+  .btn-sm { padding:6px 10px; font-size:12px; }
+  .card { background:#fff; border-radius:14px; box-shadow:0 1px 2px rgba(15,23,42,.04), 0 4px 16px rgba(15,23,42,.06); }
+  .sev-bar { height:4px; border-radius:2px; display:flex; overflow:hidden; gap:2px; }
+  .pulse { animation:pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .slide-in { animation:slide-in .25s ease-out; }
+  @keyframes slide-in { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .drawer-in { animation:drawer-in .3s ease-out; }
+  @keyframes drawer-in { from{transform:translateX(100%)} to{transform:translateX(0)} }
+  .highlight-row { animation:hl 1.5s ease-out; }
+  @keyframes hl { 0%{background:#fef3c7} 100%{background:transparent} }
+  .toast { animation:toast .3s ease-out; }
+  @keyframes toast { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  [contenteditable]:focus { outline:2px solid #2563eb; outline-offset:2px; border-radius:4px; }
+  .editable-chip { background:#EFF6FF; color:#1E40AF; padding:2px 8px; border-radius:6px; border:1px dashed #93C5FD; cursor:text; font-weight:500; }
+  .editable-chip:hover { background:#DBEAFE; }
+  /* Severity pill (multi-select) */
+  .sev-pill { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:9999px; font-size:12px; font-weight:500; background:#fff; border:1.5px solid #E2E8F0; color:#64748B; cursor:pointer; transition:all .15s; }
+  .sev-pill:hover { border-color:#CBD5E1; }
+  .sev-pill .checkmark { display:none; width:14px; height:14px; border-radius:50%; background:#0F172A; color:#fff; align-items:center; justify-content:center; font-size:9px; font-weight:700; }
+  .sev-pill.on { background:#F1F5F9; border-color:#0F172A; color:#0F172A; font-weight:600; }
+  .sev-pill.on .checkmark { display:inline-flex; }
+  /* Channel toggle button */
+  .ch-toggle { display:flex; align-items:center; gap:8px; padding:10px 14px; border-radius:10px; border:1.5px solid #E2E8F0; background:#fff; color:#64748B; font-size:13px; font-weight:500; cursor:pointer; transition:all .15s; flex:1; }
+  .ch-toggle:hover { border-color:#CBD5E1; }
+  .ch-toggle.on { background:#0F172A; border-color:#0F172A; color:#fff; }
+  .ch-toggle .ch-icon { font-size:14px; font-weight:600; }
+  .ch-toggle .ch-label { flex:1; text-align:left; }
+  .ch-toggle .ch-state { font-size:10px; padding:2px 6px; background:rgba(255,255,255,.15); border-radius:4px; text-transform:uppercase; }
+  .ch-toggle.off .ch-state { background:#F1F5F9; color:#94A3B8; }
+  /* Clean composer (matches screenshot) */
+  .composer-clean { background:#fff; border:1px solid #E2E8F0; border-radius:14px; overflow:hidden; }
+  .composer-clean-subj { display:flex; align-items:center; padding:10px 14px; border-bottom:1px solid #F1F5F9; }
+  .composer-clean-subj input { flex:1; border:none; outline:none; font-size:13px; }
+  .composer-clean textarea { width:100%; border:none; outline:none; padding:14px; font-size:14px; resize:vertical; min-height:100px; line-height:1.5; color:#0F172A; }
+  .composer-clean textarea::placeholder { color:#94A3B8; }
+  .composer-clean-footer { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-top:1px solid #F1F5F9; background:#fff; }
+  .composer-clean-btn { display:inline-flex; align-items:center; gap:6px; background:#2563EB; color:#fff; padding:8px 14px; border-radius:9999px; font-size:13px; font-weight:600; border:none; cursor:pointer; transition:background .15s; }
+  .composer-clean-btn:hover { background:#1D4ED8; }
+  .composer-clean-icons { display:flex; align-items:center; gap:4px; }
+  .composer-clean-icons button { width:32px; height:32px; border-radius:8px; border:none; background:transparent; color:#64748B; font-size:13px; cursor:pointer; transition:background .15s; }
+  .composer-clean-icons button:hover { background:#F1F5F9; color:#0F172A; }
+  /* Old composer (unused now but kept for backwards compat) */
+  .composer { background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden; }
+  .composer-header { display:flex; align-items:center; gap:8px; padding:8px 12px; background:#fff; border-bottom:1px solid #E2E8F0; }
+  .composer-toolbar { display:flex; align-items:center; gap:4px; padding:8px 12px; background:#fff; border-bottom:1px solid #E2E8F0; flex-wrap:wrap; }
+  .composer-toolbar button { padding:4px 8px; border-radius:6px; font-size:11px; color:#475569; background:transparent; border:none; cursor:pointer; }
+  .composer-toolbar button:hover { background:#F1F5F9; }
+  .composer-body { padding:12px; }
+  .composer-body textarea { width:100%; border:none; background:transparent; outline:none; font-size:13px; resize:vertical; min-height:80px; line-height:1.5; }
+  .composer-footer { display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:#fff; border-top:1px solid #E2E8F0; font-size:11px; color:#64748B; }
+  .var-chip { display:inline-block; padding:2px 6px; background:#EFF6FF; color:#1E40AF; border-radius:4px; font-size:10px; font-family:ui-monospace,monospace; cursor:pointer; margin:0 2px; }
+  .var-chip:hover { background:#DBEAFE; }
+  .ch-pill { width:30px; height:30px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; cursor:pointer; transition:all .15s; }
+  .ch-pill.on { background:#0F172A; color:#fff; }
+  .ch-pill.off { background:#F1F5F9; color:#94A3B8; }
+  .ch-pill.off:hover { background:#E2E8F0; }
+  .sparkline { stroke:#2563EB; fill:none; stroke-width:1.5; }
+  .sensor-bar { height:60px; background:linear-gradient(180deg,#EFF6FF,#fff); border-radius:6px; position:relative; overflow:hidden; }
+  details > summary { list-style:none; cursor:pointer; }
+  details > summary::-webkit-details-marker { display:none; }
+  /* === Bulk Assign Modal v2 === */
+  /* Goal-gradient progress */
+  .progress-step { display:inline-flex; align-items:center; gap:8px; padding:6px 12px 6px 6px; border-radius:9999px; transition:all .25s ease; }
+  .progress-step .step-dot { width:24px; height:24px; border-radius:50%; background:#E2E8F0; color:#94A3B8; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; transition:all .25s ease; }
+  .progress-step .step-label { font-size:13px; font-weight:500; color:#94A3B8; transition:color .25s ease; }
+  .progress-step.active { background:#F1F5F9; }
+  .progress-step.active .step-dot { background:#0F172A; color:#fff; }
+  .progress-step.active .step-label { color:#0F172A; font-weight:600; }
+  .progress-step.done .step-dot { background:#16A34A; color:#fff; }
+  .progress-step.done .step-dot::before { content:'✓'; }
+  .progress-step.done .step-dot > span, .progress-step.done .step-dot { font-size:0; }
+  .progress-step.done .step-dot::before { font-size:13px; font-weight:700; }
+  .progress-step.done .step-label { color:#16A34A; }
+  .step-line { flex:1; height:2px; background:#E2E8F0; border-radius:2px; transition:background .3s; min-width:20px; }
+  .step-line.done { background:#16A34A; }
+
+  /* User search input */
+  .user-search-wrap { position:relative; }
+  .user-search-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#94A3B8; font-size:14px; pointer-events:none; }
+  .user-search { width:100%; padding:13px 14px 13px 40px; border:1.5px solid #E2E8F0; border-radius:12px; font-size:14px; outline:none; transition:border-color .15s, box-shadow .15s; background:#fff; }
+  .user-search:focus { border-color:#0F172A; box-shadow:0 0 0 3px rgba(15,23,42,.06); }
+
+  /* User suggestions dropdown */
+  .user-suggestions { background:#fff; border:1px solid #E2E8F0; border-radius:12px; max-height:280px; overflow-y:auto; box-shadow:0 4px 16px rgba(15,23,42,.06); }
+  .user-suggestion { display:flex; align-items:center; gap:12px; padding:10px 14px; cursor:pointer; transition:background .12s; border:none; background:transparent; width:100%; text-align:left; }
+  .user-suggestion:hover { background:#F8FAFC; }
+  .user-suggestion .avatar { width:34px; height:34px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#fff; flex-shrink:0; }
+  .user-suggestion .meta { flex:1; min-width:0; }
+  .user-suggestion .name { font-size:13.5px; font-weight:600; color:#0F172A; }
+  .user-suggestion .role { font-size:11.5px; color:#64748B; margin-top:1px; }
+  .suggestion-section { padding:8px 14px 4px; font-size:10.5px; font-weight:700; text-transform:uppercase; color:#94A3B8; letter-spacing:.04em; background:#FAFBFC; }
+
+  /* Selected user chip */
+  .user-chip { display:inline-flex; align-items:center; gap:8px; padding:6px 6px 6px 10px; background:#F1F5F9; border:1px solid #E2E8F0; border-radius:9999px; transition:all .15s; animation:slide-in .2s ease-out; }
+  .user-chip:hover { background:#E2E8F0; }
+  .user-chip .chip-avatar { width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:9.5px; font-weight:700; color:#fff; }
+  .user-chip .chip-name { font-size:13px; font-weight:500; color:#0F172A; }
+  .user-chip .chip-x { width:20px; height:20px; border-radius:50%; background:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:10px; color:#64748B; cursor:pointer; border:none; transition:all .12s; }
+  .user-chip .chip-x:hover { background:#0F172A; color:#fff; }
+  .user-chip.warn { background:#FEF3C7; border-color:#FDE68A; }
+  .user-chip.warn .chip-name { color:#92400E; }
+
+  /* Helper card */
+  .helper-card { padding:12px 14px; background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; font-size:12.5px; color:#1E3A8A; }
+  .helper-card b { color:#1E40AF; }
+  .helper-card.warn { background:#FFFBEB; border-color:#FDE68A; color:#78350F; }
+  .helper-card .grant-btn { color:#0F172A; font-weight:600; text-decoration:underline; cursor:pointer; }
+  .helper-card .grant-btn:hover { color:#1E40AF; }
+
+  /* Time chip (Step 2) */
+  .time-chip { display:flex; flex-direction:column; align-items:center; gap:4px; padding:14px 10px; background:#fff; border:1.5px solid #E2E8F0; border-radius:14px; cursor:pointer; transition:all .18s ease; }
+  .time-chip:hover { border-color:#CBD5E1; transform:translateY(-1px); }
+  .time-chip.on { background:#0F172A; border-color:#0F172A; }
+  .time-chip.on .time-chip-label, .time-chip.on .time-chip-icon { color:#fff; }
+  .time-chip.on .time-chip-sub { color:rgba(255,255,255,.6); }
+  .time-chip-icon { font-size:18px; color:#64748B; }
+  .time-chip-label { font-size:13px; font-weight:600; color:#0F172A; }
+  .time-chip-sub { font-size:10.5px; color:#94A3B8; }
+
+  /* Big channel button (Step 3) */
+  .big-ch { display:flex; flex-direction:column; align-items:center; gap:6px; padding:16px 10px; background:#fff; border:1.5px solid #E2E8F0; border-radius:14px; cursor:pointer; transition:all .18s ease; }
+  .big-ch:hover { border-color:#CBD5E1; transform:translateY(-1px); }
+  .big-ch.on { background:#0F172A; border-color:#0F172A; color:#fff; }
+  .big-ch-icon { width:36px; height:36px; border-radius:10px; background:#F1F5F9; display:inline-flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#0F172A; transition:all .18s; }
+  .big-ch.on .big-ch-icon { background:rgba(255,255,255,.15); color:#fff; }
+  .big-ch-label { font-size:13px; font-weight:600; }
+
+  /* Bulk-create template card */
+  .bc-tpl { background:#fff; border:1.5px solid #E2E8F0; border-radius:10px; padding:10px 12px; cursor:pointer; transition:all .15s; text-align:left; position:relative; }
+  .bc-tpl:hover { border-color:#94A3B8; }
+  .bc-tpl.on { background:#0F172A; border-color:#0F172A; }
+  .bc-tpl.on .text-sm, .bc-tpl.on .text-slate-500, .bc-tpl.on .text-slate-400 { color:#fff !important; }
+  .bc-tpl.on::after { content:'✓'; position:absolute; top:8px; right:10px; width:18px; height:18px; background:#10B981; color:#fff; border-radius:9999px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
+  /* Real checkbox styling */
+  .row-cb { width:18px; height:18px; cursor:pointer; accent-color:#0F172A; margin-left:4px; }
+  /* Custom checkbox */
+  .cb { width:16px; height:16px; border:1.5px solid #CBD5E1; border-radius:4px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; background:#fff; }
+  .cb.checked { background:#0F172A; border-color:#0F172A; }
+  .cb.checked::after { content:'✓'; color:#fff; font-size:11px; font-weight:700; }
+  .cb.indeterminate { background:#0F172A; border-color:#0F172A; }
+  .cb.indeterminate::after { content:'–'; color:#fff; font-size:14px; font-weight:700; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- ===== Top Nav ===== -->
+<nav class="bg-white border-b border-slate-200 sticky top-0 z-30">
+  <div class="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+    <div class="flex items-center gap-8">
+      <div class="font-bold text-[15px]">Digital Paani <span class="text-slate-400 font-normal">· Plant Operations</span></div>
+      <div class="flex items-center gap-1 text-sm">
+        <button onclick="goPlants()" id="nav-plants" class="px-3 py-1.5 rounded-lg font-medium">Plants <span class="text-slate-400 ml-1">5</span></button>
+        <button onclick="goInsights()" id="nav-insights" class="px-3 py-1.5 rounded-lg font-medium">Insights <span class="text-slate-400 ml-1">18</span></button>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="text-xs text-slate-500">v2 prototype</span>
+      <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-semibold">RM</div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============== Plants SCREEN ============== -->
+<section id="screen-plants" class="screen active">
+  <div class="max-w-7xl mx-auto px-6 py-8">
+    <div class="flex items-end justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold">Sewage Treatment Plants</h1>
+        <p class="text-sm text-slate-500 mt-1">Configuration layer · sorted by severity</p>
+      </div>
+      <input placeholder="Search Plants…" class="border border-slate-200 rounded-lg px-3 py-2 text-sm w-64"/>
+    </div>
+
+    <div class="grid grid-cols-3 gap-4">
+      <div class="card p-5">
+        <div class="sev-bar mb-4"><div style="background:#DC2626;flex:2"></div><div style="background:#F59E0B;flex:1"></div><div style="background:#e2e8f0;flex:1"></div></div>
+        <h3 class="font-semibold text-[15px]">Andheri Plant</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Mumbai · 25 MLD · 4 active insights</p>
+        <div class="flex flex-wrap gap-1.5 mt-3">
+          <span class="chip" style="background:#FEE2E2;color:#991B1B">● 2 incident</span>
+          <span class="chip" style="background:#FEF3C7;color:#92400E">● 1 issue</span>
+        </div>
+        <button class="btn btn-primary w-full mt-5" onclick="filterByPlant('Andheri Plant')">View insights</button>
+        <div class="flex gap-2 mt-2">
+          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openEscalations('Andheri Plant')">⚡ Escalations</button>
+          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openDigests('Andheri Plant')">✉ Digests</button>
+        </div>
+      </div>
+
+      <div class="card p-5">
+        <div class="sev-bar mb-4"><div style="background:#F59E0B;flex:2"></div><div style="background:#e2e8f0;flex:3"></div></div>
+        <h3 class="font-semibold text-[15px]">Bandra Plant</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Mumbai · 18 MLD · 5 active insights</p>
+        <div class="flex flex-wrap gap-1.5 mt-3">
+          <span class="chip" style="background:#FEF3C7;color:#92400E">● 2 issue</span>
+        </div>
+        <button class="btn btn-primary w-full mt-5" onclick="filterByPlant('Bandra Plant')">View insights</button>
+        <div class="flex gap-2 mt-2">
+          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openEscalations('Bandra Plant')">⚡ Escalations</button>
+          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openDigests('Bandra Plant')">✉ Digests</button>
+        </div>
+      </div>
+
+      <div class="card p-5">
+        <div class="sev-bar mb-4"><div style="background:#FBBF24;flex:2"></div><div style="background:#e2e8f0;flex:3"></div></div>
+        <h3 class="font-semibold text-[15px]">Powai Plant</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Mumbai · 12 MLD · 4 active insights</p>
+        <div class="flex flex-wrap gap-1.5 mt-3">
+          <span class="chip" style="background:#FEF9C3;color:#854D0E">● 2 warning</span>
+        </div>
+        <button class="btn btn-primary w-full mt-5" onclick="filterByPlant('Powai Plant')">View insights</button>
+        <div class="flex gap-2 mt-2">
+          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openEscalations('Powai Plant')">⚡ Escalations</button>
+          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openDigests('Powai Plant')">✉ Digests</button>
+        </div>
+      </div>
+
+      <div class="card p-5 opacity-90">
+        <div class="sev-bar mb-4"><div style="background:#FBBF24;flex:1"></div><div style="background:#e2e8f0;flex:4"></div></div>
+        <h3 class="font-semibold text-[15px]">Thane Plant</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Thane · 30 MLD · 3 active insights</p>
+        <div class="flex flex-wrap gap-1.5 mt-3">
+          <span class="chip" style="background:#FEF9C3;color:#854D0E">● 1 warning</span>
+        </div>
+        <button class="btn btn-primary w-full mt-5" onclick="filterByPlant('Thane Plant')">View insights</button>
+        <div class="flex gap-2 mt-2">
+          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openEscalations('Thane Plant')">⚡ Escalations</button>
+          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openDigests('Thane Plant')">✉ Digests</button>
+        </div>
+      </div>
+
+      <div class="card p-5 opacity-70">
+        <div class="sev-bar mb-4"><div style="background:#16A34A;flex:1"></div><div style="background:#e2e8f0;flex:4"></div></div>
+        <h3 class="font-semibold text-[15px] text-slate-600">Vashi Plant</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Navi Mumbai · 20 MLD · 2 active</p>
+        <div class="flex flex-wrap gap-1.5 mt-3">
+          <span class="chip" style="background:#DCFCE7;color:#166534">● all clear</span>
+        </div>
+        <button class="btn btn-primary w-full mt-5" onclick="filterByPlant('Vashi Plant')">View insights</button>
+        <div class="flex gap-2 mt-2">
+          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openEscalations('Vashi Plant')">⚡ Escalations</button>
+          <button class="btn btn-ghost flex-1" style="padding:6px 10px;font-size:12px" onclick="openDigests('Vashi Plant')">✉ Digests</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="text-xs text-slate-500 mt-6">Each plant has two configurations: <b>⚡ Escalations</b> (timing + channels + messages, applied to every new insight in that plant) and <b>✉ Digests</b> (scheduled summaries sent to client recipients).</p>
+  </div>
+</section>
+
+<!-- ============== INSIGHTS SCREEN ============== -->
+<section id="screen-insights" class="screen">
+  <div class="max-w-7xl mx-auto px-6 py-8">
+
+    <div class="flex items-end justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold" id="insights-h1">Insights <span id="insight-count" class="text-slate-400 font-normal text-lg">· 18</span></h1>
+        <p class="text-sm text-slate-500 mt-1" id="insights-sub">Click any row to see history, sensor readings, and users.</p>
+      </div>
+      <div class="flex gap-2">
+        <button class="btn btn-ghost" onclick="toggleBulkCreate()">+ Bulk add</button>
+        <button class="btn btn-primary" onclick="openNewInsight()">+ New insight</button>
+      </div>
+    </div>
+
+    <!-- Filters: search on top, then filter row below it -->
+    <div class="card p-3 mb-3">
+      <input id="search" placeholder="🔍 Search insights, sensors, equipment…" oninput="renderInsights()" class="w-full border-0 px-2 py-2 text-sm focus:outline-none"/>
+      <div class="border-t border-slate-100 mt-2 pt-3 flex flex-wrap items-center gap-2">
+        <span class="text-[11px] uppercase font-semibold text-slate-400 mr-1">Filter by</span>
+        <select id="f-plant" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
+          <option value="">All Plants</option>
+          <option>Andheri Plant</option><option>Bandra Plant</option><option>Powai Plant</option><option>Thane Plant</option><option>Vashi Plant</option>
+        </select>
+        <select id="f-equip" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
+          <option value="">All equipment</option><option>Aerator</option><option>Pump</option><option>Tank</option><option>Blower</option><option>Valve</option>
+        </select>
+        <select id="f-sev" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
+          <option value="">All severities</option><option>incident</option><option>issue</option><option>warning</option>
+        </select>
+        <select id="f-status" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
+          <option value="">Any status</option><option>Active</option><option>Acknowledged</option><option>Paused</option>
+        </select>
+        <button class="text-xs text-slate-500 hover:text-slate-900 underline ml-auto" onclick="clearAllFilters()">Reset</button>
+      </div>
+    </div>
+
+    <!-- Bulk action panel (inline, expands when selections exist) -->
+    <!-- Bulk-create panel (inline, opens via + Bulk add) -->
+    <section id="bulk-create-panel" class="hidden card mb-3 overflow-hidden slide-in">
+      <div class="px-6 py-3 bg-slate-900 text-white flex items-center gap-3">
+        <span class="text-sm">➕ <b>Bulk add insights</b></span>
+        <span class="text-xs text-slate-400">Create multiple insights for a plant from common templates</span>
+        <button class="text-xs underline ml-auto" onclick="toggleBulkCreate()">Close</button>
+      </div>
+      <div class="px-7 py-5 border-b border-slate-100">
+        <h3 class="font-semibold text-[14px] mb-1">Which plant?</h3>
+        <p class="text-xs text-slate-500 mb-3">All selected templates will be created in this plant.</p>
+        <select id="bc-plant" class="w-full max-w-sm border border-slate-200 rounded-lg px-3 py-2 text-sm" onchange="updateBcPreview()">
+          <option>Andheri Plant</option>
+          <option>Bandra Plant</option>
+          <option>Powai Plant</option>
+          <option>Thane Plant</option>
+          <option>Vashi Plant</option>
+        </select>
+      </div>
+      <div class="px-7 py-5">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="font-semibold text-[14px]">Which insights to add?</h3>
+          <button class="text-xs text-blue-600 hover:underline" onclick="bcToggleAll()">Select all</button>
+        </div>
+        <p class="text-xs text-slate-500 mb-3">Tap any template to include it. Threshold + severity are pre-filled — edit later from the insight detail.</p>
+        <div id="bc-templates" class="grid grid-cols-2 gap-2"></div>
+      </div>
+      <div class="px-7 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between gap-3">
+        <div class="text-xs text-slate-600" id="bc-preview">Pick at least one template to continue</div>
+        <div class="flex gap-2">
+          <button class="btn btn-ghost" onclick="toggleBulkCreate()">Cancel</button>
+          <button id="bc-confirm" class="btn btn-primary opacity-50 pointer-events-none" onclick="confirmBulkCreate()">Create <span id="bc-count">0</span> insights</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="bulk-panel" class="hidden card mb-3 overflow-hidden slide-in">
+      <!-- Compact selection header -->
+      <div class="px-6 py-3 bg-slate-900 text-white flex flex-wrap items-center gap-3">
+        <span class="text-sm"><b id="bulk-count">0</b> insight<span id="bulk-count-s">s</span> selected</span>
+        <div id="bulk-summary-pills" class="flex flex-wrap gap-1.5"></div>
+        <div class="ml-auto flex items-center gap-2">
+          <button class="btn btn-sm bg-white/10 text-white hover:bg-white/20" onclick="bulkPause()">⏸ Pause all</button>
+          <button class="text-xs underline" onclick="clearSelection()">Clear selection</button>
+        </div>
+      </div>
+
+      <!-- Header: title + goal-gradient progress -->
+      <div class="px-7 pt-5 pb-4 border-b border-slate-100">
+        <div class="flex items-start justify-between mb-4">
+          <div>
+            <h2 class="text-lg font-bold tracking-tight">Assign users <span class="text-slate-400 font-normal text-sm">to <b id="bulk-modal-count">0</b> insight<span id="bulk-modal-count-s">s</span></span></h2>
+            <p class="text-xs text-slate-500 mt-0.5">Add multiple users to one or many insights at once.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="progress-step" id="ps-1" data-step="1"><span class="step-dot">1</span><span class="step-label">Users</span></div>
+          <div class="step-line" id="line-1"></div>
+          <div class="progress-step" id="ps-2" data-step="2"><span class="step-dot">2</span><span class="step-label">Timing</span></div>
+          <div class="step-line" id="line-2"></div>
+          <div class="progress-step" id="ps-3" data-step="3"><span class="step-dot">3</span><span class="step-label">Channels</span></div>
+        </div>
+      </div>
+
+      <!-- Step 1: WHO -->
+      <section class="px-7 py-5 border-b border-slate-100">
+        <h3 class="font-semibold text-[14px] mb-1">Who should be notified?</h3>
+        <p class="text-xs text-slate-500 mb-3">Search and add as many users as you need.</p>
+        <div class="user-search-wrap">
+          <span class="user-search-icon">🔍</span>
+          <input id="sup-search" class="user-search" placeholder="Type a name, role, or saved group…" oninput="searchUser(this.value)" onfocus="searchUser(this.value)"/>
+        </div>
+        <div id="sup-suggestions" class="user-suggestions hidden mt-1"></div>
+        <div id="bulk-users-block" class="mt-4 hidden">
+          <div class="flex items-center justify-between mb-2">
+            <div class="text-[11px] uppercase text-slate-500 font-semibold tracking-wide">Selected <span class="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-slate-900 text-white text-[10px]" id="sel-count">0</span></div>
+            <button class="text-[11px] text-slate-400 hover:text-red-600" onclick="clearSelectedUsers()">Clear all</button>
+          </div>
+          <div id="bulk-users" class="flex flex-wrap gap-2"></div>
+        </div>
+        <div id="bulk-helper" class="hidden mt-3 helper-card"></div>
+      </section>
+
+      <!-- Step 2: WHEN -->
+      <section id="step-timing" class="px-7 py-5 border-b border-slate-100 hidden">
+        <h3 class="font-semibold text-[14px] mb-1">When should they be notified?</h3>
+        <p class="text-xs text-slate-500 mb-3">Pick a moment in the escalation timeline.</p>
+        <div class="grid grid-cols-4 gap-2">
+          <button class="time-chip on" data-v="imm" onclick="setTimingChip(this)"><span class="time-chip-icon">⚡</span><span class="time-chip-label">Immediately</span><span class="time-chip-sub">When opens</span></button>
+          <button class="time-chip" data-v="10" onclick="setTimingChip(this)"><span class="time-chip-icon">⏱</span><span class="time-chip-label">+10 min</span><span class="time-chip-sub">If no response</span></button>
+          <button class="time-chip" data-v="30" onclick="setTimingChip(this)"><span class="time-chip-icon">⏱</span><span class="time-chip-label">+30 min</span><span class="time-chip-sub">If still open</span></button>
+          <button class="time-chip" data-v="custom" onclick="setTimingChip(this)"><span class="time-chip-icon">⚙</span><span class="time-chip-label">Custom</span><span class="time-chip-sub">Set delay</span></button>
+        </div>
+        <div id="custom-min-wrap" class="hidden mt-3 flex items-center gap-2">
+          <input id="custom-min" type="number" min="1" placeholder="Minutes" class="w-32 border border-slate-200 rounded-lg px-3 py-2 text-sm" oninput="updatePreview()"/>
+          <span class="text-xs text-slate-500">minutes after the insight opens</span>
+        </div>
+      </section>
+
+      <!-- Step 3: HOW -->
+      <section id="step-channels" class="px-7 py-5 hidden">
+        <h3 class="font-semibold text-[14px] mb-1">How should they be notified?</h3>
+        <p class="text-xs text-slate-500 mb-3">WhatsApp by default. Add more if needed.</p>
+        <div class="grid grid-cols-4 gap-2">
+          <button class="big-ch on" data-v="wa" onclick="bulkToggleCh(this)"><span class="big-ch-icon">WA</span><span class="big-ch-label">WhatsApp</span></button>
+          <button class="big-ch" data-v="sms" onclick="bulkToggleCh(this)"><span class="big-ch-icon">SMS</span><span class="big-ch-label">SMS</span></button>
+          <button class="big-ch" data-v="call" onclick="bulkToggleCh(this)"><span class="big-ch-icon">📞</span><span class="big-ch-label">Call</span></button>
+          <button class="big-ch" data-v="email" onclick="bulkToggleCh(this)"><span class="big-ch-icon">✉</span><span class="big-ch-label">Email</span></button>
+        </div>
+        <details class="mt-5">
+          <summary class="text-sm text-blue-600 hover:underline cursor-pointer inline-flex items-center gap-1">＋ Save these users as a reusable group</summary>
+          <div class="mt-3 p-4 bg-slate-50 rounded-xl">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" id="save-group-cb" class="w-4 h-4"/>
+              <span class="text-sm">Save selection as a group</span>
+            </label>
+            <input id="save-group-name" placeholder="Group name (e.g. Andheri Day Shift)" class="mt-2 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"/>
+            <p class="text-[11px] text-slate-500 mt-1.5">Pick this group from the search next time.</p>
+          </div>
+        </details>
+      </section>
+
+      <!-- Footer -->
+      <div class="px-7 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between gap-3">
+        <div class="text-xs text-slate-600 flex-1 min-w-0" id="assign-preview">Pick at least one user to continue</div>
+        <div class="flex gap-2 shrink-0">
+          <button class="btn btn-ghost" onclick="clearSelection()">Cancel</button>
+          <button id="assign-btn" class="btn btn-primary opacity-50 pointer-events-none" onclick="confirmBulkAssign()">
+            Assign to <span id="bulk-confirm-count">0</span> insight<span id="bulk-confirm-count-s">s</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Insights list -->
+    <div class="card overflow-hidden">
+      <div class="grid grid-cols-12 px-4 py-2 text-[11px] uppercase text-slate-500 font-semibold border-b border-slate-100 bg-slate-50 items-center">
+        <div class="col-span-1"><input type="checkbox" id="cb-all" class="row-cb" onclick="toggleAll()"/></div>
+        <div class="col-span-4">Insight</div>
+        <div class="col-span-2">Plant · Equipment</div>
+        <div class="col-span-2">Users</div>
+        <div class="col-span-2">Status</div>
+        <div class="col-span-1 text-right">On</div>
+      </div>
+      <div id="insights-list"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== INSIGHT DETAIL DRAWER ============== -->
+<div id="detail-drawer" class="fixed inset-y-0 right-0 w-[600px] bg-white shadow-2xl z-40 hidden overflow-y-auto">
+  <div id="detail-content"></div>
+</div>
+<div id="detail-overlay" class="fixed inset-0 bg-black/30 z-30 hidden" onclick="closeDetail()"></div>
+
+<!-- ============== NEW INSIGHT MODAL ============== -->
+<div id="modal-new" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-6">
+  <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-10">
+      <div>
+        <h2 class="font-bold text-lg">New insight</h2>
+        <p class="text-xs text-slate-500">Build it as a sentence — no forms.</p>
+      </div>
+      <button class="text-slate-400 hover:text-slate-700" onclick="closeNewInsight()">✕</button>
+    </div>
+    <div class="p-6">
+      <div class="card p-6 bg-slate-50 leading-loose text-[15px]">
+        <div class="mb-3">
+          <span class="text-slate-500 font-semibold uppercase text-[11px] mr-2">When</span>
+          <span class="editable-chip" contenteditable="true">DO sensor</span>
+          <span class="editable-chip" contenteditable="true">&lt;</span>
+          <span class="editable-chip" contenteditable="true">2.0 mg/L</span>
+          <span class="text-slate-500">on</span>
+          <span class="editable-chip" contenteditable="true">Aeration tank</span>
+          <span class="text-slate-500">at</span>
+          <span class="editable-chip" contenteditable="true">Andheri Plant</span>
+        </div>
+        <div class="mb-3">
+          <span class="text-slate-500 font-semibold uppercase text-[11px] mr-2">Then</span>
+          <span class="text-slate-700">notify users below</span>
+        </div>
+
+        <!-- Escalation timeline -->
+        <div class="mt-5 border-t border-slate-200 pt-4">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-slate-500 font-semibold uppercase text-[11px]">Escalation timeline</span>
+            <span class="text-[11px] text-slate-400">Inherits Andheri · Incident defaults · <button class="underline">Customize</button></span>
+          </div>
+          <div id="timeline"></div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-slate-200">
+          <span class="text-slate-500 font-semibold uppercase text-[11px] mr-2">Closes when</span>
+          <span class="editable-chip" contenteditable="true">DO &gt; 2.5 mg/L for 5 min</span>
+          <span class="text-slate-400 text-xs ml-2">optional</span>
+        </div>
+      </div>
+    </div>
+    <div class="px-6 py-4 border-t border-slate-100 flex justify-between items-center sticky bottom-0 bg-white">
+      <button class="text-xs text-slate-500 hover:underline" onclick="saveDraft()">Save as draft</button>
+      <div class="flex gap-2">
+        <button class="btn btn-ghost" onclick="closeNewInsight()">Cancel</button>
+        <button class="btn btn-primary" onclick="createInsight()">Create insight</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============== ESCALATIONS MODAL ============== -->
+<div id="modal-esc" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-6">
+  <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-10">
+      <div>
+        <h2 class="font-bold text-lg">⚡ Escalations — <span id="esc-plant"></span></h2>
+        <p class="text-xs text-slate-500">Applied automatically to every new insight in this plant.</p>
+      </div>
+      <button class="text-slate-400 hover:text-slate-700" onclick="closeEscalations()">✕</button>
+    </div>
+
+    <!-- Severity tabs -->
+    <div class="px-6 pt-4 flex gap-1 border-b border-slate-100">
+      <button class="esc-tab esc-tab-active px-3 py-2 text-sm font-medium border-b-2 border-slate-900" data-sev="incident" onclick="switchEscTab(this)"><span class="w-2 h-2 inline-block rounded-full" style="background:#DC2626"></span> Incident</button>
+      <button class="esc-tab px-3 py-2 text-sm text-slate-500 border-b-2 border-transparent" data-sev="issue" onclick="switchEscTab(this)"><span class="w-2 h-2 inline-block rounded-full" style="background:#F59E0B"></span> Issue</button>
+      <button class="esc-tab px-3 py-2 text-sm text-slate-500 border-b-2 border-transparent" data-sev="warning" onclick="switchEscTab(this)"><span class="w-2 h-2 inline-block rounded-full" style="background:#FBBF24"></span> Warning</button>
+    </div>
+
+    <div class="p-6 space-y-5">
+      <!-- Immediate notification (always fires) -->
+      <div class="card border border-slate-100 overflow-hidden">
+        <div class="px-4 py-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="chip bg-slate-900 text-white px-2 py-0.5">📢 Immediate</span>
+            <span class="text-sm font-medium">Fires the moment the insight opens</span>
+          </div>
+        </div>
+        <div id="esc-immediate" class="p-4"></div>
+      </div>
+
+      <!-- Followup escalation steps -->
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <span class="chip bg-amber-100 text-amber-800 px-2 py-0.5">⏱ Followup</span>
+            <span class="text-sm font-medium">Escalate if unresolved</span>
+          </div>
+          <button class="btn btn-sm btn-ghost" onclick="addEscStep()">+ Add escalation step</button>
+        </div>
+        <div id="esc-steps" class="space-y-3"></div>
+      </div>
+    </div>
+
+    <div class="px-6 py-4 border-t border-slate-100 flex justify-end gap-2 sticky bottom-0 bg-white">
+      <button class="btn btn-ghost" onclick="closeEscalations()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEscalations()">Save escalations</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============== DIGESTS MODAL ============== -->
+<div id="modal-digest" class="fixed inset-0 bg-black/40 z-50 hidden items-center justify-center p-6">
+  <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-10">
+      <div>
+        <h2 class="font-bold text-lg">✉ Digests — <span id="dig-plant"></span></h2>
+        <p class="text-xs text-slate-500">Scheduled summaries sent to client recipients.</p>
+      </div>
+      <button class="text-slate-400 hover:text-slate-700" onclick="closeDigests()">✕</button>
+    </div>
+
+    <div class="p-6 space-y-5">
+      <!-- Recipients -->
+      <div>
+        <label class="text-[11px] uppercase text-slate-500 font-semibold">Recipients</label>
+        <div id="dig-recipients" class="flex flex-wrap gap-2 mt-2 p-3 border border-slate-200 rounded-lg min-h-[44px]"></div>
+        <input id="dig-rec-input" placeholder="Type email and press Enter (e.g. client@acme.com)" class="mt-2 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm" onkeydown="if(event.key==='Enter'){addRecipient(this.value);this.value=''}"/>
+      </div>
+
+      <!-- Severity (multi-select) -->
+      <div>
+        <label class="text-[11px] uppercase text-slate-500 font-semibold">Include severities <span class="text-slate-400 normal-case font-normal">· tap any combination</span></label>
+        <div class="flex gap-2 mt-2" id="dig-sev">
+          <button class="sev-pill on" data-v="incident" onclick="toggleSev(this)"><span class="checkmark">✓</span> <span style="color:#991B1B">●</span> Incidents</button>
+          <button class="sev-pill on" data-v="issue" onclick="toggleSev(this)"><span class="checkmark">✓</span> <span style="color:#92400E">●</span> Issues</button>
+          <button class="sev-pill" data-v="warning" onclick="toggleSev(this)"><span class="checkmark">✓</span> <span style="color:#854D0E">●</span> Warnings</button>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div>
+        <label class="text-[11px] uppercase text-slate-500 font-semibold">Status</label>
+        <div class="flex gap-2 mt-2" id="dig-status">
+          <button class="chip bg-slate-900 text-white px-3 py-1.5" data-v="open" onclick="pickStatus(this)">Open</button>
+          <button class="chip bg-slate-100 px-3 py-1.5" data-v="closed" onclick="pickStatus(this)">Closed</button>
+          <button class="chip bg-slate-100 px-3 py-1.5" data-v="both" onclick="pickStatus(this)">Both</button>
+        </div>
+      </div>
+
+      <!-- Historical range -->
+      <div>
+        <label class="text-[11px] uppercase text-slate-500 font-semibold">Historical range</label>
+        <div class="flex flex-wrap gap-2 mt-2" id="dig-range">
+          <button class="chip bg-slate-100 px-3 py-1.5" data-v="6h" onclick="pickRange(this)">Last 6 hours</button>
+          <button class="chip bg-slate-100 px-3 py-1.5" data-v="12h" onclick="pickRange(this)">Last 12 hours</button>
+          <button class="chip bg-slate-900 text-white px-3 py-1.5" data-v="24h" onclick="pickRange(this)">Last 24 hours</button>
+          <button class="chip bg-slate-100 px-3 py-1.5" data-v="7d" onclick="pickRange(this)">Last 7 days</button>
+        </div>
+      </div>
+
+      <!-- Occurrence -->
+      <div>
+        <label class="text-[11px] uppercase text-slate-500 font-semibold">Occurrence</label>
+        <div class="flex flex-wrap gap-2 mt-2" id="dig-occ">
+          <button class="chip bg-slate-100 px-3 py-1.5" data-v="hourly" onclick="pickOcc(this)">Hourly</button>
+          <button class="chip bg-slate-900 text-white px-3 py-1.5" data-v="daily" onclick="pickOcc(this)">Daily</button>
+          <button class="chip bg-slate-100 px-3 py-1.5" data-v="weekly" onclick="pickOcc(this)">Weekly</button>
+        </div>
+        <div id="occ-detail" class="mt-3 p-3 bg-slate-50 rounded-lg text-sm">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-slate-500">Send at</span>
+            <select id="occ-hour" class="border border-slate-200 rounded px-2 py-1 text-sm bg-white">
+              <option>08:00</option><option>09:00</option><option>10:00</option><option>12:00</option><option>17:00</option><option>20:00</option>
+            </select>
+            <span id="occ-day-wrap" class="hidden flex items-center gap-2">
+              <span class="text-slate-500">on</span>
+              <select class="border border-slate-200 rounded px-2 py-1 text-sm bg-white"><option>Mon</option><option>Tue</option><option>Wed</option><option>Thu</option><option>Fri</option></select>
+            </span>
+            <span class="text-slate-500" id="occ-tz">IST</span>
+          </div>
+          <div class="text-[11px] text-slate-500 mt-2" id="occ-summary">Next digest: tomorrow at 08:00 IST</div>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="p-3 bg-blue-50 rounded-lg text-xs text-blue-900">
+        <b>Preview:</b> <span id="dig-preview">Daily digest of <b>open Incidents and Issues</b> from <b>last 24 hours</b>, sent to recipients at <b>08:00 IST</b>.</span>
+      </div>
+    </div>
+
+    <div class="px-6 py-4 border-t border-slate-100 flex justify-between gap-2 sticky bottom-0 bg-white">
+      <button class="text-xs text-slate-500 hover:underline" onclick="toast('Test digest sent')">Send test now</button>
+      <div class="flex gap-2">
+        <button class="btn btn-ghost" onclick="closeDigests()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveDigests()">Save digest</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============== TOAST ============== -->
+<div id="toast-container" class="fixed bottom-6 right-6 z-50 space-y-2"></div>
+
+<script>
+// ---------- Navigation ----------
+let currentPlant = '';
+function show(name) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  ['plants','insights'].forEach(n=>{
+    const el = document.getElementById('nav-'+n);
+    el.style.background = n===name ? '#0F172A' : '';
+    el.style.color = n===name ? '#fff' : '';
+  });
+  if (name !== 'insights') {
+    currentPlant = '';
+    const fp = document.getElementById('f-plant');
+    if (fp) fp.value = '';
+  } else if (!currentPlant) {
+    document.getElementById('f-plant').value = '';
+    document.getElementById('insights-h1').innerHTML = `Insights <span id="insight-count" class="text-slate-400 font-normal text-lg">· 18</span>`;
+    if (typeof renderInsights === 'function') renderInsights();
+  }
+  window.scrollTo(0,0);
+}
+function goPlants() { currentPlant=''; show('plants'); }
+function goInsights() {
+  currentPlant='';
+  document.getElementById('f-plant').value='';
+  document.getElementById('insights-h1').innerHTML = `Insights <span id="insight-count" class="text-slate-400 font-normal text-lg">· 18</span>`;
+  show('insights');
+  renderInsights();
+}
+show('plants');
+
+// ---------- Data ----------
+const insights = [
+  {id:1, name:'DO drop in aeration tank', plant:'Andheri Plant', equip:'Aerator A-1', sev:'incident', status:'Active', last:'2h 14m', on:true, users:['Ravi K.','Priya S.'], sensor:'DO-101', threshold:'< 2.0 mg/L', current:'1.4 mg/L'},
+  {id:2, name:'Inlet pump vibration high', plant:'Andheri Plant', equip:'Pump P-3', sev:'incident', status:'Active', last:'47m', on:true, users:['Ravi K.'], sensor:'VIB-203', threshold:'> 8 mm/s', current:'9.6 mm/s'},
+  {id:3, name:'pH out of range', plant:'Andheri Plant', equip:'Equalization tank', sev:'issue', status:'Active', last:'1h 02m', on:true, users:['Arjun M.'], sensor:'PH-505', threshold:'5.5–9.0', current:'9.4'},
+  {id:4, name:'Blower load high', plant:'Bandra Plant', equip:'Blower B-2', sev:'issue', status:'Active', last:'3h 11m', on:true, users:['Meera R.'], sensor:'AMP-B2', threshold:'> 80 A', current:'92 A'},
+  {id:5, name:'MLSS below target', plant:'Bandra Plant', equip:'Aeration tank', sev:'issue', status:'Active', last:'4h', on:true, users:[], sensor:'MLSS-1', threshold:'> 2500 mg/L', current:'2100 mg/L'},
+  {id:6, name:'Effluent turbidity rising', plant:'Powai Plant', equip:'Outlet', sev:'warning', status:'Active', last:'30m', on:true, users:['Operator'], sensor:'TURB-O', threshold:'> 5 NTU', current:'6.2 NTU'},
+  {id:7, name:'Sludge pump runtime over limit', plant:'Powai Plant', equip:'Sludge pump', sev:'warning', status:'Active', last:'1h 20m', on:true, users:[], sensor:'RT-SP', threshold:'> 8 hrs/day', current:'9.1 hrs'},
+  {id:8, name:'Chlorine dosing low', plant:'Thane Plant', equip:'Cl₂ doser', sev:'warning', status:'Acknowledged', last:'5h ago', on:true, users:['Meera R.'], sensor:'CL-1', threshold:'< 0.5 mg/L', current:'0.7 mg/L'},
+];
+const sevColors = {
+  incident:{bg:'#FEE2E2',fg:'#991B1B',dot:'#DC2626'},
+  issue:{bg:'#FEF3C7',fg:'#92400E',dot:'#F59E0B'},
+  warning:{bg:'#FEF9C3',fg:'#854D0E',dot:'#FBBF24'},
+};
+const selected = new Set();
+
+// ---------- Filters ----------
+function filterByPlant(p) {
+  currentPlant = p;
+  show('insights');
+  document.getElementById('f-plant').value = p;
+  document.getElementById('insights-h1').innerHTML = `Insights <span class="text-slate-400 font-normal text-lg">· ${p}</span>`;
+  renderInsights();
+}
+function clearAllFilters() {
+  ['search','f-plant','f-sev','f-equip','f-status'].forEach(id=>document.getElementById(id).value='');
+  renderInsights();
+}
+function getFiltered() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const p = document.getElementById('f-plant').value;
+  const s = document.getElementById('f-sev').value;
+  const e = document.getElementById('f-equip').value;
+  const st = document.getElementById('f-status').value;
+  return insights.filter(i =>
+    (!q || (i.name+i.plant+i.equip+i.sensor).toLowerCase().includes(q)) &&
+    (!p || i.plant===p) &&
+    (!s || i.sev===s) &&
+    (!e || i.equip.toLowerCase().includes(e.toLowerCase())) &&
+    (!st || i.status===st)
+  );
+}
+
+// ---------- Render insights table ----------
+function renderInsights() {
+  const list = getFiltered();
+  document.getElementById('insight-count').textContent = `· ${list.length}`;
+  document.getElementById('insights-list').innerHTML = list.map(i => `
+    <div class="grid grid-cols-12 px-4 py-3 hover:bg-slate-50 items-center border-b border-slate-100 last:border-0 ${selected.has(i.id)?'bg-blue-50/50':''}" data-id="${i.id}">
+      <div class="col-span-1 py-2">
+        <input type="checkbox" class="row-cb" ${selected.has(i.id)?'checked':''} onclick="toggleSel(${i.id});event.stopPropagation()" onchange="event.stopPropagation()"/>
+      </div>
+      <div class="col-span-4 flex items-center gap-2 cursor-pointer" data-action="open">
+        <span class="chip" style="background:${sevColors[i.sev].bg};color:${sevColors[i.sev].fg}">● ${i.sev}</span>
+        <div>
+          <div class="text-sm font-medium">${i.name}</div>
+          <div class="text-[11px] text-slate-500">${i.sensor} · ${i.threshold}</div>
+        </div>
+      </div>
+      <div class="col-span-2 text-sm text-slate-600 cursor-pointer" data-action="open">${i.plant}<div class="text-[11px] text-slate-400">${i.equip}</div></div>
+      <div class="col-span-2 text-sm">
+        ${i.users.length ?
+          `<div class="flex -space-x-1.5 cursor-pointer" data-action="open">${i.users.slice(0,3).map(s=>`<div class="w-6 h-6 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-semibold" title="${s}">${s.split(' ')[0][0]}${s.split(' ')[1]?s.split(' ')[1][0]:''}</div>`).join('')}${i.users.length>3?`<div class="w-6 h-6 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px]">+${i.users.length-3}</div>`:''}</div>` :
+          `<button class="text-xs text-blue-600 hover:underline" data-action="quick-add">+ Add</button>`
+        }
+      </div>
+      <div class="col-span-2 text-sm cursor-pointer" data-action="open">
+        ${i.status==='Active' ? `<span class="text-red-600 flex items-center gap-1.5 text-xs"><span class="w-1.5 h-1.5 rounded-full bg-red-500 pulse"></span>Active · ${i.last}</span>` : i.status==='Acknowledged' ? `<span class="text-emerald-700 flex items-center gap-1.5 text-xs"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Acknowledged · ${i.last}</span>` : `<span class="text-slate-400 text-xs">${i.status} · ${i.last}</span>`}
+      </div>
+      <div class="col-span-1 text-right" data-action="toggle-on">
+        <label class="inline-flex items-center cursor-pointer">
+          <input type="checkbox" ${i.on?'checked':''} onchange="toggleInsight(${i.id},this.checked)" class="sr-only peer"/>
+          <div class="w-9 h-5 bg-slate-200 peer-checked:bg-emerald-500 rounded-full transition relative">
+            <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition peer-checked:translate-x-4"></div>
+          </div>
+        </label>
+      </div>
+    </div>
+  `).join('') || `<div class="p-8 text-center text-slate-400 text-sm">No insights match these filters.</div>`;
+  updateSelectAll();
+}
+
+// ---------- Selection ----------
+function toggleSel(id) {
+  if (selected.has(id)) selected.delete(id); else selected.add(id);
+  renderInsights();
+  updateBulkBar();
+}
+function toggleAll() {
+  const list = getFiltered();
+  if (list.every(i=>selected.has(i.id))) list.forEach(i=>selected.delete(i.id));
+  else list.forEach(i=>selected.add(i.id));
+  renderInsights();
+  updateBulkBar();
+}
+function updateSelectAll() {
+  const list = getFiltered();
+  const cb = document.getElementById('cb-all');
+  if (!cb) return;
+  cb.indeterminate = false; cb.checked = false;
+  if (!list.length) return;
+  if (list.every(i=>selected.has(i.id))) cb.checked = true;
+  else if (list.some(i=>selected.has(i.id))) cb.indeterminate = true;
+}
+function updateBulkBar() {
+  const panel = document.getElementById('bulk-panel');
+  if (selected.size) {
+    if (panel.classList.contains('hidden')) {
+      panel.classList.remove('hidden');
+      // Initialize the assignment flow state on first reveal
+      initBulkPanel();
+    } else {
+      // Refresh count + summary pills as selection changes
+      refreshBulkPanelHeader();
+    }
+  } else {
+    panel.classList.add('hidden');
+  }
+}
+function refreshBulkPanelHeader() {
+  const n = selected.size;
+  document.getElementById('bulk-count').textContent = n;
+  document.getElementById('bulk-modal-count').textContent = n;
+  document.getElementById('bulk-confirm-count').textContent = n;
+  document.getElementById('bulk-count-s').textContent = n===1?'':'s';
+  document.getElementById('bulk-modal-count-s').textContent = n===1?'':'s';
+  document.getElementById('bulk-confirm-count-s').textContent = n===1?'':'s';
+  // Pills
+  const sels = [...selected].map(id=>insights.find(x=>x.id===id)).filter(Boolean);
+  const sevCounts = {}; const plantSet = new Set();
+  sels.forEach(i=>{ sevCounts[i.sev]=(sevCounts[i.sev]||0)+1; plantSet.add(i.plant); });
+  document.getElementById('bulk-summary-pills').innerHTML =
+    Object.entries(sevCounts).map(([sev,nn])=>`<span class="chip" style="background:${sevColors[sev].bg};color:${sevColors[sev].fg}">${nn} ${sev}</span>`).join('') +
+    [...plantSet].slice(0,3).map(p=>`<span class="chip bg-white/15 text-white">${p}</span>`).join('') +
+    (plantSet.size>3?`<span class="chip bg-white/15 text-white">+${plantSet.size-3} more</span>`:'');
+  updatePreview();
+}
+function clearSelection() { selected.clear(); renderInsights(); updateBulkBar(); }
+function bulkPause() {
+  selected.forEach(id=>{ const i = insights.find(x=>x.id===id); if(i) i.on=false; });
+  toast(`✓ Paused ${selected.size} insights · <button class="underline" onclick="bulkResume()">Undo</button>`);
+  clearSelection();
+}
+function bulkResume() {
+  insights.forEach(i=>i.on=true); renderInsights(); toast('✓ Resumed');
+}
+function toggleInsight(id, on){
+  const i = insights.find(x=>x.id===id); i.on = on;
+  toast(`Insight ${on?'resumed':'paused'} · <button class="underline" onclick="toggleInsight(${id},${!on});this.parentElement.remove()">Undo</button>`);
+}
+
+// ---------- Detail drawer ----------
+function openDetail(id) {
+  const i = insights.find(x=>x.id===id);
+  if (!i) return;
+  const c = sevColors[i.sev];
+  document.getElementById('detail-content').innerHTML = `
+    <div class="drawer-in">
+      <!-- Header -->
+      <div class="px-6 py-4 border-b border-slate-100 sticky top-0 bg-white z-10">
+        <div class="flex items-center justify-between mb-2">
+          <button class="text-slate-400 hover:text-slate-700 text-sm" onclick="closeDetail()">← Close</button>
+          <div class="flex gap-2">
+            <button class="btn btn-sm btn-ghost">Edit</button>
+            <button class="btn btn-sm btn-ghost">⋯</button>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="chip" style="background:${c.bg};color:${c.fg}">● ${i.sev}</span>
+          ${i.status==='Active' ? `<span class="text-red-600 flex items-center gap-1.5 text-xs font-medium"><span class="w-1.5 h-1.5 rounded-full bg-red-500 pulse"></span>Active · ${i.last}</span>` : `<span class="text-slate-500 text-xs">${i.status}</span>`}
+        </div>
+        <h2 class="font-bold text-xl">${i.name}</h2>
+        <p class="text-sm text-slate-500 mt-0.5">${i.plant} · ${i.equip}</p>
+      </div>
+
+      <div class="p-6 space-y-6">
+
+        <!-- Live reading + sparkline -->
+        <div class="card p-4 border border-slate-100">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <div class="text-[11px] uppercase text-slate-500 font-semibold">Current reading · ${i.sensor}</div>
+              <div class="text-2xl font-bold mt-1" style="color:${c.dot}">${i.current}</div>
+              <div class="text-xs text-slate-500">Threshold: ${i.threshold}</div>
+            </div>
+            <svg viewBox="0 0 200 60" class="w-48 h-16">
+              <path class="sparkline" d="M0,40 L20,38 L40,42 L60,30 L80,32 L100,20 L120,18 L140,12 L160,10 L180,8 L200,6"/>
+              <circle cx="200" cy="6" r="3" fill="${c.dot}"/>
+            </svg>
+          </div>
+          <div class="flex gap-2 text-xs">
+            <button class="chip bg-slate-100">1H</button>
+            <button class="chip bg-slate-900 text-white">24H</button>
+            <button class="chip bg-slate-100">7D</button>
+            <button class="chip bg-slate-100">30D</button>
+          </div>
+        </div>
+
+        <!-- Conditions -->
+        <div>
+          <div class="text-[11px] uppercase text-slate-500 font-semibold mb-2">Conditions</div>
+          <div class="card p-4 border border-slate-100 text-sm space-y-2">
+            <div><span class="text-slate-500">Opens when</span> <code class="bg-slate-100 px-2 py-0.5 rounded text-[12px]">${i.sensor} ${i.threshold}</code> sustained 60s</div>
+            <div><span class="text-slate-500">Closes when</span> <code class="bg-slate-100 px-2 py-0.5 rounded text-[12px]">${i.sensor} back in range for 5 min</code> · or manual</div>
+          </div>
+        </div>
+
+        <!-- Equipment -->
+        <div>
+          <div class="text-[11px] uppercase text-slate-500 font-semibold mb-2">Equipment</div>
+          <div class="card p-4 border border-slate-100 text-sm grid grid-cols-2 gap-y-2">
+            <div><span class="text-slate-500">Tag</span> <span class="font-medium">${i.equip}</span></div>
+            <div><span class="text-slate-500">Sensor</span> <span class="font-medium">${i.sensor}</span></div>
+            <div><span class="text-slate-500">Installed</span> <span>2023-08-12</span></div>
+            <div><span class="text-slate-500">Last service</span> <span>2026-04-03</span></div>
+          </div>
+        </div>
+
+        <!-- Users / escalation timeline -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <div class="text-[11px] uppercase text-slate-500 font-semibold">Personnel monitoring · escalation</div>
+            <button class="text-xs text-blue-600 hover:underline" onclick="closeDetail();selected.clear();selected.add(${i.id});updateBulkBar();openBulkAssign()">+ Add user</button>
+          </div>
+          <div class="card p-4 border border-slate-100">
+            <div class="ml-2 pl-6 border-l-2 border-slate-200 space-y-3 py-1">
+              ${[
+                {t:'Immediate', user:i.users[0]||'Plant Manager', ch:'📞 ✉ WA', color:'#DC2626'},
+                {t:'10 min', user:i.users[1]||'Shift Lead', ch:'SMS', color:'#F59E0B'},
+                {t:'30 min', user:'Operations Head', ch:'📞', color:'#64748B'},
+              ].map(s=>`
+                <div class="relative">
+                  <div class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-white border-2" style="border-color:${s.color}"></div>
+                  <div class="text-sm flex items-center gap-3">
+                    <span class="chip bg-slate-100 w-20 justify-center">${s.t}</span>
+                    <span class="font-medium">${s.user}</span>
+                    <span class="text-slate-500 text-xs">${s.ch}</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+
+        <!-- History timeline -->
+        <div>
+          <div class="text-[11px] uppercase text-slate-500 font-semibold mb-2">History</div>
+          <div class="card p-4 border border-slate-100 text-sm space-y-3">
+            <div class="flex gap-3"><span class="text-slate-400 text-xs w-32 shrink-0">2026-05-05 09:21</span><span><b>Opened</b> · ${i.sensor} = ${i.current}</span></div>
+            <div class="flex gap-3"><span class="text-slate-400 text-xs w-32 shrink-0">2026-05-05 09:21</span><span>Notified <b>${i.users[0]||'Plant Manager'}</b> via WhatsApp, Call</span></div>
+            <div class="flex gap-3"><span class="text-slate-400 text-xs w-32 shrink-0">2026-05-05 09:31</span><span>Escalated to <b>Shift Lead</b> · no acknowledgement</span></div>
+            <div class="flex gap-3"><span class="text-slate-400 text-xs w-32 shrink-0">2026-05-04 14:02</span><span>Last resolved · automatic close</span></div>
+            <button class="text-xs text-blue-600 hover:underline">View full history (24 events)</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  `;
+  document.getElementById('detail-drawer').classList.remove('hidden');
+  document.getElementById('detail-overlay').classList.remove('hidden');
+}
+function closeDetail() {
+  document.getElementById('detail-drawer').classList.add('hidden');
+  document.getElementById('detail-overlay').classList.add('hidden');
+}
+
+// ---------- Bulk assign modal v2 ----------
+const allUsers = [
+  {n:'Priya Sharma', role:'Shift Lead · Andheri', count:5, color:'#0EA5E9'},
+  {n:'Arjun Mehta', role:'Plant Manager · Bandra', count:3, noaccess:['Andheri Plant'], color:'#8B5CF6'},
+  {n:'Meera Rao', role:'Operations Head · All plants', count:8, color:'#F59E0B'},
+  {n:'Vikas Patel', role:'Operator · Powai', count:2, color:'#10B981'},
+  {n:'Ravi Kumar', role:'Senior Operator · Andheri', count:6, color:'#EC4899'},
+  {n:'Anjali Verma', role:'Compliance · All plants', count:4, color:'#6366F1'},
+  {n:'Karan Bhatt', role:'Maintenance Engineer', count:7, color:'#EF4444'},
+  {n:'Neha Tandon', role:'Night Shift Lead', count:3, color:'#14B8A6'},
+];
+
+let bulkUsers = [];
+let bulkTiming = 'imm';
+let bulkChans = { wa:true };
+let recentUserNames = ['Priya Sharma','Meera Rao','Ravi Kumar'];
+
+// Initializes the inline bulk-assign panel state when it first becomes visible
+function initBulkPanel() {
+  bulkUsers = [];
+  bulkTiming = 'imm';
+  bulkChans = { wa:true };
+  refreshBulkPanelHeader();
+  // Reset UI state
+  const ss = document.getElementById('sup-search'); if (ss) ss.value = '';
+  document.getElementById('bulk-users-block').classList.add('hidden');
+  document.getElementById('bulk-helper').classList.add('hidden');
+  document.getElementById('step-timing').classList.add('hidden');
+  document.getElementById('step-channels').classList.add('hidden');
+  document.getElementById('custom-min-wrap').classList.add('hidden');
+  // Reset save-group
+  const cb = document.getElementById('save-group-cb'); if(cb) cb.checked = false;
+  const gn = document.getElementById('save-group-name'); if(gn) gn.value = '';
+  // Reset chip selections
+  document.querySelectorAll('#step-timing .time-chip').forEach(b=>b.classList.toggle('on', b.dataset.v==='imm'));
+  document.querySelectorAll('#step-channels .big-ch').forEach(b=>b.classList.toggle('on', b.dataset.v==='wa'));
+  // Hide suggestions until user focuses search
+  const sug = document.getElementById('sup-suggestions'); if (sug) sug.classList.add('hidden');
+  updateProgress();
+  updatePreview();
+}
+// Legacy entrypoints — kept for places that still call openBulkAssign() (e.g. quick-add link)
+function openBulkAssign() {
+  if (!selected.size) { toast('Select at least one insight first'); return; }
+  updateBulkBar();
+  document.getElementById('bulk-panel').scrollIntoView({behavior:'smooth', block:'start'});
+  setTimeout(()=>{ const s=document.getElementById('sup-search'); if (s) s.focus(); }, 250);
+}
+function closeBulkAssign() {
+  // Inline panel closes by clearing the selection
+  selected.clear(); renderInsights(); updateBulkBar();
+}
+
+function avatarHTML(user, size=22) {
+  const initials = user.n.split(' ').map(x=>x[0]).slice(0,2).join('');
+  const cls = size>=30 ? 'avatar' : 'chip-avatar';
+  return `<span class="${cls}" style="background:${user.color||'#64748B'};width:${size}px;height:${size}px">${initials}</span>`;
+}
+
+function searchUser(q) {
+  const box = document.getElementById('sup-suggestions');
+  q = (q||'').trim().toLowerCase();
+  let html = '';
+  const taken = new Set(bulkUsers.map(u=>u.name));
+  if (!q) {
+    // Show Recent + Groups when empty
+    const recent = allUsers.filter(u=>recentUserNames.includes(u.n) && !taken.has(u.n)).slice(0,3);
+    const moreGroups = (typeof groups !== 'undefined' ? groups : []).slice(0,3);
+    if (recent.length) {
+      html += `<div class="suggestion-section">Recent</div>`;
+      html += recent.map(u=>userSuggestionHTML(u)).join('');
+    }
+    if (moreGroups.length) {
+      html += `<div class="suggestion-section">Saved groups</div>`;
+      html += moreGroups.map(g=>groupSuggestionHTML(g)).join('');
+    }
+    if (!html) html = `<div class="px-4 py-3 text-xs text-slate-400">Start typing to search users…</div>`;
+  } else {
+    const userMatches = allUsers.filter(s=>!taken.has(s.n) && (s.n+s.role).toLowerCase().includes(q));
+    const groupMatches = (typeof groups !== 'undefined' ? groups : []).filter(g=>(g.name+' '+g.desc).toLowerCase().includes(q));
+    if (groupMatches.length) {
+      html += `<div class="suggestion-section">Groups</div>`;
+      html += groupMatches.map(g=>groupSuggestionHTML(g)).join('');
+    }
+    if (userMatches.length) {
+      html += `<div class="suggestion-section">Users</div>`;
+      html += userMatches.map(u=>userSuggestionHTML(u)).join('');
+    }
+    if (!html) html = `<div class="px-4 py-3 text-xs text-slate-400">No match for "${q}"</div>`;
+  }
+  box.innerHTML = html;
+  box.classList.remove('hidden');
+}
+function userSuggestionHTML(u) {
+  return `
+    <button class="user-suggestion" onclick='addUserByName(${JSON.stringify(u.n)})'>
+      ${avatarHTML(u, 34)}
+      <div class="meta">
+        <div class="name">${u.n}</div>
+        <div class="role">${u.role} · on ${u.count} insights</div>
+      </div>
+      ${u.noaccess?`<span class="chip" style="background:#FEF3C7;color:#92400E">⚠ access</span>`:''}
+    </button>
+  `;
+}
+function groupSuggestionHTML(g) {
+  return `
+    <button class="user-suggestion" onclick="addGroupById('${g.id}')">
+      <span class="avatar" style="background:#3B82F6;width:34px;height:34px">👥</span>
+      <div class="meta">
+        <div class="name">${g.name}</div>
+        <div class="role">${g.members.length} members · ${g.desc}</div>
+      </div>
+    </button>
+  `;
+}
+function addUserByName(name) {
+  const u = allUsers.find(x=>x.n===name); if(!u) return;
+  if (bulkUsers.find(b=>b.name===name)) return;
+  bulkUsers.push({name:u.n, role:u.role, count:u.count, color:u.color, noaccess:[...(u.noaccess||[])]});
+  postAdd();
+}
+function addGroupById(gid) {
+  const g = (typeof groups !== 'undefined' ? groups : []).find(x=>x.id===gid); if(!g) return;
+  let added = 0;
+  g.members.forEach(m => {
+    if (!bulkUsers.find(u=>u.name===m)) {
+      const u = allUsers.find(x=>x.n===m);
+      bulkUsers.push({name:m, role:u?u.role:`From ${g.name}`, count:u?u.count:0, color:u?u.color:'#64748B', noaccess:u?[...(u.noaccess||[])]:[]});
+      added++;
+    }
+  });
+  toast(`Added ${added} from "${g.name}"`);
+  postAdd();
+}
+function postAdd() {
+  document.getElementById('sup-search').value = '';
+  searchUser('');
+  renderBulkUsers();
+  document.getElementById('step-timing').classList.remove('hidden');
+  updateHelper();
+  updateProgress();
+  updatePreview();
+}
+function clearSelectedUsers() { bulkUsers = []; renderBulkUsers(); updateHelper(); updateProgress(); updatePreview(); searchUser(''); document.getElementById('bulk-users-block').classList.add('hidden'); }
+function renderBulkUsers() {
+  const block = document.getElementById('bulk-users-block');
+  const box = document.getElementById('bulk-users');
+  document.getElementById('sel-count').textContent = bulkUsers.length;
+  if (!bulkUsers.length) { block.classList.add('hidden'); return; }
+  block.classList.remove('hidden');
+  box.innerHTML = bulkUsers.map((u,idx)=>`
+    <span class="user-chip ${u.noaccess && u.noaccess.length?'warn':''}">
+      <span class="chip-avatar" style="background:${u.color||'#64748B'}">${u.name.split(' ').map(x=>x[0]).slice(0,2).join('')}</span>
+      <span class="chip-name">${u.name}${u.noaccess && u.noaccess.length?' ⚠':''}</span>
+      <button class="chip-x" onclick="removeUser(${idx})" title="Remove">✕</button>
+    </span>
+  `).join('');
+}
+function removeUser(idx) { bulkUsers.splice(idx,1); renderBulkUsers(); updateHelper(); updateProgress(); updatePreview(); if(!bulkUsers.length){document.getElementById('step-timing').classList.add('hidden');document.getElementById('step-channels').classList.add('hidden');} }
+function updateHelper() {
+  const helper = document.getElementById('bulk-helper');
+  if (!bulkUsers.length) { helper.classList.add('hidden'); return; }
+  const access = bulkUsers.filter(u=>u.noaccess && u.noaccess.length);
+  if (access.length) {
+    helper.classList.remove('hidden'); helper.classList.add('warn'); helper.classList.remove('helper-card');
+    helper.className = 'mt-4 helper-card warn';
+    helper.innerHTML = `<b>Permission gap:</b> ${access.map(u=>`${u.name} (${u.noaccess.join(', ')})`).join('; ')}. <button class="grant-btn" onclick="grantAllAccess()">Grant access for all</button>`;
+  } else {
+    helper.classList.remove('hidden'); helper.classList.remove('warn');
+    helper.className = 'mt-4 helper-card';
+    const totalLoad = bulkUsers.reduce((s,u)=>s+(u.count||0),0);
+    helper.innerHTML = `${bulkUsers.length} user${bulkUsers.length>1?'s':''} · already on <b>${totalLoad}</b> existing insights combined.`;
+  }
+}
+function grantAllAccess() {
+  bulkUsers.forEach(u=>u.noaccess=[]);
+  toast(`✓ Access granted across ${bulkUsers.length} users`);
+  renderBulkUsers(); updateHelper();
+}
+function setTimingChip(btn) {
+  document.querySelectorAll('#step-timing .time-chip').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  bulkTiming = btn.dataset.v;
+  document.getElementById('custom-min-wrap').classList.toggle('hidden', bulkTiming!=='custom');
+  document.getElementById('step-channels').classList.remove('hidden');
+  updateProgress(); updatePreview();
+}
+function bulkToggleCh(btn) {
+  const v = btn.dataset.v;
+  bulkChans[v] = !bulkChans[v]; if (!bulkChans[v]) delete bulkChans[v];
+  btn.classList.toggle('on');
+  updatePreview();
+}
+function updateProgress() {
+  const ps1 = document.getElementById('ps-1');
+  const ps2 = document.getElementById('ps-2');
+  const ps3 = document.getElementById('ps-3');
+  const l1 = document.getElementById('line-1');
+  const l2 = document.getElementById('line-2');
+  ps1.classList.remove('active','done'); ps2.classList.remove('active','done'); ps3.classList.remove('active','done');
+  l1.classList.remove('done'); l2.classList.remove('done');
+  if (!bulkUsers.length) { ps1.classList.add('active'); return; }
+  ps1.classList.add('done'); l1.classList.add('done');
+  if (!document.querySelector('#step-channels:not(.hidden)')) { ps2.classList.add('active'); return; }
+  ps2.classList.add('done'); l2.classList.add('done');
+  ps3.classList.add('active');
+}
+function updatePreview() {
+  const btn = document.getElementById('assign-btn');
+  const preview = document.getElementById('assign-preview');
+  const ready = bulkUsers.length && Object.keys(bulkChans).length;
+  if (ready) {
+    btn.classList.remove('opacity-50','pointer-events-none');
+    const timeStr = bulkTiming==='imm' ? 'immediately' : bulkTiming==='custom' ? `+${document.getElementById('custom-min').value||'?'} min` : `+${bulkTiming} min`;
+    const chStr = Object.keys(bulkChans).map(c=>({wa:'WhatsApp',sms:'SMS',call:'Call',email:'Email'}[c])).join(', ');
+    preview.innerHTML = `<b>${bulkUsers.length}</b> user${bulkUsers.length>1?'s':''} → <b>${selected.size}</b> insight${selected.size>1?'s':''} · ${timeStr} · ${chStr}`;
+  } else {
+    btn.classList.add('opacity-50','pointer-events-none');
+    if (!bulkUsers.length) preview.textContent = 'Pick at least one user to continue';
+    else if (!Object.keys(bulkChans).length) preview.textContent = 'Pick at least one channel';
+    else preview.textContent = '';
+  }
+}
+function confirmBulkAssign() {
+  if (!bulkUsers.length || !Object.keys(bulkChans).length) return;
+  selected.forEach(id=>{
+    const i = insights.find(x=>x.id===id);
+    if (i) bulkUsers.forEach(u=>{ if(!i.users.includes(u.name)) i.users.push(u.name); });
+  });
+  // Update recents
+  bulkUsers.forEach(u=>{ if(!recentUserNames.includes(u.name)) recentUserNames.unshift(u.name); });
+  recentUserNames = recentUserNames.slice(0,5);
+  const n = selected.size;
+  let groupMsg = '';
+  const cb = document.getElementById('save-group-cb');
+  if (cb && cb.checked) {
+    const gname = document.getElementById('save-group-name').value.trim() || `Group ${(groups||[]).length+1}`;
+    if (typeof groups !== 'undefined') groups.push({id:'g'+(groups.length+1), name:gname, desc:'Custom group', members:bulkUsers.map(u=>u.name), channels:Object.keys(bulkChans).join(', '), steps:bulkTiming});
+    groupMsg = ` · saved as "<b>${gname}</b>"`;
+  }
+  closeBulkAssign();
+  clearSelection();
+  renderInsights();
+  toast(`✓ ${bulkUsers.length} user${bulkUsers.length>1?'s':''} assigned to ${n} insight${n>1?'s':''}${groupMsg}`);
+}
+// Click outside dropdown to close
+document.addEventListener('click', (e) => {
+  const wrap = document.getElementById('sup-suggestions');
+  if (!wrap || wrap.classList.contains('hidden')) return;
+  const inSearch = e.target.closest('#sup-search') || e.target.closest('#sup-suggestions');
+  if (!inSearch) wrap.classList.add('hidden');
+});
+// Reopen dropdown when search is focused
+document.addEventListener('DOMContentLoaded', () => {
+  const s = document.getElementById('sup-search');
+  if (s) s.addEventListener('focus', ()=>searchUser(s.value));
+});
+
+// ---------- Group assign modal ----------
+const groups = [
+  {id:'g1', name:'Andheri Day Shift', desc:'Operators on shift A · 06:00–14:00', members:['Priya Sharma','Vikas Patel','Rohan K.'], channels:'WA, SMS', steps:'Immediate → 10min → 30min'},
+  {id:'g2', name:'Operations Leadership', desc:'Cross-Plant managers, escalation pool', members:['Meera Rao','Arjun Mehta','Sanjay G.'], channels:'📞 ✉ WA', steps:'Immediate → 5min → 20min'},
+  {id:'g3', name:'On-call Engineers', desc:'Maintenance & instrumentation', members:['Karan B.','Anita D.'], channels:'📞 SMS', steps:'Immediate → 15min'},
+  {id:'g4', name:'Andheri Night Shift', desc:'Shift B · 22:00–06:00', members:['Vikas Patel','Rajesh M.','Neha T.'], channels:'📞 WA', steps:'Immediate → 5min'},
+  {id:'g5', name:'Compliance & Reporting', desc:'Digest only · no escalation', members:['Anjali V.','Priya Sharma'], channels:'✉', steps:'Daily digest'},
+];
+let selectedGroup = null;
+function openGroupAssign() {
+  if (!selected.size) { toast('Select at least one insight first'); return; }
+  selectedGroup = null;
+  document.getElementById('group-modal-count').textContent = selected.size;
+  document.getElementById('group-confirm-count').textContent = selected.size;
+  document.getElementById('group-search').value = '';
+  renderGroups('');
+  document.getElementById('modal-group').classList.remove('hidden');
+  document.getElementById('modal-group').classList.add('flex');
+}
+function closeGroupAssign() {
+  document.getElementById('modal-group').classList.add('hidden');
+  document.getElementById('modal-group').classList.remove('flex');
+}
+function renderGroups(q) {
+  const list = groups.filter(g => !q || (g.name+g.desc+g.members.join(' ')).toLowerCase().includes(q.toLowerCase()));
+  document.getElementById('group-list').innerHTML = list.map(g=>`
+    <button class="w-full text-left p-4 rounded-lg border ${selectedGroup===g.id?'border-blue-500 bg-blue-50':'border-slate-200 hover:bg-slate-50'} transition" onclick="pickGroup('${g.id}')">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex-1">
+          <div class="flex items-center gap-2">
+            <span class="font-semibold text-sm">${g.name}</span>
+            <span class="chip bg-slate-100 text-slate-600">${g.members.length} members</span>
+          </div>
+          <div class="text-xs text-slate-500 mt-0.5">${g.desc}</div>
+          <div class="flex -space-x-1.5 mt-2">
+            ${g.members.slice(0,4).map(m=>`<div class="w-6 h-6 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-semibold" title="${m}">${m.split(' ').map(x=>x[0]).join('').slice(0,2)}</div>`).join('')}
+            ${g.members.length>4?`<div class="w-6 h-6 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px]">+${g.members.length-4}</div>`:''}
+          </div>
+        </div>
+        <div class="text-right text-[11px] text-slate-500 shrink-0">
+          <div>${g.channels}</div>
+          <div class="mt-0.5">${g.steps}</div>
+        </div>
+      </div>
+    </button>
+  `).join('') || `<div class="p-4 text-center text-xs text-slate-400">No groups match.</div>`;
+}
+function pickGroup(id) { selectedGroup = id; renderGroups(document.getElementById('group-search').value); }
+function confirmGroupAssign() {
+  if (!selectedGroup) { toast('Pick a group first'); return; }
+  const g = groups.find(x=>x.id===selectedGroup);
+  selected.forEach(id=>{
+    const i = insights.find(x=>x.id===id);
+    if (i) g.members.forEach(m=>{ if(!i.users.includes(m)) i.users.push(m); });
+  });
+  const n = selected.size;
+  closeGroupAssign();
+  clearSelection();
+  renderInsights();
+  toast(`✓ Assigned <b>${g.name}</b> (${g.members.length} members) to ${n} insights`);
+}
+
+// ---------- Bulk create insights ----------
+const BC_TEMPLATES = [
+  {key:'do',  name:'DO drop in aeration tank',      sensor:'DO-101',  threshold:'< 2.0 mg/L',   sev:'incident', equip:'Aerator A-1',     current:'1.4 mg/L'},
+  {key:'vib', name:'Inlet pump vibration high',     sensor:'VIB-203', threshold:'> 8 mm/s',     sev:'incident', equip:'Pump P-3',         current:'9.6 mm/s'},
+  {key:'ph',  name:'pH out of range',               sensor:'PH-505',  threshold:'5.5–9.0',      sev:'issue',    equip:'Equalization tank',current:'9.4'},
+  {key:'amp', name:'Blower load high',              sensor:'AMP-B2',  threshold:'> 80 A',       sev:'issue',    equip:'Blower B-2',       current:'92 A'},
+  {key:'mlss',name:'MLSS below target',             sensor:'MLSS-1',  threshold:'< 2500 mg/L',  sev:'issue',    equip:'Aeration tank',    current:'2100 mg/L'},
+  {key:'tur', name:'Effluent turbidity rising',     sensor:'TURB-O',  threshold:'> 5 NTU',      sev:'warning',  equip:'Outlet',           current:'6.2 NTU'},
+  {key:'rt',  name:'Sludge pump runtime over limit',sensor:'RT-SP',   threshold:'> 8 hrs/day',  sev:'warning',  equip:'Sludge pump',      current:'9.1 hrs'},
+  {key:'cl',  name:'Chlorine dosing low',           sensor:'CL-1',    threshold:'< 0.5 mg/L',   sev:'warning',  equip:'Cl₂ doser',        current:'0.7 mg/L'},
+];
+const bcSelected = new Set();
+function toggleBulkCreate() {
+  const p = document.getElementById('bulk-create-panel');
+  const isHidden = p.classList.contains('hidden');
+  if (isHidden) {
+    // Auto-close bulk-assign panel if open
+    selected.clear(); updateBulkBar();
+    bcSelected.clear();
+    renderBcTemplates();
+    updateBcPreview();
+    p.classList.remove('hidden');
+    setTimeout(()=>p.scrollIntoView({behavior:'smooth', block:'start'}), 30);
+  } else {
+    p.classList.add('hidden');
+  }
+}
+function renderBcTemplates() {
+  document.getElementById('bc-templates').innerHTML = BC_TEMPLATES.map(t=>`
+    <button class="bc-tpl ${bcSelected.has(t.key)?'on':''}" onclick="bcToggle('${t.key}')">
+      <div class="flex items-center justify-between mb-1">
+        <span class="chip" style="background:${sevColors[t.sev].bg};color:${sevColors[t.sev].fg}">● ${t.sev}</span>
+        <span class="text-[10px] text-slate-400 font-mono">${t.sensor}</span>
+      </div>
+      <div class="text-sm font-semibold text-left">${t.name}</div>
+      <div class="text-[11px] text-slate-500 text-left mt-0.5">${t.equip} · ${t.threshold}</div>
+    </button>
+  `).join('');
+}
+function bcToggle(key) {
+  if (bcSelected.has(key)) bcSelected.delete(key); else bcSelected.add(key);
+  renderBcTemplates();
+  updateBcPreview();
+}
+function bcToggleAll() {
+  if (bcSelected.size === BC_TEMPLATES.length) bcSelected.clear();
+  else BC_TEMPLATES.forEach(t=>bcSelected.add(t.key));
+  renderBcTemplates();
+  updateBcPreview();
+}
+function updateBcPreview() {
+  const n = bcSelected.size;
+  const plant = document.getElementById('bc-plant').value;
+  document.getElementById('bc-count').textContent = n;
+  document.getElementById('bc-preview').innerHTML = n
+    ? `<b>${n}</b> insight${n===1?'':'s'} will be created in <b>${plant}</b> · inheriting that plant's escalation defaults`
+    : 'Pick at least one template to continue';
+  const btn = document.getElementById('bc-confirm');
+  if (n) btn.classList.remove('opacity-50','pointer-events-none');
+  else btn.classList.add('opacity-50','pointer-events-none');
+}
+function confirmBulkCreate() {
+  const plant = document.getElementById('bc-plant').value;
+  const tpls = BC_TEMPLATES.filter(t=>bcSelected.has(t.key));
+  if (!tpls.length) return;
+  let nextId = Math.max(...insights.map(i=>i.id)) + 1;
+  const created = tpls.map(t => ({
+    id: nextId++, name: t.name, plant, equip: t.equip, sev: t.sev,
+    status: 'Active', last: 'just now', on: true, users: [],
+    sensor: t.sensor, threshold: t.threshold, current: t.current,
+    _justCreated: true,
+  }));
+  insights.unshift(...created);
+  toggleBulkCreate();
+  // If user is filtered to a different plant, switch to that plant so they see results
+  const fp = document.getElementById('f-plant');
+  if (fp && fp.value && fp.value !== plant) fp.value = plant;
+  renderInsights();
+  toast(`✓ Created ${created.length} insight${created.length===1?'':'s'} in ${plant} · <button class="underline" onclick="undoBulkCreate(${JSON.stringify(created.map(c=>c.id))})">Undo</button>`);
+}
+function undoBulkCreate(ids) {
+  ids.forEach(id => { const i = insights.findIndex(x=>x.id===id); if (i>=0) insights.splice(i,1); });
+  renderInsights();
+  toast('Bulk add undone');
+}
+
+// ---------- New insight modal ----------
+function openNewInsight() {
+  document.getElementById('modal-new').classList.remove('hidden');
+  document.getElementById('modal-new').classList.add('flex');
+  renderModalTimeline();
+}
+function closeNewInsight() {
+  document.getElementById('modal-new').classList.add('hidden');
+  document.getElementById('modal-new').classList.remove('flex');
+}
+function renderModalTimeline() {
+  const steps = [
+    {t:'Immediate', user:'Plant Manager', ch:'📞 ✉ WA', color:'#DC2626'},
+    {t:'After 10 min', user:'Shift Lead', ch:'SMS', color:'#F59E0B'},
+    {t:'After 30 min', user:'Operations Head', ch:'📞', color:'#64748B'},
+  ];
+  document.getElementById('timeline').innerHTML = `
+    <div class="ml-2 pl-6 border-l-2 border-slate-300 space-y-4 pb-2">
+      ${steps.map(s=>`
+        <div class="relative slide-in">
+          <div class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-white border-2" style="border-color:${s.color}"></div>
+          <div class="flex items-center gap-3 text-sm">
+            <span class="chip bg-white border border-slate-200 w-24 justify-center">${s.t}</span>
+            <span class="editable-chip" contenteditable="true">${s.user}</span>
+            <span class="editable-chip" contenteditable="true">${s.ch}</span>
+            <button class="ml-auto text-xs text-slate-400 hover:text-red-600">✕</button>
+          </div>
+        </div>
+      `).join('')}
+      <button class="text-xs text-blue-600 hover:underline">+ Add step</button>
+    </div>
+  `;
+}
+function saveDraft() { toast('Draft saved'); closeNewInsight(); }
+function createInsight() {
+  closeNewInsight();
+  show('insights');
+  insights.unshift({id:99, name:'DO drop in aeration tank', plant:'Andheri Plant', equip:'Aerator A-1', sev:'incident', status:'Active', last:'just now', on:true, users:['Plant Manager','Shift Lead'], sensor:'DO-101', threshold:'< 2.0 mg/L', current:'1.4 mg/L'});
+  renderInsights();
+  toast('✓ Insight created');
+}
+
+// ---------- Escalations ----------
+const TIME_PRESETS = ['Immediate','+5 min','+10 min','+15 min','+30 min','+1 hour','+2 hours','Custom'];
+const CHANNELS = [
+  {id:'wa', label:'WhatsApp', icon:'WA'},
+  {id:'sms', label:'SMS', icon:'SMS'},
+  {id:'call', label:'Call', icon:'📞'},
+  {id:'email', label:'Email', icon:'✉'},
+];
+const DEFAULT_MSG = {
+  wa: 'Hi {{user}}, {{insight}} at {{plant}}. Sensor {{sensor}} = {{value}}. Please acknowledge.',
+  sms: '{{insight}} · {{plant}} · {{sensor}}={{value}}. Reply ACK.',
+  call: 'Spoken alert: {{insight}} at {{plant}}. Press 1 to acknowledge.',
+  email: 'A new {{severity}} has opened at {{plant}}.\n\n{{insight}}\nSensor: {{sensor}} = {{value}}\nThreshold: {{threshold}}\n\nView in dashboard: {{link}}',
+};
+
+let escState = { plant:'', sev:'incident', cfg:{} };
+function blankBlock(users, chans) { return { users, chans, msgs:{}, subjects:{} }; }
+function defaultCfg(sev) {
+  if (sev==='incident') return {
+    immediate: blankBlock(['Plant Manager'], {wa:true, call:true}),
+    steps: [
+      {time:'+5 min', ...blankBlock(['Shift Lead'], {sms:true})},
+      {time:'+15 min', ...blankBlock(['Operations Head'], {call:true})},
+    ],
+  };
+  if (sev==='issue') return {
+    immediate: blankBlock(['Shift Lead'], {wa:true, sms:true}),
+    steps: [{time:'+30 min', ...blankBlock(['Plant Manager'], {email:true})}],
+  };
+  return {
+    immediate: blankBlock(['Operator on duty'], {wa:true}),
+    steps: [],
+  };
+}
+function openEscalations(plant) {
+  escState = { plant, sev:'incident', cfg:{ incident:defaultCfg('incident'), issue:defaultCfg('issue'), warning:defaultCfg('warning') } };
+  document.getElementById('esc-plant').textContent = plant;
+  renderEsc();
+  document.getElementById('modal-esc').classList.remove('hidden');
+  document.getElementById('modal-esc').classList.add('flex');
+}
+function closeEscalations() {
+  document.getElementById('modal-esc').classList.add('hidden');
+  document.getElementById('modal-esc').classList.remove('flex');
+}
+function switchEscTab(btn) {
+  document.querySelectorAll('.esc-tab').forEach(t=>{
+    t.classList.remove('esc-tab-active','border-slate-900');
+    t.classList.add('text-slate-500','border-transparent');
+  });
+  btn.classList.add('esc-tab-active','border-slate-900');
+  btn.classList.remove('text-slate-500','border-transparent');
+  escState.sev = btn.dataset.sev;
+  renderEsc();
+}
+
+function renderEsc() {
+  const cfg = escState.cfg[escState.sev];
+  document.getElementById('esc-immediate').innerHTML = renderBlock(cfg.immediate, 'imm', null);
+  document.getElementById('esc-steps').innerHTML = cfg.steps.length
+    ? cfg.steps.map((s,idx)=>`
+        <div class="card p-4 border border-slate-100">
+          <div class="flex items-center gap-3 mb-3 pb-3 border-b border-slate-100">
+            <span class="chip bg-amber-100 text-amber-800">Step ${idx+1}</span>
+            <select class="border border-slate-200 rounded-lg px-2 py-1.5 text-sm" onchange="setStepTime(${idx},this.value)">
+              ${TIME_PRESETS.filter(t=>t!=='Immediate').map(t=>`<option ${t===s.time?'selected':''}>${t}</option>`).join('')}
+            </select>
+            ${s.time==='Custom' ? `<input type="number" placeholder="minutes" class="w-24 border border-slate-200 rounded-lg px-2 py-1.5 text-sm" oninput="setStepCustom(${idx},this.value)"/>` : ''}
+            <button class="ml-auto text-xs text-slate-400 hover:text-red-600" onclick="removeEscStep(${idx})">Remove step</button>
+          </div>
+          ${renderBlock(s, 'step', idx)}
+        </div>
+      `).join('')
+    : `<div class="card p-6 border border-dashed border-slate-200 text-center text-sm text-slate-400">No followup steps. Click <b>+ Add escalation step</b> to add one.</div>`;
+}
+
+function renderBlock(b, kind, idx) {
+  const ref = kind==='imm' ? `imm` : `step-${idx}`;
+  return `
+    <!-- Users -->
+    <div class="mb-3">
+      <div class="text-[11px] uppercase text-slate-500 font-semibold mb-1.5">Notify users</div>
+      <div class="flex flex-wrap gap-1.5">
+        ${b.users.map((u,uIdx)=>`<span class="chip bg-slate-100 text-slate-800">${u} <button class="ml-1 hover:text-red-600" onclick="rmUser('${kind}',${idx},${uIdx})">✕</button></span>`).join('')}
+        <button class="chip bg-white border border-dashed border-slate-300 text-slate-500 hover:bg-slate-50" onclick="addUserPrompt('${kind}',${idx})">+ Add user</button>
+      </div>
+    </div>
+    <!-- Channels -->
+    <div class="mb-3">
+      <div class="text-[11px] uppercase text-slate-500 font-semibold mb-1.5">Channels <span class="text-slate-400 normal-case font-normal">· click to enable, opens a message editor below</span></div>
+      <div class="flex gap-2">
+        ${CHANNELS.map(c=>`
+          <button class="ch-toggle ${b.chans[c.id]?'on':'off'}" onclick="toggleCh('${kind}',${idx},'${c.id}')">
+            <span class="ch-icon">${c.icon}</span>
+            <span class="ch-label">${c.label}</span>
+            <span class="ch-state">${b.chans[c.id]?'On':'Off'}</span>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+    <!-- Composers per active channel — skips Call (uses saved IVR template) -->
+    <div class="space-y-4">
+      ${CHANNELS.filter(c=>b.chans[c.id] && c.id!=='call').map(c=>renderComposer(b,c,kind,idx)).join('')}
+      ${b.chans.call ? `
+        <div class="card border border-slate-200 p-4 flex items-center gap-3 bg-slate-50">
+          <div class="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center">📞</div>
+          <div class="flex-1">
+            <div class="text-sm font-medium">Call</div>
+            <div class="text-xs text-slate-500">Voice call uses the saved IVR template — no per-step message needed.</div>
+          </div>
+          <button class="text-xs text-slate-500 hover:text-blue-600" onclick="toast('IVR template editor — coming soon')">Configure IVR</button>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function renderComposer(b, c, kind, idx) {
+  const msg = b.msgs[c.id] ?? DEFAULT_MSG[c.id];
+  const subj = b.subjects[c.id] ?? `[{{severity}}] {{insight}} at {{plant}}`;
+  const id = `msg-${kind}-${idx}-${c.id}`;
+  const note = c.id==='sms' ? '160 chars per segment' : c.id==='email' ? 'Plain text email' : 'Sent via WhatsApp Business';
+  return `
+    <div>
+      <div class="flex items-center justify-between mb-1.5">
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-semibold">${c.icon} ${c.label} message</span>
+        </div>
+        <span class="text-[11px] text-slate-400">${note}</span>
+      </div>
+      <div class="composer-clean">
+        ${c.id==='email' ? `
+          <div class="composer-clean-subj">
+            <span class="text-[11px] text-slate-400 mr-2">Subject</span>
+            <input type="text" oninput="setSubj('${kind}',${idx},'${c.id}',this.value)" value="${subj}"/>
+          </div>` : ''}
+        <textarea id="${id}" rows="${c.id==='email'?6:4}" oninput="setMsg('${kind}',${idx},'${c.id}',this.value)" placeholder="Write text here…">${msg}</textarea>
+        <div class="composer-clean-footer">
+          <button class="composer-clean-btn" onclick="toast('Test ${c.label} sent')">
+            <span>↗</span> Send test
+          </button>
+          <div class="composer-clean-icons">
+            <button title="Insert variable" onclick="cycleVar('${id}')">{ }</button>
+            <button title="Reset to default" onclick="resetMsg('${kind}',${idx},'${c.id}')">↻</button>
+            <button title="Remove channel" onclick="toggleCh('${kind}',${idx},'${c.id}')">✕</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+const VAR_CYCLE = ['{{user}}','{{plant}}','{{insight}}','{{sensor}}','{{value}}','{{threshold}}','{{severity}}','{{link}}'];
+let varCycleIdx = 0;
+function cycleVar(textareaId) {
+  const v = VAR_CYCLE[varCycleIdx % VAR_CYCLE.length];
+  varCycleIdx++;
+  insertVar(textareaId, v);
+  toast(`Inserted ${v} · click again to insert next variable`);
+}
+
+function getBlock(kind, idx) {
+  const cfg = escState.cfg[escState.sev];
+  return kind==='imm' ? cfg.immediate : cfg.steps[idx];
+}
+function toggleCh(kind, idx, cid) {
+  const b = getBlock(kind, idx);
+  b.chans[cid] = !b.chans[cid]; if (!b.chans[cid]) delete b.chans[cid];
+  renderEsc();
+}
+function setMsg(kind, idx, cid, val) {
+  getBlock(kind, idx).msgs[cid] = val;
+  const cnt = document.getElementById(`msg-${kind}-${idx}-${cid}-count`);
+  if (cnt) cnt.textContent = val.length;
+}
+function setSubj(kind, idx, cid, val) { getBlock(kind, idx).subjects[cid] = val; }
+function resetMsg(kind, idx, cid) { delete getBlock(kind, idx).msgs[cid]; delete getBlock(kind, idx).subjects[cid]; renderEsc(); }
+function insertVar(textareaId, v) {
+  const t = document.getElementById(textareaId); if(!t) return;
+  const start = t.selectionStart, end = t.selectionEnd;
+  t.value = t.value.slice(0,start) + v + t.value.slice(end);
+  t.focus(); t.setSelectionRange(start+v.length, start+v.length);
+  t.dispatchEvent(new Event('input'));
+}
+function addUserPrompt(kind, idx) {
+  const name = prompt('User name (e.g. Plant Manager, Priya Sharma):');
+  if (!name || !name.trim()) return;
+  getBlock(kind, idx).users.push(name.trim());
+  renderEsc();
+}
+function rmUser(kind, idx, uIdx) {
+  getBlock(kind, idx).users.splice(uIdx,1); renderEsc();
+}
+function setStepTime(idx, val) { escState.cfg[escState.sev].steps[idx].time = val; renderEsc(); }
+function setStepCustom(idx, val) { if(val) escState.cfg[escState.sev].steps[idx].time = '+'+val+' min'; }
+function addEscStep() {
+  escState.cfg[escState.sev].steps.push({time:'+10 min', ...blankBlock([], {wa:true})});
+  renderEsc();
+}
+function removeEscStep(idx) { escState.cfg[escState.sev].steps.splice(idx,1); renderEsc(); }
+function saveEscalations() { closeEscalations(); toast(`✓ Escalations saved for ${escState.plant} · applies to all new insights`); }
+
+// ---------- Digests ----------
+let digRecipients = ['ops@andheri-stp.com'];
+let digState = { plant:'', status:'open', range:'24h', occ:'daily' };
+function openDigests(plant) {
+  digState.plant = plant;
+  digRecipients = ['client-ops@'+plant.toLowerCase().replace(/\s/g,'-')+'.com'];
+  document.getElementById('dig-plant').textContent = plant;
+  renderRecipients();
+  updateDigPreview();
+  document.getElementById('modal-digest').classList.remove('hidden');
+  document.getElementById('modal-digest').classList.add('flex');
+}
+function closeDigests() {
+  document.getElementById('modal-digest').classList.add('hidden');
+  document.getElementById('modal-digest').classList.remove('flex');
+}
+function renderRecipients() {
+  const box = document.getElementById('dig-recipients');
+  if (!digRecipients.length) { box.innerHTML = '<span class="text-xs text-slate-400">Add at least one recipient.</span>'; return; }
+  box.innerHTML = digRecipients.map((e,i)=>`<span class="chip bg-slate-100">${e} <button class="ml-1 hover:text-red-600" onclick="removeRecipient(${i})">✕</button></span>`).join('');
+}
+function addRecipient(v) { v=v.trim(); if(!v) return; digRecipients.push(v); renderRecipients(); }
+function removeRecipient(i) { digRecipients.splice(i,1); renderRecipients(); }
+function toggleSev(btn) { btn.classList.toggle('on'); updateDigPreview(); }
+function getSelectedSevs() {
+  return Array.from(document.querySelectorAll('#dig-sev .sev-pill.on')).map(b=>b.dataset.v);
+}
+function pickStatus(btn) { pickChip(btn, 'dig-status'); digState.status = btn.dataset.v; updateDigPreview(); }
+function pickRange(btn) { pickChip(btn, 'dig-range'); digState.range = btn.dataset.v; updateDigPreview(); }
+function pickOcc(btn) {
+  pickChip(btn, 'dig-occ'); digState.occ = btn.dataset.v;
+  document.getElementById('occ-day-wrap').classList.toggle('hidden', btn.dataset.v !== 'weekly');
+  document.getElementById('occ-hour').parentElement.querySelector('span').textContent = btn.dataset.v==='hourly' ? 'Send at the top of every hour' : 'Send at';
+  document.getElementById('occ-hour').classList.toggle('hidden', btn.dataset.v==='hourly');
+  updateDigPreview();
+}
+function pickChip(btn, groupId) {
+  document.getElementById(groupId).querySelectorAll('button').forEach(b=>{ b.classList.remove('bg-slate-900','text-white'); b.classList.add('bg-slate-100'); });
+  btn.classList.add('bg-slate-900','text-white'); btn.classList.remove('bg-slate-100');
+}
+function updateDigPreview() {
+  const rangeMap = {'6h':'last 6 hours','12h':'last 12 hours','24h':'last 24 hours','7d':'last 7 days'};
+  const occMap = {'hourly':'every hour','daily':'every day at 08:00 IST','weekly':'every week at 08:00 IST'};
+  const statusMap = {'open':'open','closed':'closed','both':'open and closed'};
+  const sevs = getSelectedSevs();
+  const sevText = sevs.length ? sevs.map(s=>s.charAt(0).toUpperCase()+s.slice(1)+'s').join(', ') : '(no severities selected)';
+  document.getElementById('dig-preview').innerHTML = `${(digState.occ||'daily').replace(/^./,c=>c.toUpperCase())} digest of <b>${statusMap[digState.status]} ${sevText}</b> from <b>${rangeMap[digState.range]}</b>, sent ${occMap[digState.occ]}.`;
+  document.getElementById('occ-summary').textContent = `Schedule: ${occMap[digState.occ]}`;
+}
+function saveDigests() { closeDigests(); toast(`✓ Digest saved for ${digState.plant} · ${digRecipients.length} recipient${digRecipients.length>1?'s':''}`); }
+
+// ---------- Toast ----------
+function toast(html) {
+  const el = document.createElement('div');
+  el.className = 'toast bg-slate-900 text-white text-sm px-4 py-3 rounded-lg shadow-lg max-w-sm';
+  el.innerHTML = html;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(()=>el.remove(), 5000);
+}
+
+renderInsights();
+
+// Event delegation for insights list — separates row-click (open detail)
+// from checkbox-cell click (toggle selection) reliably
+document.getElementById('insights-list').addEventListener('click', (e) => {
+  const actionEl = e.target.closest('[data-action]');
+  if (!actionEl) return;
+  const row = actionEl.closest('[data-id]');
+  if (!row) return;
+  const id = parseInt(row.dataset.id, 10);
+  const action = actionEl.dataset.action;
+  if (action === 'toggle') { toggleSel(id); }
+  else if (action === 'open') { openDetail(id); }
+  else if (action === 'quick-add') { selected.clear(); selected.add(id); updateBulkBar(); openBulkAssign(); }
+  // 'toggle-on' is handled by the inner <input>'s onchange
+});
+</script>
+</body>
+</html>
