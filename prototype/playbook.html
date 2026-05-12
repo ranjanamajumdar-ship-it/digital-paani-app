@@ -801,6 +801,14 @@ function updateBulkBar() {
       panel.classList.remove('hidden');
       // Initialize the assignment flow state on first reveal
       initBulkPanel();
+      // Scroll panel into view so it's never hidden below the fold
+      setTimeout(() => {
+        const rect = panel.getBoundingClientRect();
+        // Only scroll if any part of the panel is below the visible viewport
+        if (rect.top > window.innerHeight - 200 || rect.bottom < 100) {
+          panel.scrollIntoView({behavior:'smooth', block:'start'});
+        }
+      }, 60);
     } else {
       // Refresh count + summary pills as selection changes
       refreshBulkPanelHeader();
