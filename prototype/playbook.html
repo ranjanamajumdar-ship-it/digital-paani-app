@@ -276,24 +276,26 @@
       </div>
     </div>
 
-    <!-- Filters -->
-    <div class="card p-3 mb-3 flex flex-wrap items-center gap-2">
-      <input id="search" placeholder="🔍 Search insights, sensors, equipment…" oninput="renderInsights()" class="border-0 px-2 py-1.5 text-sm flex-1 min-w-[200px] focus:outline-none"/>
-      <div class="h-6 w-px bg-slate-200"></div>
-      <select id="f-plant" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
-        <option value="">All Plants</option>
-        <option>Andheri Plant</option><option>Bandra Plant</option><option>Powai Plant</option><option>Thane Plant</option><option>Vashi Plant</option>
-      </select>
-      <select id="f-sev" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
-        <option value="">All severities</option><option>incident</option><option>issue</option><option>warning</option>
-      </select>
-      <select id="f-equip" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
-        <option value="">All equipment</option><option>Aerator</option><option>Pump</option><option>Tank</option><option>Blower</option><option>Valve</option>
-      </select>
-      <select id="f-status" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
-        <option value="">Any status</option><option>Active</option><option>Resolved</option>
-      </select>
-      <button class="text-xs text-slate-500 hover:text-slate-900 underline ml-auto" onclick="clearAllFilters()">Reset</button>
+    <!-- Filters: search on top, then filter row below it -->
+    <div class="card p-3 mb-3">
+      <input id="search" placeholder="🔍 Search insights, sensors, equipment…" oninput="renderInsights()" class="w-full border-0 px-2 py-2 text-sm focus:outline-none"/>
+      <div class="border-t border-slate-100 mt-2 pt-3 flex flex-wrap items-center gap-2">
+        <span class="text-[11px] uppercase font-semibold text-slate-400 mr-1">Filter by</span>
+        <select id="f-plant" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
+          <option value="">All Plants</option>
+          <option>Andheri Plant</option><option>Bandra Plant</option><option>Powai Plant</option><option>Thane Plant</option><option>Vashi Plant</option>
+        </select>
+        <select id="f-equip" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
+          <option value="">All equipment</option><option>Aerator</option><option>Pump</option><option>Tank</option><option>Blower</option><option>Valve</option>
+        </select>
+        <select id="f-sev" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
+          <option value="">All severities</option><option>incident</option><option>issue</option><option>warning</option>
+        </select>
+        <select id="f-status" class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm" onchange="renderInsights()">
+          <option value="">Any status</option><option>Active</option><option>Acknowledged</option><option>Paused</option>
+        </select>
+        <button class="text-xs text-slate-500 hover:text-slate-900 underline ml-auto" onclick="clearAllFilters()">Reset</button>
+      </div>
     </div>
 
     <!-- Bulk action panel (inline, expands when selections exist) -->
@@ -653,7 +655,7 @@ const insights = [
   {id:5, name:'MLSS below target', plant:'Bandra Plant', equip:'Aeration tank', sev:'issue', status:'Active', last:'4h', on:true, users:[], sensor:'MLSS-1', threshold:'> 2500 mg/L', current:'2100 mg/L'},
   {id:6, name:'Effluent turbidity rising', plant:'Powai Plant', equip:'Outlet', sev:'warning', status:'Active', last:'30m', on:true, users:['Operator'], sensor:'TURB-O', threshold:'> 5 NTU', current:'6.2 NTU'},
   {id:7, name:'Sludge pump runtime over limit', plant:'Powai Plant', equip:'Sludge pump', sev:'warning', status:'Active', last:'1h 20m', on:true, users:[], sensor:'RT-SP', threshold:'> 8 hrs/day', current:'9.1 hrs'},
-  {id:8, name:'Chlorine dosing low', plant:'Thane Plant', equip:'Cl₂ doser', sev:'warning', status:'Resolved', last:'5h ago', on:false, users:['Meera R.'], sensor:'CL-1', threshold:'< 0.5 mg/L', current:'0.7 mg/L'},
+  {id:8, name:'Chlorine dosing low', plant:'Thane Plant', equip:'Cl₂ doser', sev:'warning', status:'Acknowledged', last:'5h ago', on:true, users:['Meera R.'], sensor:'CL-1', threshold:'< 0.5 mg/L', current:'0.7 mg/L'},
 ];
 const sevColors = {
   incident:{bg:'#FEE2E2',fg:'#991B1B',dot:'#DC2626'},
@@ -713,7 +715,7 @@ function renderInsights() {
         }
       </div>
       <div class="col-span-2 text-sm cursor-pointer" data-action="open">
-        ${i.status==='Active' ? `<span class="text-red-600 flex items-center gap-1.5 text-xs"><span class="w-1.5 h-1.5 rounded-full bg-red-500 pulse"></span>Active · ${i.last}</span>` : `<span class="text-slate-400 text-xs">Resolved · ${i.last}</span>`}
+        ${i.status==='Active' ? `<span class="text-red-600 flex items-center gap-1.5 text-xs"><span class="w-1.5 h-1.5 rounded-full bg-red-500 pulse"></span>Active · ${i.last}</span>` : i.status==='Acknowledged' ? `<span class="text-emerald-700 flex items-center gap-1.5 text-xs"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Acknowledged · ${i.last}</span>` : `<span class="text-slate-400 text-xs">${i.status} · ${i.last}</span>`}
       </div>
       <div class="col-span-1 text-right" data-action="toggle-on">
         <label class="inline-flex items-center cursor-pointer">
@@ -815,7 +817,7 @@ function openDetail(id) {
         </div>
         <div class="flex items-center gap-2 mb-1">
           <span class="chip" style="background:${c.bg};color:${c.fg}">● ${i.sev}</span>
-          ${i.status==='Active' ? `<span class="text-red-600 flex items-center gap-1.5 text-xs font-medium"><span class="w-1.5 h-1.5 rounded-full bg-red-500 pulse"></span>Active · ${i.last}</span>` : `<span class="text-slate-400 text-xs">Resolved</span>`}
+          ${i.status==='Active' ? `<span class="text-red-600 flex items-center gap-1.5 text-xs font-medium"><span class="w-1.5 h-1.5 rounded-full bg-red-500 pulse"></span>Active · ${i.last}</span>` : `<span class="text-slate-500 text-xs">${i.status}</span>`}
         </div>
         <h2 class="font-bold text-xl">${i.name}</h2>
         <p class="text-sm text-slate-500 mt-0.5">${i.plant} · ${i.equip}</p>
