@@ -1,0 +1,1637 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Digital Paani — Config Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..900;1,14..32,300..900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink-900:#0F172A;--ink-700:#334155;--ink-500:#64748B;--ink-300:#CBD5E1;--ink-100:#F1F5F9;
+  --white:#FFFFFF;
+  --red:#DC2626;--red-bg:#FEF2F2;--red-border:#FECACA;
+  --orange:#EA580C;--orange-bg:#FFF7ED;--orange-border:#FED7AA;
+  --amber:#D97706;--amber-bg:#FFFBEB;--amber-border:#FDE68A;
+  --green:#16A34A;--green-bg:#F0FDF4;--green-border:#BBF7D0;
+  --blue:#2563EB;--blue-bg:#EFF6FF;--blue-border:#BFDBFE;
+  --radius-sm:6px;--radius:10px;--radius-lg:14px;--radius-xl:20px;
+  --shadow-sm:0 1px 2px rgba(15,23,42,.05);
+  --shadow:0 1px 3px rgba(15,23,42,.07),0 4px 16px rgba(15,23,42,.07);
+  --shadow-lg:0 8px 32px rgba(15,23,42,.13);
+}
+html,body{height:100%;font-family:'Inter',sans-serif;font-size:14px;color:var(--ink-900);background:#E8EDF2;line-height:1.5}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font-family:inherit;font-size:14px;color:inherit}
+
+/* ── LAYOUT ── */
+.shell{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:220px;flex-shrink:0;background:var(--ink-900);display:flex;flex-direction:column;overflow-y:auto}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:52px;background:var(--white);border-bottom:1px solid var(--ink-300);display:flex;align-items:center;padding:0 20px;gap:0;flex-shrink:0;position:relative}
+.content{flex:1;overflow-y:auto;padding:24px}
+
+/* ── SIDEBAR ── */
+.sb-logo{padding:18px 16px 12px;display:flex;align-items:center;gap:10px}
+.sb-logo-mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#38BDF8,#0EA5E9);display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff}
+.sb-logo-text{font-size:13px;font-weight:700;color:#fff}
+.sb-logo-sub{font-size:10px;color:rgba(255,255,255,.45);font-weight:400}
+.sb-section{padding:4px 8px;margin-top:8px}
+.sb-section-label{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.35);padding:6px 8px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--radius-sm);color:rgba(255,255,255,.6);font-size:13px;font-weight:500;transition:all .15s;cursor:pointer;border:none;background:none;width:100%;text-align:left}
+.sb-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9)}
+.sb-item.active{background:rgba(255,255,255,.12);color:#fff}
+.sb-item svg{flex-shrink:0;opacity:.7}
+.sb-item.active svg{opacity:1}
+
+/* ── TOP TABS ── */
+.section-tabs{display:flex;align-items:stretch;height:100%;gap:0}
+.section-tab{padding:0 20px;font-size:13px;font-weight:500;color:var(--ink-500);border-bottom:2px solid transparent;display:flex;align-items:center;gap:7px;cursor:pointer;transition:all .15s;border-radius:0;background:none;border:none;border-bottom:2px solid transparent}
+.section-tab:hover{color:var(--ink-900)}
+.section-tab.active{color:var(--ink-900);font-weight:600;border-bottom:2px solid var(--ink-900)}
+.tab-count{background:var(--ink-100);color:var(--ink-500);font-size:11px;font-weight:600;padding:1px 6px;border-radius:20px}
+.section-tab.active .tab-count{background:var(--ink-900);color:#fff}
+.topbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:7px 14px;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;border:none;white-space:nowrap}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--ink-900);color:#fff}
+.btn-primary:hover{background:#1e293b}
+.btn-ghost{background:var(--ink-100);color:var(--ink-900)}
+.btn-ghost:hover{background:var(--ink-300)}
+.btn-outline{background:transparent;color:var(--ink-700);border:1px solid var(--ink-300)}
+.btn-outline:hover{background:var(--ink-100)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-xs{padding:3px 8px;font-size:11px;border-radius:6px}
+
+/* ── FILTERS ── */
+.filter-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.filter-select{appearance:none;background:var(--white);border:1px solid var(--ink-300);border-radius:var(--radius);padding:6px 28px 6px 10px;font-size:12px;font-weight:500;color:var(--ink-700);cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;transition:border-color .15s}
+.filter-select:focus{outline:none;border-color:var(--ink-900)}
+.filter-active{border-color:var(--ink-900);background-color:#f8f9fc;font-weight:600;color:var(--ink-900)}
+.filter-chip{display:inline-flex;align-items:center;gap:5px;background:var(--ink-900);color:#fff;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.filter-chip button{color:rgba(255,255,255,.7);font-size:14px;line-height:1}
+.filter-chip button:hover{color:#fff}
+.search-bar{flex:1;min-width:200px;max-width:340px;position:relative}
+.search-bar input{width:100%;border:1px solid var(--ink-300);border-radius:var(--radius);padding:7px 10px 7px 32px;font-size:13px;background:var(--white);transition:border-color .15s}
+.search-bar input:focus{outline:none;border-color:var(--ink-900)}
+.search-bar svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--ink-500);pointer-events:none}
+.more-filters-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;border:1px solid var(--ink-300);border-radius:var(--radius);font-size:12px;font-weight:500;color:var(--ink-700);background:var(--white);cursor:pointer;transition:all .15s}
+.more-filters-btn:hover{background:var(--ink-100)}
+
+/* ── CARDS ── */
+.card{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden}
+.card-header{padding:16px 18px 12px;display:flex;align-items:flex-start;gap:12px}
+.card-body{padding:0 18px 16px}
+
+/* ── PLANTS GRID ── */
+.plants-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.plant-card{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;cursor:pointer;transition:box-shadow .2s}
+.plant-card:hover{box-shadow:var(--shadow-lg)}
+.plant-severity-bar{height:3px;display:flex;gap:2px}
+.plant-severity-bar .seg{height:100%;border-radius:1px}
+.plant-card-body{padding:16px}
+.plant-name{font-size:16px;font-weight:700;margin-bottom:2px}
+.plant-meta{font-size:12px;color:var(--ink-500)}
+.plant-badges{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.plant-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.plant-badge.incident{background:var(--red-bg);color:var(--red)}
+.plant-badge.issue{background:var(--orange-bg);color:var(--orange)}
+.plant-badge.warning{background:var(--amber-bg);color:var(--amber)}
+.plant-badge.clear{background:var(--green-bg);color:var(--green)}
+.plant-actions{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--ink-100)}
+.plant-action-btn{flex:1;padding:8px;border-radius:var(--radius);font-size:12px;font-weight:600;border:1px solid var(--ink-300);background:transparent;color:var(--ink-700);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s}
+.plant-action-btn:hover{background:var(--ink-100)}
+.plant-action-btn.primary{background:var(--ink-900);color:#fff;border-color:var(--ink-900)}
+.plant-action-btn.primary:hover{background:#1e293b}
+
+/* ── INSIGHTS TABLE ── */
+.insights-table{width:100%;border-collapse:collapse;font-size:13px}
+.insights-table th{text-align:left;padding:8px 12px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-500);border-bottom:1px solid var(--ink-300);background:var(--ink-100);position:sticky;top:0;z-index:1}
+.insights-table td{padding:10px 12px;border-bottom:1px solid #F1F5F9;vertical-align:middle}
+.insights-table tr:last-child td{border-bottom:none}
+.insights-table tr:hover td{background:#FAFBFC}
+.insights-table tr.severity-incident{border-left:3px solid var(--red)}
+.insights-table tr.severity-issue{border-left:3px solid var(--orange)}
+.insights-table tr.severity-warning{border-left:3px solid var(--amber)}
+.insights-table tr.severity-resolved td{opacity:.6}
+.insights-table tr.severity-resolved{border-left:3px solid transparent}
+.table-wrapper{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden}
+.table-header{padding:14px 16px;border-bottom:1px solid var(--ink-100);display:flex;align-items:center;justify-content:space-between}
+.table-title{font-size:13px;font-weight:600;color:var(--ink-500)}
+
+/* ── CHIPS ── */
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.chip-incident{background:var(--red-bg);color:var(--red)}
+.chip-issue{background:var(--orange-bg);color:var(--orange)}
+.chip-warning{background:var(--amber-bg);color:var(--amber)}
+.chip-resolved{background:var(--ink-100);color:var(--ink-500)}
+.chip-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.chip-incident .chip-dot{background:var(--red)}
+.chip-issue .chip-dot{background:var(--orange)}
+.chip-warning .chip-dot{background:var(--amber)}
+.chip-resolved .chip-dot{background:var(--ink-300)}
+
+/* ── STATUS ── */
+.status-active{font-size:12px;color:var(--ink-700)}
+.status-resolved{font-size:12px;color:var(--ink-500)}
+
+/* ── USER AVATARS ── */
+.avatar-stack{display:flex;gap:-4px}
+.avatar{width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;border:2px solid var(--white);flex-shrink:0}
+.avatar-add{background:var(--ink-100);color:var(--ink-500);border:1px dashed var(--ink-300)}
+
+/* ── TOGGLE ── */
+.toggle{position:relative;width:36px;height:20px;display:inline-block;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-track{position:absolute;inset:0;background:var(--ink-300);border-radius:20px;transition:background .2s;cursor:pointer}
+.toggle input:checked+.toggle-track{background:var(--ink-900)}
+.toggle-thumb{position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .2s;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle input:checked~.toggle-thumb{transform:translateX(16px)}
+
+/* ── CHECKBOX ── */
+.checkbox{width:16px;height:16px;border:1.5px solid var(--ink-300);border-radius:4px;cursor:pointer;appearance:none;background:var(--white);transition:all .15s;flex-shrink:0;display:grid;place-items:center}
+.checkbox:checked{background:var(--ink-900);border-color:var(--ink-900)}
+.checkbox:checked::after{content:'';width:9px;height:6px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px);display:block}
+
+/* ── BULK ACTION BAR ── */
+.bulk-bar{position:fixed;bottom:0;left:220px;right:0;background:var(--ink-900);color:#fff;padding:0;display:flex;flex-direction:column;z-index:40;transform:translateY(100%);transition:transform .25s cubic-bezier(.4,0,.2,1)}
+.bulk-bar.visible{transform:translateY(0)}
+.bulk-bar-groups{padding:8px 20px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.bulk-bar-groups-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.4);white-space:nowrap}
+.bulk-bar-main{padding:10px 20px;display:flex;align-items:center;gap:12px}
+.bulk-count{font-size:13px;font-weight:600}
+.bulk-actions{display:flex;gap:8px;margin-left:auto}
+.bulk-btn{padding:6px 14px;border-radius:var(--radius);font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.2);color:#fff;background:rgba(255,255,255,.1);cursor:pointer;transition:all .15s}
+.bulk-btn:hover{background:rgba(255,255,255,.2)}
+.bulk-btn.danger{border-color:rgba(220,38,38,.5);background:rgba(220,38,38,.2);color:#FCA5A5}
+.group-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.2);color:#fff;background:rgba(255,255,255,.08);cursor:pointer;transition:all .15s;white-space:nowrap}
+.group-chip:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.4)}
+.group-chip .gc-avatars{display:flex;gap:-2px}
+.group-chip .gc-avatar{width:16px;height:16px;border-radius:50%;font-size:7px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid var(--ink-900)}
+
+/* ── MODAL OVERLAY ── */
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);backdrop-filter:blur(3px);z-index:50;display:none;place-items:center}
+.overlay.open{display:grid}
+.modal{background:var(--white);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);width:100%;max-width:600px;max-height:88vh;overflow-y:auto;position:relative}
+.modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--ink-100);display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;background:var(--white);z-index:1;border-radius:var(--radius-xl) var(--radius-xl) 0 0}
+.modal-title{font-size:17px;font-weight:700}
+.modal-sub{font-size:12px;color:var(--ink-500);margin-top:2px}
+.modal-close{width:28px;height:28px;border-radius:50%;background:var(--ink-100);display:grid;place-items:center;cursor:pointer;flex-shrink:0;font-size:16px;color:var(--ink-500);border:none;transition:background .15s}
+.modal-close:hover{background:var(--ink-300)}
+.modal-body{padding:20px 24px}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--ink-100);display:flex;align-items:center;justify-content:space-between;position:sticky;bottom:0;background:var(--white);border-radius:0 0 var(--radius-xl) var(--radius-xl)}
+
+/* ── WIZARD STEPS ── */
+.wizard-steps{display:flex;align-items:center;gap:0;margin-bottom:24px}
+.wizard-step{display:flex;align-items:center;gap:8px;flex:1}
+.wizard-step-num{width:28px;height:28px;border-radius:50%;border:2px solid var(--ink-300);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--ink-500);flex-shrink:0;transition:all .2s;background:var(--white)}
+.wizard-step.done .wizard-step-num{background:var(--green);border-color:var(--green);color:#fff}
+.wizard-step.active .wizard-step-num{background:var(--ink-900);border-color:var(--ink-900);color:#fff}
+.wizard-step-label{font-size:12px;font-weight:600;color:var(--ink-500)}
+.wizard-step.active .wizard-step-label{color:var(--ink-900)}
+.wizard-step.done .wizard-step-label{color:var(--green)}
+.wizard-connector{flex:1;height:1px;background:var(--ink-300);margin:0 8px}
+.wizard-connector.done{background:var(--green)}
+
+/* ── ESCALATION TIMELINE ── */
+.esc-timeline{display:flex;flex-direction:column;gap:0}
+.esc-step{display:flex;gap:14px;align-items:flex-start}
+.esc-spine{display:flex;flex-direction:column;align-items:center;gap:0;flex-shrink:0}
+.esc-node{width:32px;height:32px;border-radius:50%;border:2px solid var(--ink-300);background:var(--white);display:grid;place-items:center;font-size:14px;flex-shrink:0;position:relative;z-index:1}
+.esc-node.immediate{border-color:var(--ink-900);background:var(--ink-900);color:#fff}
+.esc-node.delayed{border-color:var(--amber);background:var(--amber-bg);color:var(--amber)}
+.esc-node.add{border-style:dashed;border-color:var(--ink-300);color:var(--ink-300);cursor:pointer}
+.esc-node.add:hover{border-color:var(--ink-900);color:var(--ink-900);background:var(--ink-100)}
+.esc-line{width:2px;flex:1;min-height:16px;background:var(--ink-300);margin:2px 0}
+.esc-content{flex:1;padding-bottom:20px}
+.esc-time-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-500);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.esc-card{background:var(--ink-100);border-radius:var(--radius);padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.esc-users{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.esc-user-chip{display:inline-flex;align-items:center;gap:6px;background:var(--white);border:1px solid var(--ink-300);border-radius:20px;padding:3px 10px 3px 5px;font-size:12px;font-weight:500}
+.esc-user-chip .avatar{width:20px;height:20px;font-size:8px;border:none}
+.esc-channels{display:flex;gap:6px;flex-wrap:wrap}
+.esc-channel{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.esc-channel.wa{background:#dcfce7;color:#15803d}
+.esc-channel.sms{background:var(--blue-bg);color:var(--blue)}
+.esc-channel.call{background:var(--ink-100);color:var(--ink-700)}
+.esc-channel.email{background:var(--amber-bg);color:var(--amber)}
+.esc-edit-link{font-size:11px;color:var(--blue);cursor:pointer;text-decoration:none;margin-top:2px;display:inline-block}
+.esc-edit-link:hover{text-decoration:underline}
+
+/* ── TIME PICKER ── */
+.time-picker{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.time-option{padding:8px 16px;border-radius:var(--radius);border:1.5px solid var(--ink-300);font-size:13px;font-weight:600;color:var(--ink-700);cursor:pointer;transition:all .15s;background:var(--white)}
+.time-option:hover{border-color:var(--ink-900);color:var(--ink-900)}
+.time-option.selected{background:var(--ink-900);border-color:var(--ink-900);color:#fff}
+.custom-time{display:flex;gap:8px;align-items:center}
+.custom-time input{width:70px;border:1.5px solid var(--ink-300);border-radius:var(--radius);padding:7px 10px;font-size:14px;font-weight:600;text-align:center}
+.custom-time input:focus{outline:none;border-color:var(--ink-900)}
+.custom-time-unit{font-size:12px;color:var(--ink-500)}
+
+/* ── USER SEARCH ── */
+.user-search{position:relative;margin-bottom:12px}
+.user-search input{width:100%;border:1.5px solid var(--ink-300);border-radius:var(--radius);padding:9px 12px 9px 34px;font-size:13px}
+.user-search input:focus{outline:none;border-color:var(--ink-900)}
+.user-search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--ink-500)}
+.user-results{background:var(--white);border:1px solid var(--ink-300);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-top:4px}
+.user-result-item{padding:10px 12px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;transition:background .1s;border-bottom:1px solid var(--ink-100)}
+.user-result-item:last-child{border-bottom:none}
+.user-result-item:hover{background:var(--ink-100)}
+.user-result-name{font-size:13px;font-weight:600}
+.user-result-meta{font-size:11px;color:var(--ink-500);margin-top:2px}
+.user-result-escalations{font-size:11px;color:var(--ink-700);background:var(--ink-100);border-radius:4px;padding:3px 7px;margin-top:4px;display:inline-flex;align-items:center;gap:4px}
+.user-selected-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;min-height:10px}
+.user-selected-chip{display:inline-flex;align-items:center;gap:6px;background:var(--ink-900);color:#fff;border-radius:20px;padding:4px 10px 4px 6px;font-size:12px;font-weight:500}
+.user-selected-chip button{color:rgba(255,255,255,.6);font-size:16px;line-height:1;margin-left:2px}
+.user-selected-chip button:hover{color:#fff}
+
+/* ── HELPER BOX ── */
+.helper-box{background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:var(--radius);padding:12px 14px;font-size:12px;color:var(--ink-700);line-height:1.6;margin-bottom:12px}
+.helper-box strong{color:var(--blue);font-weight:700}
+.helper-box .helper-row{display:flex;align-items:flex-start;gap:8px;padding:4px 0;border-bottom:1px solid var(--blue-border)}
+.helper-box .helper-row:last-child{border-bottom:none;padding-bottom:0}
+.helper-box .helper-plant{font-weight:600;min-width:110px}
+.helper-box .helper-details{color:var(--ink-500)}
+
+/* ── COMPLETION STATUS ── */
+.completion-ring{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600}
+.completion-ring.complete{color:var(--green)}
+.completion-ring.partial{color:var(--amber)}
+.completion-ring.empty{color:var(--red)}
+.fix-link{font-size:11px;color:var(--blue);cursor:pointer;text-decoration:underline;margin-left:4px}
+
+/* ── PLAYBOOK ── */
+.playbook-row{display:flex;align-items:baseline;gap:6px;padding:6px 0;border-bottom:1px solid var(--ink-100);font-size:13px;flex-wrap:wrap}
+.playbook-row:last-child{border-bottom:none}
+.playbook-when{color:var(--ink-500);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;min-width:80px}
+.playbook-token{display:inline-flex;align-items:center;gap:4px;background:var(--ink-100);border-radius:6px;padding:2px 8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all .15s}
+.playbook-token:hover{border-color:var(--ink-900);background:var(--white)}
+.playbook-then{color:var(--ink-500);font-size:12px}
+
+/* ── DEFAULT RULES ── */
+.default-rule{background:var(--ink-100);border-radius:var(--radius);margin-bottom:8px;overflow:hidden}
+.default-rule-header{padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:13px;font-weight:600}
+.default-rule-header:hover{background:#E2E8F0}
+.default-rule-body{padding:8px 14px 12px;border-top:1px solid var(--ink-300);display:none}
+.default-rule-body.open{display:block}
+.inherit-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;background:var(--green-bg);color:var(--green)}
+.override-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;background:var(--amber-bg);color:var(--amber)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ink-900);color:#fff;padding:11px 18px;border-radius:var(--radius);font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px;z-index:9999;box-shadow:var(--shadow-lg);transition:transform .3s cubic-bezier(.4,0,.2,1);white-space:nowrap;max-width:90vw}
+.toast.visible{transform:translateX(-50%) translateY(0)}
+.toast-undo{color:#93C5FD;cursor:pointer;text-decoration:underline;font-weight:600}
+
+/* ── DRAWER ── */
+.drawer-overlay{position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:40;display:none}
+.drawer-overlay.open{display:block}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:380px;background:var(--white);box-shadow:var(--shadow-lg);z-index:41;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);overflow-y:auto;display:flex;flex-direction:column}
+.drawer.open{transform:translateX(0)}
+.drawer-header{padding:18px 20px;border-bottom:1px solid var(--ink-100);display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;background:var(--white);z-index:1}
+.drawer-body{padding:20px;flex:1;overflow-y:auto}
+.drawer-footer{padding:14px 20px;border-top:1px solid var(--ink-100);display:flex;gap:8px;position:sticky;bottom:0;background:var(--white)}
+
+/* ── MISC ── */
+.label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-500);margin-bottom:6px;display:block}
+.form-input{width:100%;border:1.5px solid var(--ink-300);border-radius:var(--radius);padding:8px 12px;font-size:13px;transition:border-color .15s}
+.form-input:focus{outline:none;border-color:var(--ink-900)}
+.section-title{font-size:20px;font-weight:700;margin-bottom:4px}
+.section-sub{font-size:13px;color:var(--ink-500);margin-bottom:20px}
+.empty-state{text-align:center;padding:48px 24px;color:var(--ink-500)}
+.empty-state svg{margin:0 auto 12px;opacity:.3}
+.empty-state h3{font-size:15px;font-weight:600;color:var(--ink-700);margin-bottom:4px}
+.empty-state p{font-size:13px}
+.divider{height:1px;background:var(--ink-100);margin:16px 0}
+.permission-warning{background:#FFF7ED;border:1px solid var(--orange-border);border-radius:var(--radius);padding:10px 12px;font-size:12px;color:var(--orange);display:flex;align-items:flex-start;gap:8px;margin-top:6px}
+.permission-warning .perm-actions{display:flex;gap:8px;margin-top:6px}
+.permission-warning button{font-size:11px;font-weight:600;padding:3px 8px;border-radius:5px;cursor:pointer;border:1px solid var(--orange-border);background:transparent;color:var(--orange)}
+.permission-warning button.resolve{background:var(--orange);color:#fff;border-color:var(--orange)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .bulk-bar{left:0}
+  .plants-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-mark">DP</div>
+      <div>
+        <div class="sb-logo-text">Digital Paani</div>
+        <div class="sb-logo-sub">SCADA Platform</div>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-label">Operations</div>
+      <button class="sb-item" onclick="alert('SCADA dashboard — out of scope for this prototype')">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </button>
+      <button class="sb-item" onclick="alert('Issues — out of scope')">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+        Issues
+      </button>
+      <button class="sb-item" onclick="alert('Tasks — out of scope')">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        Tasks
+      </button>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-label">Configuration</div>
+      <button class="sb-item active" onclick="showSection('plants')">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Plants &amp; Insights
+      </button>
+      <button class="sb-item" onclick="alert('Users — out of scope')">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        Users
+      </button>
+      <button class="sb-item" onclick="alert('Digest templates — out of scope')">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Digests
+      </button>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <div class="main">
+    <!-- top bar -->
+    <div class="topbar">
+      <div class="section-tabs">
+        <button class="section-tab active" id="tab-plants" onclick="switchTab('plants')">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          Plants
+          <span class="tab-count">5</span>
+        </button>
+        <button class="section-tab" id="tab-insights" onclick="switchTab('insights')">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+          Insights
+          <span class="tab-count">18</span>
+        </button>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" id="main-cta" onclick="handleCTA()">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add insight
+        </button>
+      </div>
+    </div>
+
+    <!-- ── PLANTS PANEL ── -->
+    <div id="panel-plants" class="content">
+      <div class="section-title">Plants</div>
+      <div class="section-sub">Configuration layer · sorted by severity</div>
+
+      <!-- Plants filters (no Plant filter) -->
+      <div class="filter-bar">
+        <div class="search-bar">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" placeholder="Search plants..." oninput="filterPlants(this.value)">
+        </div>
+        <select class="filter-select" onchange="applyPlantFilter('location',this)">
+          <option value="">Location · All</option>
+          <option>Mumbai</option>
+          <option>Thane</option>
+          <option>Navi Mumbai</option>
+        </select>
+        <select class="filter-select" onchange="applyPlantFilter('severity',this)">
+          <option value="">Severity · All</option>
+          <option>Has incidents</option>
+          <option>Has issues</option>
+          <option>All clear</option>
+        </select>
+        <select class="filter-select" onchange="applyPlantFilter('status',this)">
+          <option value="">Config · All</option>
+          <option>Fully configured</option>
+          <option>Needs attention</option>
+        </select>
+      </div>
+
+      <div class="plants-grid" id="plants-grid">
+        <!-- cards injected by JS -->
+      </div>
+    </div>
+
+    <!-- ── INSIGHTS PANEL ── -->
+    <div id="panel-insights" class="content" style="display:none;padding-bottom:80px">
+      <div class="section-title">Insights</div>
+      <div class="section-sub">18 of 18 · across 5 plants</div>
+
+      <!-- Insights filters -->
+      <div class="filter-bar">
+        <div class="search-bar">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" placeholder="Search insights, sensors, equipment..." oninput="filterInsights(this.value)">
+        </div>
+        <select class="filter-select" id="f-plant" onchange="applyInsightFilter()">
+          <option value="">Plant · All</option>
+          <option>Andheri Plant</option>
+          <option>Bandra Plant</option>
+          <option>Powai Plant</option>
+          <option>Thane Plant</option>
+          <option>Vashi Plant</option>
+        </select>
+        <select class="filter-select" id="f-type" onchange="applyInsightFilter()">
+          <option value="">Type · All</option>
+          <option>Incident</option>
+          <option>Issue</option>
+          <option>Warning</option>
+        </select>
+        <select class="filter-select" id="f-status" onchange="applyInsightFilter()">
+          <option value="">Status · All</option>
+          <option>Active</option>
+          <option>Resolved</option>
+        </select>
+        <button class="more-filters-btn" onclick="openMoreFilters()">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+          More filters
+        </button>
+        <div id="active-filter-chips" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+      </div>
+
+      <div class="table-wrapper">
+        <div class="table-header">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:500;color:var(--ink-500)">
+            <input type="checkbox" class="checkbox" id="select-all" onchange="toggleSelectAll(this.checked)">
+            Select all
+          </label>
+          <span class="table-title" id="insights-count">18 insights</span>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="insights-table" id="insights-table">
+            <thead>
+              <tr>
+                <th style="width:28px"></th>
+                <th>Insight</th>
+                <th>Plant · Equipment</th>
+                <th>Type</th>
+                <th>Users</th>
+                <th>Status</th>
+                <th style="width:60px">On</th>
+              </tr>
+            </thead>
+            <tbody id="insights-tbody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── BULK ACTION BAR ── -->
+<div class="bulk-bar" id="bulk-bar">
+  <!-- Saved groups row -->
+  <div class="bulk-bar-groups">
+    <span class="bulk-bar-groups-label">Quick assign group →</span>
+    <button class="group-chip" onclick="assignGroup('Andheri Day Shift',['RK','PS','AM'])">
+      <div class="gc-avatars">
+        <div class="gc-avatar" style="background:#DBEAFE;color:#1D4ED8">RK</div>
+        <div class="gc-avatar" style="background:#FCE7F3;color:#BE185D;margin-left:-4px">PS</div>
+        <div class="gc-avatar" style="background:#D1FAE5;color:#065F46;margin-left:-4px">AM</div>
+      </div>
+      Andheri Day Shift
+    </button>
+    <button class="group-chip" onclick="assignGroup('Bandra Ops Team',['MR','SS'])">
+      <div class="gc-avatars">
+        <div class="gc-avatar" style="background:#FEF3C7;color:#92400E">MR</div>
+        <div class="gc-avatar" style="background:#D1FAE5;color:#065F46;margin-left:-4px">SS</div>
+      </div>
+      Bandra Ops Team
+    </button>
+    <button class="group-chip" onclick="assignGroup('Regional Managers',['RK','MR'])">
+      <div class="gc-avatars">
+        <div class="gc-avatar" style="background:#DBEAFE;color:#1D4ED8">RK</div>
+        <div class="gc-avatar" style="background:#FEF3C7;color:#92400E;margin-left:-4px">MR</div>
+      </div>
+      Regional Managers
+    </button>
+    <button class="group-chip" style="border-style:dashed;opacity:.6" onclick="openAddUserModal()">+ New group</button>
+  </div>
+  <!-- Main actions row -->
+  <div class="bulk-bar-main">
+    <span class="bulk-count" id="bulk-count-label">0 selected</span>
+    <div class="bulk-actions">
+      <button class="bulk-btn" onclick="openAddUserModal()">+ Add user</button>
+      <button class="bulk-btn" onclick="bulkToggle(true)">Enable</button>
+      <button class="bulk-btn" onclick="bulkToggle(false)">Disable</button>
+      <button class="bulk-btn danger" onclick="showToast('Changes cleared','')">Clear</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     MODAL: Assign Users (multi-step)
+════════════════════════════════════════ -->
+<div class="overlay" id="modal-assign">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Assign users</div>
+        <div class="modal-sub" id="assign-subtitle">Add users to selected insights</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modal-assign')">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Wizard steps -->
+      <div class="wizard-steps">
+        <div class="wizard-step active" id="wstep-1">
+          <div class="wizard-step-num">1</div>
+          <div class="wizard-step-label">Users</div>
+        </div>
+        <div class="wizard-connector" id="wconn-1"></div>
+        <div class="wizard-step" id="wstep-2">
+          <div class="wizard-step-num">2</div>
+          <div class="wizard-step-label">Timing</div>
+        </div>
+        <div class="wizard-connector" id="wconn-2"></div>
+        <div class="wizard-step" id="wstep-3">
+          <div class="wizard-step-num">3</div>
+          <div class="wizard-step-label">Channels</div>
+        </div>
+      </div>
+
+      <!-- Step 1: Users -->
+      <div id="wizard-step-1">
+        <div class="label">Who should be notified?</div>
+        <p style="font-size:12px;color:var(--ink-500);margin-bottom:10px">Search and add as many users as you need.</p>
+
+        <div class="user-search">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" placeholder="Type a name, role, or saved group..." oninput="searchUsers(this.value)" id="user-search-input">
+        </div>
+
+        <div class="user-selected-chips" id="selected-user-chips"></div>
+
+        <div id="user-search-results" style="display:none"></div>
+
+        <!-- Save as group -->
+        <div id="save-group-section" style="display:none;margin-bottom:12px">
+          <button onclick="toggleSaveGroup()" id="save-group-toggle" style="font-size:12px;font-weight:600;color:var(--blue);display:flex;align-items:center;gap:5px;padding:0;background:none;border:1px solid var(--blue-border);border-radius:var(--radius);padding:7px 12px;width:100%;justify-content:flex-start;background:var(--blue-bg)">
+            <span id="save-group-icon">+</span> Save these users as a reusable group
+          </button>
+          <div id="save-group-form" style="display:none;margin-top:8px;padding:12px;background:var(--ink-100);border-radius:var(--radius)">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;cursor:pointer;margin-bottom:8px">
+              <input type="checkbox" class="checkbox" id="save-group-check" onchange="toggleGroupNameInput(this.checked)">
+              Save selection as a group
+            </label>
+            <input type="text" class="form-input" id="group-name-input" placeholder="Group name (e.g. Andheri Day Shift)" style="display:none;margin-bottom:6px">
+            <p style="font-size:11px;color:var(--ink-500)">Pick this group from the search next time.</p>
+          </div>
+        </div>
+
+        <!-- Helper: escalation summary for selected users -->
+        <div id="user-helper-box" style="display:none" class="helper-box">
+          <div style="font-weight:700;color:var(--blue);margin-bottom:6px">Current escalation setup for selected users</div>
+          <div id="user-helper-content"></div>
+        </div>
+      </div>
+
+      <!-- Step 2: Timing -->
+      <div id="wizard-step-2" style="display:none">
+        <div class="label">When should they be notified?</div>
+        <p style="font-size:12px;color:var(--ink-500);margin-bottom:12px">Pick a moment in the escalation timeline.</p>
+
+        <div class="time-picker">
+          <button class="time-option selected" id="time-immediately" onclick="selectTime('immediately',this)">
+            ⚡ Immediately<br><span style="font-size:10px;font-weight:400;opacity:.7">When opens</span>
+          </button>
+          <button class="time-option" id="time-10" onclick="selectTime('10',this)">
+            +10 min<br><span style="font-size:10px;font-weight:400;opacity:.7">If no response</span>
+          </button>
+          <button class="time-option" id="time-30" onclick="selectTime('30',this)">
+            +30 min<br><span style="font-size:10px;font-weight:400;opacity:.7">If still open</span>
+          </button>
+          <button class="time-option" id="time-1h" onclick="selectTime('60',this)">
+            +1 hr<br><span style="font-size:10px;font-weight:400;opacity:.7">If unresolved</span>
+          </button>
+          <button class="time-option" id="time-custom" onclick="selectTime('custom',this)">
+            ⚙ Custom<br><span style="font-size:10px;font-weight:400;opacity:.7">Set delay</span>
+          </button>
+        </div>
+
+        <div id="custom-time-input" style="display:none">
+          <div class="label">Custom delay after insight opens</div>
+          <div class="custom-time">
+            <input type="number" class="form-input" style="width:70px" placeholder="0" id="custom-hours" min="0" max="48">
+            <span class="custom-time-unit">hours</span>
+            <input type="number" class="form-input" style="width:70px" placeholder="0" id="custom-minutes" min="0" max="59">
+            <span class="custom-time-unit">minutes</span>
+          </div>
+          <p style="font-size:11px;color:var(--ink-500);margin-top:6px">Or after previous escalation step with no response.</p>
+        </div>
+      </div>
+
+      <!-- Step 3: Channels -->
+      <div id="wizard-step-3" style="display:none">
+        <div class="label">How should they be notified?</div>
+        <p style="font-size:12px;color:var(--ink-500);margin-bottom:14px">Click a channel to toggle it on. Enabled channels will show a message editor.</p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+          <div class="channel-card" id="ch-wa" onclick="toggleChannel('wa')" style="border:2px solid var(--ink-900);border-radius:var(--radius);padding:14px;cursor:pointer;background:var(--ink-900);color:#fff;transition:all .15s">
+            <div style="font-weight:700;font-size:14px">WA WhatsApp</div>
+            <div style="font-size:11px;opacity:.7;margin-top:2px">ON</div>
+          </div>
+          <div class="channel-card" id="ch-sms" onclick="toggleChannel('sms')" style="border:2px solid var(--ink-300);border-radius:var(--radius);padding:14px;cursor:pointer;background:var(--white);transition:all .15s">
+            <div style="font-weight:700;font-size:14px;color:var(--ink-700)">SMS</div>
+            <div style="font-size:11px;color:var(--ink-500);margin-top:2px">OFF</div>
+          </div>
+          <div class="channel-card" id="ch-call" onclick="toggleChannel('call')" style="border:2px solid var(--ink-300);border-radius:var(--radius);padding:14px;cursor:pointer;background:var(--white);transition:all .15s">
+            <div style="font-weight:700;font-size:14px;color:var(--ink-700)">📞 Call</div>
+            <div style="font-size:11px;color:var(--ink-500);margin-top:2px">OFF</div>
+          </div>
+          <div class="channel-card" id="ch-email" onclick="toggleChannel('email')" style="border:2px solid var(--ink-300);border-radius:var(--radius);padding:14px;cursor:pointer;background:var(--white);transition:all .15s">
+            <div style="font-weight:700;font-size:14px;color:var(--ink-700)">✉ Email</div>
+            <div style="font-size:11px;color:var(--ink-500);margin-top:2px">OFF</div>
+          </div>
+        </div>
+
+        <div id="wa-message-editor" style="margin-top:8px">
+          <div class="label">WhatsApp message template</div>
+          <textarea class="form-input" rows="3" style="resize:vertical">Hi {{user}}, {{insight}} at {{plant}}. Sensor {{sensor}} = {{value}}. Please acknowledge.</textarea>
+          <div style="display:flex;gap:8px;margin-top:6px;align-items:center">
+            <button class="btn btn-ghost btn-sm">Send test</button>
+            <span style="font-size:11px;color:var(--ink-500)">Sent via WhatsApp Business</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <div id="wizard-summary" style="font-size:12px;color:var(--ink-500)">Pick at least one user to continue</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost" onclick="wizardBack()" id="wizard-back-btn" style="display:none">Back</button>
+        <button class="btn btn-ghost" onclick="closeModal('modal-assign')">Cancel</button>
+        <button class="btn btn-primary" id="wizard-next-btn" onclick="wizardNext()" disabled>Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     DRAWER: Escalation Timeline (per insight)
+════════════════════════════════════════ -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer-esc">
+  <div class="drawer-header">
+    <div>
+      <div style="font-size:16px;font-weight:700" id="drawer-insight-name">DO drop in aeration tank</div>
+      <div style="font-size:12px;color:var(--ink-500)" id="drawer-insight-meta">Andheri Plant · Aerator A-1 · Incident</div>
+    </div>
+    <button class="modal-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-body">
+
+    <!-- Inheritance badge -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding:10px 12px;background:var(--green-bg);border-radius:var(--radius);border:1px solid var(--green-border)">
+      <span style="font-size:18px">⬇</span>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--green)">Inheriting plant defaults</div>
+        <div style="font-size:11px;color:var(--ink-500)">Set under Andheri Plant → Incident defaults</div>
+      </div>
+      <button class="btn btn-xs btn-outline" style="margin-left:auto" onclick="overrideInheritance()">Override</button>
+    </div>
+
+    <!-- Playbook summary -->
+    <div style="margin-bottom:20px">
+      <div class="label">Playbook</div>
+      <div style="background:var(--ink-100);border-radius:var(--radius);padding:12px 14px">
+        <div class="playbook-row">
+          <span class="playbook-when">When opens</span>
+          <span class="playbook-then">→ Notify</span>
+          <span class="playbook-token" onclick="openAddUserModal()">RK PS</span>
+          <span class="playbook-then">via</span>
+          <span class="playbook-token">WhatsApp · Call</span>
+        </div>
+        <div class="playbook-row">
+          <span class="playbook-when">+10 min</span>
+          <span class="playbook-then">→ Escalate to</span>
+          <span class="playbook-token" onclick="openAddUserModal()">AM</span>
+          <span class="playbook-then">via</span>
+          <span class="playbook-token">SMS</span>
+        </div>
+        <div class="playbook-row">
+          <span class="playbook-when">+30 min</span>
+          <span class="playbook-then">→ Escalate to</span>
+          <span class="playbook-token" style="border:1px dashed var(--ink-300);color:var(--ink-500)" onclick="openAddUserModal()">+ Add user</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Escalation Timeline -->
+    <div class="label">Escalation timeline</div>
+    <div class="esc-timeline">
+
+      <!-- Step: Immediately -->
+      <div class="esc-step">
+        <div class="esc-spine">
+          <div class="esc-node immediate">⚡</div>
+          <div class="esc-line"></div>
+        </div>
+        <div class="esc-content">
+          <div class="esc-time-label">
+            Immediately
+            <span style="background:var(--ink-900);color:#fff;font-size:9px;padding:1px 6px;border-radius:10px">When opens</span>
+          </div>
+          <div class="esc-card">
+            <div class="esc-users">
+              <div class="esc-user-chip">
+                <div class="avatar" style="background:#DBEAFE;color:#1D4ED8">RK</div>
+                Raj Kumar
+              </div>
+              <div class="esc-user-chip">
+                <div class="avatar" style="background:#FCE7F3;color:#BE185D">PS</div>
+                Priya Singh
+              </div>
+              <button class="btn btn-xs btn-outline" onclick="openAddUserModal()">+ Add</button>
+            </div>
+            <div class="esc-channels">
+              <span class="esc-channel wa">WA WhatsApp</span>
+              <span class="esc-channel call">📞 Call</span>
+            </div>
+            <a class="esc-edit-link" onclick="openAddUserModal()">Edit users · Edit channels · Edit message →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step: +10 min -->
+      <div class="esc-step">
+        <div class="esc-spine">
+          <div class="esc-node delayed">⏱</div>
+          <div class="esc-line"></div>
+        </div>
+        <div class="esc-content">
+          <div class="esc-time-label">
+            <button class="time-option" style="padding:3px 10px;font-size:11px" onclick="editStepTime(this)">+10 min</button>
+            <span>if no response</span>
+          </div>
+          <div class="esc-card">
+            <div class="esc-users">
+              <div class="esc-user-chip">
+                <div class="avatar" style="background:#D1FAE5;color:#065F46">AM</div>
+                Anil Mehta
+              </div>
+              <button class="btn btn-xs btn-outline" onclick="openAddUserModal()">+ Add</button>
+            </div>
+            <div class="esc-channels">
+              <span class="esc-channel sms">SMS</span>
+            </div>
+            <a class="esc-edit-link" onclick="openAddUserModal()">Edit →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step: +30 min -->
+      <div class="esc-step">
+        <div class="esc-spine">
+          <div class="esc-node delayed">⏱</div>
+          <div class="esc-line" style="min-height:8px"></div>
+        </div>
+        <div class="esc-content">
+          <div class="esc-time-label">
+            <button class="time-option" style="padding:3px 10px;font-size:11px" onclick="editStepTime(this)">+30 min</button>
+            <span>if still open</span>
+          </div>
+          <div class="esc-card">
+            <div class="esc-users">
+              <button class="btn btn-xs btn-outline" onclick="openAddUserModal()">+ Add user</button>
+            </div>
+            <div style="font-size:11px;color:var(--ink-500)">No users assigned to this step yet.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add step -->
+      <div class="esc-step">
+        <div class="esc-spine">
+          <div class="esc-node add" onclick="addEscalationStep(this)">+</div>
+        </div>
+        <div class="esc-content" style="padding-bottom:0">
+          <button style="font-size:12px;color:var(--ink-500);padding:6px 0;display:flex;align-items:center;gap:6px;cursor:pointer;background:none;border:none" onclick="addEscalationStep(null)">
+            + Add escalation step
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="drawer-footer">
+    <button class="btn btn-ghost" onclick="closeDrawer()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveDrawer()">Save escalation</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     DRAWER: Plant Defaults (per plant)
+════════════════════════════════════════ -->
+<div class="drawer" id="drawer-defaults" style="width:440px">
+  <div class="drawer-header">
+    <div>
+      <div style="font-size:16px;font-weight:700" id="defaults-plant-name">Andheri Plant — Default Escalations</div>
+      <div style="font-size:12px;color:var(--ink-500)">Applied to all new insights at this plant</div>
+    </div>
+    <button class="modal-close" onclick="closeDefaultsDrawer()">✕</button>
+  </div>
+  <div class="drawer-body">
+    <p style="font-size:12px;color:var(--ink-500);margin-bottom:16px;line-height:1.6">
+      These are the default escalation rules for new insights. Individual insights can override these settings at any time.
+    </p>
+
+    <!-- Incident defaults -->
+    <div class="default-rule">
+      <div class="default-rule-header" onclick="toggleDefaultRule('incident')">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="chip chip-incident"><span class="chip-dot"></span>Incident</span>
+          <span style="font-size:11px;color:var(--ink-500)">3 escalation steps</span>
+        </div>
+        <svg id="arr-incident" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="transition:transform .2s;transform:rotate(180deg)"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="default-rule-body open" id="body-incident">
+        <div class="esc-timeline" style="margin-top:8px">
+          <div class="esc-step">
+            <div class="esc-spine"><div class="esc-node immediate" style="width:24px;height:24px;font-size:11px">⚡</div><div class="esc-line"></div></div>
+            <div class="esc-content">
+              <div class="esc-time-label" style="font-size:10px">Immediately</div>
+              <div class="esc-card" style="padding:8px 10px">
+                <div class="esc-users" style="gap:4px">
+                  <div class="esc-user-chip" style="font-size:11px">
+                    <div class="avatar" style="width:18px;height:18px;font-size:7px;background:#DBEAFE;color:#1D4ED8">PM</div>
+                    Plant Manager
+                  </div>
+                </div>
+                <div class="esc-channels" style="gap:4px"><span class="esc-channel wa" style="font-size:10px">WhatsApp</span><span class="esc-channel call" style="font-size:10px">Call</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="esc-step">
+            <div class="esc-spine"><div class="esc-node delayed" style="width:24px;height:24px;font-size:11px">⏱</div><div class="esc-line"></div></div>
+            <div class="esc-content">
+              <div class="esc-time-label" style="font-size:10px"><button class="time-option" style="padding:2px 8px;font-size:10px" onclick="editStepTime(this)">+10 min</button></div>
+              <div class="esc-card" style="padding:8px 10px">
+                <div class="esc-users" style="gap:4px">
+                  <div class="esc-user-chip" style="font-size:11px">
+                    <div class="avatar" style="width:18px;height:18px;font-size:7px;background:#D1FAE5;color:#065F46">SS</div>
+                    Shift Supervisor
+                  </div>
+                </div>
+                <div class="esc-channels" style="gap:4px"><span class="esc-channel sms" style="font-size:10px">SMS</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="esc-step">
+            <div class="esc-spine"><div class="esc-node delayed" style="width:24px;height:24px;font-size:11px">⏱</div></div>
+            <div class="esc-content" style="padding-bottom:0">
+              <div class="esc-time-label" style="font-size:10px"><button class="time-option" style="padding:2px 8px;font-size:10px" onclick="editStepTime(this)">+30 min</button></div>
+              <div class="esc-card" style="padding:8px 10px">
+                <div class="esc-users" style="gap:4px">
+                  <div class="esc-user-chip" style="font-size:11px">
+                    <div class="avatar" style="width:18px;height:18px;font-size:7px;background:#FCE7F3;color:#BE185D">RH</div>
+                    Regional Head
+                  </div>
+                </div>
+                <div class="esc-channels" style="gap:4px"><span class="esc-channel call" style="font-size:10px">Call</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-xs btn-outline" style="margin-top:10px" onclick="openAddUserModal()">+ Add step</button>
+        <button class="btn btn-xs btn-ghost" style="margin-top:10px;margin-left:6px" onclick="openAddUserModal()">Edit users</button>
+      </div>
+    </div>
+
+    <!-- Issue defaults -->
+    <div class="default-rule">
+      <div class="default-rule-header" onclick="toggleDefaultRule('issue')">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="chip chip-issue"><span class="chip-dot"></span>Issue</span>
+          <span style="font-size:11px;color:var(--ink-500)">2 escalation steps</span>
+        </div>
+        <svg id="arr-issue" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="transition:transform .2s"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="default-rule-body" id="body-issue">
+        <div style="font-size:12px;color:var(--ink-500);margin-top:8px">
+          <div class="playbook-row"><span class="playbook-when">Immediately</span><span class="playbook-then">→ Operator · WhatsApp</span></div>
+          <div class="playbook-row"><span class="playbook-when">+30 min</span><span class="playbook-then">→ Plant Manager · SMS</span></div>
+        </div>
+        <button class="btn btn-xs btn-outline" style="margin-top:10px" onclick="openAddUserModal()">Edit</button>
+      </div>
+    </div>
+
+    <!-- Warning defaults -->
+    <div class="default-rule">
+      <div class="default-rule-header" onclick="toggleDefaultRule('warning')">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="chip chip-warning"><span class="chip-dot"></span>Warning</span>
+          <span style="font-size:11px;color:var(--ink-500)">1 escalation step</span>
+        </div>
+        <svg id="arr-warning" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="transition:transform .2s"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="default-rule-body" id="body-warning">
+        <div style="font-size:12px;color:var(--ink-500);margin-top:8px">
+          <div class="playbook-row"><span class="playbook-when">Immediately</span><span class="playbook-then">→ Operator · WhatsApp</span></div>
+        </div>
+        <button class="btn btn-xs btn-outline" style="margin-top:10px" onclick="openAddUserModal()">Edit</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="drawer-footer">
+    <button class="btn btn-ghost" onclick="closeDefaultsDrawer()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveDefaultsDrawer()">Save defaults</button>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast">
+  <span id="toast-msg"></span>
+  <span class="toast-undo" id="toast-undo" onclick="hideToast()" style="display:none">Undo</span>
+</div>
+
+<script>
+// ══════════════════════════════════
+// DATA
+// ══════════════════════════════════
+const PLANTS = [
+  {
+    id:'andheri',name:'Andheri Plant',location:'Mumbai',mld:25,
+    badges:[{type:'incident',label:'2 incident'},{type:'issue',label:'1 issue'}],
+    bar:[{color:'#DC2626',w:40},{color:'#EA580C',w:20},{color:'#E2E8F0',w:40}],
+    activeInsights:4,configured:true,
+  },
+  {
+    id:'bandra',name:'Bandra Plant',location:'Mumbai',mld:18,
+    badges:[{type:'issue',label:'2 issue'}],
+    bar:[{color:'#EA580C',w:40},{color:'#E2E8F0',w:60}],
+    activeInsights:5,configured:true,
+  },
+  {
+    id:'powai',name:'Powai Plant',location:'Mumbai',mld:12,
+    badges:[{type:'warning',label:'2 warning'}],
+    bar:[{color:'#D97706',w:30},{color:'#E2E8F0',w:70}],
+    activeInsights:4,configured:false,
+  },
+  {
+    id:'thane',name:'Thane Plant',location:'Thane',mld:30,
+    badges:[{type:'warning',label:'1 warning'}],
+    bar:[{color:'#D97706',w:15},{color:'#E2E8F0',w:85}],
+    activeInsights:3,configured:true,
+  },
+  {
+    id:'vashi',name:'Vashi Plant',location:'Navi Mumbai',mld:20,
+    badges:[{type:'clear',label:'all clear'}],
+    bar:[{color:'#16A34A',w:100}],
+    activeInsights:2,configured:false,
+  },
+];
+
+const INSIGHTS = [
+  {id:1,name:'DO drop in aeration tank',sensor:'DO-101 · < 2.0 mg/L',plant:'Andheri Plant',equip:'Aerator A-1',type:'incident',status:'active',statusLabel:'Active · 2h 14m',users:[{initials:'RK',bg:'#DBEAFE',color:'#1D4ED8'},{initials:'PS',bg:'#FCE7F3',color:'#BE185D'}],on:true,complete:true},
+  {id:2,name:'Inlet pump vibration high',sensor:'VIB-203 · > 8 mm/s',plant:'Andheri Plant',equip:'Pump P-3',type:'incident',status:'active',statusLabel:'Active · 47m',users:[{initials:'RK',bg:'#DBEAFE',color:'#1D4ED8'}],on:true,complete:true},
+  {id:3,name:'pH out of range',sensor:'PH-505 · 5.5–9.0',plant:'Andheri Plant',equip:'Equalization tank',type:'issue',status:'active',statusLabel:'Active · 1h 02m',users:[{initials:'AM',bg:'#D1FAE5',color:'#065F46'}],on:true,complete:true},
+  {id:4,name:'Blower load high',sensor:'AMP-B2 · > 80 A',plant:'Bandra Plant',equip:'Blower B-2',type:'issue',status:'active',statusLabel:'Active · 3h 11m',users:[{initials:'MR',bg:'#FEF3C7',color:'#92400E'}],on:true,complete:true},
+  {id:5,name:'MLSS below target',sensor:'MLSS-1 · > 2500 mg/L',plant:'Bandra Plant',equip:'Aeration tank',type:'issue',status:'active',statusLabel:'Active · 4h',users:[],on:true,complete:false},
+  {id:6,name:'Effluent turbidity rising',sensor:'TURB-O · > 5 NTU',plant:'Powai Plant',equip:'Outlet',type:'warning',status:'active',statusLabel:'Active · 30m',users:[{initials:'O',bg:'#E0E7FF',color:'#4338CA'}],on:true,complete:true},
+  {id:7,name:'Sludge pump runtime over limit',sensor:'RT-SP · > 8 hrs/day',plant:'Powai Plant',equip:'Sludge pump',type:'warning',status:'active',statusLabel:'Active · 1h 20m',users:[],on:true,complete:false},
+  {id:8,name:'Chlorine dosing low',sensor:'CL-1 · < 0.5 mg/L',plant:'Thane Plant',equip:'Cl₂ doser',type:'warning',status:'resolved',statusLabel:'Acknowledged · 5h ago',users:[{initials:'MR',bg:'#FEF3C7',color:'#92400E'}],on:true,complete:true},
+  {id:9,name:'Conveyor belt speed deviation',sensor:'SPD-C · nominal ±15%',plant:'Bandra Plant',equip:'Conveyor',type:'warning',status:'resolved',statusLabel:'Resolved · 1h ago',users:[{initials:'RK',bg:'#DBEAFE',color:'#1D4ED8'}],on:true,complete:true},
+  {id:10,name:'Feed water pH out of range',sensor:'PH-IN · 6.5–8.5',plant:'Thane Plant',equip:'Inlet tank',type:'warning',status:'active',statusLabel:'Active · 22m',users:[{initials:'SS',bg:'#D1FAE5',color:'#065F46'}],on:true,complete:true},
+];
+
+const USERS_DB = [
+  {id:'rk',name:'Raj Kumar',role:'Plant Manager',initials:'RK',bg:'#DBEAFE',color:'#1D4ED8',
+   escalations:[{plant:'Andheri Plant',insights:5,timing:'Immediately',channels:'WhatsApp · Call'},{plant:'Bandra Plant',insights:2,timing:'+30 min',channels:'SMS'}]},
+  {id:'ps',name:'Priya Singh',role:'Shift Supervisor',initials:'PS',bg:'#FCE7F3',color:'#BE185D',
+   escalations:[{plant:'Andheri Plant',insights:3,timing:'Immediately',channels:'WhatsApp'}]},
+  {id:'am',name:'Anil Mehta',role:'Operator',initials:'AM',bg:'#D1FAE5',color:'#065F46',
+   escalations:[{plant:'Andheri Plant',insights:2,timing:'+10 min',channels:'SMS'},{plant:'Powai Plant',insights:1,timing:'Immediately',channels:'WhatsApp'}]},
+  {id:'mr',name:'Meera Rao',role:'Regional Head',initials:'MR',bg:'#FEF3C7',color:'#92400E',
+   escalations:[{plant:'Bandra Plant',insights:8,timing:'+30 min',channels:'Call'},{plant:'Thane Plant',insights:3,timing:'Immediately',channels:'WhatsApp · SMS'}]},
+  {id:'ss',name:'Suresh Shah',role:'Operator',initials:'SS',bg:'#D1FAE5',color:'#065F46',
+   escalations:[{plant:'Thane Plant',insights:4,timing:'Immediately',channels:'WhatsApp'}]},
+];
+
+// ══════════════════════════════════
+// STATE
+// ══════════════════════════════════
+let currentTab = 'plants';
+let selectedInsights = new Set();
+let selectedUsers = [];
+let wizardStep = 1;
+let selectedTime = 'immediately';
+let channels = {wa:true,sms:false,call:false,email:false};
+let insightData = [...INSIGHTS];
+
+// ══════════════════════════════════
+// INIT
+// ══════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  renderPlants(PLANTS);
+  renderInsights(insightData);
+});
+
+// ══════════════════════════════════
+// TAB SWITCHING
+// ══════════════════════════════════
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('panel-plants').style.display = tab === 'plants' ? 'block' : 'none';
+  document.getElementById('panel-insights').style.display = tab === 'insights' ? 'block' : 'none';
+  document.getElementById('tab-plants').classList.toggle('active', tab === 'plants');
+  document.getElementById('tab-insights').classList.toggle('active', tab === 'insights');
+  document.getElementById('main-cta').textContent = tab === 'plants' ? '⚙ Manage defaults' : '+ Add insight';
+}
+
+function handleCTA() {
+  if (currentTab === 'plants') {
+    showToast('Select a plant card to configure defaults', '');
+  } else {
+    showToast('Add insight form — coming in full implementation', '');
+  }
+}
+
+function showSection(s) { /* already handled by switchTab */ }
+
+// ══════════════════════════════════
+// PLANTS
+// ══════════════════════════════════
+function renderPlants(plants) {
+  const grid = document.getElementById('plants-grid');
+  grid.innerHTML = plants.map(p => `
+    <div class="plant-card" id="plant-${p.id}">
+      <div class="plant-severity-bar">
+        ${p.bar.map(s => `<div class="seg" style="background:${s.color};flex:${s.w}"></div>`).join('')}
+      </div>
+      <div class="plant-card-body">
+        <div class="plant-name">${p.name}</div>
+        <div class="plant-meta">${p.location} · ${p.mld} MLD · ${p.activeInsights} active insights</div>
+        <div class="plant-badges">
+          ${p.badges.map(b => `<span class="plant-badge ${b.type}"><span style="width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block"></span>${b.label}</span>`).join('')}
+        </div>
+        ${!p.configured ? `<div style="font-size:11px;color:var(--amber);display:flex;align-items:center;gap:5px;margin-top:6px">⚠ Escalation defaults not configured <a class="fix-link" onclick="openDefaultsDrawer('${p.id}')">Set up →</a></div>` : ''}
+      </div>
+      <div class="plant-actions">
+        <button class="plant-action-btn primary" onclick="switchTab('insights');applyInsightFilterByPlant('${p.name}')">View insights</button>
+        <button class="plant-action-btn" onclick="openDefaultsDrawer('${p.id}')">⚡ Escalations</button>
+        <button class="plant-action-btn" onclick="showToast('Digest configuration — coming soon','')">✉ Digests</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterPlants(query) {
+  const q = query.toLowerCase();
+  const filtered = PLANTS.filter(p =>
+    p.name.toLowerCase().includes(q) || p.location.toLowerCase().includes(q)
+  );
+  renderPlants(filtered);
+}
+
+function applyPlantFilter(type, sel) {
+  const val = sel.value;
+  if (val) sel.classList.add('filter-active');
+  else sel.classList.remove('filter-active');
+}
+
+function applyInsightFilterByPlant(plantName) {
+  const sel = document.getElementById('f-plant');
+  sel.value = plantName;
+  sel.classList.add('filter-active');
+  applyInsightFilter();
+}
+
+// ══════════════════════════════════
+// INSIGHTS TABLE
+// ══════════════════════════════════
+function renderInsights(data) {
+  const tbody = document.getElementById('insights-tbody');
+  tbody.innerHTML = data.map(ins => `
+    <tr class="severity-${ins.status === 'resolved' ? 'resolved' : ins.type}" id="row-${ins.id}">
+      <td><input type="checkbox" class="checkbox" data-id="${ins.id}" onchange="toggleInsightSelect(${ins.id},this.checked)"></td>
+      <td>
+        <div style="font-weight:600;font-size:13px;display:flex;align-items:center;gap:6px">
+          ${ins.name}
+          ${!ins.complete ? `<span style="font-size:10px;color:var(--red);background:var(--red-bg);padding:1px 6px;border-radius:10px;font-weight:600">⚠ incomplete</span>` : ''}
+        </div>
+        <div style="font-size:11px;color:var(--ink-500);margin-top:1px">${ins.sensor}</div>
+        ${!ins.complete ? `<a class="fix-link" onclick="openAddUserModal()">Add user →</a>` : ''}
+      </td>
+      <td>
+        <div style="font-size:13px;font-weight:500">${ins.plant}</div>
+        <div style="font-size:11px;color:var(--ink-500)">${ins.equip}</div>
+      </td>
+      <td><span class="chip chip-${ins.type}"><span class="chip-dot"></span>${cap(ins.type)}</span></td>
+      <td>
+        <div style="display:flex;gap:3px;align-items:center;flex-wrap:wrap">
+          ${ins.users.map(u => `<div class="avatar" style="background:${u.bg};color:${u.color}">${u.initials}</div>`).join('')}
+          ${ins.users.length === 0 ? `<button class="btn btn-xs" style="border:1px dashed var(--ink-300);color:var(--ink-500);background:transparent" onclick="openAddUserModal()">+ Add</button>` : `<button class="btn btn-xs btn-outline" onclick="openAddUserModal()" title="Edit users">✎</button>`}
+        </div>
+      </td>
+      <td>
+        <div class="${ins.status === 'active' ? 'status-active' : 'status-resolved'}" style="display:flex;align-items:center;gap:5px">
+          <span style="width:7px;height:7px;border-radius:50%;background:${ins.status === 'active' ? 'var(--green)' : 'var(--ink-300)'};flex-shrink:0"></span>
+          ${ins.statusLabel}
+        </div>
+      </td>
+      <td>
+        <label class="toggle" title="Toggle insight on/off">
+          <input type="checkbox" ${ins.on ? 'checked' : ''} onchange="toggleInsight(${ins.id},this.checked)">
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </td>
+    </tr>
+    <!-- Expandable escalation row (hidden by default) -->
+    <tr id="esc-row-${ins.id}" style="display:none;background:var(--ink-100)">
+      <td colspan="7" style="padding:12px 16px">
+        <div style="font-size:12px;color:var(--ink-500)">Escalation detail — click row to expand</div>
+      </td>
+    </tr>
+  `).join('');
+  document.getElementById('insights-count').textContent = `${data.length} insights`;
+}
+
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+
+function toggleInsight(id, on) {
+  const ins = insightData.find(i => i.id === id);
+  if (ins) ins.on = on;
+  showToast(`${on ? 'Enabled' : 'Disabled'} — ${insightData.find(i=>i.id===id)?.name}`, 'Undo');
+}
+
+function toggleInsightSelect(id, checked) {
+  if (checked) selectedInsights.add(id);
+  else selectedInsights.delete(id);
+  updateBulkBar();
+}
+
+function toggleSelectAll(checked) {
+  document.querySelectorAll('#insights-tbody .checkbox').forEach(cb => {
+    cb.checked = checked;
+    const id = parseInt(cb.dataset.id);
+    if (checked) selectedInsights.add(id);
+    else selectedInsights.delete(id);
+  });
+  updateBulkBar();
+}
+
+function updateBulkBar() {
+  const bar = document.getElementById('bulk-bar');
+  const n = selectedInsights.size;
+  document.getElementById('bulk-count-label').textContent = `${n} selected`;
+  if (n > 0) bar.classList.add('visible');
+  else bar.classList.remove('visible');
+}
+
+function bulkToggle(on) {
+  selectedInsights.forEach(id => {
+    const ins = insightData.find(i => i.id === id);
+    if (ins) ins.on = on;
+  });
+  renderInsights(insightData);
+  showToast(`${on ? 'Enabled' : 'Disabled'} ${selectedInsights.size} insights`, 'Undo');
+  selectedInsights.clear();
+  updateBulkBar();
+  document.getElementById('select-all').checked = false;
+}
+
+function applyInsightFilter() {
+  const plant = document.getElementById('f-plant').value;
+  const type = document.getElementById('f-type').value.toLowerCase();
+  const status = document.getElementById('f-status').value.toLowerCase();
+
+  ['f-plant','f-type','f-status'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el.value) el.classList.add('filter-active');
+    else el.classList.remove('filter-active');
+  });
+
+  const filtered = INSIGHTS.filter(ins => {
+    return (!plant || ins.plant === plant) &&
+           (!type || ins.type === type) &&
+           (!status || ins.status === status);
+  });
+  insightData = filtered;
+  renderInsights(filtered);
+
+  // chips
+  const chipContainer = document.getElementById('active-filter-chips');
+  chipContainer.innerHTML = '';
+  if (plant) chipContainer.innerHTML += `<div class="filter-chip">Plant: ${plant}<button onclick="clearFilter('f-plant')">×</button></div>`;
+  if (type) chipContainer.innerHTML += `<div class="filter-chip">Type: ${cap(type)}<button onclick="clearFilter('f-type')">×</button></div>`;
+  if (status) chipContainer.innerHTML += `<div class="filter-chip">Status: ${cap(status)}<button onclick="clearFilter('f-status')">×</button></div>`;
+}
+
+function clearFilter(id) {
+  document.getElementById(id).value = '';
+  document.getElementById(id).classList.remove('filter-active');
+  applyInsightFilter();
+}
+
+function filterInsights(query) {
+  const q = query.toLowerCase();
+  const filtered = INSIGHTS.filter(ins =>
+    ins.name.toLowerCase().includes(q) ||
+    ins.plant.toLowerCase().includes(q) ||
+    ins.equip.toLowerCase().includes(q) ||
+    ins.sensor.toLowerCase().includes(q)
+  );
+  insightData = filtered;
+  renderInsights(filtered);
+}
+
+function openMoreFilters() {
+  showToast('Advanced filters: Equipment, Channel, Escalation Time, Repeats — coming in full build', '');
+}
+
+// ══════════════════════════════════
+// MODAL: ASSIGN USERS WIZARD
+// ══════════════════════════════════
+function openAddUserModal() {
+  wizardStep = 1;
+  selectedUsers = [];
+  channels = {wa:true,sms:false,call:false,email:false};
+  selectedTime = 'immediately';
+  resetWizard();
+  document.getElementById('modal-assign').classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  selectedUsers = [];
+  renderSelectedChips();
+}
+
+function resetWizard() {
+  showWizardStep(1);
+  updateWizardStep(1,'active');
+  updateWizardStep(2,'');
+  updateWizardStep(3,'');
+  document.getElementById('wconn-1').classList.remove('done');
+  document.getElementById('wconn-2').classList.remove('done');
+  document.getElementById('wizard-back-btn').style.display = 'none';
+  document.getElementById('wizard-next-btn').textContent = 'Next';
+  document.getElementById('wizard-next-btn').disabled = true;
+  document.getElementById('wizard-summary').textContent = 'Pick at least one user to continue';
+  document.getElementById('user-search-input').value = '';
+  document.getElementById('user-search-results').style.display = 'none';
+  document.getElementById('user-helper-box').style.display = 'none';
+  renderSelectedChips();
+  resetTimeOptions();
+}
+
+function showWizardStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById(`wizard-step-${i}`).style.display = i === n ? 'block' : 'none';
+  });
+}
+
+function updateWizardStep(n, state) {
+  const el = document.getElementById(`wstep-${n}`);
+  el.className = `wizard-step ${state}`;
+}
+
+function wizardNext() {
+  if (wizardStep === 1) {
+    if (selectedUsers.length === 0) return;
+    wizardStep = 2;
+    updateWizardStep(1,'done');
+    updateWizardStep(2,'active');
+    document.getElementById('wconn-1').classList.add('done');
+    showWizardStep(2);
+    document.getElementById('wizard-back-btn').style.display = 'inline-flex';
+    document.getElementById('wizard-next-btn').disabled = false;
+    updateSummary();
+  } else if (wizardStep === 2) {
+    wizardStep = 3;
+    updateWizardStep(2,'done');
+    updateWizardStep(3,'active');
+    document.getElementById('wconn-2').classList.add('done');
+    showWizardStep(3);
+    document.getElementById('wizard-next-btn').textContent = 'Assign';
+    updateSummary();
+  } else if (wizardStep === 3) {
+    // Complete
+    const n = selectedInsights.size || 1;
+    const names = selectedUsers.map(u => u.name).join(', ');
+    const timeLabel = selectedTime === 'immediately' ? 'immediately' :
+                      selectedTime === 'custom' ? `+${document.getElementById('custom-hours').value||0}h ${document.getElementById('custom-minutes').value||0}m` :
+                      `+${selectedTime} min`;
+    closeModal('modal-assign');
+    showToast(`✓ ${names} assigned to ${n} insight${n>1?'s':''} · ${timeLabel} · WhatsApp`, 'Undo');
+    selectedInsights.clear();
+    updateBulkBar();
+  }
+}
+
+function wizardBack() {
+  if (wizardStep === 2) {
+    wizardStep = 1;
+    updateWizardStep(1,'active');
+    updateWizardStep(2,'');
+    document.getElementById('wconn-1').classList.remove('done');
+    showWizardStep(1);
+    document.getElementById('wizard-back-btn').style.display = 'none';
+    document.getElementById('wizard-next-btn').textContent = 'Next';
+    document.getElementById('wizard-next-btn').disabled = selectedUsers.length === 0;
+  } else if (wizardStep === 3) {
+    wizardStep = 2;
+    updateWizardStep(2,'active');
+    updateWizardStep(3,'');
+    document.getElementById('wconn-2').classList.remove('done');
+    showWizardStep(2);
+    document.getElementById('wizard-next-btn').textContent = 'Next';
+  }
+}
+
+function updateSummary() {
+  const names = selectedUsers.map(u => u.initials).join(', ') || '—';
+  const timeLabel = selectedTime === 'immediately' ? 'immediately' :
+                    selectedTime === 'custom' ? 'custom time' :
+                    `+${selectedTime} min`;
+  const ch = Object.entries(channels).filter(([,v])=>v).map(([k])=>k.toUpperCase()).join(' · ') || '—';
+  const n = selectedInsights.size || 1;
+  document.getElementById('wizard-summary').textContent =
+    wizardStep === 1 ? `${selectedUsers.length} user${selectedUsers.length!==1?'s':''} selected` :
+    wizardStep === 2 ? `${names} · ${timeLabel}` :
+    `${names} · ${timeLabel} · ${ch} → ${n} insight${n>1?'s':''}`;
+}
+
+// User search
+function searchUsers(query) {
+  const q = query.toLowerCase().trim();
+  const container = document.getElementById('user-search-results');
+  if (!q) { container.style.display = 'none'; return; }
+  const results = USERS_DB.filter(u =>
+    u.name.toLowerCase().includes(q) || u.role.toLowerCase().includes(q)
+  ).filter(u => !selectedUsers.find(s => s.id === u.id));
+
+  if (results.length === 0) {
+    container.style.display = 'block';
+    container.innerHTML = '<div class="user-results"><div style="padding:12px;font-size:12px;color:var(--ink-500)">No users found</div></div>';
+    return;
+  }
+
+  container.style.display = 'block';
+  container.innerHTML = `<div class="user-results">${results.map(u => `
+    <div class="user-result-item" onclick="selectUser('${u.id}')">
+      <div class="avatar" style="background:${u.bg};color:${u.color};width:32px;height:32px;font-size:11px;flex-shrink:0">${u.initials}</div>
+      <div style="flex:1">
+        <div class="user-result-name">${u.name}</div>
+        <div class="user-result-meta">${u.role}</div>
+        ${u.escalations.length > 0 ? `
+          <div class="user-result-escalations">
+            📋 Already on: ${u.escalations.map(e => `${e.plant} (${e.insights} insights, ${e.timing})`).join(' · ')}
+          </div>
+        ` : ''}
+      </div>
+    </div>
+  `).join('')}</div>`;
+}
+
+function selectUser(id) {
+  const u = USERS_DB.find(u => u.id === id);
+  if (!u || selectedUsers.find(s => s.id === id)) return;
+  selectedUsers.push(u);
+  renderSelectedChips();
+  document.getElementById('user-search-input').value = '';
+  document.getElementById('user-search-results').style.display = 'none';
+  document.getElementById('wizard-next-btn').disabled = false;
+  updateHelperBox();
+  updateSummary();
+
+  // Permission check demo
+  if (id === 'mr') {
+    setTimeout(() => {
+      const chipContainer = document.getElementById('selected-user-chips');
+      const warning = document.createElement('div');
+      warning.className = 'permission-warning';
+      warning.style.width = '100%';
+      warning.innerHTML = `
+        <span>⚠</span>
+        <div>
+          <strong>Meera Rao</strong> doesn't have access to <strong>Powai Plant</strong>
+          <div class="perm-actions">
+            <button class="resolve" onclick="this.closest('.permission-warning').remove();showToast('Access granted to Meera Rao for Powai Plant','')">Grant access</button>
+            <button onclick="removeUser('mr');this.closest('.permission-warning').remove()">Remove from insight</button>
+          </div>
+        </div>
+      `;
+      chipContainer.after(warning);
+    }, 300);
+  }
+}
+
+function removeUser(id) {
+  selectedUsers = selectedUsers.filter(u => u.id !== id);
+  renderSelectedChips();
+  if (selectedUsers.length === 0) {
+    document.getElementById('wizard-next-btn').disabled = true;
+    document.getElementById('user-helper-box').style.display = 'none';
+  }
+  updateHelperBox();
+  updateSummary();
+}
+
+function renderSelectedChips() {
+  const container = document.getElementById('selected-user-chips');
+  container.innerHTML = selectedUsers.map(u => `
+    <div class="user-selected-chip">
+      <div class="avatar" style="background:${u.bg};color:${u.color};width:20px;height:20px;font-size:8px;border:none">${u.initials}</div>
+      ${u.name}
+      <button onclick="removeUser('${u.id}')">×</button>
+    </div>
+  `).join('');
+  // show save-group only when ≥2 users selected
+  const sgSection = document.getElementById('save-group-section');
+  if (sgSection) sgSection.style.display = selectedUsers.length >= 2 ? 'block' : 'none';
+  if (selectedUsers.length < 2) {
+    document.getElementById('save-group-form').style.display = 'none';
+    document.getElementById('save-group-icon').textContent = '+';
+  }
+}
+
+function toggleSaveGroup() {
+  const form = document.getElementById('save-group-form');
+  const icon = document.getElementById('save-group-icon');
+  const open = form.style.display === 'none';
+  form.style.display = open ? 'block' : 'none';
+  icon.textContent = open ? '−' : '+';
+}
+
+function toggleGroupNameInput(checked) {
+  const inp = document.getElementById('group-name-input');
+  inp.style.display = checked ? 'block' : 'none';
+  if (checked) inp.focus();
+}
+
+function assignGroup(groupName, initials) {
+  const n = selectedInsights.size || 1;
+  showToast(`✓ "${groupName}" assigned to ${n} insight${n>1?'s':''} · immediately · WhatsApp`, 'Undo');
+  selectedInsights.clear();
+  updateBulkBar();
+  document.querySelectorAll('#insights-tbody .checkbox').forEach(cb => cb.checked = false);
+  document.getElementById('select-all').checked = false;
+}
+
+function updateHelperBox() {
+  const box = document.getElementById('user-helper-box');
+  const content = document.getElementById('user-helper-content');
+  if (selectedUsers.length === 0) { box.style.display = 'none'; return; }
+
+  const rows = selectedUsers.flatMap(u =>
+    u.escalations.map(e => ({user:u.name, ...e}))
+  );
+
+  if (rows.length === 0) { box.style.display = 'none'; return; }
+
+  box.style.display = 'block';
+  content.innerHTML = rows.map(r => `
+    <div class="helper-row">
+      <div style="font-size:11px">
+        <strong>${r.user}</strong> · ${r.plant} · ${r.insights} insights · <span style="color:var(--ink-900);font-weight:600">${r.timing}</span> · ${r.channels}
+      </div>
+    </div>
+  `).join('');
+}
+
+// Timing
+function selectTime(val, btn) {
+  selectedTime = val;
+  document.querySelectorAll('.time-option').forEach(b => b.classList.remove('selected'));
+  if (btn) btn.classList.add('selected');
+  document.getElementById('custom-time-input').style.display = val === 'custom' ? 'block' : 'none';
+  updateSummary();
+}
+
+function resetTimeOptions() {
+  document.querySelectorAll('.time-option').forEach(b => b.classList.remove('selected'));
+  document.getElementById('time-immediately').classList.add('selected');
+  document.getElementById('custom-time-input').style.display = 'none';
+}
+
+// Channels
+function toggleChannel(ch) {
+  channels[ch] = !channels[ch];
+  const el = document.getElementById(`ch-${ch}`);
+  if (channels[ch]) {
+    el.style.background = 'var(--ink-900)';
+    el.style.borderColor = 'var(--ink-900)';
+    el.style.color = '#fff';
+    el.querySelector('div:last-child').textContent = 'ON';
+  } else {
+    el.style.background = 'var(--white)';
+    el.style.borderColor = 'var(--ink-300)';
+    el.style.color = 'var(--ink-700)';
+    el.querySelector('div:last-child').textContent = 'OFF';
+    el.querySelector('div:last-child').style.color = 'var(--ink-500)';
+  }
+  document.getElementById('wa-message-editor').style.display = channels.wa ? 'block' : 'none';
+  updateSummary();
+}
+
+// ══════════════════════════════════
+// DRAWER: ESCALATION
+// ══════════════════════════════════
+function openEscDrawer(insightId) {
+  const ins = INSIGHTS.find(i => i.id === insightId) || INSIGHTS[0];
+  document.getElementById('drawer-insight-name').textContent = ins.name;
+  document.getElementById('drawer-insight-meta').textContent = `${ins.plant} · ${ins.equip} · ${cap(ins.type)}`;
+  document.getElementById('drawer-overlay').classList.add('open');
+  document.getElementById('drawer-esc').classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('drawer-overlay').classList.remove('open');
+  document.getElementById('drawer-esc').classList.remove('open');
+  document.getElementById('drawer-defaults').classList.remove('open');
+}
+
+function saveDrawer() {
+  closeDrawer();
+  showToast('Escalation saved', 'Undo');
+}
+
+function overrideInheritance() {
+  const badge = document.querySelector('#drawer-esc .drawer-body > div:first-child');
+  badge.style.background = 'var(--amber-bg)';
+  badge.style.borderColor = 'var(--amber-border)';
+  badge.querySelector('div:first-child').style.fontSize = '18px';
+  badge.querySelector('div:nth-child(2) div:first-child').style.color = 'var(--amber)';
+  badge.querySelector('div:nth-child(2) div:first-child').textContent = 'Custom escalation';
+  badge.querySelector('div:nth-child(2) div:last-child').textContent = 'Overrides plant defaults for this insight';
+  badge.querySelector('button').textContent = 'Reset to defaults';
+  badge.querySelector('button').onclick = () => { location.reload(); };
+  showToast('Now editing custom escalation for this insight', '');
+}
+
+function addEscalationStep(node) {
+  showToast('New escalation step added — set timing and add users', '');
+}
+
+function editStepTime(btn) {
+  const current = btn.textContent.trim();
+  const newTime = prompt(`Change timing (current: ${current})\nExamples: +5 min, +45 min, +2 hr`, current);
+  if (newTime) { btn.textContent = newTime; showToast('Timing updated', ''); }
+}
+
+// ══════════════════════════════════
+// DRAWER: PLANT DEFAULTS
+// ══════════════════════════════════
+function openDefaultsDrawer(plantId) {
+  const plant = PLANTS.find(p => p.id === plantId);
+  document.getElementById('defaults-plant-name').textContent = `${plant.name} — Default Escalations`;
+  document.getElementById('drawer-overlay').classList.add('open');
+  document.getElementById('drawer-defaults').classList.add('open');
+}
+
+function closeDefaultsDrawer() {
+  document.getElementById('drawer-overlay').classList.remove('open');
+  document.getElementById('drawer-defaults').classList.remove('open');
+}
+
+function saveDefaultsDrawer() {
+  closeDefaultsDrawer();
+  showToast('Default escalation rules saved for this plant', '');
+}
+
+function toggleDefaultRule(type) {
+  const body = document.getElementById(`body-${type}`);
+  const arr = document.getElementById(`arr-${type}`);
+  const isOpen = body.classList.toggle('open');
+  arr.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+}
+
+// ══════════════════════════════════
+// TOAST
+// ══════════════════════════════════
+let toastTimer;
+function showToast(msg, undoLabel) {
+  clearTimeout(toastTimer);
+  document.getElementById('toast-msg').textContent = msg;
+  const undoEl = document.getElementById('toast-undo');
+  undoEl.textContent = undoLabel;
+  undoEl.style.display = undoLabel ? 'inline' : 'none';
+  const toast = document.getElementById('toast');
+  toast.classList.add('visible');
+  toastTimer = setTimeout(() => toast.classList.remove('visible'), 3200);
+}
+
+function hideToast() {
+  document.getElementById('toast').classList.remove('visible');
+}
+</script>
+</body>
+</html>
