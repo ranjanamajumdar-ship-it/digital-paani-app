@@ -160,6 +160,8 @@ input,select,textarea{font-family:inherit;font-size:14px;color:inherit}
 /* ── BULK ACTION BAR ── */
 .bulk-bar{background:var(--ink-900);color:#fff;padding:0;flex-direction:column;border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px;display:none;box-shadow:var(--shadow)}
 .bulk-bar.visible{display:flex}
+.bulk-bar-single{padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bulk-bar-single .bulk-actions{margin-left:auto}
 .bulk-bar-groups{padding:8px 20px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .bulk-bar-groups-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.4);white-space:nowrap}
 .bulk-bar-main{padding:10px 20px;display:flex;align-items:center;gap:12px}
@@ -447,9 +449,9 @@ input,select,textarea{font-family:inherit;font-size:14px;color:inherit}
 
       <!-- ── BULK ACTION BAR (inline, appears when items selected) ── -->
       <div class="bulk-bar" id="bulk-bar">
-        <!-- Saved groups row -->
-        <div class="bulk-bar-groups">
-          <span class="bulk-bar-groups-label">Quick assign group →</span>
+        <div class="bulk-bar-single">
+          <span class="bulk-count" id="bulk-count-label">0 selected</span>
+          <span class="bulk-bar-groups-label">Quick assign →</span>
           <button class="group-chip" onclick="assignGroup('Andheri Day Shift',['RK','PS','AM'])">
             <div class="gc-avatars">
               <div class="gc-avatar" style="background:#DBEAFE;color:#1D4ED8">RK</div>
@@ -473,14 +475,8 @@ input,select,textarea{font-family:inherit;font-size:14px;color:inherit}
             Regional Managers
           </button>
           <button class="group-chip" style="border-style:dashed;opacity:.6" onclick="openAddUserModal()">+ New group</button>
-        </div>
-        <!-- Main actions row -->
-        <div class="bulk-bar-main">
-          <span class="bulk-count" id="bulk-count-label">0 selected</span>
           <div class="bulk-actions">
             <button class="bulk-btn" onclick="openAddUserModal()">+ Add user</button>
-            <button class="bulk-btn" onclick="bulkToggle(true)">Enable</button>
-            <button class="bulk-btn" onclick="bulkToggle(false)">Disable</button>
             <button class="bulk-btn danger" onclick="showToast('Changes cleared','')">Clear</button>
           </div>
         </div>
