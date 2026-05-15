@@ -421,42 +421,35 @@ const steps = {
     mascot:'curious',
     say:'नमस्ते! मैं Dr. Paani हूँ, आज मैं आपकी सहायक हूँ। Blower-02 में दिक्कत है — देखें?',
     render: () => `
-      <!-- Plant title + user profile (red-tinted alert mode) -->
-      <div class="card p-4" style="background:linear-gradient(160deg,#FEF2F2,#FECACA);border:1px solid #FCA5A5">
+      <!-- Plant title + user profile (no box, color-only alert indication) -->
+      <div class="px-1">
         <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-2xl flex items-center justify-center" style="background:linear-gradient(135deg,#FCA5A5,#7F1D1D);box-shadow:0 4px 12px rgba(232,90,69,.25)">
-            <svg viewBox="0 0 32 40" width="20" height="26"><path d="M16,2 C20,8 30,18 30,26 A14,14 0 0 1 2,26 C2,18 12,8 16,2 Z" fill="#FFFFFF"/></svg>
-          </div>
           <div class="flex-1 min-w-0">
             <div class="label-tiny" style="color:#E85A45">STP Plant · Shift A</div>
-            <div class="font-serif text-lg font-bold leading-tight tracking-tight" style="color:#7F1D1D">HONDA MANESAR</div>
+            <div class="font-serif text-2xl font-bold leading-tight tracking-tight" style="color:#7F1D1D">HONDA MANESAR</div>
           </div>
-          <button onclick="showToast('प्रोफ़ाइल खोल रहे हैं...')" class="flex items-center gap-2 pl-1 pr-2 py-1 rounded-full tap-scale" style="background:#FFFFFF;border:1px solid #FCA5A5">
-            <div class="w-9 h-9 rounded-full flex items-center justify-center font-serif font-bold text-sm" style="background:linear-gradient(135deg,#E85A45,#7F1D1D);color:#FFFFFF">R</div>
-            <div class="text-left hidden sm:block">
-              <div class="text-[11px] font-semibold leading-tight">Ramesh</div>
-              <div class="text-[9px]" style="color:#64748B">Operator</div>
-            </div>
+          <button onclick="showToast('प्रोफ़ाइल खोल रहे हैं...')" class="tap-scale" aria-label="Profile">
+            <div class="w-11 h-11 rounded-full flex items-center justify-center font-serif font-bold text-base" style="background:linear-gradient(135deg,#E85A45,#7F1D1D);color:#FFFFFF;box-shadow:0 3px 10px rgba(232,90,69,.25)">R</div>
           </button>
         </div>
 
-        <!-- Inline alert line -->
-        <button onclick="goStep('alert')" class="mt-3 w-full flex items-center gap-2 px-3 py-2.5 rounded-2xl tap-scale" style="background:#FFFFFF;border:1.5px solid #E85A45">
-          <span class="relative flex h-2 w-2 flex-shrink-0">
+        <!-- Inline alert line (no box, just colored text + dot) -->
+        <button onclick="goStep('alert')" class="mt-3 w-full flex items-center gap-2 tap-scale text-left">
+          <span class="relative flex h-2.5 w-2.5 flex-shrink-0">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style="background:#E85A45"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2" style="background:#E85A45"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5" style="background:#E85A45"></span>
           </span>
-          <span class="font-serif font-bold text-sm flex-1 text-left" style="color:#7F1D1D">⚠ Alert · MBR-1 का पानी गंदा है</span>
+          <span class="font-serif font-bold text-base flex-1" style="color:#E85A45">⚠ Alert · MBR-1 का पानी गंदा है</span>
           ${soundBtn('Alert। MBR-1 का पानी गंदा है।')}
         </button>
       </div>
 
-      <!-- Plant SCADA diagram — Honda Manesar (red-tinted alert mode) -->
-      <div class="card p-3" style="background:linear-gradient(160deg,#FFFFFF,#FEF2F2);border:1px solid #FCA5A5">
+      <!-- Plant SCADA diagram — Honda Manesar -->
+      <div class="card p-3">
         <div class="flex items-center justify-between mb-3 px-1">
           <div>
             <div class="label-tiny" style="color:#E85A45">Plant Live View</div>
-            <div class="font-serif text-sm font-bold flex items-center" style="color:#7F1D1D">Honda Manesar · MBR Train ${soundBtn('Honda Manesar plant का live view। MBR-1 में alert है।')}</div>
+            <div class="font-serif text-sm font-bold flex items-center">Honda Manesar · MBR Train ${soundBtn('Honda Manesar plant का live view। MBR-1 में alert है।')}</div>
           </div>
           <div class="flex items-center gap-1">
             <span class="relative flex h-2 w-2">
@@ -466,7 +459,7 @@ const steps = {
             <span class="text-[10px] font-semibold" style="color:#E85A45">ALERT</span>
           </div>
         </div>
-        <div class="overflow-x-auto -mx-3 px-3 rounded-2xl" style="background:#FEF2F2;border:1px solid #FCA5A5">
+        <div class="overflow-x-auto -mx-3 px-3 rounded-2xl" style="background:#F8FAFC;border:1px solid #E2E8F0">
         <svg viewBox="0 0 540 460" class="w-full" style="min-width:540px;height:auto">
           <defs>
             <pattern id="waterPipe" x="0" y="0" width="14" height="6" patternUnits="userSpaceOnUse">
@@ -770,21 +763,21 @@ const steps = {
         </div>
       </div>
 
-      <!-- Quick stats — red-tinted -->
+      <!-- Quick stats — white, alert indicated by colour on DO -->
       <div class="grid grid-cols-3 gap-2.5">
-        <div class="card p-3 text-center" style="background:linear-gradient(160deg,#FFFFFF,#FEF2F2);border:1px solid #FECACA">
-          <div class="label-tiny" style="color:#E85A45">Inflow</div>
-          <div class="font-serif text-2xl font-semibold mt-1" style="color:#7F1D1D">112</div>
+        <div class="card p-3 text-center">
+          <div class="label-tiny">Inflow</div>
+          <div class="font-serif text-2xl font-semibold mt-1" style="color:#1E40AF">112</div>
           <div class="text-[10px]" style="color:#64748B">m³/h</div>
         </div>
-        <div class="card p-3 text-center" style="background:linear-gradient(160deg,#FEF2F2,#FECACA);border:1.5px solid #E85A45">
+        <div class="card p-3 text-center" style="border:1.5px solid #E85A45">
           <div class="label-tiny" style="color:#E85A45">⚠ DO</div>
           <div class="font-serif text-2xl font-semibold mt-1" style="color:#E85A45">1.8</div>
-          <div class="text-[10px]" style="color:#7F1D1D">mg/L · कम</div>
+          <div class="text-[10px]" style="color:#E85A45">mg/L · कम</div>
         </div>
-        <div class="card p-3 text-center" style="background:linear-gradient(160deg,#FFFFFF,#FEF2F2);border:1px solid #FECACA">
-          <div class="label-tiny" style="color:#E85A45">pH</div>
-          <div class="font-serif text-2xl font-semibold mt-1" style="color:#7F1D1D">7.2</div>
+        <div class="card p-3 text-center">
+          <div class="label-tiny">pH</div>
+          <div class="font-serif text-2xl font-semibold mt-1" style="color:#1E40AF">7.2</div>
           <div class="text-[10px]" style="color:#64748B">stable</div>
         </div>
       </div>
@@ -1553,16 +1546,12 @@ function renderStep(){
   const s = steps[currentStep];
   if (!s) return;
   document.getElementById('flowStepLabel').textContent = s.label;
-  // Phone surface: red-tinted on home (alert state), white elsewhere
-  const phoneEl = document.querySelector('.relative.w-\\[390px\\]');
-  if (phoneEl) phoneEl.style.background = s.isHome ? '#FFF5F5' : '#FFFFFF';
   if (s.isHome){
     document.getElementById('flowHeader').style.display = 'none';
     document.querySelector('#stepBadge').parentElement.parentElement.style.display = 'none';
     document.querySelector('nav.absolute.inset-x-0.bottom-0').style.display = 'none';
     document.getElementById('content').style.height = 'calc(100% - 130px)';
-    // Red-tint the mascot bar
-    document.getElementById('mascotBar').style.background = 'linear-gradient(180deg,#FECACA 0%,#FEF2F2 100%)';
+    document.getElementById('mascotBar').style.background = '';
   } else {
     document.getElementById('flowHeader').style.display = 'flex';
     document.querySelector('#stepBadge').parentElement.parentElement.style.display = 'block';
