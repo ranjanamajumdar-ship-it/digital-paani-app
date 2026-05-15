@@ -524,27 +524,49 @@ const steps = {
             <text x="165" y="96" text-anchor="middle" font-size="10" fill="#FFFFFF" font-weight="700">Tank 1</text>
           </g>
 
-          <!-- MBR-1 (ALERT pulsing red) -->
-          <g class="cursor-pointer" onclick="goStep('alert')">
-            <rect x="240" y="42" width="65" height="78" rx="3" fill="#5A8BC8" stroke="#E85A45" stroke-width="3"/>
-            <rect x="240" y="42" width="65" height="78" rx="3" fill="none" stroke="#E85A45" stroke-width="2" opacity=".5">
-              <animate attributeName="stroke-width" values="2;5;2" dur="1.5s" repeatCount="indefinite"/>
-              <animate attributeName="opacity" values=".7;0;.7" dur="1.5s" repeatCount="indefinite"/>
+          <!-- MBR-1 (ALERT pulsing red — tap to open details) -->
+          <g class="cursor-pointer" onclick="goStep('equipment')" style="transform-box:fill-box;transform-origin:center">
+            <!-- Glow ring -->
+            <rect x="234" y="36" width="77" height="90" rx="6" fill="none" stroke="#E85A45" stroke-width="1.5" opacity=".4">
+              <animate attributeName="opacity" values=".5;0;.5" dur="2s" repeatCount="indefinite"/>
+              <animate attributeName="stroke-width" values="1;6;1" dur="2s" repeatCount="indefinite"/>
             </rect>
-            <!-- Membrane modules (vertical bars inside) -->
-            <g fill="#FFFFFF" opacity=".55">
-              <rect x="248" y="60" width="3" height="48"/><rect x="254" y="60" width="3" height="48"/>
-              <rect x="260" y="60" width="3" height="48"/><rect x="266" y="60" width="3" height="48"/>
-              <rect x="272" y="60" width="3" height="48"/><rect x="278" y="60" width="3" height="48"/>
-              <rect x="284" y="60" width="3" height="48"/><rect x="290" y="60" width="3" height="48"/>
-              <rect x="296" y="60" width="3" height="48"/>
+            <!-- Inviting scale animation on the whole tank -->
+            <g>
+              <animateTransform attributeName="transform" type="scale" values="1;1.025;1" dur="2s" repeatCount="indefinite" additive="sum"/>
+              <rect x="240" y="42" width="65" height="78" rx="3" fill="#5A8BC8" stroke="#E85A45" stroke-width="3"/>
+              <rect x="240" y="42" width="65" height="78" rx="3" fill="none" stroke="#E85A45" stroke-width="2" opacity=".5">
+                <animate attributeName="stroke-width" values="2;5;2" dur="1.5s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values=".7;0;.7" dur="1.5s" repeatCount="indefinite"/>
+              </rect>
+              <!-- Membrane modules (vertical bars inside) -->
+              <g fill="#FFFFFF" opacity=".55">
+                <rect x="248" y="60" width="3" height="48"/><rect x="254" y="60" width="3" height="48"/>
+                <rect x="260" y="60" width="3" height="48"/><rect x="266" y="60" width="3" height="48"/>
+                <rect x="272" y="60" width="3" height="48"/><rect x="278" y="60" width="3" height="48"/>
+                <rect x="284" y="60" width="3" height="48"/><rect x="290" y="60" width="3" height="48"/>
+                <rect x="296" y="60" width="3" height="48"/>
+              </g>
+              <!-- Diffuser strip -->
+              <rect x="243" y="113" width="59" height="4" fill="#2A2017" opacity=".4"/>
+              <!-- Warning pip -->
+              <circle cx="298" cy="48" r="9" fill="#E85A45">
+                <animate attributeName="r" values="9;10.5;9" dur="1s" repeatCount="indefinite"/>
+              </circle>
+              <text x="298" y="52" text-anchor="middle" font-size="13" fill="#FFFFFF" font-weight="900">!</text>
+              <text x="272" y="134" text-anchor="middle" font-size="10" fill="#7F1D1D" font-weight="700">MBR 1</text>
             </g>
-            <!-- Diffuser strip -->
-            <rect x="243" y="113" width="59" height="4" fill="#2A2017" opacity=".4"/>
-            <!-- Warning pip -->
-            <circle cx="298" cy="48" r="9" fill="#E85A45"/>
-            <text x="298" y="52" text-anchor="middle" font-size="13" fill="#FFFFFF" font-weight="900">!</text>
-            <text x="272" y="134" text-anchor="middle" font-size="10" fill="#7F1D1D" font-weight="700">MBR 1</text>
+            <!-- Tap-to-view hint (floating finger) -->
+            <g>
+              <animateTransform attributeName="transform" type="translate" values="0,0;0,-3;0,0" dur="1.4s" repeatCount="indefinite"/>
+              <circle cx="272" cy="22" r="11" fill="#FFFFFF" stroke="#E85A45" stroke-width="1.5"/>
+              <text x="272" y="27" text-anchor="middle" font-size="13">👆</text>
+            </g>
+            <!-- "tap" label -->
+            <g opacity=".9">
+              <animate attributeName="opacity" values=".5;1;.5" dur="1.4s" repeatCount="indefinite"/>
+              <text x="272" y="0" text-anchor="middle" font-size="7" fill="#E85A45" font-weight="800">देखें</text>
+            </g>
           </g>
 
           <!-- MBR-1 Flux gauge -->
