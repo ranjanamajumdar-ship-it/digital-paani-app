@@ -1,0 +1,1540 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Digital Paani — Dr. Paani Diagnostic Prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+  tailwind.config = { theme: { extend: {
+    fontFamily: {
+      sans: ['Fraunces','Noto Sans Devanagari','ui-serif','Georgia','serif'],
+      ui: ['Inter','Noto Sans Devanagari','system-ui','sans-serif']
+    },
+    colors: {
+      ink:{900:'#0F172A',700:'#334155',500:'#64748B',300:'#CBD5E1'},
+      crit:'#E85A45', warn:'#3B82F6', prog:'#3B82F6', ok:'#51BD55', idle:'#94A3B8',
+      paani:{50:'#EFF6FF',100:'#DBEAFE',300:'#93C5FD',500:'#3B82F6',700:'#1E40AF',900:'#30158F'},
+      indigo:'#30158F', blue:'#0058DE', sky:'#72A9F7', mist:'#9CE8ED'
+    },
+    boxShadow: {
+      card:'0 1px 3px rgba(51,65,85,.04), 0 8px 24px rgba(51,65,85,.06)',
+      pop:'0 12px 40px rgba(51,65,85,.14)',
+      soft:'0 2px 8px rgba(51,65,85,.05)',
+      mascot:'0 8px 24px rgba(59,130,246,.25)'
+    },
+    borderRadius: { '3xl':'1.5rem','4xl':'2rem' }
+  } } };
+</script>
+<style>
+  html,body{background:#FFFFFF;font-family:'Inter','Noto Sans Devanagari',system-ui,sans-serif;color:#0F172A}
+  .font-serif{font-family:'Fraunces','Noto Sans Devanagari',ui-serif,Georgia,serif;font-feature-settings:"ss01","ss02";letter-spacing:-.01em}
+  /* Grain texture overlay */
+  .grain{position:relative}
+  .grain::before{
+    content:"";position:absolute;inset:0;pointer-events:none;z-index:1;opacity:.35;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.2  0 0 0 0 0.18  0 0 0 0 0.14  0 0 0 0.5 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+  .grain-soft::before{opacity:.18}
+  .screen{display:none} .screen.active{display:flex}
+  .chip{display:inline-flex;align-items:center;gap:.25rem;padding:.2rem .6rem;border-radius:9999px;font-size:11px;font-weight:600;letter-spacing:.01em}
+  .btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border-radius:1.25rem;padding:1.05rem 1.25rem;font-size:16px;font-weight:600;background:#0F172A;color:#FFFFFF;width:100%;box-shadow:0 2px 6px rgba(15,23,42,.18);font-family:'Fraunces',serif;letter-spacing:-.01em}
+  .btn-ghost{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border-radius:1.25rem;padding:.95rem 1rem;font-size:15px;font-weight:600;background:#F5F9FF;color:#0F172A;width:100%;border:1px solid rgba(51,65,85,.08);font-family:'Fraunces',serif}
+  .btn-paani{background:linear-gradient(140deg,#93C5FD 0%,#72A9F7 55%,#3B82F6 100%);color:#FFFFFF;display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border-radius:1.25rem;padding:1.1rem 1.25rem;font-size:17px;font-weight:600;width:100%;box-shadow:0 6px 16px rgba(59,130,246,.22),inset 0 1px 0 rgba(255,255,255,.25);font-family:'Fraunces',serif;letter-spacing:-.01em}
+  .card{background:#FFFFFF;border-radius:1.5rem;box-shadow:0 1px 3px rgba(51,65,85,.04),0 8px 24px rgba(51,65,85,.06);border:1px solid rgba(51,65,85,.05);position:relative;overflow:hidden}
+  .card-warm{background:linear-gradient(160deg,#FFFFFF 0%,#F5F9FF 100%)}
+  .card-sage{background:linear-gradient(160deg,#F5F9FF 0%,#E2E8F0 100%)}
+  .card-rose{background:linear-gradient(160deg,#EFF6FF 0%,#DBEAFE 100%)}
+  .card-peach{background:linear-gradient(160deg,#EFF6FF 0%,#DBEAFE 100%)}
+  .card-cream{background:linear-gradient(160deg,#FFFFFF 0%,#EFF6FF 100%)}
+  .mascot-bob{animation:bob 3.2s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-5px) rotate(1deg)}}
+  .pulse-ring{animation:pulse 2.2s ease-out infinite}
+  @keyframes pulse{0%{transform:scale(1);opacity:.5}100%{transform:scale(1.7);opacity:0}}
+  .auto-bar{animation:fill 5s linear forwards}
+  @keyframes fill{from{width:100%}to{width:0%}}
+  .tap-scale{transition:transform .15s ease, box-shadow .15s ease}
+  .tap-scale:active{transform:scale(.97)}
+  .safe-bottom{padding-bottom:env(safe-area-inset-bottom)}
+  .toggle-switch{width:46px;height:26px;background:#CBD5E1;border-radius:9999px;position:relative;transition:background .25s;cursor:pointer;box-shadow:inset 0 1px 2px rgba(51,65,85,.15)}
+  .toggle-switch.on{background:#3B82F6}
+  .toggle-switch::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;background:#FFFFFF;border-radius:9999px;transition:transform .25s cubic-bezier(.4,1.5,.6,1);box-shadow:0 2px 4px rgba(15,23,42,.2)}
+  .toggle-switch.on::after{transform:translateX(20px)}
+  .speech{position:relative;background:#FFFFFF;border:1.5px solid #72A9F7;border-radius:1.25rem;padding:.85rem 1.05rem;color:#0F172A;font-family:'Fraunces',serif;line-height:1.45;letter-spacing:-.005em;box-shadow:0 4px 12px rgba(59,130,246,.1)}
+  .speech::before{content:'';position:absolute;left:-9px;top:18px;width:0;height:0;border:9px solid transparent;border-right-color:#72A9F7}
+  .speech::after{content:'';position:absolute;left:-6px;top:20px;width:0;height:0;border:7px solid transparent;border-right-color:#FFFFFF}
+  .dotted-bg{background-image:radial-gradient(circle,#CBD5E1 1px,transparent 1px);background-size:18px 18px;background-position:0 0}
+  .hi-lg{font-size:23px;font-weight:600;line-height:1.25;font-family:'Fraunces',serif;letter-spacing:-.015em}
+  .hi-md{font-size:17px;font-weight:600;line-height:1.4;font-family:'Fraunces',serif;letter-spacing:-.01em}
+  .label-tiny{font-size:10px;text-transform:uppercase;letter-spacing:.12em;font-weight:600;color:#64748B}
+  /* Inline sound button */
+  .sound-pill{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:9999px;background:#DBEAFE;color:#3B82F6;border:1px solid rgba(59,130,246,.2);cursor:pointer;transition:all .15s;flex-shrink:0;margin-left:6px}
+  .sound-pill:hover{background:#93C5FD;transform:scale(1.08)}
+  .sound-pill:active{transform:scale(.92)}
+  .sound-pill.speaking{background:#3B82F6;color:#FFFFFF;animation:speak 1s ease-in-out infinite}
+  @keyframes speak{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+  /* Cute home button */
+  .home-btn{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:9999px;background:#F5F9FF;color:#0F172A;border:1px solid rgba(51,65,85,.1);box-shadow:0 2px 6px rgba(51,65,85,.08)}
+</style>
+</head>
+<body class="font-sans text-ink-900">
+
+<div class="min-h-screen w-full flex flex-col lg:flex-row items-start justify-center gap-6 p-4 lg:p-8" style="background:#FFFFFF">
+
+  <!-- Sidebar -->
+  <aside class="lg:w-64 w-full lg:sticky lg:top-8">
+    <div class="card p-5">
+      <div class="label-tiny">Prototype v3</div>
+      <div class="font-serif text-xl font-semibold mt-1">Digital Paani</div>
+      <div class="text-xs mt-0.5" style="color:#64748B">DT-001 · MBR Turbidity High</div>
+
+      <!-- Dr Paani Toggle -->
+      <div class="mt-5 p-4 rounded-3xl card-sage" style="border:1px solid rgba(59,130,246,.15)">
+        <div class="flex items-center gap-3 mb-3">
+          <div id="sidebarMascot" class="flex-shrink-0 mascot-bob"></div>
+          <div class="flex-1">
+            <div class="font-serif font-semibold" style="color:#1E3A8A">Dr. Paani</div>
+            <div class="text-[10px]" style="color:#1E40AF">Voice Assistant</div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-serif font-semibold" id="drPaaniLabel" style="color:#1E3A8A">ON</span>
+          <div id="drPaaniToggle" class="toggle-switch on" onclick="toggleDrPaani()"></div>
+        </div>
+      </div>
+
+      <div class="mt-4 text-[11px] uppercase tracking-wider text-ink-500 font-semibold">Home</div>
+      <nav class="mt-2 flex flex-col gap-1 text-xs">
+        <button onclick="goStep('home')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100 font-semibold">🏠 Plant Overview</button>
+      </nav>
+
+      <div class="mt-4 text-[11px] uppercase tracking-wider text-ink-500 font-semibold">Diagnostic Flow</div>
+      <nav class="mt-2 flex flex-col gap-1 text-xs">
+        <button onclick="goStep('alert')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">1 · Alert</button>
+        <button onclick="goStep('preview')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">2 · Step Preview</button>
+        <button onclick="goStep('autocheck1')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">3 · Auto-check (TMP/Flux)</button>
+        <button onclick="goStep('foam')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">4 · Foam observation</button>
+        <button onclick="goStep('foamcolor')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">5 · Foam colour</button>
+        <button onclick="goStep('autocheck2')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">6 · Blower status</button>
+        <button onclick="goStep('action')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">7 · Action card</button>
+        <button onclick="goStep('wait')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">8 · Wait / observe</button>
+        <button onclick="goStep('rootcause')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">9 · Root cause</button>
+        <button onclick="goStep('close')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">10 · Issue close</button>
+      </nav>
+
+      <div class="mt-4 text-[11px] uppercase tracking-wider text-ink-500 font-semibold">Equipment</div>
+      <nav class="mt-2 flex flex-col gap-1 text-xs">
+        <button onclick="goStep('equipment')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">MBR-1 Tank · Details</button>
+      </nav>
+
+      <div class="mt-4 pt-4 border-t border-slate-200 text-[11px] text-ink-500 leading-relaxed">
+        Toggle Dr. Paani to compare assisted vs. standard mode. Built for low-literacy Hindi-speaking operators (Ramesh persona).
+      </div>
+    </div>
+  </aside>
+
+  <!-- Phone -->
+  <div class="relative">
+    <div class="relative w-[390px] h-[844px] rounded-[52px] shadow-pop overflow-hidden grain" style="background:#FFFFFF;border:1px solid rgba(51,65,85,.1)">
+
+      <!-- Status bar -->
+      <div class="absolute top-0 inset-x-0 h-10 flex items-center justify-between px-6 text-[12px] font-semibold z-40">
+        <span>9:41</span>
+        <span class="flex gap-1">
+          <span class="text-[10px]">●●●●</span>
+          <span class="text-[10px]">📶</span>
+          <span class="text-[10px]">🔋</span>
+        </span>
+      </div>
+
+      <!-- Main screen container -->
+      <main class="absolute inset-0 pt-10 pb-[60px] overflow-hidden">
+
+        <!-- Persistent header: home button + equipment chip + Dr. Paani toggle indicator -->
+        <div id="flowHeader" class="px-4 py-3 flex items-center gap-2.5 relative z-10" style="background:#FFFFFF;border-bottom:1px solid rgba(51,65,85,.06)">
+          <button onclick="goStep('home')" class="home-btn tap-scale" aria-label="Home">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
+          </button>
+          <button onclick="goStep('equipment')" class="flex-1 min-w-0 text-left tap-scale px-2.5 py-1.5 rounded-2xl" style="background:#F5F9FF;border:1px solid rgba(51,65,85,.06)">
+            <div class="label-tiny flex items-center gap-1" style="color:#1E40AF">
+              <span>📍</span>MBR-1 Tank · Secondary
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="ml-0.5"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+            <div class="text-[13px] font-semibold leading-tight font-serif" id="flowStepLabel">Alert</div>
+          </button>
+          <button id="listenBtn" onclick="playAudio()" class="h-10 w-10 rounded-full flex items-center justify-center tap-scale" style="background:#3B82F6;color:#FFFFFF;box-shadow:0 4px 10px rgba(59,130,246,.3)" aria-label="Listen">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+          </button>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="px-4 pt-2.5 pb-1.5 relative z-10" style="background:#FFFFFF">
+          <div class="flex items-center gap-2">
+            <span id="stepBadge" class="chip" style="background:#EFF6FF;color:#1E40AF">Step 1 of 10</span>
+            <div class="flex-1 h-1.5 rounded-full overflow-hidden" style="background:#EFF6FF">
+              <div id="stepBar" class="h-full transition-all duration-500" style="width:10%;background:linear-gradient(90deg,#93C5FD,#3B82F6)"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mascot bar (Dr. Paani assisted mode) -->
+        <div id="mascotBar" class="px-4 py-3 flex items-start gap-3 relative z-10" style="background:linear-gradient(180deg,#F5F9FF 0%,#FFFFFF 100%)">
+          <div id="mascotEl" class="flex-shrink-0 mascot-bob" style="filter:drop-shadow(0 4px 8px rgba(59,130,246,.2))"></div>
+          <div id="mascotSpeech" class="speech flex-1 text-sm cursor-pointer tap-scale" onclick="playAudio()">
+            <div id="mascotText">नमस्ते! मैं Dr. Paani हूँ — चलिए देखते हैं क्या हुआ।</div>
+            <div class="mt-1.5 flex items-center gap-1 text-[10px]" style="color:#3B82F6">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              <span class="font-semibold">सुनने के लिए दबाएँ</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content area -->
+        <div id="content" class="overflow-y-auto px-4 py-4 space-y-3 relative z-10" style="height:calc(100% - 200px)"></div>
+
+      </main>
+
+      <!-- Bottom action bar (persistent) -->
+      <nav class="absolute inset-x-0 bottom-0 z-30 safe-bottom" style="background:#FFFFFF;border-top:1px solid rgba(51,65,85,.06)">
+        <div class="grid grid-cols-4 gap-1 px-3 py-2.5">
+          <button onclick="goStep('home')" class="flex flex-col items-center gap-0.5 py-1 tap-scale" style="color:#1E40AF">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
+            <span class="text-[10px] font-semibold">घर</span>
+          </button>
+          <button onclick="skipStep()" class="flex flex-col items-center gap-0.5 py-1 tap-scale" style="color:#64748B">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+            <span class="text-[10px] font-semibold">छोड़ें</span>
+          </button>
+          <button onclick="sendPhoto()" class="flex flex-col items-center gap-0.5 py-1 tap-scale" style="color:#1E40AF">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <span class="text-[10px] font-semibold">फ़ोटो</span>
+          </button>
+          <button onclick="callSupervisor()" class="flex flex-col items-center gap-0.5 py-1 tap-scale" style="color:#E85A45">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span class="text-[10px] font-semibold">Supervisor</span>
+          </button>
+        </div>
+      </nav>
+
+      <!-- Photo upload modal -->
+      <input type="file" accept="image/*" capture="environment" id="photoInput" class="hidden" onchange="handlePhotoSelect(event)">
+      <div id="photoModal" class="absolute inset-0 z-40 hidden flex-col" style="background:#FFFFFF">
+        <div class="px-4 py-3 flex items-center gap-2.5" style="border-bottom:1px solid rgba(51,65,85,.06)">
+          <button onclick="closePhotoModal()" class="home-btn tap-scale" aria-label="Close">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+          <div class="flex-1">
+            <div class="label-tiny">Photo भेजें</div>
+            <div class="text-[13px] font-semibold font-serif">Supervisor को भेजें</div>
+          </div>
+          <button onclick="speak('Photo भेजें। Supervisor देखेंगे।')" class="h-10 w-10 rounded-full flex items-center justify-center tap-scale" style="background:#3B82F6;color:#FFFFFF;box-shadow:0 4px 10px rgba(59,130,246,.3)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+          <!-- Empty state / preview -->
+          <div id="photoPreviewArea" class="card p-4">
+            <div id="photoEmpty" class="">
+              <div class="rounded-3xl p-8 text-center" style="background:#EFF6FF;border:2px dashed #93C5FD">
+                <div class="text-5xl mb-3">📷</div>
+                <div class="hi-md mb-1">तस्वीर लें या चुनें</div>
+                <div class="text-xs mb-4" style="color:#64748B">Equipment की तस्वीर खींचें</div>
+                <button onclick="document.getElementById('photoInput').click()" class="btn-paani tap-scale">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  <span>Camera खोलें</span>
+                </button>
+              </div>
+            </div>
+            <div id="photoPreview" class="hidden">
+              <div class="relative rounded-3xl overflow-hidden" style="background:#0F172A">
+                <img id="previewImg" class="w-full h-64 object-cover" alt="Captured photo"/>
+                <button onclick="document.getElementById('photoInput').click()" class="absolute bottom-3 right-3 px-3 py-1.5 rounded-full text-xs font-semibold tap-scale" style="background:rgba(255,255,255,.9);color:#0F172A">
+                  ↻ बदलें
+                </button>
+              </div>
+              <div class="mt-3 flex items-center gap-2 text-[11px]" style="color:#64748B">
+                <span>📍</span>
+                <span>MBR-1 Tank · <span id="photoStep">Step</span> पर खींची</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Note -->
+          <div class="card p-4">
+            <div class="label-tiny mb-2 flex items-center">Note (वैकल्पिक) ${soundBtn('Note लिख सकते हैं या बोलकर भी बता सकते हैं।')}</div>
+            <textarea id="photoNote" rows="3" placeholder="क्या दिख रहा है? (वैकल्पिक)" class="w-full p-3 rounded-2xl text-sm font-serif" style="background:#F5F9FF;border:1px solid rgba(51,65,85,.08);outline:none;resize:none"></textarea>
+            <div class="mt-2 flex gap-2">
+              <button onclick="showToast('🎤 बोलिए... सुन रहे हैं')" class="flex-1 py-2.5 rounded-2xl text-sm font-serif font-semibold tap-scale flex items-center justify-center gap-1.5" style="background:#EFF6FF;color:#1E40AF;border:1px solid #93C5FD">
+                <span>🎤</span> बोलकर बताएँ
+              </button>
+            </div>
+          </div>
+
+          <!-- Recipient -->
+          <div class="card p-4">
+            <div class="label-tiny mb-2">कहाँ जाएगा</div>
+            <div class="flex items-center gap-3 p-3 rounded-2xl" style="background:#F5F9FF">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center font-serif font-bold" style="background:#3B82F6;color:#fff">AK</div>
+              <div class="flex-1">
+                <div class="font-serif font-semibold text-sm">Ashok Kumar</div>
+                <div class="text-[11px]" style="color:#64748B">Shift Supervisor · Online</div>
+              </div>
+              <div class="w-2 h-2 rounded-full" style="background:#51BD55"></div>
+            </div>
+          </div>
+
+          <!-- Send button -->
+          <button id="sendPhotoBtn" onclick="confirmSendPhoto()" disabled class="btn-paani tap-scale disabled:opacity-50">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <span>Supervisor को भेजें</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Toast -->
+      <div id="toast" class="absolute bottom-24 left-1/2 -translate-x-1/2 bg-ink-900 text-white text-sm px-4 py-2.5 rounded-full opacity-0 transition-opacity z-50">Done</div>
+    </div>
+    <div class="text-center text-xs text-ink-500 mt-3">390 × 844 · DT-001 MBR Turbidity High · Hindi-first</div>
+  </div>
+</div>
+
+<script>
+/* ============== DR. PAANI MASCOT ============== */
+function mascotSVG(expr, size){
+  size = size || 72;
+  const h = Math.round(size * 1.3);
+  const blush = `<circle cx="12" cy="42" r="3.5" fill="#BFDBFE" opacity=".7"/><circle cx="38" cy="42" r="3.5" fill="#BFDBFE" opacity=".7"/>`;
+  const faces = {
+    curious: `
+      <ellipse cx="18" cy="37" rx="3" ry="3.8" fill="#0F172A"/>
+      <ellipse cx="32" cy="37" rx="3" ry="3.8" fill="#0F172A"/>
+      <circle cx="19" cy="35.5" r="1.1" fill="#fff"/><circle cx="33" cy="35.5" r="1.1" fill="#fff"/>
+      <path d="M20,46 Q25,50 30,46" stroke="#0F172A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      ${blush}`,
+    thinking: `
+      <path d="M14,31 Q17,29 20,31" stroke="#0F172A" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path d="M30,31 Q33,29 36,31" stroke="#0F172A" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <ellipse cx="18" cy="37" rx="2.5" ry="3.5" fill="#0F172A"/>
+      <ellipse cx="32" cy="37" rx="2.5" ry="3.5" fill="#0F172A"/>
+      <circle cx="19" cy="35.5" r="1" fill="#fff"/><circle cx="33" cy="35.5" r="1" fill="#fff"/>
+      <path d="M21,46 Q25,46 29,46" stroke="#0F172A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      ${blush}`,
+    concerned: `
+      <path d="M14,32 Q17,34 20,32" stroke="#0F172A" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path d="M30,32 Q33,34 36,32" stroke="#0F172A" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <ellipse cx="18" cy="38" rx="2.6" ry="3.3" fill="#0F172A"/>
+      <ellipse cx="32" cy="38" rx="2.6" ry="3.3" fill="#0F172A"/>
+      <circle cx="19" cy="36.5" r="1" fill="#fff"/><circle cx="33" cy="36.5" r="1" fill="#fff"/>
+      <path d="M21,48 Q25,45 29,48" stroke="#0F172A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      ${blush}`,
+    celebrating: `
+      <path d="M13,37 Q18,41 23,37" stroke="#0F172A" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M27,37 Q32,41 37,37" stroke="#0F172A" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M18,44 Q25,52 32,44 Q32,49 25,50 Q18,49 18,44 Z" fill="#3B82F6" stroke="#0F172A" stroke-width="1.5" stroke-linejoin="round"/>
+      <ellipse cx="25" cy="48" rx="3" ry="1.6" fill="#DBEAFE"/>
+      ${blush}
+      <g fill="#3B82F6">
+        <path d="M8,18 L10,16 L9,19 Z"/><path d="M42,16 L44,14 L43,17 Z"/>
+        <circle cx="6" cy="26" r="1.5"/><circle cx="44" cy="28" r="1.5"/>
+      </g>`,
+    waiting: `
+      <path d="M14,36 Q18,39 22,36" stroke="#0F172A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M28,36 Q32,39 36,36" stroke="#0F172A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <ellipse cx="25" cy="45" rx="2.5" ry="1.3" fill="#0F172A"/>
+      ${blush}`
+  };
+  return `<svg viewBox="0 0 50 64" width="${size}" height="${h}">
+    <defs>
+      <radialGradient id="dg_${expr}" cx="38%" cy="32%">
+        <stop offset="0%" stop-color="#EFF6FF"/>
+        <stop offset="55%" stop-color="#BFDBFE"/>
+        <stop offset="100%" stop-color="#72A9F7"/>
+      </radialGradient>
+      <filter id="mf_${expr}"><feGaussianBlur stdDeviation="0.15"/></filter>
+    </defs>
+    <!-- Body: water drop -->
+    <path d="M25,3 C29,9 46,24 46,38 A21,21 0 0 1 4,38 C4,24 21,9 25,3 Z"
+      fill="url(#dg_${expr})" stroke="#1E40AF" stroke-width="1.4" stroke-linejoin="round"/>
+    <!-- Highlight -->
+    <ellipse cx="16" cy="22" rx="3.5" ry="6.5" fill="#fff" opacity=".55" transform="rotate(-22 16 22)"/>
+    <ellipse cx="14" cy="32" rx="1.2" ry="2" fill="#fff" opacity=".4" transform="rotate(-22 14 32)"/>
+    ${faces[expr] || faces.curious}
+    <!-- Stethoscope -->
+    <path d="M11,54 Q18,60 25,56 Q32,60 39,54" stroke="#0F172A" stroke-width="1.4" fill="none" stroke-linecap="round" opacity=".85"/>
+    <circle cx="39" cy="55" r="2.4" fill="#FFFFFF" stroke="#0F172A" stroke-width="1.4"/>
+    <circle cx="39" cy="55" r="1" fill="#0F172A"/>
+  </svg>`;
+}
+
+/* ============== STATE ============== */
+let drPaaniMode = true;
+let currentStep = 'home';
+let autoCheckTimer = null;
+let voiceReady = false;
+let hindiVoice = null;
+
+/* ============== VOICE (Web Speech API) ============== */
+function loadVoices(){
+  const voices = speechSynthesis.getVoices();
+  // Try Hindi voice first, fall back to anything
+  hindiVoice = voices.find(v => v.lang === 'hi-IN')
+            || voices.find(v => v.lang.startsWith('hi'))
+            || voices.find(v => v.name.toLowerCase().includes('hindi'))
+            || voices.find(v => v.lang === 'en-IN')
+            || voices[0];
+}
+if ('speechSynthesis' in window){
+  loadVoices();
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+function speak(text){
+  if (!('speechSynthesis' in window) || !text) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  if (hindiVoice) u.voice = hindiVoice;
+  u.lang = 'hi-IN';
+  u.rate = 0.92;
+  u.pitch = 1.1;
+  speechSynthesis.speak(u);
+  voiceReady = true;
+}
+
+/* ============== TOGGLE ============== */
+function toggleDrPaani(){
+  drPaaniMode = !drPaaniMode;
+  const tg = document.getElementById('drPaaniToggle');
+  const lbl = document.getElementById('drPaaniLabel');
+  tg.classList.toggle('on', drPaaniMode);
+  lbl.textContent = drPaaniMode ? 'ON' : 'OFF';
+  document.getElementById('mascotBar').style.display = drPaaniMode ? 'flex' : 'none';
+  document.getElementById('listenBtn').style.display = drPaaniMode ? 'flex' : 'none';
+  renderStep();
+}
+
+/* ============== STEPS DATA ============== */
+const steps = {
+  home: {
+    n:0, label:'Home · Plant Overview', isHome:true,
+    mascot:'curious',
+    say:'नमस्ते! मैं Dr. Paani हूँ, आज मैं आपकी सहायक हूँ। Blower-02 में दिक्कत है — देखें?',
+    render: () => `
+      <div class="card card-warm p-5">
+        <div class="flex items-center gap-3">
+          <div class="w-14 h-14 rounded-3xl flex items-center justify-center" style="background:linear-gradient(135deg,#93C5FD,#1E40AF);box-shadow:0 4px 12px rgba(59,130,246,.25)">
+            <svg viewBox="0 0 32 40" width="22" height="28"><path d="M16,2 C20,8 30,18 30,26 A14,14 0 0 1 2,26 C2,18 12,8 16,2 Z" fill="#FFFFFF"/></svg>
+          </div>
+          <div class="flex-1">
+            <div class="font-serif text-xl font-semibold leading-tight">Digital Paani</div>
+            <div class="text-xs flex items-center gap-1.5" style="color:#64748B">
+              <span>STP Plant</span><span>·</span><span>Shift A</span><span>·</span><span>9:41 AM</span>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="label-tiny">Issues</div>
+            <div class="flex gap-1 mt-1">
+              <span class="chip" style="background:rgba(232,90,69,.12);color:#3B82F6">●1</span>
+              <span class="chip" style="background:rgba(59,130,246,.18);color:#3B82F6">●1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick start: symptom-first entry (F9) -->
+      <div class="card card-sage p-4">
+        <div class="label-tiny mb-3 flex items-center" style="color:#1E40AF">क्या दिख रहा है? ${soundBtn('आपको क्या दिख रहा है? नीचे से चुनें।')}</div>
+        <div class="grid grid-cols-4 gap-2">
+          <button onclick="goStep('alert')" class="rounded-3xl p-3 text-center tap-scale" style="background:#FFFFFF;border:1px solid rgba(51,65,85,.06);box-shadow:0 2px 6px rgba(51,65,85,.05)">
+            <div class="text-3xl">💧</div><div class="text-[10px] font-serif font-semibold mt-1">गंदा पानी</div>
+          </button>
+          <button onclick="showToast('Foam check शुरू...')" class="rounded-3xl p-3 text-center tap-scale" style="background:#FFFFFF;border:1px solid rgba(51,65,85,.06);box-shadow:0 2px 6px rgba(51,65,85,.05)">
+            <div class="text-3xl">🫧</div><div class="text-[10px] font-serif font-semibold mt-1">झाग</div>
+          </button>
+          <button onclick="showToast('Noise diagnostic...')" class="rounded-3xl p-3 text-center tap-scale" style="background:#FFFFFF;border:1px solid rgba(51,65,85,.06);box-shadow:0 2px 6px rgba(51,65,85,.05)">
+            <div class="text-3xl">🔊</div><div class="text-[10px] font-serif font-semibold mt-1">आवाज़</div>
+          </button>
+          <button onclick="showToast('Smell check...')" class="rounded-3xl p-3 text-center tap-scale" style="background:#FFFFFF;border:1px solid rgba(51,65,85,.06);box-shadow:0 2px 6px rgba(51,65,85,.05)">
+            <div class="text-3xl">👃</div><div class="text-[10px] font-serif font-semibold mt-1">बदबू</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Resume previous session (F12) -->
+      <div class="card card-rose p-4">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style="background:#DBEAFE">⏸</div>
+          <div class="flex-1">
+            <div class="label-tiny" style="color:#3B82F6">Resume · 5 मिनट पहले</div>
+            <div class="font-serif text-sm font-semibold mt-0.5">MBR Turbidity · Step 4 तक हुआ था</div>
+          </div>
+          <button onclick="goStep('foam')" class="px-4 py-2 rounded-2xl font-serif font-semibold text-sm tap-scale" style="background:#0F172A;color:#FFFFFF;box-shadow:0 3px 8px rgba(15,23,42,.2)">आगे →</button>
+        </div>
+      </div>
+
+      <!-- Plant SCADA diagram -->
+      <div class="card card-warm p-4 dotted-bg">
+        <div class="label-tiny mb-3 flex items-center justify-between">
+          <span class="flex items-center">🏭 Plant Live View ${soundBtn('Plant का live view। कोई भी equipment दबाएँ।')}</span>
+          <span style="color:#3B82F6">⚠ BLW-02 में दिक्कत</span>
+        </div>
+        <svg viewBox="0 0 340 360" class="w-full">
+          <!-- Connections -->
+          <g stroke="#CBD5E1" stroke-width="3" fill="none" stroke-linecap="round">
+            <path d="M50,55 L100,55"/>
+            <path d="M70,80 L70,120"/>
+            <path d="M70,165 L70,200"/>
+            <path d="M70,245 L70,280"/>
+            <path d="M115,140 L155,140"/>
+            <path d="M115,220 L155,220"/>
+            <path d="M115,300 L155,300"/>
+            <path d="M260,180 L290,180"/>
+            <path d="M310,210 L310,250"/>
+          </g>
+
+          <!-- Inlet Valve -->
+          <g class="cursor-pointer" onclick="showToast('Inlet Valve · खुला है')">
+            <rect x="25" y="35" width="40" height="40" rx="10" fill="#fff" stroke="#CBD5E1" stroke-width="2"/>
+            <polygon points="45,48 38,58 52,58" fill="none" stroke="#94A3B8" stroke-width="2"/>
+            <text x="45" y="92" text-anchor="middle" font-size="10" fill="#64748B" font-weight="700">Inlet Valve</text>
+          </g>
+
+          <!-- BLW-01 (healthy) -->
+          <g class="cursor-pointer" onclick="showToast('Blower 1 · सब ठीक है')">
+            <circle cx="70" cy="140" r="26" fill="#fff" stroke="#7DD3FC" stroke-width="2.5"/>
+            <g transform="translate(70,140)">
+              <path d="M0,-10 a10,10 0 1,0 0.001,0 M-7,0 a7,7 0 1,0 0.001,0" fill="none" stroke="#0EA5E9" stroke-width="2.5"/>
+            </g>
+            <text x="70" y="145" text-anchor="middle" font-size="8" fill="#0369A1" font-weight="700">BLW-01</text>
+            <text x="70" y="180" text-anchor="middle" font-size="10" fill="#0369A1" font-weight="700">SBR Blower 1</text>
+          </g>
+
+          <!-- BLW-02 (warning - tap to start diagnostic) -->
+          <g class="cursor-pointer" onclick="goStep('alert')">
+            <circle cx="70" cy="220" r="28" fill="#fff" stroke="#E85A45" stroke-width="3"/>
+            <circle cx="70" cy="220" r="32" fill="none" stroke="#E85A45" stroke-width="2" opacity="0.4">
+              <animate attributeName="r" values="28;36;28" dur="1.8s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.7;0;0.7" dur="1.8s" repeatCount="indefinite"/>
+            </circle>
+            <g transform="translate(70,220)">
+              <path d="M0,-10 a10,10 0 1,0 0.001,0 M-7,0 a7,7 0 1,0 0.001,0" fill="none" stroke="#0EA5E9" stroke-width="2.5"/>
+            </g>
+            <text x="70" y="225" text-anchor="middle" font-size="8" fill="#1E40AF" font-weight="700">BLW-02</text>
+            <!-- Warning badge -->
+            <circle cx="92" cy="200" r="10" fill="#E85A45"/>
+            <text x="92" y="204" text-anchor="middle" font-size="13" fill="#fff" font-weight="900">!</text>
+            <text x="70" y="260" text-anchor="middle" font-size="10" fill="#1E40AF" font-weight="700">SBR Blower 2</text>
+          </g>
+
+          <!-- BLW-03 (healthy) -->
+          <g class="cursor-pointer" onclick="showToast('Blower 3 · सब ठीक है')">
+            <circle cx="70" cy="300" r="26" fill="#fff" stroke="#7DD3FC" stroke-width="2.5"/>
+            <g transform="translate(70,300)">
+              <path d="M0,-10 a10,10 0 1,0 0.001,0 M-7,0 a7,7 0 1,0 0.001,0" fill="none" stroke="#0EA5E9" stroke-width="2.5"/>
+            </g>
+            <text x="70" y="305" text-anchor="middle" font-size="8" fill="#0369A1" font-weight="700">BLW-03</text>
+            <text x="70" y="340" text-anchor="middle" font-size="10" fill="#0369A1" font-weight="700">SBR Blower 3</text>
+          </g>
+
+          <!-- CASS Basin with 3 zones -->
+          <g class="cursor-pointer" onclick="goStep('equipment')">
+            <rect x="155" y="100" width="170" height="160" rx="12" fill="#F0F9FF" stroke="#7DD3FC" stroke-width="2"/>
+            <!-- Zone dividers -->
+            <line x1="212" y1="100" x2="212" y2="260" stroke="#BAE6FD" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <line x1="269" y1="100" x2="269" y2="260" stroke="#BAE6FD" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <!-- Zone labels -->
+            <text x="183" y="120" text-anchor="middle" font-size="11" fill="#0369A1" font-weight="700">Z1</text>
+            <text x="240" y="120" text-anchor="middle" font-size="11" fill="#0369A1" font-weight="700">Z2</text>
+            <text x="297" y="120" text-anchor="middle" font-size="11" fill="#0369A1" font-weight="700">Z3</text>
+            <!-- Diffusers -->
+            <g stroke="#0EA5E9" stroke-width="2" fill="none">
+              <circle cx="183" cy="170" r="14"/><line x1="169" y1="170" x2="197" y2="170"/><line x1="183" y1="156" x2="183" y2="184"/>
+              <circle cx="240" cy="170" r="14"/><line x1="226" y1="170" x2="254" y2="170"/><line x1="240" y1="156" x2="240" y2="184"/>
+              <circle cx="297" cy="170" r="14"/><line x1="283" y1="170" x2="311" y2="170"/><line x1="297" y1="156" x2="297" y2="184"/>
+            </g>
+            <text x="240" y="245" text-anchor="middle" font-size="10" fill="#0369A1" font-weight="700">CASS BASIN-1 · 4500 KL</text>
+          </g>
+
+          <!-- Re-Circ Pump -->
+          <g class="cursor-pointer" onclick="showToast('Re-Circ Pump A · चल रहा है')">
+            <circle cx="310" cy="190" r="18" fill="#fff" stroke="#CBD5E1" stroke-width="2"/>
+            <g transform="translate(310,190)" stroke="#64748B" stroke-width="2" fill="none">
+              <path d="M-6,-6 L6,6 M6,-6 L-6,6"/>
+              <circle cx="0" cy="0" r="4"/>
+            </g>
+            <text x="310" y="232" text-anchor="middle" font-size="9" fill="#475569" font-weight="700">Re-Circ</text>
+            <text x="310" y="244" text-anchor="middle" font-size="9" fill="#475569" font-weight="700">Pump A</text>
+          </g>
+
+          <!-- DO Sensor -->
+          <g class="cursor-pointer" onclick="showToast('DO Sensor: 1.8 mg/L · थोड़ा कम')">
+            <rect x="290" y="260" width="40" height="34" rx="6" fill="#fff" stroke="#7DD3FC" stroke-width="2"/>
+            <text x="310" y="278" text-anchor="middle" font-size="12" fill="#0369A1" font-weight="800">1.8</text>
+            <text x="310" y="289" text-anchor="middle" font-size="7" fill="#64748B" font-weight="600">mg/L DO</text>
+            <text x="310" y="310" text-anchor="middle" font-size="9" fill="#0369A1" font-weight="700">DO Sensor</text>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Quick stats -->
+      <div class="grid grid-cols-3 gap-2.5">
+        <div class="card p-3 text-center">
+          <div class="label-tiny">Inflow</div>
+          <div class="font-serif text-2xl font-semibold mt-1" style="color:#1E40AF">112</div>
+          <div class="text-[10px]" style="color:#64748B">m³/h</div>
+        </div>
+        <div class="card p-3 text-center" style="background:linear-gradient(160deg,#FFFFFF,#F5F9FF)">
+          <div class="label-tiny">DO</div>
+          <div class="font-serif text-2xl font-semibold mt-1" style="color:#3B82F6">1.8</div>
+          <div class="text-[10px]" style="color:#64748B">mg/L</div>
+        </div>
+        <div class="card p-3 text-center">
+          <div class="label-tiny">pH</div>
+          <div class="font-serif text-2xl font-semibold mt-1" style="color:#1E40AF">7.2</div>
+          <div class="text-[10px]" style="color:#64748B">stable</div>
+        </div>
+      </div>
+      `
+  },
+
+  alert: {
+    n:1, label:'Alert',
+    mascot:'concerned',
+    say:'अरे! MBR का पानी गंदा हो गया है। चलिए मिलकर देखते हैं।',
+    render: () => `
+      <div class="card card-rose p-5">
+        <div class="flex items-center justify-between mb-4">
+          <span class="chip" style="background:rgba(232,90,69,.12);color:#3B82F6">● ज़रूरी</span>
+          <span class="label-tiny">12 मिनट पहले</span>
+        </div>
+
+        <!-- Cause -->
+        <div class="flex items-start gap-3 mb-4">
+          <div class="w-14 h-14 rounded-3xl flex items-center justify-center text-3xl flex-shrink-0" style="background:#DBEAFE">💧</div>
+          <div class="flex-1">
+            <div class="label-tiny flex items-center">क्या हुआ ${soundBtn('क्या हुआ — MBR का पानी गंदा है। Turbidity बहुत बढ़ गया है।')}</div>
+            <div class="hi-md mt-0.5">MBR का पानी गंदा है</div>
+            <div class="text-xs" style="color:#64748B">Turbidity बहुत बढ़ गया</div>
+          </div>
+        </div>
+
+        <!-- Consequence -->
+        <div class="flex items-start gap-3 mb-4">
+          <div class="w-14 h-14 rounded-3xl flex items-center justify-center text-3xl flex-shrink-0" style="background:#DBEAFE">⚠️</div>
+          <div class="flex-1">
+            <div class="label-tiny flex items-center">क्या हो सकता है ${soundBtn('क्या हो सकता है — Quality alarm बज सकता है। Outlet बंद हो सकता है।')}</div>
+            <div class="hi-md mt-0.5">Quality alarm बज सकता है</div>
+            <div class="text-xs" style="color:#64748B">Outlet बंद हो सकता है</div>
+          </div>
+        </div>
+
+        <!-- Urgency -->
+        <div class="flex items-start gap-3 mb-5">
+          <div class="w-14 h-14 rounded-3xl flex items-center justify-center text-3xl flex-shrink-0" style="background:#EFF6FF">⏱️</div>
+          <div class="flex-1">
+            <div class="label-tiny flex items-center">कितना ज़रूरी ${soundBtn('कितना ज़रूरी — अभी देखें। 12 मिनट से ऐसा है।')}</div>
+            <div class="hi-md mt-0.5">अभी देखें</div>
+            <div class="text-xs" style="color:#64748B">12 मिनट से ऐसा है</div>
+          </div>
+        </div>
+
+        <!-- Mini-map -->
+        <div class="rounded-xl bg-slate-50 p-3 mb-4">
+          <div class="text-[10px] uppercase tracking-wider text-ink-500 font-semibold mb-1">कहाँ है</div>
+          <svg viewBox="0 0 200 70" class="w-full h-16">
+            <rect x="10" y="20" width="30" height="30" rx="4" fill="#E2E8F0" stroke="#94A3B8"/>
+            <text x="25" y="38" text-anchor="middle" font-size="8" fill="#475569" font-weight="600">Inlet</text>
+            <line x1="40" y1="35" x2="70" y2="35" stroke="#94A3B8" stroke-width="2"/>
+            <rect x="70" y="20" width="40" height="30" rx="4" fill="#DCFCE7" stroke="#16A34A"/>
+            <text x="90" y="38" text-anchor="middle" font-size="8" fill="#166534" font-weight="600">EQ</text>
+            <line x1="110" y1="35" x2="140" y2="35" stroke="#94A3B8" stroke-width="2"/>
+            <rect x="140" y="15" width="40" height="40" rx="4" fill="#FEE2E2" stroke="#DC2626" stroke-width="2"/>
+            <text x="160" y="33" text-anchor="middle" font-size="8" fill="#991B1B" font-weight="700">MBR-1</text>
+            <text x="160" y="45" text-anchor="middle" font-size="7" fill="#991B1B" font-weight="700">यहाँ</text>
+            <circle cx="178" cy="20" r="6" fill="#DC2626"><animate attributeName="r" values="6;9;6" dur="1.5s" repeatCount="indefinite"/></circle>
+            <text x="178" y="23" text-anchor="middle" font-size="8" fill="#fff" font-weight="700">!</text>
+          </svg>
+        </div>
+
+        <button onclick="goStep('preview')" class="btn-paani tap-scale">
+          <span>🔍</span>जाँच शुरू करें
+        </button>
+
+        <button onclick="goStep('rootcause')" class="mt-2 w-full text-center py-2 text-xs text-ink-500 underline">
+          मुझे कारण पता है — सीधे चुनें
+        </button>
+      </div>`
+  },
+
+  preview: {
+    n:2, label:'Step Preview',
+    mascot:'curious',
+    say:'सिर्फ़ 4 चीज़ें देखेंगे। 5 मिनट लगेंगे। शुरू करें?',
+    render: () => `
+      <div class="card p-4">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-3xl">📋</span>
+          <div>
+            <div class="hi-lg">4 जल्दी जाँच</div>
+            <div class="text-sm text-ink-500">करीब 5 मिनट</div>
+          </div>
+        </div>
+        <div class="space-y-2 mt-4">
+          ${[
+            ['📊','Membrane का दबाव देखें','TMP · Flux'],
+            ['🫧','Tank के ऊपर झाग है?','Foam check'],
+            ['🌬️','Blower चल रहा है?','Equipment status'],
+            ['⏳','30 मिनट इंतज़ार करें','Re-check turbidity']
+          ].map(([icon,hi,en],i)=>`
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
+              <div class="w-9 h-9 rounded-full bg-paani-100 text-paani-700 flex items-center justify-center font-bold text-sm">${i+1}</div>
+              <div class="text-2xl">${icon}</div>
+              <div class="flex-1">
+                <div class="hi-md text-sm">${hi}</div>
+                <div class="text-[11px] text-ink-500">${en}</div>
+              </div>
+            </div>`).join('')}
+        </div>
+        <button onclick="goStep('autocheck1')" class="btn-paani tap-scale mt-4">
+          <span>▶</span>शुरू करें
+        </button>
+      </div>`
+  },
+
+  autocheck1: {
+    n:3, label:'Membrane · हाथ से reading',
+    mascot:'curious',
+    say:'Panel पर जाकर TMP और Flux का reading देखिए। यहाँ टाइप कर दीजिए।',
+    render: () => `
+      <div class="card p-4">
+        <div class="flex items-center justify-between mb-3">
+          <div class="label-tiny">✍️ Panel से reading लिखें</div>
+          <div class="text-[10px]" style="color:#64748B">MBR-1 Panel</div>
+        </div>
+
+        <!-- How-to hint -->
+        <div class="mb-4 p-3 rounded-2xl flex items-start gap-2.5" style="background:#EFF6FF;border:1px solid #BFDBFE">
+          <div class="text-xl flex-shrink-0">📟</div>
+          <div class="flex-1">
+            <div class="font-serif text-sm font-semibold" style="color:#1E40AF">Panel पर TMP और Flux का number देखें</div>
+            <div class="text-[11px] mt-0.5" style="color:#64748B">MBR-1 Panel के display पर दिखेगा</div>
+          </div>
+          ${soundBtn('Panel पर TMP और Flux का number देखें। फिर यहाँ टाइप करें।')}
+        </div>
+
+        <!-- TMP Manual Entry -->
+        <div class="mb-4 p-4 rounded-3xl" style="background:#F5F9FF;border:1px solid rgba(51,65,85,.06)">
+          <div class="flex items-center justify-between mb-2">
+            <div class="label-tiny flex items-center">Membrane का दबाव (TMP) ${soundBtn('Membrane का दबाव। TMP कहते हैं।')}</div>
+            <span class="text-[10px]" style="color:#64748B">सामान्य: -0.20 to -0.45 kPa</span>
+          </div>
+          <div class="flex items-stretch gap-2">
+            <input id="tmpInput" type="number" step="0.01" placeholder="-0.42" inputmode="decimal"
+              oninput="updateTmpBar()"
+              class="flex-1 px-4 py-3 rounded-2xl font-serif text-2xl font-semibold"
+              style="background:#FFFFFF;border:1.5px solid #BFDBFE;color:#0F172A;outline:none"/>
+            <div class="flex items-center px-4 rounded-2xl font-serif font-semibold text-sm" style="background:#DBEAFE;color:#1E40AF">kPa</div>
+          </div>
+          <div class="relative h-4 rounded-full overflow-hidden mt-3" style="background:#E2E8F0">
+            <div class="absolute inset-y-0 left-0 w-[30%]" style="background:rgba(232,90,69,.25)"></div>
+            <div class="absolute inset-y-0 left-[30%] w-[25%]" style="background:rgba(59,130,246,.25)"></div>
+            <div class="absolute inset-y-0 left-[55%] w-[45%]" style="background:rgba(81,189,85,.25)"></div>
+            <div id="tmpMarker" class="absolute top-0 bottom-0 w-1.5 rounded-full shadow opacity-0 transition-all" style="left:0;background:#3B82F6"></div>
+          </div>
+          <div class="flex justify-between text-[9px] mt-1 px-1" style="color:#64748B">
+            <span>ज़्यादा (-1.0)</span><span>सामान्य</span><span>ठीक (-0.1)</span>
+          </div>
+        </div>
+
+        <!-- Flux Manual Entry -->
+        <div class="mb-4 p-4 rounded-3xl" style="background:#F5F9FF;border:1px solid rgba(51,65,85,.06)">
+          <div class="flex items-center justify-between mb-2">
+            <div class="label-tiny flex items-center">पानी की रफ़्तार (Flux) ${soundBtn('पानी निकलने की रफ़्तार। Flux कहते हैं।')}</div>
+            <span class="text-[10px]" style="color:#64748B">सामान्य: 18-25 LMH</span>
+          </div>
+          <div class="flex items-stretch gap-2">
+            <input id="fluxInput" type="number" step="0.1" placeholder="18.0" inputmode="decimal"
+              oninput="updateFluxBar()"
+              class="flex-1 px-4 py-3 rounded-2xl font-serif text-2xl font-semibold"
+              style="background:#FFFFFF;border:1.5px solid #BFDBFE;color:#0F172A;outline:none"/>
+            <div class="flex items-center px-4 rounded-2xl font-serif font-semibold text-sm" style="background:#DBEAFE;color:#1E40AF">LMH</div>
+          </div>
+          <div class="relative h-4 rounded-full overflow-hidden mt-3" style="background:#E2E8F0">
+            <div class="absolute inset-y-0 left-0 w-[30%]" style="background:rgba(232,90,69,.25)"></div>
+            <div class="absolute inset-y-0 left-[30%] w-[20%]" style="background:rgba(59,130,246,.25)"></div>
+            <div class="absolute inset-y-0 left-[50%] w-[50%]" style="background:rgba(81,189,85,.25)"></div>
+            <div id="fluxMarker" class="absolute top-0 bottom-0 w-1.5 rounded-full shadow opacity-0 transition-all" style="left:0;background:#3B82F6"></div>
+          </div>
+          <div class="flex justify-between text-[9px] mt-1 px-1" style="color:#64748B">
+            <span>कम (0)</span><span>सामान्य</span><span>ज़्यादा (40)</span>
+          </div>
+        </div>
+
+        <!-- Status feedback -->
+        <div id="readingStatus" class="hidden mb-3 p-3 rounded-2xl text-sm font-serif"></div>
+
+        <!-- Voice helper -->
+        <button onclick="showToast('🎤 बोलिए — सुन रहे हैं'); speak('Number बोलिए, मैं सुन रहा हूँ।')" class="w-full py-3 rounded-2xl text-sm font-serif font-semibold tap-scale flex items-center justify-center gap-2 mb-2" style="background:#EFF6FF;color:#1E40AF;border:1px solid #93C5FD">
+          <span>🎤</span><span>बोलकर बताएँ (Voice)</span>
+        </button>
+
+        <!-- Continue -->
+        <button onclick="submitReadings()" class="btn-paani tap-scale">
+          <span>✓</span>आगे बढ़ें
+        </button>
+      </div>`,
+    onShow: () => { /* manual entry — no timer */ }
+  },
+
+  foam: {
+    n:4, label:'Foam observation',
+    mascot:'curious',
+    say:'Tank के ऊपर झाग दिख रहा है? ध्यान से देखिए।',
+    render: () => `
+      <div class="card card-warm p-5">
+        <h2 class="hi-lg mb-1 flex items-start gap-1">
+          <span>Tank के ऊपर झाग दिख रहा है?</span>
+          ${soundBtn('Tank के ऊपर झाग दिख रहा है? ऐसा कुछ देखिए।')}
+        </h2>
+        <div class="text-xs mb-4" style="color:#64748B">ऐसा कुछ?</div>
+
+        <!-- Foam pictograms -->
+        <div class="grid grid-cols-2 gap-2 mb-4">
+          <div class="rounded-xl bg-slate-50 p-3 text-center">
+            <svg viewBox="0 0 80 60" class="w-full h-16">
+              <rect x="10" y="30" width="60" height="25" rx="2" fill="#7DD3FC" stroke="#0284C7"/>
+              <ellipse cx="20" cy="28" rx="6" ry="4" fill="#fff" stroke="#94A3B8"/>
+              <ellipse cx="32" cy="26" rx="7" ry="5" fill="#fff" stroke="#94A3B8"/>
+              <ellipse cx="46" cy="27" rx="6" ry="4" fill="#fff" stroke="#94A3B8"/>
+              <ellipse cx="60" cy="28" rx="7" ry="5" fill="#fff" stroke="#94A3B8"/>
+            </svg>
+            <div class="text-[11px] mt-1 font-semibold">सफ़ेद झाग</div>
+          </div>
+          <div class="rounded-xl bg-slate-50 p-3 text-center">
+            <svg viewBox="0 0 80 60" class="w-full h-16">
+              <rect x="10" y="30" width="60" height="25" rx="2" fill="#7DD3FC" stroke="#0284C7"/>
+              <ellipse cx="20" cy="28" rx="6" ry="4" fill="#64748B" stroke="#334155"/>
+              <ellipse cx="32" cy="26" rx="7" ry="5" fill="#475569" stroke="#334155"/>
+              <ellipse cx="46" cy="27" rx="6" ry="4" fill="#64748B" stroke="#334155"/>
+              <ellipse cx="60" cy="28" rx="7" ry="5" fill="#334155" stroke="#1F2937"/>
+            </svg>
+            <div class="text-[11px] mt-1 font-semibold">भूरा झाग</div>
+          </div>
+        </div>
+
+        <!-- Big Yes/No -->
+        <div class="grid grid-cols-2 gap-3">
+          <button onclick="goStep('foamcolor')" class="rounded-3xl p-6 tap-scale text-center" style="background:linear-gradient(160deg,#DBEAFE,#93C5FD);border:1.5px solid #3B82F6;box-shadow:0 6px 16px rgba(59,130,246,.18)">
+            <div class="text-5xl mb-2">✓</div>
+            <div class="font-serif text-2xl font-semibold" style="color:#1E3A8A">हाँ</div>
+            <div class="text-xs mt-1" style="color:#1E40AF">झाग दिख रहा है</div>
+          </button>
+          <button onclick="goStep('autocheck2')" class="rounded-3xl p-6 tap-scale text-center" style="background:#FFFFFF;border:1.5px solid rgba(51,65,85,.12);box-shadow:0 4px 12px rgba(51,65,85,.08)">
+            <div class="text-5xl mb-2" style="color:#64748B">✗</div>
+            <div class="font-serif text-2xl font-semibold" style="color:#334155">नहीं</div>
+            <div class="text-xs mt-1" style="color:#64748B">कोई झाग नहीं</div>
+          </button>
+        </div>
+      </div>`
+  },
+
+  foamcolor: {
+    n:5, label:'Foam colour',
+    mascot:'curious',
+    say:'अच्छा! झाग का रंग कौन सा है? तस्वीर से मिलाइए।',
+    render: () => `
+      <div class="card p-4">
+        <h2 class="hi-lg mb-3">झाग का रंग कौन सा है?</h2>
+        <div class="space-y-2">
+          <button onclick="goStep('autocheck2')" class="w-full flex items-center gap-3 p-3 rounded-2xl border-2 border-slate-200 bg-white tap-scale">
+            <svg viewBox="0 0 60 40" class="w-16 h-12 flex-shrink-0">
+              <rect x="5" y="20" width="50" height="18" rx="2" fill="#7DD3FC"/>
+              <ellipse cx="15" cy="18" rx="6" ry="4" fill="#fff" stroke="#CBD5E1"/>
+              <ellipse cx="30" cy="16" rx="7" ry="5" fill="#fff" stroke="#CBD5E1"/>
+              <ellipse cx="45" cy="18" rx="6" ry="4" fill="#fff" stroke="#CBD5E1"/>
+            </svg>
+            <div class="flex-1 text-left">
+              <div class="hi-md text-base">सफ़ेद</div>
+              <div class="text-[11px] text-ink-500">नया झाग — surfactant</div>
+            </div>
+          </button>
+          <button onclick="goStep('autocheck2')" class="w-full flex items-center gap-3 p-3 rounded-2xl border-2 border-amber-300 bg-amber-50 tap-scale">
+            <svg viewBox="0 0 60 40" class="w-16 h-12 flex-shrink-0">
+              <rect x="5" y="20" width="50" height="18" rx="2" fill="#7DD3FC"/>
+              <ellipse cx="15" cy="18" rx="6" ry="4" fill="#64748B" stroke="#334155"/>
+              <ellipse cx="30" cy="16" rx="7" ry="5" fill="#475569" stroke="#334155"/>
+              <ellipse cx="45" cy="18" rx="6" ry="4" fill="#64748B" stroke="#334155"/>
+            </svg>
+            <div class="flex-1 text-left">
+              <div class="hi-md text-base">भूरा</div>
+              <div class="text-[11px] text-amber-700">पुराना sludge — biomass</div>
+            </div>
+          </button>
+          <button onclick="goStep('autocheck2')" class="w-full flex items-center gap-3 p-3 rounded-2xl border-2 border-crit/40 bg-crit/5 tap-scale">
+            <svg viewBox="0 0 60 40" class="w-16 h-12 flex-shrink-0">
+              <rect x="5" y="20" width="50" height="18" rx="2" fill="#1E3A8A"/>
+              <ellipse cx="15" cy="18" rx="6" ry="4" fill="#1F2937"/>
+              <ellipse cx="30" cy="16" rx="7" ry="5" fill="#111827"/>
+              <ellipse cx="45" cy="18" rx="6" ry="4" fill="#1F2937"/>
+            </svg>
+            <div class="flex-1 text-left">
+              <div class="hi-md text-base text-crit">काला</div>
+              <div class="text-[11px] text-crit/80">हवा खत्म — septic · Supervisor</div>
+            </div>
+          </button>
+        </div>
+      </div>`
+  },
+
+  autocheck2: {
+    n:6, label:'Blower status',
+    mascot:'thinking',
+    say:'अब Blower देखता हूँ... चल रहा है या बंद है?',
+    render: () => `
+      <div class="card p-4">
+        <div class="flex items-center justify-between mb-3">
+          <div class="text-[11px] uppercase tracking-wider text-ink-500 font-semibold">🤖 Sensor पढ़ रहा है</div>
+          <div class="text-[10px] text-ink-500">अभी</div>
+        </div>
+
+        <div class="text-center py-6">
+          <div class="relative inline-block">
+            <div class="absolute inset-0 rounded-full bg-crit/20 pulse-ring"></div>
+            <div class="relative w-28 h-28 rounded-full bg-crit/10 border-4 border-crit flex items-center justify-center">
+              <div class="text-center">
+                <div class="text-4xl">⏹</div>
+                <div class="text-[10px] font-bold text-crit mt-1">STOPPED</div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="hi-lg text-crit">Blower बंद है</div>
+            <div class="text-sm text-ink-500 mt-1">MBR-1 का aeration blower</div>
+            <div class="text-xs text-ink-500 mt-2">8 मिनट से बंद</div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 p-3 rounded-xl bg-slate-50">
+          <div class="text-center">
+            <div class="text-[10px] uppercase tracking-wider text-ink-500 font-semibold">अभी</div>
+            <div class="text-lg font-bold text-crit">0 A</div>
+          </div>
+          <div class="text-center">
+            <div class="text-[10px] uppercase tracking-wider text-ink-500 font-semibold">सामान्य</div>
+            <div class="text-lg font-bold text-ok">12 A</div>
+          </div>
+        </div>
+
+        <div class="mt-4 p-3 rounded-xl bg-paani-50 border border-paani-300">
+          <div class="text-[11px] text-paani-700 font-semibold mb-1.5 flex items-center justify-between">
+            <span>⏱ अपने आप आगे बढ़ेगा</span>
+            <span id="acTimer2">5 sec</span>
+          </div>
+          <div class="h-2 bg-white rounded-full overflow-hidden">
+            <div class="h-full bg-paani-500 auto-bar"></div>
+          </div>
+        </div>
+
+        <button onclick="flagSensor()" class="mt-3 w-full py-3 rounded-xl border-2 border-crit/40 bg-crit/5 text-crit font-semibold tap-scale flex items-center justify-center gap-2">
+          <span class="text-xl">🚩</span><span>ये सही नहीं है</span>
+        </button>
+      </div>`,
+    onShow: () => {
+      let r = 5;
+      autoCheckTimer = setInterval(() => {
+        r -= 0.1;
+        const el = document.getElementById('acTimer2');
+        if (el) el.textContent = Math.max(0,r).toFixed(1) + ' sec';
+        if (r <= 0) { clearInterval(autoCheckTimer); goStep('action'); }
+      }, 100);
+    }
+  },
+
+  action: {
+    n:7, label:'Action · Start blower',
+    mascot:'concerned',
+    say:'Blower चालू करना है। Tank में हवा फिर से जाएगी।',
+    render: () => `
+      <div class="card p-4">
+        <div class="text-center py-4">
+          <div class="text-6xl mb-3">🌬️</div>
+          <h2 class="hi-lg mb-2">Blower चालू करें</h2>
+          <div class="text-sm text-ink-700 mb-1">Tank में हवा फिर से जाएगी</div>
+          <div class="text-xs text-ink-500">पानी साफ़ होने लगेगा</div>
+        </div>
+
+        <!-- How-to picture -->
+        <div class="rounded-xl bg-paani-50 p-4 mb-4">
+          <div class="text-[11px] uppercase tracking-wider text-paani-700 font-semibold mb-2">कैसे करें</div>
+          <div class="space-y-2 text-sm">
+            <div class="flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-paani-500 text-white flex items-center justify-center font-bold text-xs">1</span><span>Panel पर जाएँ — MBR-1 Blower</span></div>
+            <div class="flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-paani-500 text-white flex items-center justify-center font-bold text-xs">2</span><span>हरा button दबाएँ (Start)</span></div>
+            <div class="flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-paani-500 text-white flex items-center justify-center font-bold text-xs">3</span><span>हवा निकलना देखें</span></div>
+          </div>
+        </div>
+
+        <button onclick="goStep('wait')" class="btn-paani tap-scale">
+          <span>✓</span>हो गया
+        </button>
+        <button onclick="goStep('rootcause')" class="mt-2 w-full text-center py-2 text-xs text-ink-500 underline">
+          नहीं कर पाया — आगे बढ़ें
+        </button>
+      </div>`
+  },
+
+  wait: {
+    n:8, label:'Wait · observe',
+    mascot:'waiting',
+    say:'अब 30 मिनट इंतज़ार करते हैं। पानी साफ़ होने में समय लगता है।',
+    render: () => `
+      <div class="card p-4">
+        <div class="text-center py-6">
+          <div class="text-6xl mb-3">⏳</div>
+          <h2 class="hi-lg mb-1">30 मिनट इंतज़ार</h2>
+          <div class="text-sm text-ink-500 mb-4">Turbidity फिर से देखेंगे</div>
+
+          <div class="inline-block p-6 rounded-2xl bg-paani-50 border-2 border-paani-300">
+            <div class="text-5xl font-bold text-paani-700 font-mono" id="waitTimer">29:47</div>
+            <div class="text-xs text-ink-500 mt-1">बाकी समय</div>
+          </div>
+        </div>
+
+        <div class="rounded-xl bg-slate-50 p-3 mb-4">
+          <div class="text-[11px] uppercase tracking-wider text-ink-500 font-semibold mb-2">इस बीच क्या करें</div>
+          <ul class="space-y-1 text-sm">
+            <li>• दूसरे काम कर सकते हैं</li>
+            <li>• 10 मिनट बाद हम बताएँगे</li>
+            <li>• कुछ गड़बड़ लगे तो फ़ोटो भेजें</li>
+          </ul>
+        </div>
+
+        <button onclick="goStep('rootcause')" class="btn-paani tap-scale">
+          <span>👀</span>अभी देख लिया
+        </button>
+      </div>`,
+    onShow: () => {
+      let s = 30*60 - 13;
+      autoCheckTimer = setInterval(() => {
+        s -= 1;
+        const m = Math.floor(s/60), r = s%60;
+        const el = document.getElementById('waitTimer');
+        if (el) el.textContent = String(m).padStart(2,'0')+':'+String(r).padStart(2,'0');
+        if (s <= 0) clearInterval(autoCheckTimer);
+      }, 1000);
+    }
+  },
+
+  rootcause: {
+    n:9, label:'Root cause',
+    mascot:'thinking',
+    say:'क्या कारण था? जो सही लगे वो चुनिए।',
+    render: () => `
+      <div class="card card-warm p-5">
+        <h2 class="hi-lg mb-1 flex items-start gap-1">
+          <span>क्या कारण मिला?</span>
+          ${soundBtn('क्या कारण मिला? सबसे सही जवाब चुनें।')}
+        </h2>
+        <div class="text-xs mb-4" style="color:#64748B">सबसे सही जवाब चुनें</div>
+
+        <div class="space-y-2.5">
+          <button onclick="goStep('close')" class="w-full flex items-center gap-3 p-3.5 rounded-3xl tap-scale" style="background:linear-gradient(160deg,#DBEAFE,#93C5FD);border:1.5px solid #3B82F6;box-shadow:0 4px 12px rgba(59,130,246,.18)">
+            <div class="text-3xl">🌬️</div>
+            <div class="flex-1 text-left">
+              <div class="hi-md text-base" style="color:#1E3A8A">Blower बंद था</div>
+              <div class="text-[11px]" style="color:#1E40AF">सबसे संभावित</div>
+            </div>
+            ${soundBtn('Blower बंद था। यह सबसे संभावित कारण है।')}
+            <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs" style="background:#1E40AF;color:#FFFFFF">✓</div>
+          </button>
+
+          <button onclick="goStep('close')" class="w-full flex items-center gap-3 p-3.5 rounded-3xl tap-scale" style="background:#FFFFFF;border:1.5px solid rgba(51,65,85,.12)">
+            <div class="text-3xl">🔬</div>
+            <div class="flex-1 text-left">
+              <div class="hi-md text-base">Diffuser में जमावट</div>
+              <div class="text-[11px]" style="color:#64748B">हवा ठीक से नहीं निकल रही</div>
+            </div>
+            ${soundBtn('Diffuser में जमावट है। हवा ठीक से नहीं निकल रही।')}
+          </button>
+
+          <button onclick="goStep('close')" class="w-full flex items-center gap-3 p-3.5 rounded-3xl tap-scale" style="background:#FFFFFF;border:1.5px solid rgba(51,65,85,.12)">
+            <div class="text-3xl">🧱</div>
+            <div class="flex-1 text-left">
+              <div class="hi-md text-base">Membrane fouling</div>
+              <div class="text-[11px]" style="color:#64748B">Membrane गंदा हो गया</div>
+            </div>
+            ${soundBtn('Membrane fouling — Membrane गंदा हो गया है।')}
+          </button>
+
+          <button onclick="goStep('close')" class="w-full flex items-center gap-3 p-3.5 rounded-3xl tap-scale" style="background:#FFFFFF;border:1.5px solid rgba(51,65,85,.12)">
+            <div class="text-3xl">📟</div>
+            <div class="flex-1 text-left">
+              <div class="hi-md text-base">Sensor गलत है</div>
+              <div class="text-[11px]" style="color:#64748B">पानी असल में ठीक है</div>
+            </div>
+            ${soundBtn('Sensor गलत है — पानी असल में ठीक है।')}
+          </button>
+
+          <button onclick="callSupervisor()" class="w-full flex items-center gap-3 p-3.5 rounded-3xl tap-scale" style="background:rgba(232,90,69,.08);border:1.5px solid rgba(232,90,69,.3)">
+            <div class="text-3xl">📞</div>
+            <div class="flex-1 text-left">
+              <div class="hi-md text-base" style="color:#E85A45">कोई नहीं — Supervisor बुलाएँ</div>
+              <div class="text-[11px]" style="color:#E85A45">मदद चाहिए</div>
+            </div>
+          </button>
+        </div>
+      </div>`
+  },
+
+  equipment: {
+    n:1, label:'Equipment · MBR-1 Tank',
+    mascot:'curious',
+    say:'यह है MBR-1 Tank। Membrane filter से पानी निकलता है यहाँ।',
+    render: () => `
+      <!-- Equipment hero card -->
+      <div class="card overflow-hidden">
+        <div class="bg-gradient-to-br from-paani-500 to-paani-700 p-4 text-white">
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="text-[10px] uppercase tracking-wider opacity-80 font-semibold">Equipment</div>
+              <div class="text-xl font-bold">MBR-1 Tank</div>
+              <div class="text-xs opacity-90">Membrane Bioreactor · Secondary section</div>
+            </div>
+            <span class="chip bg-white/20 text-white font-bold">● Active Issue</span>
+          </div>
+        </div>
+
+        <!-- Big equipment illustration -->
+        <div class="p-4 bg-slate-50">
+          <svg viewBox="0 0 320 160" class="w-full h-40">
+            <!-- Tank body -->
+            <rect x="40" y="30" width="240" height="110" rx="8" fill="#fff" stroke="#0F172A" stroke-width="2"/>
+            <!-- Water -->
+            <rect x="44" y="60" width="232" height="76" rx="4" fill="#7DD3FC" opacity="0.5"/>
+            <!-- Membrane modules (vertical strips) -->
+            <g>
+              <rect x="80" y="65" width="6" height="65" rx="2" fill="#475569"/>
+              <rect x="100" y="65" width="6" height="65" rx="2" fill="#475569"/>
+              <rect x="120" y="65" width="6" height="65" rx="2" fill="#475569"/>
+              <rect x="140" y="65" width="6" height="65" rx="2" fill="#475569"/>
+              <rect x="160" y="65" width="6" height="65" rx="2" fill="#475569"/>
+              <rect x="180" y="65" width="6" height="65" rx="2" fill="#475569"/>
+              <rect x="200" y="65" width="6" height="65" rx="2" fill="#475569"/>
+              <rect x="220" y="65" width="6" height="65" rx="2" fill="#475569"/>
+            </g>
+            <!-- Diffusers (bottom) -->
+            <rect x="55" y="132" width="210" height="6" rx="2" fill="#64748B"/>
+            <!-- Bubbles (sparse - blower stopped) -->
+            <circle cx="90" cy="100" r="3" fill="#fff" opacity="0.7"/>
+            <circle cx="155" cy="85" r="2" fill="#fff" opacity="0.5"/>
+            <!-- Inlet pipe -->
+            <rect x="10" y="55" width="30" height="10" fill="#94A3B8"/>
+            <text x="25" y="50" text-anchor="middle" font-size="8" fill="#475569" font-weight="600">Inlet</text>
+            <!-- Outlet pipe -->
+            <rect x="280" y="55" width="30" height="10" fill="#94A3B8"/>
+            <text x="295" y="50" text-anchor="middle" font-size="8" fill="#475569" font-weight="600">Outlet</text>
+            <!-- Labels -->
+            <text x="160" y="22" text-anchor="middle" font-size="10" fill="#0F172A" font-weight="700">MBR-1 Tank</text>
+            <text x="160" y="155" text-anchor="middle" font-size="8" fill="#64748B">Membrane modules · Diffusers</text>
+            <!-- Warning pulse -->
+            <circle cx="280" cy="35" r="8" fill="#DC2626"><animate attributeName="r" values="8;12;8" dur="1.5s" repeatCount="indefinite"/></circle>
+            <text x="280" y="38" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">!</text>
+          </svg>
+        </div>
+
+        <!-- Status pill -->
+        <div class="px-4 py-3 border-t border-slate-100">
+          <div class="flex items-center gap-2">
+            <span class="chip bg-crit/10 text-crit font-bold">● Turbidity High</span>
+            <span class="chip bg-warn/10 text-warn font-bold">⚠ Blower stopped</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sensor readings -->
+      <div class="card p-4">
+        <div class="text-[11px] uppercase tracking-wider text-ink-500 font-semibold mb-3">📊 अभी के Reading</div>
+
+        <!-- TMP -->
+        <div class="mb-4">
+          <div class="flex items-baseline justify-between mb-1">
+            <div>
+              <span class="text-xl font-bold text-crit">-0.62</span>
+              <span class="text-xs text-ink-500">kPa</span>
+              <span class="text-[10px] text-ink-500 ml-1">· Membrane का दबाव</span>
+            </div>
+            <span class="text-[10px] text-ink-500">सामान्य: -0.20 to -0.45</span>
+          </div>
+          <div class="relative h-4 rounded-full overflow-hidden bg-slate-100">
+            <div class="absolute inset-y-0 left-0 w-[30%] bg-crit/30"></div>
+            <div class="absolute inset-y-0 left-[30%] w-[25%] bg-warn/30"></div>
+            <div class="absolute inset-y-0 left-[55%] w-[45%] bg-ok/30"></div>
+            <div class="absolute top-0 bottom-0 w-1 bg-crit rounded-full shadow" style="left:15%"></div>
+          </div>
+        </div>
+
+        <!-- Flux -->
+        <div class="mb-4">
+          <div class="flex items-baseline justify-between mb-1">
+            <div>
+              <span class="text-xl font-bold text-warn">14.2</span>
+              <span class="text-xs text-ink-500">LMH</span>
+              <span class="text-[10px] text-ink-500 ml-1">· पानी की रफ़्तार</span>
+            </div>
+            <span class="text-[10px] text-ink-500">सामान्य: 18-25</span>
+          </div>
+          <div class="relative h-4 rounded-full overflow-hidden bg-slate-100">
+            <div class="absolute inset-y-0 left-0 w-[30%] bg-crit/30"></div>
+            <div class="absolute inset-y-0 left-[30%] w-[20%] bg-warn/30"></div>
+            <div class="absolute inset-y-0 left-[50%] w-[50%] bg-ok/30"></div>
+            <div class="absolute top-0 bottom-0 w-1 bg-warn rounded-full shadow" style="left:35%"></div>
+          </div>
+        </div>
+
+        <!-- Turbidity -->
+        <div class="mb-4">
+          <div class="flex items-baseline justify-between mb-1">
+            <div>
+              <span class="text-xl font-bold text-crit">28</span>
+              <span class="text-xs text-ink-500">NTU</span>
+              <span class="text-[10px] text-ink-500 ml-1">· पानी कितना गंदा</span>
+            </div>
+            <span class="text-[10px] text-ink-500">सामान्य: &lt; 5</span>
+          </div>
+          <div class="relative h-4 rounded-full overflow-hidden bg-slate-100">
+            <div class="absolute inset-y-0 left-0 w-[40%] bg-ok/30"></div>
+            <div class="absolute inset-y-0 left-[40%] w-[25%] bg-warn/30"></div>
+            <div class="absolute inset-y-0 left-[65%] w-[35%] bg-crit/30"></div>
+            <div class="absolute top-0 bottom-0 w-1 bg-crit rounded-full shadow" style="left:85%"></div>
+          </div>
+        </div>
+
+        <!-- Comparison pair -->
+        <div class="grid grid-cols-2 gap-2 p-3 rounded-xl bg-slate-50 mt-3">
+          <div class="text-center">
+            <div class="text-[10px] uppercase tracking-wider text-ink-500 font-semibold">अभी Blower</div>
+            <div class="text-lg font-bold text-crit">0 A</div>
+            <div class="text-[10px] text-crit">बंद है</div>
+          </div>
+          <div class="text-center">
+            <div class="text-[10px] uppercase tracking-wider text-ink-500 font-semibold">सामान्य</div>
+            <div class="text-lg font-bold text-ok">12 A</div>
+            <div class="text-[10px] text-ok">चलना चाहिए</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active issues -->
+      <div class="card p-4">
+        <div class="text-[11px] uppercase tracking-wider text-ink-500 font-semibold mb-2">🚨 Active Issues</div>
+        <button onclick="goStep('alert')" class="w-full text-left p-3 rounded-xl border-l-4 border-crit bg-crit/5 tap-scale">
+          <div class="flex items-center justify-between">
+            <span class="chip bg-crit text-white">Critical</span>
+            <span class="text-[10px] text-ink-500">12 मिनट पहले</span>
+          </div>
+          <div class="hi-md text-sm mt-1.5">MBR का पानी गंदा है</div>
+          <div class="text-[11px] text-ink-500">DT-001 · Turbidity High</div>
+        </button>
+      </div>
+
+      <!-- Location map -->
+      <div class="card p-4">
+        <div class="text-[11px] uppercase tracking-wider text-ink-500 font-semibold mb-2">📍 कहाँ है</div>
+        <svg viewBox="0 0 320 100" class="w-full h-24">
+          <rect x="10" y="40" width="40" height="30" rx="4" fill="#E2E8F0" stroke="#94A3B8"/>
+          <text x="30" y="58" text-anchor="middle" font-size="9" fill="#475569" font-weight="600">Inlet</text>
+          <line x1="50" y1="55" x2="80" y2="55" stroke="#94A3B8" stroke-width="2"/>
+          <rect x="80" y="40" width="50" height="30" rx="4" fill="#DCFCE7" stroke="#16A34A"/>
+          <text x="105" y="58" text-anchor="middle" font-size="9" fill="#166534" font-weight="600">EQ Tank</text>
+          <line x1="130" y1="55" x2="160" y2="55" stroke="#94A3B8" stroke-width="2"/>
+          <rect x="160" y="35" width="50" height="40" rx="4" fill="#DCFCE7" stroke="#16A34A"/>
+          <text x="185" y="58" text-anchor="middle" font-size="9" fill="#166534" font-weight="600">Aeration</text>
+          <line x1="210" y1="55" x2="240" y2="55" stroke="#94A3B8" stroke-width="2"/>
+          <rect x="240" y="30" width="60" height="50" rx="4" fill="#FEE2E2" stroke="#DC2626" stroke-width="2"/>
+          <text x="270" y="50" text-anchor="middle" font-size="10" fill="#991B1B" font-weight="700">MBR-1</text>
+          <text x="270" y="62" text-anchor="middle" font-size="8" fill="#991B1B" font-weight="600">आप यहाँ</text>
+          <circle cx="294" cy="36" r="6" fill="#DC2626"><animate attributeName="r" values="6;9;6" dur="1.5s" repeatCount="indefinite"/></circle>
+          <text x="294" y="39" text-anchor="middle" font-size="8" fill="#fff" font-weight="700">!</text>
+        </svg>
+      </div>
+
+      <!-- Quick info -->
+      <div class="card p-4">
+        <div class="text-[11px] uppercase tracking-wider text-ink-500 font-semibold mb-2">ℹ️ Equipment Info</div>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div class="p-2 rounded-lg bg-slate-50">
+            <div class="text-[10px] text-ink-500">Installed</div>
+            <div class="font-semibold">Mar 2023</div>
+          </div>
+          <div class="p-2 rounded-lg bg-slate-50">
+            <div class="text-[10px] text-ink-500">Last CIP</div>
+            <div class="font-semibold">14 दिन पहले</div>
+          </div>
+          <div class="p-2 rounded-lg bg-slate-50">
+            <div class="text-[10px] text-ink-500">Capacity</div>
+            <div class="font-semibold">120 m³/day</div>
+          </div>
+          <div class="p-2 rounded-lg bg-slate-50">
+            <div class="text-[10px] text-ink-500">Blower</div>
+            <div class="font-semibold">MBR-BLW-01</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="goStep('alert')" class="btn-ghost tap-scale">
+          <span>🔍</span>जाँच देखें
+        </button>
+        <button onclick="showToast('Maintenance log खोल रहे हैं...')" class="btn-ghost tap-scale">
+          <span>🔧</span>Maintenance
+        </button>
+      </div>
+      `
+  },
+
+  close: {
+    n:10, label:'Issue close',
+    mascot:'celebrating',
+    say:'शाबाश! आपने बहुत अच्छा काम किया। क्या Issue हल हो गया?',
+    render: () => `
+      <div class="card card-sage p-5">
+        <div class="text-center py-3">
+          <div class="text-4xl mb-1">🎉</div>
+          <h2 class="hi-lg mt-1 flex items-center justify-center gap-1">
+            <span>बढ़िया!</span>
+            ${soundBtn('बढ़िया! क्या Issue हल हो गया?')}
+          </h2>
+          <div class="text-sm mt-1" style="color:#1E40AF">क्या Issue हल हो गया?</div>
+        </div>
+
+        <div class="space-y-2.5 mt-5">
+          <button onclick="finish('yes')" class="w-full flex items-center gap-3 p-4 rounded-3xl tap-scale" style="background:linear-gradient(160deg,#DCFCE7,#86EFAC);border:1.5px solid #51BD55;box-shadow:0 4px 12px rgba(81,189,85,.2)">
+            <div class="text-4xl">✅</div>
+            <div class="flex-1 text-left">
+              <div class="hi-md" style="color:#14532D">हाँ — यही कारण था</div>
+              <div class="text-[11px]" style="color:#1E40AF">पूरी तरह ठीक हो गया</div>
+            </div>
+          </button>
+
+          <button onclick="finish('partial')" class="w-full flex items-center gap-3 p-4 rounded-3xl tap-scale" style="background:#EFF6FF;border:1.5px solid #93C5FD">
+            <div class="text-4xl">🤔</div>
+            <div class="flex-1 text-left">
+              <div class="hi-md" style="color:#1E40AF">हाँ, लेकिन कुछ और भी था</div>
+              <div class="text-[11px]" style="color:#3B82F6">थोड़ा ठीक हुआ</div>
+            </div>
+          </button>
+
+          <button onclick="finish('no')" class="w-full flex items-center gap-3 p-4 rounded-3xl tap-scale" style="background:rgba(232,90,69,.08);border:1.5px solid rgba(232,90,69,.3)">
+            <div class="text-4xl">❌</div>
+            <div class="flex-1 text-left">
+              <div class="hi-md" style="color:#E85A45">नहीं — दूसरा कारण था</div>
+              <div class="text-[11px]" style="color:#3B82F6">Supervisor को बताएँगे</div>
+            </div>
+          </button>
+        </div>
+
+        <div class="mt-5 p-3.5 rounded-3xl" style="background:#FFFFFF">
+          <div class="label-tiny mb-2">क्या किया? (वैकल्पिक)</div>
+          <div class="flex gap-2">
+            <button class="flex-1 py-3 rounded-2xl font-serif font-semibold text-sm tap-scale" style="background:#F5F9FF;border:1px solid rgba(51,65,85,.08);color:#334155">📷 फ़ोटो</button>
+            <button class="flex-1 py-3 rounded-2xl font-serif font-semibold text-sm tap-scale" style="background:#F5F9FF;border:1px solid rgba(51,65,85,.08);color:#334155">🎤 बोलकर</button>
+          </div>
+        </div>
+
+        <button onclick="goStep('home')" class="btn-paani tap-scale mt-5">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
+          <span>घर वापस जाएँ</span>
+        </button>
+      </div>`
+  }
+};
+
+/* ============== RENDER ============== */
+function goStep(name){
+  if (autoCheckTimer) { clearInterval(autoCheckTimer); autoCheckTimer = null; }
+  currentStep = name;
+  renderStep();
+}
+function renderStep(){
+  const s = steps[currentStep];
+  if (!s) return;
+  document.getElementById('flowStepLabel').textContent = s.label;
+  if (s.isHome){
+    document.getElementById('flowHeader').style.display = 'none';
+    document.querySelector('#stepBadge').parentElement.parentElement.style.display = 'none';
+    document.querySelector('nav.absolute.inset-x-0.bottom-0').style.display = 'none';
+    document.getElementById('content').style.height = 'calc(100% - 130px)';
+  } else {
+    document.getElementById('flowHeader').style.display = 'flex';
+    document.querySelector('#stepBadge').parentElement.parentElement.style.display = 'block';
+    document.querySelector('nav.absolute.inset-x-0.bottom-0').style.display = 'block';
+    document.getElementById('content').style.height = 'calc(100% - 200px)';
+    document.getElementById('stepBadge').textContent = `Step ${s.n} of 10`;
+    document.getElementById('stepBar').style.width = (s.n * 10) + '%';
+  }
+  document.getElementById('content').innerHTML = s.render();
+  document.getElementById('content').scrollTop = 0;
+
+  if (drPaaniMode){
+    document.getElementById('mascotBar').style.display = 'flex';
+    document.getElementById('mascotEl').innerHTML = mascotSVG(s.mascot, 64);
+    document.getElementById('mascotText').textContent = s.say;
+    if (voiceReady) speak(s.say);
+  } else {
+    document.getElementById('mascotBar').style.display = 'none';
+  }
+
+  // sidebar mascot
+  document.getElementById('sidebarMascot').innerHTML = mascotSVG('curious', 42);
+
+  if (s.onShow) s.onShow();
+}
+
+/* ============== ACTIONS ============== */
+function skipStep(){
+  showToast('ठीक है, अगले स्टेप पर जाते हैं');
+  const order = ['alert','preview','autocheck1','foam','foamcolor','autocheck2','action','wait','rootcause','close'];
+  const i = order.indexOf(currentStep);
+  if (i >= 0 && i < order.length-1) setTimeout(()=>goStep(order[i+1]), 600);
+}
+/* Manual entry — TMP / Flux */
+function updateTmpBar(){
+  const v = parseFloat(document.getElementById('tmpInput').value);
+  const m = document.getElementById('tmpMarker');
+  if (isNaN(v)) { m.style.opacity = '0'; return; }
+  // Map -1.0 → 0%, -0.1 → 100%
+  const pct = Math.max(0, Math.min(100, ((v - -1.0) / (-0.1 - -1.0)) * 100));
+  m.style.left = pct + '%';
+  m.style.opacity = '1';
+  // Color by zone
+  let color = '#51BD55'; // safe
+  if (pct < 30) color = '#E85A45';
+  else if (pct < 55) color = '#3B82F6';
+  m.style.background = color;
+}
+function updateFluxBar(){
+  const v = parseFloat(document.getElementById('fluxInput').value);
+  const m = document.getElementById('fluxMarker');
+  if (isNaN(v)) { m.style.opacity = '0'; return; }
+  // Map 0 → 0%, 40 → 100%
+  const pct = Math.max(0, Math.min(100, (v / 40) * 100));
+  m.style.left = pct + '%';
+  m.style.opacity = '1';
+  let color = '#51BD55';
+  if (pct < 30) color = '#E85A45';
+  else if (pct < 50) color = '#3B82F6';
+  m.style.background = color;
+}
+function submitReadings(){
+  const tmp = parseFloat(document.getElementById('tmpInput').value);
+  const flux = parseFloat(document.getElementById('fluxInput').value);
+  const status = document.getElementById('readingStatus');
+  if (isNaN(tmp) || isNaN(flux)){
+    status.className = 'mb-3 p-3 rounded-2xl text-sm font-serif';
+    status.style.background = 'rgba(232,90,69,.08)';
+    status.style.border = '1px solid rgba(232,90,69,.3)';
+    status.style.color = '#E85A45';
+    status.textContent = 'दोनों number भरें';
+    speak('दोनों number भरना है।');
+    return;
+  }
+  const tmpBad = tmp < -0.45;
+  const fluxBad = flux < 18;
+  let msg, color;
+  if (tmpBad || fluxBad){
+    msg = 'Reading गिरा हुआ है। आगे जाँच करते हैं।';
+    color = '#E85A45';
+    status.style.background = 'rgba(232,90,69,.08)';
+    status.style.border = '1px solid rgba(232,90,69,.3)';
+  } else {
+    msg = 'Reading ठीक है, पर आगे और देखते हैं।';
+    color = '#1E40AF';
+    status.style.background = '#EFF6FF';
+    status.style.border = '1px solid #BFDBFE';
+  }
+  status.className = 'mb-3 p-3 rounded-2xl text-sm font-serif';
+  status.style.color = color;
+  status.textContent = msg;
+  speak(msg);
+  setTimeout(() => goStep('foam'), 1200);
+}
+
+function sendPhoto(){ openPhotoModal(); }
+function openPhotoModal(){
+  const m = document.getElementById('photoModal');
+  m.classList.remove('hidden');
+  m.classList.add('flex');
+  document.getElementById('photoStep').textContent = steps[currentStep]?.label || 'Step';
+  if (drPaaniMode && voiceReady) speak('तस्वीर खींचिए, मैं supervisor को भेज दूँगा।');
+}
+function closePhotoModal(){
+  const m = document.getElementById('photoModal');
+  m.classList.add('hidden');
+  m.classList.remove('flex');
+  document.getElementById('photoEmpty').classList.remove('hidden');
+  document.getElementById('photoPreview').classList.add('hidden');
+  document.getElementById('photoNote').value = '';
+  document.getElementById('sendPhotoBtn').disabled = true;
+  document.getElementById('photoInput').value = '';
+}
+function handlePhotoSelect(e){
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('previewImg').src = ev.target.result;
+    document.getElementById('photoEmpty').classList.add('hidden');
+    document.getElementById('photoPreview').classList.remove('hidden');
+    document.getElementById('sendPhotoBtn').disabled = false;
+    if (drPaaniMode && voiceReady) speak('अच्छी तस्वीर! अब भेज दीजिए।');
+  };
+  reader.readAsDataURL(file);
+}
+function confirmSendPhoto(){
+  showToast('✓ फ़ोटो Ashok Kumar को भेज दी');
+  speak('फ़ोटो भेज दी। Supervisor जल्द देखेंगे।');
+  setTimeout(closePhotoModal, 1200);
+}
+function callSupervisor(){ showToast('📞 Supervisor को बुला रहे हैं...'); }
+function flagSensor(){
+  if (autoCheckTimer) { clearInterval(autoCheckTimer); }
+  showToast('🚩 Sensor flag किया · Supervisor देखेंगे');
+}
+function playAudio(){
+  const txt = steps[currentStep]?.say || '';
+  speak(txt);
+  showToast('🔊 Dr. Paani बोल रहे हैं...');
+}
+/* Inline sound button — speak any phrase on tap */
+function speakNow(phrase){
+  speak(phrase);
+  showToast('🔊 ' + phrase.slice(0,40) + (phrase.length>40?'…':''));
+}
+function soundBtn(phrase){
+  const safe = phrase.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  return `<button onclick="event.stopPropagation();speakNow('${safe}')" class="sound-pill tap-scale" aria-label="Listen">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+  </button>`;
+}
+function finish(kind){
+  const msg = kind==='yes' ? '🎉 बहुत बढ़िया! Issue बंद हो गया।' :
+              kind==='partial' ? '✓ ठीक है, थोड़ा monitor करेंगे।' :
+              'Supervisor को भेज दिया।';
+  speak(msg);
+  showToast(msg);
+  setTimeout(()=>goStep('home'), 1800);
+}
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.opacity = '1';
+  setTimeout(()=>t.style.opacity = '0', 2000);
+}
+
+/* ============== INIT ============== */
+document.getElementById('sidebarMascot').innerHTML = mascotSVG('curious', 42);
+renderStep();
+</script>
+</body>
+</html>
