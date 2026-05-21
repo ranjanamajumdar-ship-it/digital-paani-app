@@ -916,8 +916,8 @@ const steps = {
           <span>🔍</span>जाँच शुरू करें
         </button>
 
-        <button onclick="goStep('rootcause')" class="mt-2 w-full text-center py-2 text-xs text-ink-500 underline">
-          मुझे कारण पता है — सीधे चुनें
+        <button onclick="goStep('evidence')" class="mt-2 w-full py-3 rounded-2xl text-sm font-serif font-semibold tap-scale" style="background:#EFF6FF;color:#1E40AF;border:1.5px solid #93C5FD">
+          <span class="mr-1">⚡</span> मुझे पता है · Resolution पे जाएँ
         </button>
       </div>`
   },
@@ -962,8 +962,8 @@ const steps = {
         <button onclick="startMTTR();goStep('dStep1')" class="btn-paani tap-scale mt-4">
           <span>▶</span> जाँच शुरू करें
         </button>
-        <button onclick="goStep('evidence')" class="mt-2 w-full py-2.5 text-xs font-serif font-semibold" style="color:#64748B">
-          ⏭ जाँच skip करें · सीधे supervisor को भेजें
+        <button onclick="goStep('evidence')" class="mt-2 w-full py-3 rounded-2xl text-sm font-serif font-semibold tap-scale" style="background:#EFF6FF;color:#1E40AF;border:1.5px solid #93C5FD">
+          <span class="mr-1">⚡</span> मुझे पता है · Resolution पे जाएँ
         </button>
         <button onclick="goStep('reassign')" class="mt-1 w-full py-2 text-[11px] font-serif font-semibold" style="color:#94A3B8">
           🤝 मुझे यह नहीं आता · दूसरे operator को दें
@@ -1616,28 +1616,46 @@ const steps = {
   },
 
   evidence: {
-    n:0, label:'Evidence · Supervisor को भेजें',
-    mascot:'concerned',
-    say:'कोई बात नहीं। मुझे जो लगता है बताइए और मैं supervisor तक पहुँचा दूँगा।',
+    n:0, label:'Resolution · मुझे पता है',
+    mascot:'curious',
+    say:'अच्छा! आपको कारण पता है। चुनिए कौन सा है, सबूत जोड़िए और supervisor को भेजिए।',
     render: () => {
       const opts = [
-        ['blower_fault','Blower बंद है'],
-        ['membrane_fouling','Membrane में जमावट'],
-        ['diffuser_fouling','Diffuser में जमावट'],
-        ['probe_calibration','Sensor calibration गलत'],
-        ['unknown','मुझे नहीं पता']
+        ['blower_fault','🌬️','Blower बंद है','MBR blower stop'],
+        ['membrane_fouling','🧱','Membrane में जमावट','TMP गिरना'],
+        ['diffuser_fouling','💨','Diffuser में जमावट','हवा कम'],
+        ['probe_calibration','📟','Sensor calibration गलत','Reading गलत'],
+        ['dirty_probe','🧽','Sensor पर गंदगी थी','मैंने साफ़ कर दिया'],
+        ['other','❓','कुछ और','अपने शब्दों में लिखें']
       ];
       return `
-        <div class="card p-4">
-          <div class="hi-lg mb-1">क्या लगता है कारण?</div>
-          <div class="text-xs mb-3" style="color:#64748B">जो सबसे सही लगे चुनें (वैकल्पिक)</div>
+        <div class="card p-4" style="background:linear-gradient(160deg,#FFFFFF,#EFF6FF);border:1.5px solid #BFDBFE">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-2xl">⚡</span>
+            <div>
+              <div class="label-tiny" style="color:#1E40AF">Quick Resolution</div>
+              <div class="font-serif text-[11px]" style="color:#64748B">मुझे पता है · सीधे supervisor को भेजें</div>
+            </div>
+          </div>
+          <h2 class="hi-lg mb-1 flex items-start gap-1">
+            <span>कारण क्या है?</span>
+            ${soundBtn('आपको कारण पता है? चुनिए कौन सा है।')}
+          </h2>
+          <div class="text-xs mb-3" style="color:#64748B">सबसे सही कारण चुनें</div>
           <div class="space-y-2" id="rcOpts">
-            ${opts.map(([id,lbl]) => `<button data-rc="${id}" onclick="pickEvidenceRC(this)" class="w-full p-3 rounded-2xl text-left text-sm font-serif tap-scale rc-opt" style="background:#F5F9FF;border:1.5px solid #E2E8F0">${lbl}</button>`).join('')}
+            ${opts.map(([id,icon,lbl,sub]) => `<button data-rc="${id}" onclick="pickEvidenceRC(this)" class="w-full p-3 rounded-2xl text-left tap-scale rc-opt flex items-center gap-3" style="background:#FFFFFF;border:1.5px solid #E2E8F0">
+              <div class="text-2xl">${icon}</div>
+              <div class="flex-1">
+                <div class="hi-md text-sm">${lbl}</div>
+                <div class="text-[10px]" style="color:#64748B">${sub}</div>
+              </div>
+              <div class="w-5 h-5 rounded-full rc-check flex items-center justify-center" style="border:1.5px solid #CBD5E1"></div>
+            </button>`).join('')}
           </div>
         </div>
 
         <div class="card p-4">
-          <div class="label-tiny mb-2">सबूत जोड़ें (वैकल्पिक)</div>
+          <div class="label-tiny mb-2">सबूत जोड़ें (Image / Voice / Text)</div>
           <div class="grid grid-cols-3 gap-2 mb-3">
             <button onclick="sendPhoto()" class="rounded-2xl p-3 text-center tap-scale" style="background:#F5F9FF;border:1px solid #E2E8F0">
               <div class="text-2xl">📷</div><div class="text-[10px] font-serif font-semibold mt-1">फ़ोटो</div>
@@ -1681,9 +1699,14 @@ const steps = {
         </div>
 
         <button onclick="sendEvidence()" class="btn-paani tap-scale">
-          <span>📤</span> भेजें
+          <span>📤</span> Supervisor को भेजें · Issue resolve करें
         </button>
-        <style>.rc-opt.sel{background:#DBEAFE !important;border-color:#3B82F6 !important;color:#1E40AF}</style>`;
+        <div class="mt-2 text-center text-[10px]" style="color:#64748B">Issue resolved as: चुना हुआ कारण · Supervisor को सूचना जाएगी</div>
+        <style>
+          .rc-opt.sel{background:linear-gradient(160deg,#DBEAFE,#BFDBFE) !important;border-color:#3B82F6 !important}
+          .rc-opt.sel .rc-check{background:#3B82F6;border-color:#3B82F6 !important}
+          .rc-opt.sel .rc-check::after{content:"✓";color:#FFFFFF;font-weight:bold;font-size:12px}
+        </style>`;
     }
   },
 
@@ -1967,9 +1990,9 @@ function yesNoBig(yesAction, noAction){
 }
 function stepFooterBtns(){
   return `<div class="mt-3 flex gap-2">
-    <button onclick="goStep('evidence')" class="flex-1 py-1.5 rounded-xl text-[10px] font-serif font-semibold tap-scale" style="background:#FEF2F2;color:#E85A45;border:1px solid #FECACA">⚠ नहीं आता</button>
-    <button onclick="goStep('linkIssue')" class="flex-1 py-1.5 rounded-xl text-[10px] font-serif font-semibold tap-scale" style="background:#FFFBEB;color:#92400E;border:1px solid #FCD34D">➕ नई issue</button>
-    <button onclick="goStep('reassign')" class="flex-1 py-1.5 rounded-xl text-[10px] font-serif font-semibold tap-scale" style="background:#F5F9FF;color:#1E40AF;border:1px solid #BFDBFE">🤝 दूसरे को दें</button>
+    <button onclick="goStep('evidence')" class="flex-1 py-2 rounded-xl text-[10px] font-serif font-semibold tap-scale" style="background:#EFF6FF;color:#1E40AF;border:1px solid #BFDBFE">⚡ मुझे पता है · Resolution</button>
+    <button onclick="goStep('linkIssue')" class="flex-1 py-2 rounded-xl text-[10px] font-serif font-semibold tap-scale" style="background:#FFFBEB;color:#92400E;border:1px solid #FCD34D">➕ नई issue</button>
+    <button onclick="goStep('reassign')" class="flex-1 py-2 rounded-xl text-[10px] font-serif font-semibold tap-scale" style="background:#FEF2F2;color:#E85A45;border:1px solid #FECACA">🤝 दूसरे को दें</button>
   </div>`;
 }
 function foamSwatch(color){
@@ -2015,9 +2038,18 @@ function pickEvidenceRC(btn){
   btn.classList.add('sel');
 }
 function sendEvidence(){
-  showToast('✓ Supervisor को भेज दिया');
-  speak('Supervisor को सब कुछ भेज दिया है। जल्द जवाब आएगा।');
-  setTimeout(() => goStep('home'), 1500);
+  const sel = document.querySelector('.rc-opt.sel');
+  if (!sel) {
+    showToast('पहले एक कारण चुनें');
+    speak('पहले कारण चुनिए।');
+    return;
+  }
+  const rcId = sel.dataset.rc;
+  if (RC_MAP[rcId]) { window.identifiedRC = { ...RC_MAP[rcId], prob:1.0, reasoning:'Operator confirmed · evidence sent to supervisor' }; }
+  showToast('✓ Issue resolved · Supervisor को भेज दिया');
+  speak('Issue resolve कर दिया। Supervisor को सब भेज दिया है।');
+  if (!mttrStart) startMTTR();
+  setTimeout(() => goStep('success'), 1500);
 }
 function linkAndContinue(kind){
   const msg = kind==='blocking' ? 'Blocking issue link की · main pause' :
