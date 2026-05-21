@@ -111,18 +111,33 @@
         <button onclick="goStep('home')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100 font-semibold">🏠 Plant Overview</button>
       </nav>
 
-      <div class="mt-4 text-[11px] uppercase tracking-wider text-ink-500 font-semibold">Diagnostic Flow</div>
+      <div class="mt-4 text-[11px] uppercase tracking-wider text-ink-500 font-semibold">Diagnostic Tree (DT-001)</div>
       <nav class="mt-2 flex flex-col gap-1 text-xs">
-        <button onclick="goStep('alert')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">1 · Alert</button>
-        <button onclick="goStep('preview')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">2 · Step Preview</button>
-        <button onclick="goStep('autocheck1')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">3 · Auto-check (TMP/Flux)</button>
-        <button onclick="goStep('foam')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">4 · Foam observation</button>
-        <button onclick="goStep('foamcolor')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">5 · Foam colour</button>
-        <button onclick="goStep('autocheck2')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">6 · Blower status</button>
-        <button onclick="goStep('action')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">7 · Action card</button>
-        <button onclick="goStep('wait')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">8 · Wait / observe</button>
-        <button onclick="goStep('rootcause')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">9 · Root cause</button>
-        <button onclick="goStep('close')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">10 · Issue close</button>
+        <button onclick="goStep('alert')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">Alert card</button>
+        <button onclick="goStep('preview')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">Plan · Sensor A + priors</button>
+        <button onclick="goStep('dStep1')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">Step 1 · RECORD (blower light)</button>
+        <button onclick="goStep('dStep2')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">Step 2 · OBSERVATION (foam)</button>
+        <button onclick="goStep('dStep2a')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">Step 2 · OBSERVATION (foam color)</button>
+        <button onclick="goStep('dStep3')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">Step 3 · READING (TMP · gated)</button>
+        <button onclick="goStep('dStep4')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">Step 4 · READING (Flux)</button>
+        <button onclick="goStep('dStep5')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">Step 5 · CONFIRM (probe)</button>
+        <button onclick="goStep('fallback')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">Fallback notice</button>
+      </nav>
+
+      <div class="mt-4 text-[11px] uppercase tracking-wider text-ink-500 font-semibold">Root Cause + Remediation</div>
+      <nav class="mt-2 flex flex-col gap-1 text-xs">
+        <button onclick="terminate('blower_fault',0.65,'Blower stopped — DO drops — turbidity rises.');goStep('rootCauseCard')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">Root cause card</button>
+        <button onclick="terminate('blower_fault',0.65,'Blower stopped — DO drops.');goStep('rStep1')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">Remediation Step 1 (ACTION)</button>
+        <button onclick="terminate('blower_fault',0.65,'Blower stopped — DO drops.');goStep('verification')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">Verification (Sensor B + timer)</button>
+        <button onclick="goStep('success')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">Success · MTTR</button>
+        <button onclick="goStep('rediagnose')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">Sensor didn't normalize · Re-dx</button>
+      </nav>
+
+      <div class="mt-4 text-[11px] uppercase tracking-wider text-ink-500 font-semibold">Escape Hatches</div>
+      <nav class="mt-2 flex flex-col gap-1 text-xs">
+        <button onclick="goStep('evidence')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">⚠ Evidence · Send to supervisor</button>
+        <button onclick="goStep('linkIssue')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">➕ Link new issue</button>
+        <button onclick="goStep('reassign')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">🤝 Reassign to another operator</button>
       </nav>
 
       <div class="mt-4 text-[11px] uppercase tracking-wider text-ink-500 font-semibold">Equipment</div>
@@ -908,423 +923,237 @@ const steps = {
   },
 
   preview: {
-    n:2, label:'Step Preview',
+    n:1, label:'जाँच की तैयारी',
     mascot:'curious',
-    say:'सिर्फ़ 4 चीज़ें देखेंगे। 5 मिनट लगेंगे। शुरू करें?',
+    say:'चलिए शुरू करते हैं। पाँच जाँच करनी हैं — लगभग छह मिनट लगेंगे।',
     render: () => `
-      <div class="card p-4">
-        <div class="flex items-center gap-2 mb-3">
-          <span class="text-3xl">📋</span>
-          <div>
-            <div class="hi-lg">4 जल्दी जाँच</div>
-            <div class="text-sm text-ink-500">करीब 5 मिनट</div>
+      <div class="card p-5">
+        <div class="flex items-center gap-2 mb-3 flex-wrap">
+          <span class="chip" style="background:#EFF6FF;color:#1E40AF">DT-001</span>
+          <span class="chip" style="background:#FEF2F2;color:#E85A45">⚠ Turbidity High</span>
+          <span class="chip" style="background:#F5F9FF;color:#64748B">Site · Honda Manesar</span>
+        </div>
+        <h2 class="hi-lg leading-tight mb-1 flex items-start gap-1">
+          <span>MBR-1 Turbidity जाँच</span>
+          ${soundBtn('हम पाँच जाँच करेंगे। हर सवाल का जवाब आपको देना है।')}
+        </h2>
+        <div class="text-xs" style="color:#64748B">5 steps · ~6 मिनट · 5 संभावित कारण</div>
+
+        <div class="mt-4 p-3 rounded-2xl" style="background:#FEF2F2;border:1px solid #FECACA">
+          <div class="label-tiny" style="color:#E85A45">Alert sensor (A)</div>
+          <div class="font-serif font-semibold text-sm mt-0.5">Outlet Turbidity</div>
+          <div class="flex items-baseline gap-1 mt-1">
+            <span class="font-serif text-2xl font-bold" style="color:#E85A45">28</span>
+            <span class="text-xs" style="color:#64748B">NTU · सामान्य &lt; 5</span>
           </div>
         </div>
-        <div class="space-y-2 mt-4">
-          ${[
-            ['📊','Membrane का दबाव देखें','TMP · Flux'],
-            ['🫧','Tank के ऊपर झाग है?','Foam check'],
-            ['🌬️','Blower चल रहा है?','Equipment status'],
-            ['⏳','30 मिनट इंतज़ार करें','Re-check turbidity']
-          ].map(([icon,hi,en],i)=>`
-            <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
-              <div class="w-9 h-9 rounded-full bg-paani-100 text-paani-700 flex items-center justify-center font-bold text-sm">${i+1}</div>
-              <div class="text-2xl">${icon}</div>
-              <div class="flex-1">
-                <div class="hi-md text-sm">${hi}</div>
-                <div class="text-[11px] text-ink-500">${en}</div>
-              </div>
-            </div>`).join('')}
+
+        <div class="mt-3 p-3 rounded-2xl" style="background:#F5F9FF">
+          <div class="label-tiny mb-2">संभावित कारण (priors)</div>
+          <div class="text-xs space-y-1.5">
+            <div class="flex justify-between"><span>Blower बंद है</span><span style="color:#1E40AF">35%</span></div>
+            <div class="flex justify-between"><span>Membrane में जमावट</span><span style="color:#1E40AF">25%</span></div>
+            <div class="flex justify-between"><span>Diffuser में जमावट</span><span style="color:#1E40AF">20%</span></div>
+            <div class="flex justify-between"><span>Sensor calibration गलत</span><span style="color:#1E40AF">15%</span></div>
+            <div class="flex justify-between"><span>Sensor पर गंदगी</span><span style="color:#1E40AF">5%</span></div>
+          </div>
         </div>
-        <button onclick="goStep('autocheck1')" class="btn-paani tap-scale mt-4">
-          <span>▶</span>शुरू करें
+
+        <button onclick="startMTTR();goStep('dStep1')" class="btn-paani tap-scale mt-4">
+          <span>▶</span> जाँच शुरू करें
+        </button>
+        <button onclick="goStep('evidence')" class="mt-2 w-full py-2.5 text-xs font-serif font-semibold" style="color:#64748B">
+          ⏭ जाँच skip करें · सीधे supervisor को भेजें
+        </button>
+        <button onclick="goStep('reassign')" class="mt-1 w-full py-2 text-[11px] font-serif font-semibold" style="color:#94A3B8">
+          🤝 मुझे यह नहीं आता · दूसरे operator को दें
         </button>
       </div>`
   },
 
-  autocheck1: {
-    n:3, label:'Membrane · हाथ से reading',
+  dStep1: {
+    n:1, label:'Step 1 · Blower Light',
     mascot:'curious',
-    say:'Panel पर जाकर TMP और Flux का reading देखिए। यहाँ टाइप कर दीजिए।',
-    render: () => `
+    say:'Panel पर Blower की light चालू है? देखकर बताइए।',
+    render: () => stepHead(1,5,'RECORD') + `
       <div class="card p-4">
-        <div class="flex items-center justify-between mb-3">
-          <div class="label-tiny">✍️ Panel से reading लिखें</div>
-          <div class="text-[10px]" style="color:#64748B">MBR-1 Panel</div>
+        <div class="mb-4">
+          <div class="hi-lg leading-tight">MBR Blower की light<br/>panel पर चालू है?</div>
+          <div class="text-[11px] mt-2 font-serif italic" style="color:#94A3B8">EN: Is the MBR blower light ON at the panel?</div>
         </div>
+        ${yesNoBig("goStep('dStep2')", "terminate('blower_fault',0.65,'Blower stopped — DO drops — turbidity rises. Most common cause in MBR plants.')")}
+        ${stepFooterBtns()}
+      </div>`
+  },
 
-        <!-- How-to hint -->
-        <div class="mb-4 p-3 rounded-2xl flex items-start gap-2.5" style="background:#EFF6FF;border:1px solid #BFDBFE">
-          <div class="text-xl flex-shrink-0">📟</div>
+  dStep2: {
+    n:2, label:'Step 2 · Foam',
+    mascot:'curious',
+    say:'Tank के ऊपर झाग दिख रहा है?',
+    render: () => stepHead(2,5,'OBSERVATION') + `
+      <div class="card p-4">
+        <div class="mb-3">
+          <div class="hi-lg leading-tight">Tank की सतह पर<br/>झाग दिख रहा है?</div>
+          <div class="text-[11px] mt-1 font-serif italic" style="color:#94A3B8">EN: Is foam visible on the tank surface?</div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 mb-4">
+          ${foamTile('white')} ${foamTile('brown')}
+        </div>
+        ${yesNoBig("goStep('dStep2a')", "goStep('dStep3')")}
+        ${stepFooterBtns()}
+      </div>`
+  },
+
+  dStep2a: {
+    n:2, label:'Step 2 · Foam Colour',
+    mascot:'curious',
+    say:'झाग का रंग? सबसे मिलती तस्वीर चुनें।',
+    render: () => stepHead(2,5,'OBSERVATION') + `
+      <div class="card p-4">
+        <div class="mb-3">
+          <div class="hi-lg">झाग का रंग?</div>
+          <div class="text-[11px] mt-1 font-serif italic" style="color:#94A3B8">EN: What colour is the foam?</div>
+        </div>
+        <div class="space-y-2">
+          <button onclick="goStep('dStep3')" class="w-full flex items-center gap-3 p-3 rounded-2xl tap-scale" style="background:#FFFFFF;border:1.5px solid #E2E8F0">
+            ${foamSwatch('white')}
+            <div class="flex-1 text-left">
+              <div class="hi-md text-base">सफ़ेद</div>
+              <div class="text-[11px]" style="color:#64748B">Surfactant — आगे जाँच</div>
+            </div>
+          </button>
+          <button onclick="goStep('dStep3')" class="w-full flex items-center gap-3 p-3 rounded-2xl tap-scale" style="background:#FFFFFF;border:1.5px solid #E2E8F0">
+            ${foamSwatch('brown')}
+            <div class="flex-1 text-left">
+              <div class="hi-md text-base">भूरा</div>
+              <div class="text-[11px]" style="color:#64748B">Biomass — आगे जाँच</div>
+            </div>
+          </button>
+          <button onclick="terminate('septic_anaerobic',0.85,'Black foam = anaerobic / septic conditions. Escalate immediately.')" class="w-full flex items-center gap-3 p-3 rounded-2xl tap-scale" style="background:#FEF2F2;border:1.5px solid #E85A45">
+            ${foamSwatch('black')}
+            <div class="flex-1 text-left">
+              <div class="hi-md text-base" style="color:#E85A45">काला</div>
+              <div class="text-[11px]" style="color:#E85A45">हवा खत्म · supervisor</div>
+            </div>
+          </button>
+        </div>
+        ${stepFooterBtns()}
+      </div>`
+  },
+
+  dStep3: {
+    n:3, label:'Step 3 · TMP',
+    mascot:'thinking',
+    say:'MBR panel पर जाकर TMP reading देखिए और यहाँ लिखिए।',
+    render: () => stepHead(3,5,'INSTRUMENT_READING') + `
+      <div class="space-y-2 mb-3">
+        <div class="card p-3 flex items-center gap-2.5" style="background:#FFFBEB;border:1px solid #FCD34D">
+          <span class="text-xl flex-shrink-0">🔧</span>
           <div class="flex-1">
-            <div class="font-serif text-sm font-semibold" style="color:#1E40AF">Panel पर TMP और Flux का number देखें</div>
-            <div class="text-[11px] mt-0.5" style="color:#64748B">MBR-1 Panel के display पर दिखेगा</div>
+            <div class="text-[11px] font-semibold" style="color:#92400E">Skill: Operational · Intermediate</div>
+            <div class="text-[10px]" style="color:#92400E">कम है? → Step 4 पर जाएँगे</div>
           </div>
-          ${soundBtn('Panel पर TMP और Flux का number देखें। फिर यहाँ टाइप करें।')}
+          <button onclick="goStep('fallback')" class="text-[10px] font-bold px-2 py-1 rounded-full" style="background:#FFFFFF;color:#92400E">Skip →</button>
         </div>
-
-        <!-- TMP Manual Entry -->
-        <div class="mb-4 p-4 rounded-3xl" style="background:#F5F9FF;border:1px solid rgba(51,65,85,.06)">
+        <div class="card p-3 flex items-center gap-2.5" style="background:#EFF6FF;border:1px solid #BFDBFE">
+          <span class="text-xl flex-shrink-0">🌡</span>
+          <div class="flex-1">
+            <div class="text-[11px] font-semibold" style="color:#1E40AF">Instrument: TMP gauge · Hard gate</div>
+            <div class="text-[10px]" style="color:#1E40AF">नहीं है? → Step 4 पर जाएँगे</div>
+          </div>
+          <button onclick="goStep('fallback')" class="text-[10px] font-bold px-2 py-1 rounded-full" style="background:#FFFFFF;color:#1E40AF">Skip →</button>
+        </div>
+      </div>
+      <div class="card p-4">
+        <div class="mb-3">
+          <div class="hi-lg leading-tight">MBR Panel से<br/>TMP reading लिखें</div>
+          <div class="text-[11px] mt-1 font-serif italic" style="color:#94A3B8">EN: Enter TMP reading from MBR panel (kPa)</div>
+        </div>
+        <div class="p-3 rounded-3xl" style="background:#F5F9FF;border:1px solid #E2E8F0">
           <div class="flex items-center justify-between mb-2">
-            <div class="label-tiny flex items-center">Membrane का दबाव (TMP) ${soundBtn('Membrane का दबाव। TMP कहते हैं।')}</div>
+            <div class="label-tiny">Membrane का दबाव (TMP)</div>
             <span class="text-[10px]" style="color:#64748B">सामान्य: -0.20 to -0.45 kPa</span>
           </div>
           <div class="flex items-stretch gap-2">
-            <input id="tmpInput" type="number" step="0.01" placeholder="-0.42" inputmode="decimal"
-              oninput="updateTmpBar()"
+            <input id="tmpIn" type="number" step="0.01" placeholder="-0.42" inputmode="decimal" oninput="upTmp()"
               class="flex-1 px-4 py-3 rounded-2xl font-serif text-2xl font-semibold"
-              style="background:#FFFFFF;border:1.5px solid #BFDBFE;color:#0F172A;outline:none"/>
+              style="background:#FFFFFF;border:1.5px solid #BFDBFE;outline:none"/>
             <div class="flex items-center px-4 rounded-2xl font-serif font-semibold text-sm" style="background:#DBEAFE;color:#1E40AF">kPa</div>
           </div>
           <div class="relative h-4 rounded-full overflow-hidden mt-3" style="background:#E2E8F0">
             <div class="absolute inset-y-0 left-0 w-[30%]" style="background:rgba(232,90,69,.25)"></div>
             <div class="absolute inset-y-0 left-[30%] w-[25%]" style="background:rgba(59,130,246,.25)"></div>
             <div class="absolute inset-y-0 left-[55%] w-[45%]" style="background:rgba(81,189,85,.25)"></div>
-            <div id="tmpMarker" class="absolute top-0 bottom-0 w-1.5 rounded-full shadow opacity-0 transition-all" style="left:0;background:#3B82F6"></div>
-          </div>
-          <div class="flex justify-between text-[9px] mt-1 px-1" style="color:#64748B">
-            <span>ज़्यादा (-1.0)</span><span>सामान्य</span><span>ठीक (-0.1)</span>
+            <div id="tmpMrk" class="absolute top-0 bottom-0 w-1.5 rounded-full shadow opacity-0 transition-all" style="left:0;background:#3B82F6"></div>
           </div>
         </div>
+        <button onclick="submitTmp3()" class="btn-paani tap-scale mt-4"><span>✓</span> आगे बढ़ें</button>
+        ${stepFooterBtns()}
+      </div>`,
+    onShow: () => {
+      window.upTmp = () => { const v=parseFloat(document.getElementById('tmpIn').value); const m=document.getElementById('tmpMrk'); if(isNaN(v)){m.style.opacity='0';return;} const p=Math.max(0,Math.min(100,((v+1)/0.9)*100)); m.style.left=p+'%'; m.style.opacity='1'; m.style.background=p<30?'#E85A45':p<55?'#3B82F6':'#51BD55'; };
+      window.submitTmp3 = () => { const v=parseFloat(document.getElementById('tmpIn').value); if(isNaN(v)){showToast('Number भरें');return;} if(v<-0.45) terminate('membrane_fouling',0.7,'TMP very negative — membrane is fouled. Outlet turbidity rises as the filter struggles.'); else goStep('dStep4'); };
+    }
+  },
 
-        <!-- Flux Manual Entry -->
-        <div class="mb-4 p-4 rounded-3xl" style="background:#F5F9FF;border:1px solid rgba(51,65,85,.06)">
+  dStep4: {
+    n:4, label:'Step 4 · Flux',
+    mascot:'thinking',
+    say:'अब Flux reading चाहिए। Panel से देखकर लिखें।',
+    render: () => stepHead(4,5,'INSTRUMENT_READING') + `
+      <div class="card p-4">
+        <div class="mb-3">
+          <div class="hi-lg leading-tight">MBR Panel से<br/>Flux reading लिखें</div>
+          <div class="text-[11px] mt-1 font-serif italic" style="color:#94A3B8">EN: Enter Flux reading (LMH)</div>
+        </div>
+        <div class="p-3 rounded-3xl" style="background:#F5F9FF;border:1px solid #E2E8F0">
           <div class="flex items-center justify-between mb-2">
-            <div class="label-tiny flex items-center">पानी की रफ़्तार (Flux) ${soundBtn('पानी निकलने की रफ़्तार। Flux कहते हैं।')}</div>
+            <div class="label-tiny">पानी की रफ़्तार (Flux)</div>
             <span class="text-[10px]" style="color:#64748B">सामान्य: 18-25 LMH</span>
           </div>
           <div class="flex items-stretch gap-2">
-            <input id="fluxInput" type="number" step="0.1" placeholder="18.0" inputmode="decimal"
-              oninput="updateFluxBar()"
+            <input id="fluxIn" type="number" step="0.1" placeholder="18.0" inputmode="decimal"
               class="flex-1 px-4 py-3 rounded-2xl font-serif text-2xl font-semibold"
-              style="background:#FFFFFF;border:1.5px solid #BFDBFE;color:#0F172A;outline:none"/>
+              style="background:#FFFFFF;border:1.5px solid #BFDBFE;outline:none"/>
             <div class="flex items-center px-4 rounded-2xl font-serif font-semibold text-sm" style="background:#DBEAFE;color:#1E40AF">LMH</div>
           </div>
-          <div class="relative h-4 rounded-full overflow-hidden mt-3" style="background:#E2E8F0">
-            <div class="absolute inset-y-0 left-0 w-[30%]" style="background:rgba(232,90,69,.25)"></div>
-            <div class="absolute inset-y-0 left-[30%] w-[20%]" style="background:rgba(59,130,246,.25)"></div>
-            <div class="absolute inset-y-0 left-[50%] w-[50%]" style="background:rgba(81,189,85,.25)"></div>
-            <div id="fluxMarker" class="absolute top-0 bottom-0 w-1.5 rounded-full shadow opacity-0 transition-all" style="left:0;background:#3B82F6"></div>
-          </div>
-          <div class="flex justify-between text-[9px] mt-1 px-1" style="color:#64748B">
-            <span>कम (0)</span><span>सामान्य</span><span>ज़्यादा (40)</span>
-          </div>
         </div>
-
-        <!-- Status feedback -->
-        <div id="readingStatus" class="hidden mb-3 p-3 rounded-2xl text-sm font-serif"></div>
-
-        <!-- Voice helper -->
-        <button onclick="showToast('🎤 बोलिए — सुन रहे हैं'); speak('Number बोलिए, मैं सुन रहा हूँ।')" class="w-full py-3 rounded-2xl text-sm font-serif font-semibold tap-scale flex items-center justify-center gap-2 mb-2" style="background:#EFF6FF;color:#1E40AF;border:1px solid #93C5FD">
-          <span>🎤</span><span>बोलकर बताएँ (Voice)</span>
-        </button>
-
-        <!-- Continue -->
-        <button onclick="submitReadings()" class="btn-paani tap-scale">
-          <span>✓</span>आगे बढ़ें
-        </button>
+        <button onclick="submitFlux4()" class="btn-paani tap-scale mt-4"><span>✓</span> आगे बढ़ें</button>
+        ${stepFooterBtns()}
       </div>`,
-    onShow: () => { /* manual entry — no timer */ }
+    onShow: () => { window.submitFlux4 = () => { const v=parseFloat(document.getElementById('fluxIn').value); if(isNaN(v)){showToast('Number भरें');return;} if(v<18) terminate('diffuser_fouling',0.55,'Low flux with no membrane issue — diffusers are likely fouled, reducing aeration efficiency.'); else goStep('dStep5'); }; }
   },
 
-  foam: {
-    n:4, label:'Foam observation',
+  dStep5: {
+    n:5, label:'Step 5 · Probe Wipe',
     mascot:'curious',
-    say:'Tank के ऊपर झाग दिख रहा है? ध्यान से देखिए।',
-    render: () => `
-      <div class="card card-warm p-5">
-        <h2 class="hi-lg mb-1 flex items-start gap-1">
-          <span>Tank के ऊपर झाग दिख रहा है?</span>
-          ${soundBtn('Tank के ऊपर झाग दिख रहा है? ऐसा कुछ देखिए।')}
-        </h2>
-        <div class="text-xs mb-4" style="color:#64748B">ऐसा कुछ?</div>
-
-        <!-- Foam pictograms -->
-        <div class="grid grid-cols-2 gap-2 mb-4">
-          <div class="rounded-xl bg-slate-50 p-3 text-center">
-            <svg viewBox="0 0 80 60" class="w-full h-16">
-              <rect x="10" y="30" width="60" height="25" rx="2" fill="#7DD3FC" stroke="#0284C7"/>
-              <ellipse cx="20" cy="28" rx="6" ry="4" fill="#fff" stroke="#94A3B8"/>
-              <ellipse cx="32" cy="26" rx="7" ry="5" fill="#fff" stroke="#94A3B8"/>
-              <ellipse cx="46" cy="27" rx="6" ry="4" fill="#fff" stroke="#94A3B8"/>
-              <ellipse cx="60" cy="28" rx="7" ry="5" fill="#fff" stroke="#94A3B8"/>
-            </svg>
-            <div class="text-[11px] mt-1 font-semibold">सफ़ेद झाग</div>
-          </div>
-          <div class="rounded-xl bg-slate-50 p-3 text-center">
-            <svg viewBox="0 0 80 60" class="w-full h-16">
-              <rect x="10" y="30" width="60" height="25" rx="2" fill="#7DD3FC" stroke="#0284C7"/>
-              <ellipse cx="20" cy="28" rx="6" ry="4" fill="#64748B" stroke="#334155"/>
-              <ellipse cx="32" cy="26" rx="7" ry="5" fill="#475569" stroke="#334155"/>
-              <ellipse cx="46" cy="27" rx="6" ry="4" fill="#64748B" stroke="#334155"/>
-              <ellipse cx="60" cy="28" rx="7" ry="5" fill="#334155" stroke="#1F2937"/>
-            </svg>
-            <div class="text-[11px] mt-1 font-semibold">भूरा झाग</div>
-          </div>
-        </div>
-
-        <!-- Big Yes/No -->
-        <div class="grid grid-cols-2 gap-3">
-          <button onclick="goStep('foamcolor')" class="rounded-3xl p-6 tap-scale text-center" style="background:linear-gradient(160deg,#DBEAFE,#93C5FD);border:1.5px solid #3B82F6;box-shadow:0 6px 16px rgba(59,130,246,.18)">
-            <div class="text-5xl mb-2">✓</div>
-            <div class="font-serif text-2xl font-semibold" style="color:#1E3A8A">हाँ</div>
-            <div class="text-xs mt-1" style="color:#1E40AF">झाग दिख रहा है</div>
-          </button>
-          <button onclick="goStep('autocheck2')" class="rounded-3xl p-6 tap-scale text-center" style="background:#FFFFFF;border:1.5px solid rgba(51,65,85,.12);box-shadow:0 4px 12px rgba(51,65,85,.08)">
-            <div class="text-5xl mb-2" style="color:#64748B">✗</div>
-            <div class="font-serif text-2xl font-semibold" style="color:#334155">नहीं</div>
-            <div class="text-xs mt-1" style="color:#64748B">कोई झाग नहीं</div>
-          </button>
-        </div>
-      </div>`
-  },
-
-  foamcolor: {
-    n:5, label:'Foam colour',
-    mascot:'curious',
-    say:'अच्छा! झाग का रंग कौन सा है? तस्वीर से मिलाइए।',
-    render: () => `
+    say:'Turbidity probe की lens साफ़ करें — reading अब भी high है?',
+    render: () => stepHead(5,5,'CONFIRM') + `
       <div class="card p-4">
-        <h2 class="hi-lg mb-3">झाग का रंग कौन सा है?</h2>
+        <div class="mb-4">
+          <div class="hi-lg leading-tight">Probe की lens साफ़ करें।<br/>Reading अब भी high है?</div>
+          <div class="text-[11px] mt-2 font-serif italic" style="color:#94A3B8">EN: Wipe turbidity probe lens. Reading still high?</div>
+        </div>
         <div class="space-y-2">
-          <button onclick="goStep('autocheck2')" class="w-full flex items-center gap-3 p-3 rounded-2xl border-2 border-slate-200 bg-white tap-scale">
-            <svg viewBox="0 0 60 40" class="w-16 h-12 flex-shrink-0">
-              <rect x="5" y="20" width="50" height="18" rx="2" fill="#7DD3FC"/>
-              <ellipse cx="15" cy="18" rx="6" ry="4" fill="#fff" stroke="#CBD5E1"/>
-              <ellipse cx="30" cy="16" rx="7" ry="5" fill="#fff" stroke="#CBD5E1"/>
-              <ellipse cx="45" cy="18" rx="6" ry="4" fill="#fff" stroke="#CBD5E1"/>
-            </svg>
+          <button onclick="terminate('probe_calibration',0.6,'Clean probe but still reads high — sensor calibration drift. Needs recalibration.')" class="w-full flex items-center gap-3 p-4 rounded-3xl tap-scale" style="background:#FFFFFF;border:1.5px solid #E2E8F0">
+            <div class="text-3xl">📈</div>
             <div class="flex-1 text-left">
-              <div class="hi-md text-base">सफ़ेद</div>
-              <div class="text-[11px] text-ink-500">नया झाग — surfactant</div>
+              <div class="hi-md">हाँ — अब भी high है</div>
+              <div class="text-[11px]" style="color:#64748B">Calibration गलत है</div>
             </div>
           </button>
-          <button onclick="goStep('autocheck2')" class="w-full flex items-center gap-3 p-3 rounded-2xl border-2 border-amber-300 bg-amber-50 tap-scale">
-            <svg viewBox="0 0 60 40" class="w-16 h-12 flex-shrink-0">
-              <rect x="5" y="20" width="50" height="18" rx="2" fill="#7DD3FC"/>
-              <ellipse cx="15" cy="18" rx="6" ry="4" fill="#64748B" stroke="#334155"/>
-              <ellipse cx="30" cy="16" rx="7" ry="5" fill="#475569" stroke="#334155"/>
-              <ellipse cx="45" cy="18" rx="6" ry="4" fill="#64748B" stroke="#334155"/>
-            </svg>
+          <button onclick="terminate('dirty_probe',1.0,'Dirty probe was the cause — wiping the lens cleared it.')" class="w-full flex items-center gap-3 p-4 rounded-3xl tap-scale" style="background:linear-gradient(160deg,#DCFCE7,#86EFAC);border:1.5px solid #51BD55">
+            <div class="text-3xl">✓</div>
             <div class="flex-1 text-left">
-              <div class="hi-md text-base">भूरा</div>
-              <div class="text-[11px] text-amber-700">पुराना sludge — biomass</div>
-            </div>
-          </button>
-          <button onclick="goStep('autocheck2')" class="w-full flex items-center gap-3 p-3 rounded-2xl border-2 border-crit/40 bg-crit/5 tap-scale">
-            <svg viewBox="0 0 60 40" class="w-16 h-12 flex-shrink-0">
-              <rect x="5" y="20" width="50" height="18" rx="2" fill="#1E3A8A"/>
-              <ellipse cx="15" cy="18" rx="6" ry="4" fill="#1F2937"/>
-              <ellipse cx="30" cy="16" rx="7" ry="5" fill="#111827"/>
-              <ellipse cx="45" cy="18" rx="6" ry="4" fill="#1F2937"/>
-            </svg>
-            <div class="flex-1 text-left">
-              <div class="hi-md text-base text-crit">काला</div>
-              <div class="text-[11px] text-crit/80">हवा खत्म — septic · Supervisor</div>
+              <div class="hi-md" style="color:#14532D">नहीं — साफ़ कर के ठीक</div>
+              <div class="text-[11px]" style="color:#14532D">गंदा sensor था · हल हो गया</div>
             </div>
           </button>
         </div>
+        ${stepFooterBtns()}
       </div>`
   },
 
-  autocheck2: {
-    n:6, label:'Blower status',
-    mascot:'thinking',
-    say:'अब Blower देखता हूँ... चल रहा है या बंद है?',
-    render: () => `
-      <div class="card p-4">
-        <div class="flex items-center justify-between mb-3">
-          <div class="text-[11px] uppercase tracking-wider text-ink-500 font-semibold">🤖 Sensor पढ़ रहा है</div>
-          <div class="text-[10px] text-ink-500">अभी</div>
-        </div>
-
-        <div class="text-center py-6">
-          <div class="relative inline-block">
-            <div class="absolute inset-0 rounded-full bg-crit/20 pulse-ring"></div>
-            <div class="relative w-28 h-28 rounded-full bg-crit/10 border-4 border-crit flex items-center justify-center">
-              <div class="text-center">
-                <div class="text-4xl">⏹</div>
-                <div class="text-[10px] font-bold text-crit mt-1">STOPPED</div>
-              </div>
-            </div>
-          </div>
-          <div class="mt-4">
-            <div class="hi-lg text-crit">Blower बंद है</div>
-            <div class="text-sm text-ink-500 mt-1">MBR-1 का aeration blower</div>
-            <div class="text-xs text-ink-500 mt-2">8 मिनट से बंद</div>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2 p-3 rounded-xl bg-slate-50">
-          <div class="text-center">
-            <div class="text-[10px] uppercase tracking-wider text-ink-500 font-semibold">अभी</div>
-            <div class="text-lg font-bold text-crit">0 A</div>
-          </div>
-          <div class="text-center">
-            <div class="text-[10px] uppercase tracking-wider text-ink-500 font-semibold">सामान्य</div>
-            <div class="text-lg font-bold text-ok">12 A</div>
-          </div>
-        </div>
-
-        <div class="mt-4 p-3 rounded-xl bg-paani-50 border border-paani-300">
-          <div class="text-[11px] text-paani-700 font-semibold mb-1.5 flex items-center justify-between">
-            <span>⏱ अपने आप आगे बढ़ेगा</span>
-            <span id="acTimer2">5 sec</span>
-          </div>
-          <div class="h-2 bg-white rounded-full overflow-hidden">
-            <div class="h-full bg-paani-500 auto-bar"></div>
-          </div>
-        </div>
-
-        <button onclick="flagSensor()" class="mt-3 w-full py-3 rounded-xl border-2 border-crit/40 bg-crit/5 text-crit font-semibold tap-scale flex items-center justify-center gap-2">
-          <span class="text-xl">🚩</span><span>ये सही नहीं है</span>
-        </button>
-      </div>`,
-    onShow: () => {
-      let r = 5;
-      autoCheckTimer = setInterval(() => {
-        r -= 0.1;
-        const el = document.getElementById('acTimer2');
-        if (el) el.textContent = Math.max(0,r).toFixed(1) + ' sec';
-        if (r <= 0) { clearInterval(autoCheckTimer); goStep('action'); }
-      }, 100);
-    }
-  },
-
-  action: {
-    n:7, label:'Action · Start blower',
-    mascot:'concerned',
-    say:'Blower चालू करना है। Tank में हवा फिर से जाएगी।',
-    render: () => `
-      <div class="card p-4">
-        <div class="text-center py-4">
-          <div class="text-6xl mb-3">🌬️</div>
-          <h2 class="hi-lg mb-2">Blower चालू करें</h2>
-          <div class="text-sm text-ink-700 mb-1">Tank में हवा फिर से जाएगी</div>
-          <div class="text-xs text-ink-500">पानी साफ़ होने लगेगा</div>
-        </div>
-
-        <!-- How-to picture -->
-        <div class="rounded-xl bg-paani-50 p-4 mb-4">
-          <div class="text-[11px] uppercase tracking-wider text-paani-700 font-semibold mb-2">कैसे करें</div>
-          <div class="space-y-2 text-sm">
-            <div class="flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-paani-500 text-white flex items-center justify-center font-bold text-xs">1</span><span>Panel पर जाएँ — MBR-1 Blower</span></div>
-            <div class="flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-paani-500 text-white flex items-center justify-center font-bold text-xs">2</span><span>हरा button दबाएँ (Start)</span></div>
-            <div class="flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-paani-500 text-white flex items-center justify-center font-bold text-xs">3</span><span>हवा निकलना देखें</span></div>
-          </div>
-        </div>
-
-        <button onclick="goStep('wait')" class="btn-paani tap-scale">
-          <span>✓</span>हो गया
-        </button>
-        <button onclick="goStep('rootcause')" class="mt-2 w-full text-center py-2 text-xs text-ink-500 underline">
-          नहीं कर पाया — आगे बढ़ें
-        </button>
-      </div>`
-  },
-
-  wait: {
-    n:8, label:'Wait · observe',
-    mascot:'waiting',
-    say:'अब 30 मिनट इंतज़ार करते हैं। पानी साफ़ होने में समय लगता है।',
-    render: () => `
-      <div class="card p-4">
-        <div class="text-center py-6">
-          <div class="text-6xl mb-3">⏳</div>
-          <h2 class="hi-lg mb-1">30 मिनट इंतज़ार</h2>
-          <div class="text-sm text-ink-500 mb-4">Turbidity फिर से देखेंगे</div>
-
-          <div class="inline-block p-6 rounded-2xl bg-paani-50 border-2 border-paani-300">
-            <div class="text-5xl font-bold text-paani-700 font-mono" id="waitTimer">29:47</div>
-            <div class="text-xs text-ink-500 mt-1">बाकी समय</div>
-          </div>
-        </div>
-
-        <div class="rounded-xl bg-slate-50 p-3 mb-4">
-          <div class="text-[11px] uppercase tracking-wider text-ink-500 font-semibold mb-2">इस बीच क्या करें</div>
-          <ul class="space-y-1 text-sm">
-            <li>• दूसरे काम कर सकते हैं</li>
-            <li>• 10 मिनट बाद हम बताएँगे</li>
-            <li>• कुछ गड़बड़ लगे तो फ़ोटो भेजें</li>
-          </ul>
-        </div>
-
-        <button onclick="goStep('rootcause')" class="btn-paani tap-scale">
-          <span>👀</span>अभी देख लिया
-        </button>
-      </div>`,
-    onShow: () => {
-      let s = 30*60 - 13;
-      autoCheckTimer = setInterval(() => {
-        s -= 1;
-        const m = Math.floor(s/60), r = s%60;
-        const el = document.getElementById('waitTimer');
-        if (el) el.textContent = String(m).padStart(2,'0')+':'+String(r).padStart(2,'0');
-        if (s <= 0) clearInterval(autoCheckTimer);
-      }, 1000);
-    }
-  },
-
-  rootcause: {
-    n:9, label:'Root cause',
-    mascot:'thinking',
-    say:'क्या कारण था? जो सही लगे वो चुनिए।',
-    render: () => `
-      <div class="card card-warm p-5">
-        <h2 class="hi-lg mb-1 flex items-start gap-1">
-          <span>क्या कारण मिला?</span>
-          ${soundBtn('क्या कारण मिला? सबसे सही जवाब चुनें।')}
-        </h2>
-        <div class="text-xs mb-4" style="color:#64748B">सबसे सही जवाब चुनें</div>
-
-        <div class="space-y-2.5">
-          <button onclick="goStep('close')" class="w-full flex items-center gap-3 p-3.5 rounded-3xl tap-scale" style="background:linear-gradient(160deg,#DBEAFE,#93C5FD);border:1.5px solid #3B82F6;box-shadow:0 4px 12px rgba(59,130,246,.18)">
-            <div class="text-3xl">🌬️</div>
-            <div class="flex-1 text-left">
-              <div class="hi-md text-base" style="color:#1E3A8A">Blower बंद था</div>
-              <div class="text-[11px]" style="color:#1E40AF">सबसे संभावित</div>
-            </div>
-            ${soundBtn('Blower बंद था। यह सबसे संभावित कारण है।')}
-            <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs" style="background:#1E40AF;color:#FFFFFF">✓</div>
-          </button>
-
-          <button onclick="goStep('close')" class="w-full flex items-center gap-3 p-3.5 rounded-3xl tap-scale" style="background:#FFFFFF;border:1.5px solid rgba(51,65,85,.12)">
-            <div class="text-3xl">🔬</div>
-            <div class="flex-1 text-left">
-              <div class="hi-md text-base">Diffuser में जमावट</div>
-              <div class="text-[11px]" style="color:#64748B">हवा ठीक से नहीं निकल रही</div>
-            </div>
-            ${soundBtn('Diffuser में जमावट है। हवा ठीक से नहीं निकल रही।')}
-          </button>
-
-          <button onclick="goStep('close')" class="w-full flex items-center gap-3 p-3.5 rounded-3xl tap-scale" style="background:#FFFFFF;border:1.5px solid rgba(51,65,85,.12)">
-            <div class="text-3xl">🧱</div>
-            <div class="flex-1 text-left">
-              <div class="hi-md text-base">Membrane fouling</div>
-              <div class="text-[11px]" style="color:#64748B">Membrane गंदा हो गया</div>
-            </div>
-            ${soundBtn('Membrane fouling — Membrane गंदा हो गया है।')}
-          </button>
-
-          <button onclick="goStep('close')" class="w-full flex items-center gap-3 p-3.5 rounded-3xl tap-scale" style="background:#FFFFFF;border:1.5px solid rgba(51,65,85,.12)">
-            <div class="text-3xl">📟</div>
-            <div class="flex-1 text-left">
-              <div class="hi-md text-base">Sensor गलत है</div>
-              <div class="text-[11px]" style="color:#64748B">पानी असल में ठीक है</div>
-            </div>
-            ${soundBtn('Sensor गलत है — पानी असल में ठीक है।')}
-          </button>
-
-          <button onclick="callSupervisor()" class="w-full flex items-center gap-3 p-3.5 rounded-3xl tap-scale" style="background:rgba(232,90,69,.08);border:1.5px solid rgba(232,90,69,.3)">
-            <div class="text-3xl">📞</div>
-            <div class="flex-1 text-left">
-              <div class="hi-md text-base" style="color:#E85A45">कोई नहीं — Supervisor बुलाएँ</div>
-              <div class="text-[11px]" style="color:#E85A45">मदद चाहिए</div>
-            </div>
-          </button>
-        </div>
-      </div>`
-  },
 
   equipment: {
     n:1, label:'Equipment · MBR-1 Tank',
@@ -1533,58 +1362,440 @@ const steps = {
       `
   },
 
-  close: {
-    n:10, label:'Issue close',
-    mascot:'celebrating',
-    say:'शाबाश! आपने बहुत अच्छा काम किया। क्या Issue हल हो गया?',
-    render: () => `
-      <div class="card card-sage p-5">
-        <div class="text-center py-3">
-          <div class="text-4xl mb-1">🎉</div>
-          <h2 class="hi-lg mt-1 flex items-center justify-center gap-1">
-            <span>बढ़िया!</span>
-            ${soundBtn('बढ़िया! क्या Issue हल हो गया?')}
+  rootCauseCard: {
+    n:0, label:'Root Cause',
+    mascot:'thinking',
+    say:'कारण मिल गया। अब इसे ठीक करते हैं।',
+    render: () => {
+      const rc = window.identifiedRC || {};
+      const isResolved = rc.id === 'dirty_probe';
+      const isEscalate = rc.id === 'septic_anaerobic';
+      return `
+        <div class="card p-5" style="background:${isResolved?'linear-gradient(160deg,#FFFFFF,#DCFCE7)':isEscalate?'linear-gradient(160deg,#FFFFFF,#FEF2F2)':'linear-gradient(160deg,#FFFFFF,#EFF6FF)'};border:1.5px solid ${isResolved?'#51BD55':isEscalate?'#E85A45':'#BFDBFE'}">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center text-lg" style="background:${isResolved?'#51BD55':isEscalate?'#E85A45':'#3B82F6'};color:#FFFFFF">${isResolved?'✓':isEscalate?'⚠':'🎯'}</div>
+            <div>
+              <div class="label-tiny" style="color:${isResolved?'#15803D':isEscalate?'#E85A45':'#3B82F6'}">${isResolved?'पहले ही हल':isEscalate?'Escalate ज़रूरी':'Root cause मिला'}</div>
+              <div class="font-serif text-[11px]" style="color:#64748B">${rc.name_en||''}</div>
+            </div>
+          </div>
+          <h2 class="hi-lg mt-2 flex items-start gap-1">
+            <span>${rc.name_hi||'—'}</span>
+            ${soundBtn((rc.name_hi||'') + '। ' + (rc.reasoning||''))}
           </h2>
-          <div class="text-sm mt-1" style="color:#1E40AF">क्या Issue हल हो गया?</div>
+
+          <div class="mt-3 p-3 rounded-2xl" style="background:#F5F9FF">
+            <div class="label-tiny mb-1">क्यों लग रहा है</div>
+            <div class="text-xs font-serif" style="color:#334155">${rc.reasoning||''}</div>
+            <div class="mt-2.5 flex items-center gap-2">
+              <span class="text-[10px]" style="color:#64748B">कितना पक्का</span>
+              <div class="flex-1 h-1.5 rounded-full overflow-hidden" style="background:#E2E8F0">
+                <div class="h-full" style="width:${((rc.prob||0)*100).toFixed(0)}%;background:linear-gradient(90deg,#3B82F6,#1E40AF)"></div>
+              </div>
+              <span class="text-[11px] font-bold" style="color:#1E40AF">${((rc.prob||0)*100).toFixed(0)}%</span>
+            </div>
+          </div>
+
+          ${isResolved ? `
+            <div class="mt-4 p-3 rounded-2xl" style="background:#DCFCE7;border:1px solid #51BD55">
+              <div class="font-serif font-semibold text-sm" style="color:#14532D">✓ कोई fix नहीं चाहिए</div>
+              <div class="text-[11px] mt-1" style="color:#15803D">Sensor cleaning से ही हल।</div>
+            </div>
+            <button onclick="endRemediation();goStep('success')" class="btn-paani tap-scale mt-4">Issue बंद करें</button>
+          ` : isEscalate ? `
+            <div class="mt-4 p-3 rounded-2xl" style="background:#FEF2F2;border:1px solid #E85A45">
+              <div class="font-serif font-semibold text-sm" style="color:#7F1D1D">⚠ ज़रूरी escalation</div>
+              <div class="text-[11px] mt-1" style="color:#7F1D1D">Anaerobic condition — site engineer को तुरंत बुलाना है।</div>
+            </div>
+            <button onclick="callSupervisor();setTimeout(()=>goStep('home'),1500)" class="btn-paani tap-scale mt-4" style="background:linear-gradient(140deg,#E85A45 0%,#7F1D1D 100%)">
+              <span>📞</span> Supervisor + Site engineer बुलाएँ
+            </button>
+          ` : `
+            <div class="mt-4 p-3 rounded-2xl" style="background:#FFFBEB;border:1px solid #FCD34D">
+              <div class="label-tiny" style="color:#92400E">Fix के बाद यह देखेंगे (Sensor B)</div>
+              <div class="mt-1.5 flex items-center gap-2 text-xs flex-wrap">
+                <span class="px-2 py-1 rounded-lg font-mono text-[10px]" style="background:#FECACA;color:#7F1D1D">A: Turbidity (NTU)</span>
+                <span>→</span>
+                <span class="px-2 py-1 rounded-lg font-mono text-[10px]" style="background:#DCFCE7;color:#14532D">B: ${rc.sensor_b_label||'—'} (${rc.sensor_b_unit||''})</span>
+              </div>
+            </div>
+            <button onclick="endDiagnosis();goStep('rStep1')" class="btn-paani tap-scale mt-4">
+              <span>🔧</span> Fix शुरू करें
+            </button>
+            <button onclick="goStep('evidence')" class="mt-2 w-full py-2.5 text-xs font-serif font-semibold" style="color:#E85A45">
+              मैं सहमत नहीं · supervisor को भेजें
+            </button>
+          `}
+        </div>`;
+    }
+  },
+
+  rStep1: {
+    n:1, label:'Fix · Step 1',
+    mascot:'concerned',
+    say:'पहला step। ध्यान से कीजिए।',
+    render: () => {
+      const rc = window.identifiedRC || {};
+      const actions = {
+        blower_fault: { title:'Blower चालू करें', steps:['Panel पर जाएँ — MBR-1 Blower','हरा START button दबाएँ','बुलबुले निकलते देखें'], hazard:false },
+        membrane_fouling: { title:'CIP cycle शुरू करें', steps:['MBR-1 को isolate करें (valve बंद)','CIP mode चुनें panel पर','45 मिनट तक चलने दें'], hazard:true },
+        diffuser_fouling: { title:'Diffuser air-scour चलाएँ', steps:['Aeration blower full पर करें','5 मिनट तक चलाएँ','Bubble pattern देखें — समान होना चाहिए'], hazard:false },
+        probe_calibration: { title:'Turbidity probe recalibrate करें', steps:['Probe निकालें (gloves पहनें)','Zero standard में डालें','Panel पर "Calibrate Zero" दबाएँ','Span standard में डालें','"Calibrate Span" दबाएँ'], hazard:true }
+      };
+      const a = actions[rc.id] || { title:'Action', steps:['Step 1','Step 2','Step 3'], hazard:false };
+      return stepHead(1,2,'ACTION') + `
+        <div class="card p-4">
+          ${a.hazard ? `
+            <div class="mb-3 p-2.5 rounded-2xl flex items-center gap-2" style="background:#FEF2F2;border:1px solid #FCA5A5">
+              <span class="text-lg">⚠</span>
+              <div class="text-[11px] font-semibold" style="color:#7F1D1D">Skill ज़रूरी · Mechanical/Chemical · फ़ोटो mandatory</div>
+            </div>
+          ` : ''}
+          <div class="hi-lg mb-3">${a.title}</div>
+          <div class="rounded-2xl p-4 mb-4" style="background:#EFF6FF">
+            <div class="space-y-2 text-sm font-serif">
+              ${a.steps.map((s,i) => `<div class="flex gap-2"><span class="w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0" style="background:#3B82F6;color:#FFFFFF">${i+1}</span><span>${s}</span></div>`).join('')}
+            </div>
+          </div>
+          ${a.hazard ? `
+            <button onclick="sendPhoto()" class="w-full mb-2 py-2.5 rounded-2xl text-sm font-serif font-semibold tap-scale" style="background:#FEF2F2;color:#E85A45;border:1.5px solid #FCA5A5">📷 पहले फ़ोटो लें (ज़रूरी)</button>
+          ` : ''}
+          <button onclick="endRemediation();goStep('verification')" class="btn-paani tap-scale">
+            <span>✓</span> हो गया
+          </button>
+          <button onclick="goStep('evidence')" class="mt-2 w-full py-2.5 text-xs font-serif font-semibold" style="color:#E85A45">
+            नहीं कर पाया · supervisor को भेजें
+          </button>
+        </div>`;
+    }
+  },
+
+  verification: {
+    n:2, label:'Verification',
+    mascot:'waiting',
+    say:'अब sensor को सामान्य आते देखते हैं। थोड़ा रुकें।',
+    render: () => {
+      const rc = window.identifiedRC || {};
+      return stepHead(2,2,'VERIFICATION') + `
+        <div class="card p-4">
+          <div class="hi-lg mb-1">Sensor B verify कर रहे हैं</div>
+          <div class="text-xs mb-3" style="color:#64748B">${rc.sensor_b_label||'Sensor'} normal आना है</div>
+
+          <div class="rounded-3xl p-4" style="background:linear-gradient(160deg,#F5F9FF,#DBEAFE);border:1.5px solid #93C5FD">
+            <div class="flex items-center justify-between mb-2">
+              <div class="label-tiny" style="color:#1E40AF">Sensor B · ${rc.sensor_b_label||''}</div>
+              <span class="text-[10px]" style="color:#1E40AF">Target ≥ ${rc.sensor_b_target||'1.5'}</span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span id="verifyVal" class="font-serif text-5xl font-bold" style="color:#E85A45">0.8</span>
+              <span class="text-sm font-semibold" style="color:#64748B">${rc.sensor_b_unit||''}</span>
+            </div>
+            <div class="relative h-3 rounded-full overflow-hidden mt-3" style="background:#FFFFFF">
+              <div id="verifyBar" class="absolute inset-y-0 left-0 transition-all duration-1000" style="width:30%;background:linear-gradient(90deg,#E85A45,#3B82F6,#51BD55)"></div>
+            </div>
+          </div>
+
+          <div class="mt-3 p-3 rounded-2xl flex items-center gap-3" style="background:#F5F9FF">
+            <div class="w-14 h-14 rounded-full flex items-center justify-center font-mono font-bold text-sm" id="verifyTimer" style="background:#3B82F6;color:#FFFFFF">10:00</div>
+            <div class="flex-1">
+              <div class="text-xs font-semibold">सामान्य आने का समय</div>
+              <div class="text-[10px]" style="color:#64748B">समय खत्म पर re-diagnose · supervisor notify</div>
+            </div>
+          </div>
+
+          <button onclick="verifySuccess()" class="btn-paani tap-scale mt-3" style="background:linear-gradient(140deg,#86EFAC 0%,#15803D 100%)">
+            <span>✓</span> Demo: ठीक हो गया
+          </button>
+          <button onclick="goStep('rediagnose')" class="mt-2 w-full py-3 rounded-2xl text-sm font-serif font-semibold tap-scale" style="background:#FEF2F2;color:#E85A45;border:1.5px solid #FECACA">
+            ⚠ Demo: ठीक नहीं हो रहा
+          </button>
+        </div>`;
+    },
+    onShow: () => {
+      let secs = 10*60;
+      if (autoCheckTimer) clearInterval(autoCheckTimer);
+      autoCheckTimer = setInterval(() => {
+        secs -= 1;
+        const m = Math.floor(secs/60), s = secs%60;
+        const el = document.getElementById('verifyTimer');
+        if (el) el.textContent = String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+        const valEl = document.getElementById('verifyVal');
+        const barEl = document.getElementById('verifyBar');
+        const progress = 1 - (secs / (10*60));
+        const val = 0.8 + (1.0 * progress);
+        if (valEl) { valEl.textContent = val.toFixed(1); valEl.style.color = val >= 1.5 ? '#51BD55' : val >= 1.0 ? '#3B82F6' : '#E85A45'; }
+        if (barEl) barEl.style.width = Math.min(100, 30 + (60 * progress)) + '%';
+        if (secs <= 0) { clearInterval(autoCheckTimer); goStep('rediagnose'); }
+      }, 1000);
+      window.verifySuccess = () => { if(autoCheckTimer) clearInterval(autoCheckTimer); goStep('success'); };
+    }
+  },
+
+  success: {
+    n:0, label:'हल हो गया',
+    mascot:'celebrating',
+    say:'शाबाश! Issue हल हो गया।',
+    render: () => {
+      const total = totalMTTR();
+      const rc = window.identifiedRC || {};
+      return `
+        <div class="card p-5" style="background:linear-gradient(160deg,#FFFFFF,#DCFCE7);border:1.5px solid #51BD55">
+          <div class="text-center py-2">
+            <div class="text-5xl mb-2">🎉</div>
+            <h2 class="hi-lg mt-1" style="color:#14532D">Issue हल हो गया!</h2>
+            <div class="text-sm mt-1" style="color:#15803D">बहुत बढ़िया काम</div>
+          </div>
+
+          <div class="mt-4 p-3 rounded-2xl" style="background:#FFFFFF;border:1px solid #BBF7D0">
+            <div class="label-tiny mb-2" style="color:#15803D">कुल समय (MTTR)</div>
+            <div class="flex items-baseline gap-1">
+              <span class="font-serif text-4xl font-bold" style="color:#14532D">${total}</span>
+              <span class="text-sm" style="color:#15803D">मिनट</span>
+            </div>
+            <div class="mt-3 space-y-1.5 text-xs">
+              <div class="flex justify-between"><span style="color:#64748B">📋 Diagnosis</span><span class="font-semibold">~${Math.max(1,Math.floor(total*0.3))} min</span></div>
+              <div class="flex justify-between"><span style="color:#64748B">🔧 Fix</span><span class="font-semibold">~${Math.max(1,Math.floor(total*0.2))} min</span></div>
+              <div class="flex justify-between"><span style="color:#64748B">⏳ Sensor normalize</span><span class="font-semibold">~${Math.max(1,Math.floor(total*0.5))} min</span></div>
+            </div>
+          </div>
+
+          <div class="mt-3 p-3 rounded-2xl" style="background:#FFFFFF;border:1px solid #BBF7D0">
+            <div class="label-tiny mb-1" style="color:#15803D">यही कारण था?</div>
+            <div class="font-serif font-semibold text-sm">${rc.name_hi||'—'}</div>
+            <div class="grid grid-cols-3 gap-1.5 mt-3">
+              <button onclick="finishWithFeedback('yes')" class="py-2 rounded-xl text-xs font-serif font-semibold tap-scale" style="background:#51BD55;color:#FFFFFF">✓ हाँ</button>
+              <button onclick="finishWithFeedback('partial')" class="py-2 rounded-xl text-xs font-serif font-semibold tap-scale" style="background:#3B82F6;color:#FFFFFF">≈ कुछ और भी</button>
+              <button onclick="finishWithFeedback('no')" class="py-2 rounded-xl text-xs font-serif font-semibold tap-scale" style="background:#E85A45;color:#FFFFFF">✗ नहीं</button>
+            </div>
+          </div>
+
+          <button onclick="goStep('home')" class="btn-paani tap-scale mt-4">
+            <span>🏠</span> घर वापस जाएँ
+          </button>
+        </div>`;
+    }
+  },
+
+  rediagnose: {
+    n:0, label:'Re-diagnose',
+    mascot:'concerned',
+    say:'Sensor अब भी ठीक नहीं हुआ। Supervisor को बता दिया गया।',
+    render: () => `
+      <div class="card p-5" style="background:linear-gradient(160deg,#FFFFFF,#FEF2F2);border:1.5px solid #E85A45">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="w-10 h-10 rounded-full flex items-center justify-center text-lg" style="background:#E85A45;color:#FFFFFF">⚠</span>
+          <div>
+            <div class="label-tiny" style="color:#E85A45">Sensor ठीक नहीं हुआ</div>
+            <div class="text-[11px]" style="color:#64748B">10 मिनट का timer खत्म</div>
+          </div>
         </div>
-
-        <div class="space-y-2.5 mt-5">
-          <button onclick="finish('yes')" class="w-full flex items-center gap-3 p-4 rounded-3xl tap-scale" style="background:linear-gradient(160deg,#DCFCE7,#86EFAC);border:1.5px solid #51BD55;box-shadow:0 4px 12px rgba(81,189,85,.2)">
-            <div class="text-4xl">✅</div>
-            <div class="flex-1 text-left">
-              <div class="hi-md" style="color:#14532D">हाँ — यही कारण था</div>
-              <div class="text-[11px]" style="color:#1E40AF">पूरी तरह ठीक हो गया</div>
+        <h2 class="hi-lg mt-2 flex items-start gap-1">
+          <span>दूसरी जाँच ज़रूरी</span>
+          ${soundBtn('Sensor अब भी ठीक नहीं हुआ। Supervisor को बता दिया है।')}
+        </h2>
+        <div class="mt-3 p-3 rounded-2xl" style="background:#FEF2F2;border:1px solid #FCA5A5">
+          <div class="flex items-start gap-2.5">
+            <span class="text-xl">📞</span>
+            <div class="flex-1">
+              <div class="font-serif font-semibold text-sm" style="color:#7F1D1D">Supervisor Ashok को notify किया</div>
+              <div class="text-[11px] mt-0.5" style="color:#7F1D1D">वे diagnosis को override कर सकते हैं</div>
+              <div class="flex items-center gap-1.5 mt-2 text-[10px]" style="color:#7F1D1D">
+                <span class="w-1.5 h-1.5 rounded-full animate-pulse" style="background:#E85A45"></span>
+                <span class="font-semibold">Supervisor reviewing...</span>
+              </div>
             </div>
-          </button>
-
-          <button onclick="finish('partial')" class="w-full flex items-center gap-3 p-4 rounded-3xl tap-scale" style="background:#EFF6FF;border:1.5px solid #93C5FD">
-            <div class="text-4xl">🤔</div>
-            <div class="flex-1 text-left">
-              <div class="hi-md" style="color:#1E40AF">हाँ, लेकिन कुछ और भी था</div>
-              <div class="text-[11px]" style="color:#3B82F6">थोड़ा ठीक हुआ</div>
-            </div>
-          </button>
-
-          <button onclick="finish('no')" class="w-full flex items-center gap-3 p-4 rounded-3xl tap-scale" style="background:rgba(232,90,69,.08);border:1.5px solid rgba(232,90,69,.3)">
-            <div class="text-4xl">❌</div>
-            <div class="flex-1 text-left">
-              <div class="hi-md" style="color:#E85A45">नहीं — दूसरा कारण था</div>
-              <div class="text-[11px]" style="color:#3B82F6">Supervisor को बताएँगे</div>
-            </div>
-          </button>
+          </div>
         </div>
+        <button onclick="goStep('preview')" class="btn-paani tap-scale mt-4">
+          <span>🔄</span> फिर से जाँच करें
+        </button>
+        <button onclick="goStep('home')" class="mt-2 w-full py-3 rounded-2xl text-sm font-serif font-semibold tap-scale" style="background:#F1F5F9;color:#475569;border:1px solid #CBD5E1">
+          ⏳ Supervisor का wait करें
+        </button>
+      </div>`
+  },
 
-        <div class="mt-5 p-3.5 rounded-3xl" style="background:#FFFFFF">
-          <div class="label-tiny mb-2">क्या किया? (वैकल्पिक)</div>
-          <div class="flex gap-2">
-            <button class="flex-1 py-3 rounded-2xl font-serif font-semibold text-sm tap-scale" style="background:#F5F9FF;border:1px solid rgba(51,65,85,.08);color:#334155">📷 फ़ोटो</button>
-            <button class="flex-1 py-3 rounded-2xl font-serif font-semibold text-sm tap-scale" style="background:#F5F9FF;border:1px solid rgba(51,65,85,.08);color:#334155">🎤 बोलकर</button>
+  evidence: {
+    n:0, label:'Evidence · Supervisor को भेजें',
+    mascot:'concerned',
+    say:'कोई बात नहीं। मुझे जो लगता है बताइए और मैं supervisor तक पहुँचा दूँगा।',
+    render: () => {
+      const opts = [
+        ['blower_fault','Blower बंद है'],
+        ['membrane_fouling','Membrane में जमावट'],
+        ['diffuser_fouling','Diffuser में जमावट'],
+        ['probe_calibration','Sensor calibration गलत'],
+        ['unknown','मुझे नहीं पता']
+      ];
+      return `
+        <div class="card p-4">
+          <div class="hi-lg mb-1">क्या लगता है कारण?</div>
+          <div class="text-xs mb-3" style="color:#64748B">जो सबसे सही लगे चुनें (वैकल्पिक)</div>
+          <div class="space-y-2" id="rcOpts">
+            ${opts.map(([id,lbl]) => `<button data-rc="${id}" onclick="pickEvidenceRC(this)" class="w-full p-3 rounded-2xl text-left text-sm font-serif tap-scale rc-opt" style="background:#F5F9FF;border:1.5px solid #E2E8F0">${lbl}</button>`).join('')}
           </div>
         </div>
 
-        <button onclick="goStep('home')" class="btn-paani tap-scale mt-5">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
-          <span>घर वापस जाएँ</span>
+        <div class="card p-4">
+          <div class="label-tiny mb-2">सबूत जोड़ें (वैकल्पिक)</div>
+          <div class="grid grid-cols-3 gap-2 mb-3">
+            <button onclick="sendPhoto()" class="rounded-2xl p-3 text-center tap-scale" style="background:#F5F9FF;border:1px solid #E2E8F0">
+              <div class="text-2xl">📷</div><div class="text-[10px] font-serif font-semibold mt-1">फ़ोटो</div>
+            </button>
+            <button onclick="showToast('🎤 बोलिए... सुन रहे हैं');speak('बोलिए, मैं सुन रहा हूँ।')" class="rounded-2xl p-3 text-center tap-scale" style="background:#F5F9FF;border:1px solid #E2E8F0">
+              <div class="text-2xl">🎤</div><div class="text-[10px] font-serif font-semibold mt-1">Voice</div>
+            </button>
+            <button onclick="document.getElementById('evNote').focus()" class="rounded-2xl p-3 text-center tap-scale" style="background:#F5F9FF;border:1px solid #E2E8F0">
+              <div class="text-2xl">✏️</div><div class="text-[10px] font-serif font-semibold mt-1">लिखें</div>
+            </button>
+          </div>
+          <textarea id="evNote" rows="3" placeholder="क्या हुआ बताइए..." class="w-full p-3 rounded-2xl text-sm font-serif" style="background:#F5F9FF;border:1px solid #E2E8F0;outline:none;resize:none"></textarea>
+        </div>
+
+        <div class="card p-4">
+          <div class="label-tiny mb-2">किसको भेजें</div>
+          <div class="space-y-2">
+            <label class="flex items-center gap-3 p-3 rounded-2xl cursor-pointer" style="background:#EFF6FF;border:1.5px solid #3B82F6">
+              <input type="radio" name="rcpt" checked class="accent-blue-600"/>
+              <div class="flex-1">
+                <div class="font-serif font-semibold text-sm">Supervisor · Ashok Kumar</div>
+                <div class="text-[10px]" style="color:#64748B">Online · Default</div>
+              </div>
+              <div class="w-2 h-2 rounded-full" style="background:#51BD55"></div>
+            </label>
+            <label class="flex items-center gap-3 p-3 rounded-2xl cursor-pointer" style="background:#FFFFFF;border:1.5px solid #E2E8F0">
+              <input type="radio" name="rcpt" class="accent-blue-600"/>
+              <div class="flex-1">
+                <div class="font-serif font-semibold text-sm">अगली Shift · Suresh</div>
+                <div class="text-[10px]" style="color:#64748B">3:00 PM से</div>
+              </div>
+            </label>
+            <label class="flex items-center gap-3 p-3 rounded-2xl cursor-pointer" style="background:#FFFFFF;border:1.5px solid #E2E8F0">
+              <input type="radio" name="rcpt" class="accent-blue-600"/>
+              <div class="flex-1">
+                <div class="font-serif font-semibold text-sm">Site Engineer · Vikram</div>
+                <div class="text-[10px]" style="color:#64748B">Specialist · MBR/Membrane</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <button onclick="sendEvidence()" class="btn-paani tap-scale">
+          <span>📤</span> भेजें
+        </button>
+        <style>.rc-opt.sel{background:#DBEAFE !important;border-color:#3B82F6 !important;color:#1E40AF}</style>`;
+    }
+  },
+
+  linkIssue: {
+    n:0, label:'नई Issue · Link',
+    mascot:'curious',
+    say:'नई issue मिली? बताइए — main issue से कैसे जुड़ी है?',
+    render: () => `
+      <div class="card p-4">
+        <div class="hi-lg mb-1">नई Issue link करें</div>
+        <div class="text-xs mb-3" style="color:#64748B">Main issue से इसका क्या relationship है?</div>
+        <div class="space-y-2">
+          <button onclick="linkAndContinue('blocking')" class="w-full flex items-center gap-3 p-4 rounded-3xl tap-scale" style="background:#FEF2F2;border:1.5px solid #E85A45">
+            <div class="text-3xl">🚫</div>
+            <div class="flex-1 text-left">
+              <div class="hi-md" style="color:#7F1D1D">Blocking</div>
+              <div class="text-[11px]" style="color:#7F1D1D">यह ठीक हुए बिना main issue नहीं हो सकता</div>
+            </div>
+          </button>
+          <button onclick="linkAndContinue('attached')" class="w-full flex items-center gap-3 p-4 rounded-3xl tap-scale" style="background:#EFF6FF;border:1.5px solid #3B82F6">
+            <div class="text-3xl">🔗</div>
+            <div class="flex-1 text-left">
+              <div class="hi-md" style="color:#1E40AF">Attached</div>
+              <div class="text-[11px]" style="color:#1E40AF">साथ में हल करना है (related)</div>
+            </div>
+          </button>
+          <button onclick="linkAndContinue('separate')" class="w-full flex items-center gap-3 p-4 rounded-3xl tap-scale" style="background:#FFFFFF;border:1.5px solid #E2E8F0">
+            <div class="text-3xl">➕</div>
+            <div class="flex-1 text-left">
+              <div class="hi-md">Separate</div>
+              <div class="text-[11px]" style="color:#64748B">अलग issue · बाद में देखेंगे</div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <div class="card p-4">
+        <div class="label-tiny mb-2">नई Issue के बारे में</div>
+        <textarea rows="3" placeholder="क्या मिला बताइए..." class="w-full p-3 rounded-2xl text-sm font-serif" style="background:#F5F9FF;border:1px solid #E2E8F0;outline:none;resize:none"></textarea>
+        <div class="mt-2 grid grid-cols-2 gap-2">
+          <button onclick="sendPhoto()" class="py-2 rounded-2xl text-xs font-serif font-semibold tap-scale" style="background:#EFF6FF;color:#1E40AF;border:1px solid #BFDBFE">📷 फ़ोटो</button>
+          <button onclick="showToast('🎤 बोलिए...')" class="py-2 rounded-2xl text-xs font-serif font-semibold tap-scale" style="background:#EFF6FF;color:#1E40AF;border:1px solid #BFDBFE">🎤 Voice</button>
+        </div>
+      </div>`
+  },
+
+  reassign: {
+    n:0, label:'दूसरे Operator को दें',
+    mascot:'curious',
+    say:'चलिए, किसी और को देते हैं। Supervisor को भी notify कर देंगे।',
+    render: () => `
+      <div class="card p-4">
+        <div class="hi-lg mb-1">किसको दें?</div>
+        <div class="text-xs mb-3" style="color:#64748B">यह issue किसी और को assign करेंगे</div>
+        <div class="space-y-2">
+          <button onclick="reassignTo('next_shift')" class="w-full flex items-center gap-3 p-4 rounded-3xl tap-scale" style="background:#EFF6FF;border:1.5px solid #3B82F6">
+            <div class="w-11 h-11 rounded-full flex items-center justify-center font-serif font-bold" style="background:#3B82F6;color:#FFFFFF">S</div>
+            <div class="flex-1 text-left">
+              <div class="hi-md" style="color:#1E40AF">अगली Shift · Suresh</div>
+              <div class="text-[11px]" style="color:#1E40AF">3:00 PM शुरू होगी · 4 घंटे बाद</div>
+            </div>
+          </button>
+          <button onclick="reassignTo('specific')" class="w-full flex items-center gap-3 p-4 rounded-3xl tap-scale" style="background:#FFFFFF;border:1.5px solid #E2E8F0">
+            <div class="w-11 h-11 rounded-full flex items-center justify-center font-serif font-bold" style="background:#64748B;color:#FFFFFF">R</div>
+            <div class="flex-1 text-left">
+              <div class="hi-md">Specific Operator · Rajesh</div>
+              <div class="text-[11px]" style="color:#64748B">Senior · MBR specialist</div>
+            </div>
+          </button>
+          <button onclick="reassignTo('engineer')" class="w-full flex items-center gap-3 p-4 rounded-3xl tap-scale" style="background:#FEF2F2;border:1.5px solid #E85A45">
+            <div class="w-11 h-11 rounded-full flex items-center justify-center font-serif font-bold" style="background:#E85A45;color:#FFFFFF">V</div>
+            <div class="flex-1 text-left">
+              <div class="hi-md" style="color:#7F1D1D">Site Engineer · Vikram</div>
+              <div class="text-[11px]" style="color:#7F1D1D">Phone +91-9xx · Expert call</div>
+            </div>
+          </button>
+        </div>
+      </div>
+      <div class="card p-4">
+        <div class="label-tiny mb-2">क्यों दे रहे हैं? (वैकल्पिक)</div>
+        <textarea rows="2" placeholder="मुझे यह काम नहीं आता..." class="w-full p-3 rounded-2xl text-sm font-serif" style="background:#F5F9FF;border:1px solid #E2E8F0;outline:none;resize:none"></textarea>
+        <div class="mt-2 flex gap-2">
+          <button onclick="sendPhoto()" class="flex-1 py-2 rounded-2xl text-xs font-serif font-semibold tap-scale" style="background:#EFF6FF;color:#1E40AF;border:1px solid #BFDBFE">📷 फ़ोटो</button>
+          <button onclick="showToast('🎤 बोलिए...')" class="flex-1 py-2 rounded-2xl text-xs font-serif font-semibold tap-scale" style="background:#EFF6FF;color:#1E40AF;border:1px solid #BFDBFE">🎤 Voice</button>
+        </div>
+      </div>
+      <div class="card p-3 flex items-center gap-2.5" style="background:#FFFBEB;border:1px solid #FCD34D">
+        <span class="text-lg">📞</span>
+        <div class="text-[11px] font-serif" style="color:#92400E">Supervisor को भी notify किया जाएगा automatically</div>
+      </div>`
+  },
+
+  fallback: {
+    n:0, label:'Skip · Fallback',
+    mascot:'curious',
+    say:'कोई बात नहीं। अगले step पर ले चलता हूँ।',
+    render: () => `
+      <div class="card p-5">
+        <div class="text-center py-4">
+          <div class="text-5xl mb-3">🔀</div>
+          <h2 class="hi-lg">Step skip किया</h2>
+          <div class="text-xs mt-1" style="color:#64748B">Instrument या skill नहीं — दूसरा रास्ता है</div>
+        </div>
+        <div class="p-3 rounded-2xl" style="background:#FFFBEB;border:1px solid #FCD34D">
+          <div class="text-[11px] font-semibold" style="color:#92400E">Step 3 (TMP) skip किया</div>
+          <div class="text-[10px] mt-1" style="color:#92400E">अब Step 4 (Flux) पर जाएँगे — यह बिना TMP gauge के भी हो जाएगा।</div>
+        </div>
+        <button onclick="goStep('dStep4')" class="btn-paani tap-scale mt-4">
+          <span>→</span> Step 4 पर जाएँ
+        </button>
+        <button onclick="goStep('evidence')" class="mt-2 w-full py-2.5 text-xs font-serif font-semibold" style="color:#64748B">
+          सीधे supervisor को भेजें →
         </button>
       </div>`
   }
@@ -1717,6 +1928,120 @@ function closeMbrChoice(e){
   m.classList.add('hidden');
   m.classList.remove('flex');
 }
+/* ============== STEP HELPERS (tree-driven) ============== */
+const STEP_TYPES = {
+  RECORD: { icon:'📝', label:'Record', color:'#3B82F6' },
+  OBSERVATION: { icon:'👁', label:'Observation', color:'#0EA5E9' },
+  INSTRUMENT_READING: { icon:'📊', label:'Instrument Reading', color:'#1E40AF' },
+  CONFIRM: { icon:'✓', label:'Confirm', color:'#51BD55' },
+  ACTION: { icon:'🔧', label:'Action', color:'#3B82F6' },
+  VERIFICATION: { icon:'🎯', label:'Verification', color:'#51BD55' }
+};
+function stepHead(n, total, type){
+  const t = STEP_TYPES[type] || STEP_TYPES.RECORD;
+  return `<div class="flex items-center justify-between mb-3">
+    <div class="flex items-center gap-2">
+      <div class="w-10 h-10 rounded-2xl flex items-center justify-center text-lg" style="background:${t.color}1A;color:${t.color}">${t.icon}</div>
+      <div>
+        <div class="label-tiny" style="color:${t.color}">${t.label}</div>
+        <div class="text-xs font-semibold">Step ${n} of ${total}</div>
+      </div>
+    </div>
+    <span class="chip" style="background:#F5F9FF;color:#64748B">DT-001</span>
+  </div>`;
+}
+function yesNoBig(yesAction, noAction){
+  return `<div class="grid grid-cols-2 gap-3">
+    <button onclick="${yesAction}" class="rounded-3xl p-6 tap-scale text-center" style="background:linear-gradient(160deg,#DBEAFE,#93C5FD);border:1.5px solid #3B82F6">
+      <div class="text-5xl mb-2">✓</div>
+      <div class="font-serif text-2xl font-semibold" style="color:#1E40AF">हाँ</div>
+    </button>
+    <button onclick="${noAction}" class="rounded-3xl p-6 tap-scale text-center" style="background:#FFFFFF;border:1.5px solid #E2E8F0">
+      <div class="text-5xl mb-2" style="color:#64748B">✗</div>
+      <div class="font-serif text-2xl font-semibold">नहीं</div>
+    </button>
+  </div>
+  <button onclick="${yesAction}" class="w-full mt-3 py-2.5 rounded-2xl text-sm font-serif font-semibold tap-scale" style="background:#F1F5F9;color:#475569">
+    🤷 नहीं पता / Skip
+  </button>`;
+}
+function stepFooterBtns(){
+  return `<div class="mt-3 flex gap-2">
+    <button onclick="goStep('evidence')" class="flex-1 py-1.5 rounded-xl text-[10px] font-serif font-semibold tap-scale" style="background:#FEF2F2;color:#E85A45;border:1px solid #FECACA">⚠ नहीं आता</button>
+    <button onclick="goStep('linkIssue')" class="flex-1 py-1.5 rounded-xl text-[10px] font-serif font-semibold tap-scale" style="background:#FFFBEB;color:#92400E;border:1px solid #FCD34D">➕ नई issue</button>
+    <button onclick="goStep('reassign')" class="flex-1 py-1.5 rounded-xl text-[10px] font-serif font-semibold tap-scale" style="background:#F5F9FF;color:#1E40AF;border:1px solid #BFDBFE">🤝 दूसरे को दें</button>
+  </div>`;
+}
+function foamSwatch(color){
+  const f = { white:'fill="#FFFFFF" stroke="#CBD5E1"', brown:'fill="#A16207" stroke="#78350F"', black:'fill="#1F2937"' };
+  const bg = color==='black' ? '#1E3A8A' : '#93C5FD';
+  return `<svg viewBox="0 0 60 40" class="w-14 h-10 flex-shrink-0">
+    <rect x="5" y="20" width="50" height="18" rx="2" fill="${bg}"/>
+    <ellipse cx="15" cy="18" rx="6" ry="4" ${f[color]}/>
+    <ellipse cx="30" cy="16" rx="7" ry="5" ${f[color]}/>
+    <ellipse cx="45" cy="18" rx="6" ry="4" ${f[color]}/>
+  </svg>`;
+}
+function foamTile(color){
+  return `<div class="rounded-2xl p-2 text-center" style="background:#F5F9FF;border:1px solid #E2E8F0">
+    ${foamSwatch(color)}
+    <div class="text-[10px] mt-1 font-serif font-semibold">${color==='white'?'सफ़ेद':'भूरा'}</div>
+  </div>`;
+}
+
+const RC_MAP = {
+  blower_fault: { id:'blower_fault', name_hi:'Blower बंद है', name_en:'Air Blower Fault', sensor_b_label:'पानी में हवा (DO)', sensor_b_unit:'mg/L', sensor_b_target:'1.5' },
+  membrane_fouling: { id:'membrane_fouling', name_hi:'Membrane में जमावट', name_en:'Membrane Fouling', sensor_b_label:'Membrane दबाव (TMP)', sensor_b_unit:'kPa', sensor_b_target:'-0.30' },
+  diffuser_fouling: { id:'diffuser_fouling', name_hi:'Diffuser में जमावट', name_en:'Diffuser Fouling', sensor_b_label:'पानी की रफ़्तार (Flux)', sensor_b_unit:'LMH', sensor_b_target:'20' },
+  probe_calibration: { id:'probe_calibration', name_hi:'Sensor calibration गलत है', name_en:'Probe Calibration Error', sensor_b_label:'Turbidity', sensor_b_unit:'NTU', sensor_b_target:'< 5' },
+  dirty_probe: { id:'dirty_probe', name_hi:'Sensor पर गंदगी थी', name_en:'Dirty Probe (Cleaned)', sensor_b_label:'Turbidity', sensor_b_unit:'NTU', sensor_b_target:'< 5' },
+  septic_anaerobic: { id:'septic_anaerobic', name_hi:'Septic / हवा खत्म', name_en:'Anaerobic Condition', sensor_b_label:'DO', sensor_b_unit:'mg/L', sensor_b_target:'1.5' }
+};
+function terminate(rcId, prob, reasoning){
+  window.identifiedRC = { ...(RC_MAP[rcId] || {}), prob, reasoning };
+  goStep('rootCauseCard');
+}
+
+/* MTTR */
+let mttrStart = null;
+function startMTTR(){ mttrStart = Date.now(); }
+function endDiagnosis(){}
+function endRemediation(){}
+function totalMTTR(){ return mttrStart ? Math.max(1, Math.floor((Date.now() - mttrStart)/60000)) : 23; }
+window.identifiedRC = null;
+
+function pickEvidenceRC(btn){
+  document.querySelectorAll('.rc-opt').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+function sendEvidence(){
+  showToast('✓ Supervisor को भेज दिया');
+  speak('Supervisor को सब कुछ भेज दिया है। जल्द जवाब आएगा।');
+  setTimeout(() => goStep('home'), 1500);
+}
+function linkAndContinue(kind){
+  const msg = kind==='blocking' ? 'Blocking issue link की · main pause' :
+              kind==='attached' ? 'Attached issue link की · साथ देखेंगे' :
+              'Separate issue बनाई · बाद में देखेंगे';
+  showToast(msg); speak(msg);
+  setTimeout(() => goStep('dStep1'), 1500);
+}
+function reassignTo(who){
+  const msg = who==='next_shift' ? 'अगली shift को दे दिया · Suresh को मिलेगी' :
+              who==='specific' ? 'Rajesh को assign कर दी' :
+              'Site Engineer Vikram को call कर रहे हैं';
+  showToast(msg); speak(msg);
+  setTimeout(() => { showToast('📞 Supervisor को भी notify किया'); }, 1000);
+  setTimeout(() => goStep('home'), 2200);
+}
+function finishWithFeedback(kind){
+  const msg = kind==='yes' ? '🎉 बहुत बढ़िया! Issue बंद हो गया।' :
+              kind==='partial' ? '✓ Monitor करेंगे।' :
+              'Supervisor को भेज दिया।';
+  speak(msg); showToast(msg);
+  setTimeout(()=>goStep('home'), 1800);
+}
+
 function sendPhoto(){ openPhotoModal(); }
 function openPhotoModal(){
   const m = document.getElementById('photoModal');
