@@ -138,6 +138,7 @@
         <button onclick="goStep('evidence')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">⚠ Evidence · Send to supervisor</button>
         <button onclick="goStep('linkIssue')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">➕ Link new issue</button>
         <button onclick="goStep('reassign')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">🤝 Reassign to another operator</button>
+        <button onclick="window.ackContext={title:'भेज दिया!',message:'Supervisor ने देखा और acknowledge किया।',who:'Ashok Kumar',role:'Shift Supervisor',detail:'Demo acknowledgement',nextStep:'home',nextLabel:'घर वापस जाएँ'};goStep('acknowledged')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">✓ Acknowledgement (demo)</button>
       </nav>
 
       <div class="mt-4 text-[11px] uppercase tracking-wider text-ink-500 font-semibold">Equipment</div>
@@ -316,7 +317,12 @@
 
           <!-- Note -->
           <div class="card p-4">
-            <div class="label-tiny mb-2 flex items-center">Note (वैकल्पिक) ${soundBtn('Note लिख सकते हैं या बोलकर भी बता सकते हैं।')}</div>
+            <div class="label-tiny mb-2 flex items-center gap-1.5">
+              <span>Note (वैकल्पिक)</span>
+              <button onclick="speak('Note लिख सकते हैं या बोलकर भी बता सकते हैं।')" class="sound-pill" aria-label="Listen">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              </button>
+            </div>
             <textarea id="photoNote" rows="3" placeholder="क्या दिख रहा है? (वैकल्पिक)" class="w-full p-3 rounded-2xl text-sm font-serif" style="background:#F5F9FF;border:1px solid rgba(51,65,85,.08);outline:none;resize:none"></textarea>
             <div class="mt-2 flex gap-2">
               <button onclick="showToast('🎤 बोलिए... सुन रहे हैं')" class="flex-1 py-2.5 rounded-2xl text-sm font-serif font-semibold tap-scale flex items-center justify-center gap-1.5" style="background:#EFF6FF;color:#1E40AF;border:1px solid #93C5FD">
@@ -818,12 +824,98 @@ const steps = {
             <text x="499" y="406" text-anchor="middle" font-size="8" fill="#334155" font-weight="700">Valve 110</text>
           </g>
 
+          <!-- ============ LIVE DATA BADGES ============ -->
+          <!-- Anoxic Tank 1 · DO -->
+          <g transform="translate(10, 132)">
+            <rect width="36" height="24" rx="4" fill="#FFFFFF" stroke="#51BD55" stroke-width="1.5"/>
+            <text x="18" y="11" text-anchor="middle" font-size="6" fill="#15803D" font-weight="700">DO</text>
+            <text x="18" y="20" text-anchor="middle" font-size="10" fill="#15803D" font-weight="800">0.2</text>
+          </g>
+          <!-- Aeration Tank 1 · DO (live, RED — affected by blower stop) -->
+          <g transform="translate(132, 124)">
+            <rect width="44" height="28" rx="5" fill="#FFFFFF" stroke="#E85A45" stroke-width="2"/>
+            <text x="22" y="12" text-anchor="middle" font-size="6.5" fill="#7F1D1D" font-weight="700">DO mg/L</text>
+            <text x="22" y="22" text-anchor="middle" font-size="11" fill="#E85A45" font-weight="900">0.8</text>
+            <circle cx="40" cy="6" r="3" fill="#E85A45">
+              <animate attributeName="opacity" values="1;0.3;1" dur="1.4s" repeatCount="indefinite"/>
+            </circle>
+          </g>
+          <!-- MBR-1 · Turbidity (Sensor A · ALERT) — prominent! -->
+          <g transform="translate(220, 124)">
+            <rect width="46" height="30" rx="5" fill="#FFFFFF" stroke="#E85A45" stroke-width="2.5"/>
+            <rect width="46" height="10" rx="5" fill="#E85A45"/>
+            <text x="23" y="7" text-anchor="middle" font-size="6.5" fill="#FFFFFF" font-weight="800">TURBIDITY</text>
+            <text x="23" y="24" text-anchor="middle" font-size="12" fill="#E85A45" font-weight="900">28</text>
+            <text x="38" y="24" text-anchor="start" font-size="6" fill="#7F1D1D" font-weight="600">NTU</text>
+            <circle cx="42" cy="7" r="3" fill="#FFFFFF">
+              <animate attributeName="opacity" values="1;0.3;1" dur="1.2s" repeatCount="indefinite"/>
+            </circle>
+          </g>
+          <!-- Recirc Pumps · Flow -->
+          <g transform="translate(85, 264)">
+            <rect width="36" height="20" rx="4" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+            <text x="18" y="9" text-anchor="middle" font-size="6" fill="#475569" font-weight="700">FLOW</text>
+            <text x="18" y="17" text-anchor="middle" font-size="8" fill="#64748B" font-weight="800">0 m³/h</text>
+          </g>
+          <!-- Aeration Blower 1 · current -->
+          <g transform="translate(10, 195)">
+            <rect width="32" height="20" rx="4" fill="#FFFFFF" stroke="#51BD55" stroke-width="1.5"/>
+            <text x="16" y="9" text-anchor="middle" font-size="6" fill="#15803D" font-weight="700">CURRENT</text>
+            <text x="16" y="17" text-anchor="middle" font-size="8" fill="#15803D" font-weight="800">12 A</text>
+          </g>
+          <!-- Aeration Blower 2 · current -->
+          <g transform="translate(10, 262)">
+            <rect width="32" height="20" rx="4" fill="#FFFFFF" stroke="#51BD55" stroke-width="1.5"/>
+            <text x="16" y="9" text-anchor="middle" font-size="6" fill="#15803D" font-weight="700">CURRENT</text>
+            <text x="16" y="17" text-anchor="middle" font-size="8" fill="#15803D" font-weight="800">12 A</text>
+          </g>
+          <!-- MBR Blower 1 · STOPPED (red) -->
+          <g transform="translate(388, 168)">
+            <rect width="36" height="22" rx="4" fill="#FFFFFF" stroke="#E85A45" stroke-width="2"/>
+            <text x="18" y="10" text-anchor="middle" font-size="6" fill="#7F1D1D" font-weight="700">CURRENT</text>
+            <text x="18" y="19" text-anchor="middle" font-size="9" fill="#E85A45" font-weight="900">0 A ⚠</text>
+          </g>
+          <!-- MBR Blower 2 · running green -->
+          <g transform="translate(388, 222)">
+            <rect width="32" height="20" rx="4" fill="#FFFFFF" stroke="#51BD55" stroke-width="1.5"/>
+            <text x="16" y="9" text-anchor="middle" font-size="6" fill="#15803D" font-weight="700">CURRENT</text>
+            <text x="16" y="17" text-anchor="middle" font-size="8" fill="#15803D" font-weight="800">8 A</text>
+          </g>
+          <!-- MBR Blower 3 · running green -->
+          <g transform="translate(388, 276)">
+            <rect width="32" height="20" rx="4" fill="#FFFFFF" stroke="#51BD55" stroke-width="1.5"/>
+            <text x="16" y="9" text-anchor="middle" font-size="6" fill="#15803D" font-weight="700">CURRENT</text>
+            <text x="16" y="17" text-anchor="middle" font-size="8" fill="#15803D" font-weight="800">8 A</text>
+          </g>
+          <!-- Anoxic Tank 2 · DO -->
+          <g transform="translate(10, 422)">
+            <rect width="36" height="24" rx="4" fill="#FFFFFF" stroke="#51BD55" stroke-width="1.5"/>
+            <text x="18" y="11" text-anchor="middle" font-size="6" fill="#15803D" font-weight="700">DO</text>
+            <text x="18" y="20" text-anchor="middle" font-size="10" fill="#15803D" font-weight="800">0.3</text>
+          </g>
+          <!-- Aeration Tank 2 · DO (healthy) -->
+          <g transform="translate(132, 424)">
+            <rect width="44" height="28" rx="5" fill="#FFFFFF" stroke="#51BD55" stroke-width="2"/>
+            <text x="22" y="12" text-anchor="middle" font-size="6.5" fill="#15803D" font-weight="700">DO mg/L</text>
+            <text x="22" y="22" text-anchor="middle" font-size="11" fill="#15803D" font-weight="900">2.1</text>
+          </g>
+          <!-- MBR-2 · Turbidity (healthy) -->
+          <g transform="translate(220, 424)">
+            <rect width="46" height="30" rx="5" fill="#FFFFFF" stroke="#51BD55" stroke-width="2"/>
+            <rect width="46" height="10" rx="5" fill="#51BD55"/>
+            <text x="23" y="7" text-anchor="middle" font-size="6.5" fill="#FFFFFF" font-weight="800">TURBIDITY</text>
+            <text x="23" y="24" text-anchor="middle" font-size="12" fill="#15803D" font-weight="900">4</text>
+            <text x="38" y="24" text-anchor="start" font-size="6" fill="#15803D" font-weight="600">NTU</text>
+          </g>
+
           <!-- Legend -->
           <g transform="translate(20, 10)">
             <rect width="6" height="6" fill="url(#waterPipe)"/>
             <text x="10" y="6" font-size="7" fill="#64748B" font-weight="600">Water</text>
             <rect x="50" width="6" height="6" fill="url(#sludgePipe)"/>
             <text x="60" y="6" font-size="7" fill="#64748B" font-weight="600">Sludge / Air</text>
+            <rect x="110" width="6" height="6" fill="#FFFFFF" stroke="#51BD55" stroke-width="1.5"/>
+            <text x="120" y="6" font-size="7" fill="#64748B" font-weight="600">Live data</text>
           </g>
         </svg>
         </div>
@@ -1618,8 +1710,9 @@ const steps = {
   evidence: {
     n:0, label:'Resolution · मुझे पता है',
     mascot:'curious',
-    say:'अच्छा! आपको कारण पता है। चुनिए कौन सा है, सबूत जोड़िए और supervisor को भेजिए।',
+    say:'अच्छा! आपको कारण पता है। एक-एक करके भरते हैं — कारण, सबूत, फिर भेज देंगे।',
     render: () => {
+      window.evStep = window.evStep || 1;
       const opts = [
         ['blower_fault','🌬️','Blower बंद है','MBR blower stop'],
         ['membrane_fouling','🧱','Membrane में जमावट','TMP गिरना'],
@@ -1628,18 +1721,26 @@ const steps = {
         ['dirty_probe','🧽','Sensor पर गंदगी थी','मैंने साफ़ कर दिया'],
         ['other','❓','कुछ और','अपने शब्दों में लिखें']
       ];
-      return `
+      const step = window.evStep;
+      const progressDots = `<div class="flex items-center gap-1 mb-3">
+        ${[1,2,3].map(i => `<div class="h-1.5 rounded-full transition-all" style="width:${i===step?'28px':'12px'};background:${i<step?'#51BD55':i===step?'#3B82F6':'#E2E8F0'}"></div>`).join('')}
+        <span class="ml-2 text-[10px] font-serif font-semibold" style="color:#64748B">Step ${step} of 3</span>
+      </div>`;
+
+      // Card 1: pick RC
+      if (step === 1) return `
         <div class="card p-4" style="background:linear-gradient(160deg,#FFFFFF,#EFF6FF);border:1.5px solid #BFDBFE">
           <div class="flex items-center gap-2 mb-2">
             <span class="text-2xl">⚡</span>
             <div>
               <div class="label-tiny" style="color:#1E40AF">Quick Resolution</div>
-              <div class="font-serif text-[11px]" style="color:#64748B">मुझे पता है · सीधे supervisor को भेजें</div>
+              <div class="font-serif text-[11px]" style="color:#64748B">मुझे पता है · 3 steps में हो जाएगा</div>
             </div>
           </div>
+          ${progressDots}
           <h2 class="hi-lg mb-1 flex items-start gap-1">
             <span>कारण क्या है?</span>
-            ${soundBtn('आपको कारण पता है? चुनिए कौन सा है।')}
+            ${soundBtn('आपको कारण पता है? सबसे सही चुनिए।')}
           </h2>
           <div class="text-xs mb-3" style="color:#64748B">सबसे सही कारण चुनें</div>
           <div class="space-y-2" id="rcOpts">
@@ -1652,26 +1753,56 @@ const steps = {
               <div class="w-5 h-5 rounded-full rc-check flex items-center justify-center" style="border:1.5px solid #CBD5E1"></div>
             </button>`).join('')}
           </div>
-        </div>
+          <button onclick="evNext()" class="btn-paani tap-scale mt-4">
+            <span>आगे →</span>
+          </button>
+          <style>
+            .rc-opt.sel{background:linear-gradient(160deg,#DBEAFE,#BFDBFE) !important;border-color:#3B82F6 !important}
+            .rc-opt.sel .rc-check{background:#3B82F6;border-color:#3B82F6 !important}
+            .rc-opt.sel .rc-check::after{content:"✓";color:#FFFFFF;font-weight:bold;font-size:12px}
+          </style>`;
 
-        <div class="card p-4">
-          <div class="label-tiny mb-2">सबूत जोड़ें (Image / Voice / Text)</div>
+      // Card 2: evidence
+      if (step === 2) return `
+        <div class="card p-4" style="background:linear-gradient(160deg,#FFFFFF,#EFF6FF);border:1.5px solid #BFDBFE">
+          ${progressDots}
+          <h2 class="hi-lg mb-1 flex items-start gap-1">
+            <span>सबूत जोड़ें</span>
+            ${soundBtn('Image, voice या लिखकर बताइए। यह वैकल्पिक है।')}
+          </h2>
+          <div class="text-xs mb-3" style="color:#64748B">Image / Voice / Text · वैकल्पिक</div>
+          <div class="rounded-2xl p-3 mb-3" style="background:#F5F9FF">
+            <div class="label-tiny mb-1.5" style="color:#1E40AF">✓ चुना हुआ कारण</div>
+            <div id="evRcLabel" class="font-serif font-semibold text-sm"></div>
+          </div>
           <div class="grid grid-cols-3 gap-2 mb-3">
-            <button onclick="sendPhoto()" class="rounded-2xl p-3 text-center tap-scale" style="background:#F5F9FF;border:1px solid #E2E8F0">
-              <div class="text-2xl">📷</div><div class="text-[10px] font-serif font-semibold mt-1">फ़ोटो</div>
+            <button onclick="sendPhoto()" class="rounded-2xl p-3 text-center tap-scale" style="background:#FFFFFF;border:1.5px solid #BFDBFE">
+              <div class="text-3xl">📷</div><div class="text-[10px] font-serif font-semibold mt-1">फ़ोटो</div>
             </button>
-            <button onclick="showToast('🎤 बोलिए... सुन रहे हैं');speak('बोलिए, मैं सुन रहा हूँ।')" class="rounded-2xl p-3 text-center tap-scale" style="background:#F5F9FF;border:1px solid #E2E8F0">
-              <div class="text-2xl">🎤</div><div class="text-[10px] font-serif font-semibold mt-1">Voice</div>
+            <button onclick="showToast('🎤 बोलिए... सुन रहे हैं');speak('बोलिए, मैं सुन रहा हूँ।')" class="rounded-2xl p-3 text-center tap-scale" style="background:#FFFFFF;border:1.5px solid #BFDBFE">
+              <div class="text-3xl">🎤</div><div class="text-[10px] font-serif font-semibold mt-1">Voice</div>
             </button>
-            <button onclick="document.getElementById('evNote').focus()" class="rounded-2xl p-3 text-center tap-scale" style="background:#F5F9FF;border:1px solid #E2E8F0">
-              <div class="text-2xl">✏️</div><div class="text-[10px] font-serif font-semibold mt-1">लिखें</div>
+            <button onclick="document.getElementById('evNote').focus()" class="rounded-2xl p-3 text-center tap-scale" style="background:#FFFFFF;border:1.5px solid #BFDBFE">
+              <div class="text-3xl">✏️</div><div class="text-[10px] font-serif font-semibold mt-1">लिखें</div>
             </button>
           </div>
-          <textarea id="evNote" rows="3" placeholder="क्या हुआ बताइए..." class="w-full p-3 rounded-2xl text-sm font-serif" style="background:#F5F9FF;border:1px solid #E2E8F0;outline:none;resize:none"></textarea>
+          <textarea id="evNote" rows="3" placeholder="क्या हुआ बताइए... (वैकल्पिक)" class="w-full p-3 rounded-2xl text-sm font-serif" style="background:#FFFFFF;border:1px solid #BFDBFE;outline:none;resize:none"></textarea>
+          <div class="flex gap-2 mt-3">
+            <button onclick="evBack()" class="flex-1 py-3 rounded-2xl text-sm font-serif font-semibold tap-scale" style="background:#F1F5F9;color:#475569">← पीछे</button>
+            <button onclick="evNext()" class="flex-1 btn-paani tap-scale">आगे →</button>
+          </div>
         </div>
+        <script>setTimeout(()=>{const s=document.querySelector('.rc-opt.sel');const lbl=document.getElementById('evRcLabel');if(s&&lbl){lbl.textContent=s.querySelector('.hi-md').textContent;}else if(lbl){lbl.textContent='—';}},10)<\/script>`;
 
-        <div class="card p-4">
-          <div class="label-tiny mb-2">किसको भेजें</div>
+      // Card 3: recipient + send
+      return `
+        <div class="card p-4" style="background:linear-gradient(160deg,#FFFFFF,#EFF6FF);border:1.5px solid #BFDBFE">
+          ${progressDots}
+          <h2 class="hi-lg mb-1 flex items-start gap-1">
+            <span>किसको भेजें?</span>
+            ${soundBtn('यह सूचना किसको जाएगी? Supervisor default है।')}
+          </h2>
+          <div class="text-xs mb-3" style="color:#64748B">Default · Supervisor</div>
           <div class="space-y-2">
             <label class="flex items-center gap-3 p-3 rounded-2xl cursor-pointer" style="background:#EFF6FF;border:1.5px solid #3B82F6">
               <input type="radio" name="rcpt" checked class="accent-blue-600"/>
@@ -1696,17 +1827,14 @@ const steps = {
               </div>
             </label>
           </div>
-        </div>
-
-        <button onclick="sendEvidence()" class="btn-paani tap-scale">
-          <span>📤</span> Supervisor को भेजें · Issue resolve करें
-        </button>
-        <div class="mt-2 text-center text-[10px]" style="color:#64748B">Issue resolved as: चुना हुआ कारण · Supervisor को सूचना जाएगी</div>
-        <style>
-          .rc-opt.sel{background:linear-gradient(160deg,#DBEAFE,#BFDBFE) !important;border-color:#3B82F6 !important}
-          .rc-opt.sel .rc-check{background:#3B82F6;border-color:#3B82F6 !important}
-          .rc-opt.sel .rc-check::after{content:"✓";color:#FFFFFF;font-weight:bold;font-size:12px}
-        </style>`;
+          <div class="flex gap-2 mt-4">
+            <button onclick="evBack()" class="flex-1 py-3 rounded-2xl text-sm font-serif font-semibold tap-scale" style="background:#F1F5F9;color:#475569">← पीछे</button>
+            <button onclick="sendEvidence()" class="flex-1 btn-paani tap-scale" style="background:linear-gradient(140deg,#3B82F6,#1E40AF)">
+              📤 भेजें
+            </button>
+          </div>
+          <div class="mt-2 text-center text-[10px]" style="color:#64748B">Issue resolved as चुना हुआ कारण · Supervisor को acknowledgement आएगा</div>
+        </div>`;
     }
   },
 
@@ -1799,6 +1927,59 @@ const steps = {
       </div>`
   },
 
+  acknowledged: {
+    n:0, label:'Acknowledged',
+    mascot:'celebrating',
+    say:'Supervisor ने देखा। आपका काम हो गया।',
+    render: () => {
+      const ctx = window.ackContext || { title:'Acknowledged', message:'Supervisor ने आपकी सूचना देखी।', who:'Ashok Kumar', role:'Shift Supervisor', detail:'', nextStep:'home', nextLabel:'घर वापस जाएँ' };
+      const now = new Date();
+      const ts = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+      return `
+        <div class="card p-5" style="background:linear-gradient(160deg,#FFFFFF,#DCFCE7);border:1.5px solid #51BD55">
+          <div class="text-center py-3">
+            <div class="relative inline-block">
+              <div class="absolute inset-0 rounded-full" style="background:#51BD55;opacity:.2;animation:pulse 1.6s ease-out infinite"></div>
+              <div class="relative w-16 h-16 rounded-full flex items-center justify-center text-3xl mx-auto" style="background:#51BD55;color:#FFFFFF;box-shadow:0 6px 20px rgba(81,189,85,.35)">✓</div>
+            </div>
+            <h2 class="hi-lg mt-4" style="color:#14532D">${ctx.title}</h2>
+            <div class="text-xs mt-1" style="color:#15803D">${ctx.message}</div>
+          </div>
+
+          <div class="mt-4 p-3 rounded-2xl" style="background:#FFFFFF;border:1px solid #BBF7D0">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-full flex items-center justify-center font-serif font-bold" style="background:#3B82F6;color:#FFFFFF">${ctx.who.split(' ').map(s=>s[0]).join('').slice(0,2)}</div>
+              <div class="flex-1">
+                <div class="font-serif font-semibold text-sm">${ctx.who}</div>
+                <div class="text-[10px]" style="color:#64748B">${ctx.role}</div>
+              </div>
+              <div class="text-right">
+                <div class="flex items-center gap-1 text-[10px] font-semibold" style="color:#15803D">
+                  <span class="w-1.5 h-1.5 rounded-full" style="background:#51BD55"></span>
+                  <span>Acknowledged</span>
+                </div>
+                <div class="text-[10px]" style="color:#64748B">${ts}</div>
+              </div>
+            </div>
+          </div>
+
+          ${ctx.detail ? `<div class="mt-2 p-3 rounded-2xl text-xs font-serif" style="background:#FFFFFF;border:1px solid #BBF7D0;color:#334155">"${ctx.detail}"</div>` : ''}
+
+          <div class="mt-4 p-3 rounded-2xl flex items-start gap-2" style="background:#EFF6FF;border:1px solid #BFDBFE">
+            <span class="text-lg flex-shrink-0">💬</span>
+            <div>
+              <div class="text-[11px] font-serif font-semibold" style="color:#1E40AF">Supervisor का response</div>
+              <div class="text-[11px] mt-0.5" style="color:#334155">"देख लिया, मैं आगे की कार्रवाई करता हूँ।"</div>
+            </div>
+          </div>
+
+          <button onclick="goStep('${ctx.nextStep}')" class="btn-paani tap-scale mt-4">
+            <span>🏠</span> ${ctx.nextLabel}
+          </button>
+        </div>`;
+    }
+  },
+
   fallback: {
     n:0, label:'Skip · Fallback',
     mascot:'curious',
@@ -1827,6 +2008,7 @@ const steps = {
 /* ============== RENDER ============== */
 function goStep(name){
   if (autoCheckTimer) { clearInterval(autoCheckTimer); autoCheckTimer = null; }
+  if (name === 'evidence' && currentStep !== 'evidence') window.evStep = 1;
   currentStep = name;
   renderStep();
 }
@@ -2037,6 +2219,19 @@ function pickEvidenceRC(btn){
   document.querySelectorAll('.rc-opt').forEach(b => b.classList.remove('sel'));
   btn.classList.add('sel');
 }
+function evNext(){
+  if (window.evStep === 1 && !document.querySelector('.rc-opt.sel')){
+    showToast('पहले एक कारण चुनें');
+    speak('पहले कारण चुनिए।');
+    return;
+  }
+  window.evStep = (window.evStep || 1) + 1;
+  renderStep();
+}
+function evBack(){
+  window.evStep = Math.max(1, (window.evStep || 1) - 1);
+  renderStep();
+}
 function sendEvidence(){
   const sel = document.querySelector('.rc-opt.sel');
   if (!sel) {
@@ -2045,26 +2240,59 @@ function sendEvidence(){
     return;
   }
   const rcId = sel.dataset.rc;
+  const note = document.getElementById('evNote');
+  const noteText = note ? note.value : '';
   if (RC_MAP[rcId]) { window.identifiedRC = { ...RC_MAP[rcId], prob:1.0, reasoning:'Operator confirmed · evidence sent to supervisor' }; }
-  showToast('✓ Issue resolved · Supervisor को भेज दिया');
-  speak('Issue resolve कर दिया। Supervisor को सब भेज दिया है।');
   if (!mttrStart) startMTTR();
-  setTimeout(() => goStep('success'), 1500);
+  window.ackContext = {
+    title: 'भेज दिया!',
+    message: 'Supervisor ने आपकी resolution देखी और acknowledge की।',
+    who: 'Ashok Kumar',
+    role: 'Shift Supervisor',
+    detail: noteText || (RC_MAP[rcId] ? 'Cause: ' + RC_MAP[rcId].name_hi : ''),
+    nextStep: 'success',
+    nextLabel: 'Issue बंद करें'
+  };
+  speak('Supervisor को भेज दिया। उन्होंने देख लिया है।');
+  goStep('acknowledged');
 }
 function linkAndContinue(kind){
-  const msg = kind==='blocking' ? 'Blocking issue link की · main pause' :
-              kind==='attached' ? 'Attached issue link की · साथ देखेंगे' :
-              'Separate issue बनाई · बाद में देखेंगे';
-  showToast(msg); speak(msg);
-  setTimeout(() => goStep('dStep1'), 1500);
+  const labels = {
+    blocking: { title:'Blocking issue link की', detail:'Main pause · यह पहले ठीक करना है' },
+    attached: { title:'Attached issue link की', detail:'साथ में हल करेंगे' },
+    separate: { title:'Separate issue बनाई', detail:'बाद में देखेंगे · independent' }
+  };
+  const l = labels[kind] || labels.separate;
+  window.ackContext = {
+    title: l.title,
+    message: 'Supervisor ने भी देख लिया · diagnosis जारी रखें',
+    who: 'Ashok Kumar',
+    role: 'Shift Supervisor',
+    detail: l.detail,
+    nextStep: kind==='blocking' ? 'home' : 'dStep1',
+    nextLabel: kind==='blocking' ? 'घर वापस जाएँ · main pause' : 'Main diagnosis जारी रखें'
+  };
+  speak(l.title);
+  goStep('acknowledged');
 }
 function reassignTo(who){
-  const msg = who==='next_shift' ? 'अगली shift को दे दिया · Suresh को मिलेगी' :
-              who==='specific' ? 'Rajesh को assign कर दी' :
-              'Site Engineer Vikram को call कर रहे हैं';
-  showToast(msg); speak(msg);
-  setTimeout(() => { showToast('📞 Supervisor को भी notify किया'); }, 1000);
-  setTimeout(() => goStep('home'), 2200);
+  const profiles = {
+    next_shift: { title:'अगली shift को दे दिया', who:'Suresh Kumar', role:'Next Shift Operator', detail:'3:00 PM से Suresh को मिलेगी' },
+    specific:   { title:'Rajesh को assign किया', who:'Rajesh Sharma', role:'Senior · MBR specialist', detail:'Senior operator · expert in MBR' },
+    engineer:   { title:'Site Engineer को call किया', who:'Vikram Singh', role:'Site Engineer', detail:'Specialist · arriving in ~30 min' }
+  };
+  const p = profiles[who] || profiles.next_shift;
+  window.ackContext = {
+    title: p.title,
+    message: 'Supervisor को भी notify कर दिया गया।',
+    who: p.who,
+    role: p.role,
+    detail: p.detail,
+    nextStep: 'home',
+    nextLabel: 'घर वापस जाएँ'
+  };
+  speak(p.title + '। Supervisor को भी सूचना भेज दी।');
+  goStep('acknowledged');
 }
 function finishWithFeedback(kind){
   const msg = kind==='yes' ? '🎉 बहुत बढ़िया! Issue बंद हो गया।' :
