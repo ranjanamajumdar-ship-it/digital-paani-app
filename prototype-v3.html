@@ -304,6 +304,63 @@
   .reading .v{font-size:22px;font-weight:800;color:var(--ink)}
   .reading .l{font-size:10.5px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;font-weight:700}
 
+  /* Threshold slider (Screen 9) */
+  .slider-wrap{position:relative;padding:6px 0 0}
+  .slider-wrap .zones{
+    position:absolute;left:0;right:0;top:14px;height:12px;border-radius:6px;overflow:hidden;
+    display:flex;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);
+  }
+  .zones .z-good{background:#bfe8c2}
+  .zones .z-warn{background:#fbe0a8}
+  .zones .z-bad {background:#f3b8b1}
+  .slider-wrap input[type=range]{
+    -webkit-appearance:none;appearance:none;width:100%;background:transparent;
+    height:40px;position:relative;z-index:2;margin:0;
+  }
+  .slider-wrap input[type=range]::-webkit-slider-runnable-track{
+    height:12px;background:transparent;border-radius:6px;
+  }
+  .slider-wrap input[type=range]::-moz-range-track{
+    height:12px;background:transparent;border-radius:6px;
+  }
+  .slider-wrap input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:#fff;border:3px solid var(--navy);
+    box-shadow:0 2px 6px rgba(0,0,0,.18);margin-top:-7px;cursor:pointer;
+  }
+  .slider-wrap input[type=range]::-moz-range-thumb{
+    width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid var(--navy);
+    box-shadow:0 2px 6px rgba(0,0,0,.18);cursor:pointer;
+  }
+  .zone-labels{
+    display:flex;margin-top:4px;font-size:10px;color:var(--muted);text-align:center;line-height:1.25;
+  }
+  .zone-labels span{padding:4px 2px;font-weight:600}
+  .zone-labels .zl-good{flex:0 0 50%;color:#1b6b1b}
+  .zone-labels .zl-warn{flex:0 0 35%;color:#7a5a00}
+  .zone-labels .zl-bad {flex:0 0 15%;color:#8a1414}
+  .slider-readout{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-top:12px;padding:10px 12px;background:#f4f6fa;border-radius:10px;
+  }
+  .rd-value{font-size:22px;font-weight:800;color:var(--navy);line-height:1.1}
+  .rd-value small{font-size:12px;font-weight:600;color:var(--muted);margin-left:2px}
+  .status-chip{
+    font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;
+    display:inline-flex;align-items:center;gap:4px;letter-spacing:.02em;
+  }
+  .status-chip.sm{font-size:10px;padding:3px 8px}
+  .status-chip.ok  {background:#d6f0d6;color:#1b6b1b}
+  .status-chip.warn{background:#fbe6b0;color:#6b4a00}
+  .status-chip.bad {background:#f6cdc7;color:#8a1414}
+  .param-list li{align-items:center}
+  .param-list .dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0}
+  .param-list .dot.good{background:var(--green)}
+  .param-list .dot.warn{background:var(--orange)}
+  .param-list .dot.bad {background:var(--red)}
+  .param-list .pv{font-size:13px;color:var(--ink);min-width:64px;text-align:right;margin-right:8px}
+  .param-list .pv b{font-weight:800}
+
   /* Desktop supervisor styles */
   .ds-body{display:grid;grid-template-columns:240px 1fr;min-height:620px}
   .ds-side{background:#fafbfd;border-right:1px solid var(--line);padding:18px 14px}
@@ -996,10 +1053,87 @@
             <div class="scroll"><div class="pad">
 
               <div class="card">
-                <div class="h-eyebrow">Threshold</div>
-                <div class="threshold"><span class="pin" style="left:18%"></span></div>
-                <div class="scale"><span>0 NTU</span><span>5</span><span>10</span></div>
-                <div class="muted" style="margin-top:4px">Target: &lt; 5 NTU</div>
+                <div class="h-eyebrow">Enter verification reading · Turbidity (NTU)</div>
+
+                <div class="slider-wrap">
+                  <!-- Coloured zone track behind the slider -->
+                  <div class="zones">
+                    <span class="z-good" style="width:50%"></span>
+                    <span class="z-warn" style="width:35%"></span>
+                    <span class="z-bad"  style="width:15%"></span>
+                  </div>
+                  <input id="ntuSlider" type="range" min="0" max="10" step="0.1" value="3.1" />
+                  <!-- Zone labels under track -->
+                  <div class="zone-labels">
+                    <span class="zl-good">Valid<br><b>0 – 5</b></span>
+                    <span class="zl-warn">Warning<br><b>5 – 8.5</b></span>
+                    <span class="zl-bad">Out of range<br><b>&gt; 8.5</b></span>
+                  </div>
+                </div>
+
+                <div class="slider-readout">
+                  <div>
+                    <div class="muted" style="font-size:11px">Current reading</div>
+                    <div id="ntuValue" class="rd-value">3.1 <small>NTU</small></div>
+                  </div>
+                  <div id="ntuStatus" class="status-chip ok">✓ Valid · within target</div>
+                </div>
+
+                <div class="muted" style="margin-top:8px;font-size:11.5px">
+                  Target threshold &lt; 5 NTU · Drag the slider to enter the live reading.
+                </div>
+              </div>
+
+              <!-- Parameter overview: which sensors are in range vs out -->
+              <div class="card">
+                <div class="h-eyebrow">All linked parameters</div>
+                <ul class="ulist param-list">
+                  <li>
+                    <span class="dot good"></span>
+                    <div style="flex:1">
+                      <b>Turbidity</b>
+                      <div class="muted" style="font-size:11px">Target &lt; 5 NTU</div>
+                    </div>
+                    <div class="pv"><b id="pvTurb">3.1</b> NTU</div>
+                    <span id="pvTurbChip" class="status-chip ok sm">Valid</span>
+                  </li>
+                  <li>
+                    <span class="dot good"></span>
+                    <div style="flex:1">
+                      <b>Dissolved O₂</b>
+                      <div class="muted" style="font-size:11px">Target ≥ 6 mg/L</div>
+                    </div>
+                    <div class="pv"><b>7.2</b> mg/L</div>
+                    <span class="status-chip ok sm">Valid</span>
+                  </li>
+                  <li>
+                    <span class="dot good"></span>
+                    <div style="flex:1">
+                      <b>pH</b>
+                      <div class="muted" style="font-size:11px">Target 6.5 – 8.5</div>
+                    </div>
+                    <div class="pv"><b>7.4</b></div>
+                    <span class="status-chip ok sm">Valid</span>
+                  </li>
+                  <li>
+                    <span class="dot warn"></span>
+                    <div style="flex:1">
+                      <b>TMP (MBR-1)</b>
+                      <div class="muted" style="font-size:11px">Target &lt; 35 kPa</div>
+                    </div>
+                    <div class="pv"><b>38</b> kPa</div>
+                    <span class="status-chip warn sm">Warning</span>
+                  </li>
+                  <li>
+                    <span class="dot bad"></span>
+                    <div style="flex:1">
+                      <b>TSS Outlet</b>
+                      <div class="muted" style="font-size:11px">Target &lt; 30 mg/L</div>
+                    </div>
+                    <div class="pv"><b>42</b> mg/L</div>
+                    <span class="status-chip bad sm">Out of range</span>
+                  </li>
+                </ul>
               </div>
 
               <div class="reading-row">
@@ -1010,19 +1144,13 @@
                 </div>
                 <div class="reading after">
                   <div class="l">After</div>
-                  <div class="v">3.1</div>
+                  <div class="v" id="ntuAfter">3.1</div>
                   <div class="muted">NTU · just now</div>
                 </div>
               </div>
 
-              <div class="card" style="text-align:center;background:#eaf8ea;border:1px solid #b9e2b9">
-                <div class="mascot" style="margin:0 auto 8px;background:linear-gradient(180deg,#00c853,#009a3a)"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="none" stroke="#fff" stroke-width="3"/><polygon points="22,26 22,22 26,22 26,26" fill="#fff"/><polygon points="38,26 38,22 42,22 42,26" fill="#fff"/><path d="M22 40 Q32 50 42 40" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></svg></div>
-                <div style="font-size:17px;font-weight:800;color:#1b6b1b">Reading within target</div>
-                <div class="muted">5.3 NTU drop · Fix is holding for 4 min</div>
-              </div>
-
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-                <button class="btn green" data-go="s10">✓ Pass</button>
+                <button class="btn green" data-go="s10" id="passBtn">✓ Pass</button>
                 <button class="btn red" data-go="s12">✗ Fail</button>
               </div>
               <div class="muted" style="text-align:center;margin-top:8px">Pass → Supervisor approval · Fail → Escalate</div>
@@ -1514,6 +1642,41 @@
     if(e.key === 'ArrowLeft') document.getElementById('fb-prev').click();
   });
   updateFlowBar(currentScreen());
+
+  // ===== Verification slider (Screen 9) =====
+  const slider = document.getElementById('ntuSlider');
+  if(slider){
+    const val   = document.getElementById('ntuValue');
+    const after = document.getElementById('ntuAfter');
+    const stat  = document.getElementById('ntuStatus');
+    const pvT   = document.getElementById('pvTurb');
+    const pvC   = document.getElementById('pvTurbChip');
+    const pass  = document.getElementById('passBtn');
+
+    function classify(v){
+      if(v <= 5)   return {cls:'ok',   short:'Valid',        long:'✓ Valid · within target'};
+      if(v <= 8.5) return {cls:'warn', short:'Warning',      long:'⚠ Warning · approaching limit'};
+      return                 {cls:'bad',  short:'Out of range', long:'✗ Out of range · fix did not hold'};
+    }
+    function sync(){
+      const v = parseFloat(slider.value);
+      const c = classify(v);
+      const txt = v.toFixed(1);
+      val.innerHTML = txt + ' <small>NTU</small>';
+      after.textContent = txt;
+      pvT.textContent = txt;
+      stat.className = 'status-chip ' + c.cls;
+      stat.textContent = c.long;
+      pvC.className = 'status-chip sm ' + c.cls;
+      pvC.textContent = c.short;
+      // Disable Pass if out of range
+      pass.disabled = (c.cls === 'bad');
+      pass.style.opacity = pass.disabled ? .5 : 1;
+      pass.style.cursor  = pass.disabled ? 'not-allowed' : 'pointer';
+    }
+    slider.addEventListener('input', sync);
+    sync();
+  }
 
   // Allow simple tile toggle as a tiny prototype delight
   document.addEventListener('click', e => {
