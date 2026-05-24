@@ -462,7 +462,7 @@
                   </div>
                   <h4>MBR-1 Outlet Turbidity High</h4>
                   <div class="muted" style="margin-top:2px">MBR का पानी गंदा है · Quality alarm trigger ho sakta hai</div>
-                  <div style="margin-top:10px"><button class="btn primary">जाँच शुरू करें · Start Investigation</button></div>
+                  <div style="margin-top:10px"><button class="btn primary" data-go="s3">जाँच शुरू करें · Start Investigation</button></div>
                 </div>
 
                 <div class="issue">
@@ -486,8 +486,8 @@
 
                 <div class="section-h"><h3>Quick Actions</h3></div>
                 <div class="tile-grid">
-                  <div class="tile"><span class="pg">📝</span>Report Issue</div>
-                  <div class="tile"><span class="pg">📋</span>Open Queue</div>
+                  <div class="tile" data-go="s14"><span class="pg">📝</span>Report Issue</div>
+                  <div class="tile" data-go="s2"><span class="pg">📋</span>Open Queue</div>
                   <div class="tile"><span class="pg">📷</span>Scan QR</div>
                 </div>
 
@@ -536,7 +536,7 @@
                 <div class="chip">Escalated</div>
               </div>
 
-              <div class="issue">
+              <div class="issue" data-go="s3" style="cursor:pointer">
                 <div class="row1">
                   <span class="sev critical">CRITICAL</span>
                   <span class="state">OPEN</span>
@@ -659,7 +659,7 @@
               <div class="card" style="background:#eaf2ff;border:1px solid #bcd1ee">
                 <div class="h-eyebrow">E · Next Action</div>
                 <div class="h-title" style="margin-bottom:10px">Continue diagnostic</div>
-                <button class="btn primary">Continue Step 2 of 5 →</button>
+                <button class="btn primary" data-go="s4">Continue Step 2 of 5 →</button>
               </div>
 
             </div></div>
@@ -724,8 +724,8 @@
                 <div class="muted" style="font-size:11px">ऐसा कुछ? Tap what matches.</div>
 
                 <div style="display:flex;gap:10px;margin-top:14px">
-                  <button class="btn green" style="flex:2">हाँ · Yes</button>
-                  <button class="btn ghost" style="flex:1">नहीं · No</button>
+                  <button class="btn green" style="flex:2" data-go="s5">हाँ · Yes</button>
+                  <button class="btn ghost" style="flex:1" data-go="s5">नहीं · No</button>
                 </div>
 
                 <div style="display:flex;justify-content:center;gap:14px;margin-top:14px;font-size:12px;color:var(--blue);font-weight:600">
@@ -781,10 +781,10 @@
                 <div class="muted">Confidence <b style="color:var(--green)">High</b> · 4 / 4 indicators</div>
 
                 <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
-                  <button class="btn green">✓ Confirm</button>
-                  <button class="btn orange">Not this</button>
-                  <button class="btn ghost">Other cause</button>
-                  <button class="btn blue">False alarm</button>
+                  <button class="btn green" data-go="s6">✓ Confirm</button>
+                  <button class="btn orange" data-go="s4">Not this</button>
+                  <button class="btn ghost" data-go="s4">Other cause</button>
+                  <button class="btn blue" data-go="s10">False alarm</button>
                 </div>
               </div>
 
@@ -834,7 +834,7 @@
                 <div style="font-size:62px;line-height:1">🧽</div>
                 <div style="font-size:18px;font-weight:800;color:var(--navy);margin:4px 0 2px">Clean diffuser stones</div>
                 <div class="muted">Use brush + 5% citric solution. Cover entire grid.</div>
-                <button class="btn green" style="margin-top:14px">हो गया · Done</button>
+                <button class="btn green" style="margin-top:14px" data-go="s8">हो गया · Done</button>
                 <div class="muted" style="margin-top:8px;font-size:11px">📷 Photo of cleaned grid required at Step 3</div>
               </div>
 
@@ -910,7 +910,7 @@
                 </ul>
               </div>
 
-              <button class="btn primary">Check now (early)</button>
+              <button class="btn primary" data-go="s9">Check now (early)</button>
               <div class="muted" style="text-align:center;margin-top:8px">Early check is logged in audit trail</div>
 
             </div></div>
@@ -963,8 +963,8 @@
                 </div>
               </div>
 
-              <button class="btn primary" style="margin-top:8px">Continue</button>
-              <button class="btn ghost" style="margin-top:8px">Skip (optional only)</button>
+              <button class="btn primary" style="margin-top:8px" data-go="s7">Continue</button>
+              <button class="btn ghost" style="margin-top:8px" data-go="s7">Skip (optional only)</button>
 
             </div></div>
           </div>
@@ -1022,8 +1022,8 @@
               </div>
 
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-                <button class="btn green">✓ Pass</button>
-                <button class="btn red">✗ Fail</button>
+                <button class="btn green" data-go="s10">✓ Pass</button>
+                <button class="btn red" data-go="s12">✗ Fail</button>
               </div>
               <div class="muted" style="text-align:center;margin-top:8px">Pass → Supervisor approval · Fail → Escalate</div>
 
@@ -1082,7 +1082,7 @@
                 </div>
               </div>
 
-              <button class="btn green">Submit to Supervisor</button>
+              <button class="btn green" data-go="s12">Submit to Supervisor</button>
               <button class="btn ghost" style="margin-top:8px">📷 Add photo of fix · 🎙 Voice note</button>
 
             </div></div>
@@ -1166,9 +1166,9 @@
                     <h4>Blower-2 restart · Rohan</h4>
                     <div class="muted" style="font-size:11.5px">Verified DO 7.2 mg/L · photo attached</div>
                     <div style="display:flex;gap:6px;margin-top:8px">
-                      <button class="btn green sm">Approve</button>
-                      <button class="btn red sm">Reject</button>
-                      <button class="btn blue sm">Reassign</button>
+                      <button class="btn green sm" data-go="s12">Approve</button>
+                      <button class="btn red sm" data-go="s12">Reject</button>
+                      <button class="btn blue sm" data-go="s12">Reassign</button>
                     </div>
                   </div>
                   <div class="issue" style="box-shadow:none;border:1px solid var(--line)">
@@ -1237,10 +1237,10 @@
               </div>
 
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-                <button class="btn green">✓ Approve</button>
-                <button class="btn red">✗ Reject</button>
+                <button class="btn green" data-go="s13">✓ Approve</button>
+                <button class="btn red" data-go="s2">✗ Reject</button>
               </div>
-              <button class="btn blue" style="margin-top:8px">↻ Reassign to another operator</button>
+              <button class="btn blue" style="margin-top:8px" data-go="s2">↻ Reassign to another operator</button>
 
             </div></div>
           </div>
@@ -1388,7 +1388,7 @@
                 </div>
               </div>
 
-              <button class="btn primary">Submit to queue</button>
+              <button class="btn primary" data-go="s2">Submit to queue</button>
               <div class="muted" style="text-align:center;margin-top:8px">Will sync when online · saved locally now</div>
 
             </div></div>
@@ -1409,18 +1409,111 @@
 </div>
 
 <script>
-  // Sidebar nav
+  // ===== Single linear flow (start → finish) =====
+  const flow = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11','s12','s13','s14'];
+  const labels = {
+    s1:'Home', s2:'Queue', s3:'Context', s4:'Diagnostic', s5:'Root cause',
+    s6:'Remediation', s7:'Wait timer', s8:'Photo', s9:'Verify', s10:'Close',
+    s11:'Supervisor', s12:'Approval', s13:'Timeline', s14:'Report'
+  };
   const links = document.querySelectorAll('.nav a[data-go]');
   const screens = document.querySelectorAll('.screen');
-  links.forEach(a => {
-    a.addEventListener('click', e => {
-      e.preventDefault();
-      const id = a.dataset.go;
-      links.forEach(l => l.classList.toggle('active', l === a));
-      screens.forEach(s => s.classList.toggle('on', s.id === id));
-      document.getElementById('stage').scrollTo({top:0,behavior:'smooth'});
+
+  function goTo(id){
+    if(!document.getElementById(id)) return;
+    links.forEach(l => l.classList.toggle('active', l.dataset.go === id));
+    screens.forEach(s => s.classList.toggle('on', s.id === id));
+    updateFlowBar(id);
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  document.addEventListener('click', e => {
+    const el = e.target.closest('[data-go]');
+    if(!el) return;
+    e.preventDefault();
+    goTo(el.dataset.go);
+  });
+
+  // Back arrow in mobile topbars walks the flow
+  document.querySelectorAll('.topbar .back').forEach(b => {
+    b.style.cursor = 'pointer';
+    b.addEventListener('click', () => {
+      const cur = b.closest('.screen').id;
+      const i = flow.indexOf(cur);
+      if(i > 0) goTo(flow[i-1]); else goTo('s1');
     });
   });
+
+  // ===== Floating flow bar — always-on prev/next =====
+  const bar = document.createElement('div');
+  bar.id = 'flowbar';
+  bar.innerHTML = `
+    <button id="fb-prev" aria-label="Previous">←</button>
+    <div id="fb-mid">
+      <div id="fb-step">Step 1 / 14</div>
+      <div id="fb-name">Home Dashboard</div>
+    </div>
+    <button id="fb-next" aria-label="Next">Next →</button>
+  `;
+  document.body.appendChild(bar);
+
+  const style = document.createElement('style');
+  style.textContent = `
+    #flowbar{
+      position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:9999;
+      display:flex;align-items:center;gap:10px;
+      background:#001a3b;color:#fff;border-radius:999px;
+      padding:6px 6px 6px 6px;box-shadow:0 12px 40px rgba(0,0,0,.45),0 2px 6px rgba(0,0,0,.2);
+      border:1px solid rgba(255,255,255,.08);
+      font-family:var(--font);
+    }
+    #flowbar button{
+      background:#0066CC;color:#fff;border:0;cursor:pointer;
+      height:42px;min-width:54px;padding:0 16px;border-radius:999px;
+      font-weight:700;font-size:14px;font-family:inherit;
+    }
+    #flowbar button:disabled{background:#2a3e63;color:#7e95b8;cursor:not-allowed}
+    #flowbar #fb-prev{background:#1a2748;min-width:42px;padding:0}
+    #fb-mid{min-width:140px;text-align:center;padding:0 6px}
+    #fb-step{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#9fb6d6}
+    #fb-name{font-size:13px;font-weight:700;margin-top:1px}
+    @media (max-width:520px){
+      #flowbar{bottom:10px;padding:5px}
+      #flowbar button{height:38px;font-size:13px;padding:0 12px;min-width:48px}
+      #fb-mid{min-width:110px}
+      #fb-name{font-size:12px}
+    }
+  `;
+  document.head.appendChild(style);
+
+  function currentScreen(){
+    const on = document.querySelector('.screen.on');
+    return on ? on.id : 's1';
+  }
+  function updateFlowBar(id){
+    const i = flow.indexOf(id);
+    const prev = document.getElementById('fb-prev');
+    const next = document.getElementById('fb-next');
+    prev.disabled = i <= 0;
+    next.disabled = i >= flow.length - 1;
+    next.innerHTML = (i >= flow.length - 1) ? 'Finish' : 'Next →';
+    document.getElementById('fb-step').textContent = `Step ${i+1} / ${flow.length}`;
+    document.getElementById('fb-name').textContent = labels[id] || '';
+  }
+  document.getElementById('fb-prev').addEventListener('click', () => {
+    const i = flow.indexOf(currentScreen());
+    if(i > 0) goTo(flow[i-1]);
+  });
+  document.getElementById('fb-next').addEventListener('click', () => {
+    const i = flow.indexOf(currentScreen());
+    if(i < flow.length - 1) goTo(flow[i+1]); else goTo('s1');
+  });
+  // Keyboard arrows
+  document.addEventListener('keydown', e => {
+    if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if(e.key === 'ArrowRight') document.getElementById('fb-next').click();
+    if(e.key === 'ArrowLeft') document.getElementById('fb-prev').click();
+  });
+  updateFlowBar(currentScreen());
 
   // Allow simple tile toggle as a tiny prototype delight
   document.addEventListener('click', e => {
