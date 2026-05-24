@@ -1,0 +1,1436 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Digital Paani — Operator & Supervisor Prototype v3</title>
+<style>
+  /* =========================================================
+     Design tokens (from brief §6)
+     ========================================================= */
+  :root{
+    --navy:#003366;
+    --navy-2:#004DA6;
+    --blue:#0066CC;
+    --bg:#F0F0F0;
+    --ink:#1B1B1B;
+    --ink-2:#333;
+    --muted:#666;
+    --line:#E3E6EB;
+    --card:#fff;
+    --green:#00AA00;
+    --orange:#FFA500;
+    --red:#CC0000;
+    --yellow:#E5B400;
+    --radius:14px;
+    --shadow:0 2px 8px rgba(10,30,60,.08), 0 1px 2px rgba(10,30,60,.06);
+    --shadow-lg:0 10px 30px rgba(10,30,60,.18);
+    --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#0b1b33;color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased}
+
+  /* =========================================================
+     App shell — desktop showcases mobile frames
+     ========================================================= */
+  .shell{
+    min-height:100vh;
+    display:grid;
+    grid-template-columns:280px 1fr;
+  }
+  .nav{
+    background:linear-gradient(180deg,#002551 0%,#001a3b 100%);
+    color:#fff;padding:22px 18px;position:sticky;top:0;height:100vh;overflow:auto;
+  }
+  @media (max-width:900px){
+    .shell{grid-template-columns:1fr}
+    .nav{position:static;height:auto;padding:14px 14px 10px}
+    .nav h1{font-size:16px}
+    .nav .sub{margin-bottom:10px}
+    .nav .group{margin:8px 0 4px}
+    .nav{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+    .nav h1,.nav .sub{flex-basis:100%}
+    .nav .group{flex-basis:100%;margin:6px 0 2px;font-size:10px}
+    .nav a{flex:0 0 auto;white-space:nowrap;padding:7px 11px;font-size:12px;background:rgba(255,255,255,.05);border-radius:999px}
+    .nav a .n{display:none}
+    .nav .legend{display:none}
+    .stage{padding:18px 14px 64px}
+    .frame{width:100%;max-width:390px;height:auto;min-height:720px}
+    .screen-shell{flex-direction:column;gap:18px}
+    .screen-aside{max-width:none}
+  }
+  .nav h1{font-size:18px;margin:0 0 4px 0;letter-spacing:.2px}
+  .nav .sub{font-size:12px;color:#9fb6d6;margin-bottom:18px}
+  .nav .group{font-size:11px;letter-spacing:.12em;color:#9fb6d6;text-transform:uppercase;margin:14px 0 6px}
+  .nav a{
+    display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;
+    color:#cfe0ff;text-decoration:none;font-size:13.5px;line-height:1.25
+  }
+  .nav a .n{font-size:11px;color:#7e9bc4;width:22px;text-align:right}
+  .nav a:hover{background:rgba(255,255,255,.06);color:#fff}
+  .nav a.active{background:#0066CC;color:#fff}
+  .nav a.active .n{color:#cfe0ff}
+
+  .stage{padding:36px 28px 64px;background:#0b1b33;color:#fff;min-height:100vh}
+  .stage h2.screen-title{font-size:22px;margin:0 0 4px}
+  .stage .screen-sub{color:#9fb6d6;font-size:13px;margin-bottom:18px}
+
+  /* Mobile frame */
+  .frame{
+    width:390px;height:780px;
+    background:var(--bg);color:var(--ink);
+    border-radius:38px;border:10px solid #11121a;
+    box-shadow:var(--shadow-lg);
+    overflow:hidden;position:relative;
+    display:flex;flex-direction:column;
+    margin:0 auto;
+  }
+  .frame .status-bar{
+    height:34px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 22px;font-size:12px;font-weight:600;color:#000;background:#F0F0F0;
+  }
+  .frame .scroll{flex:1;overflow:auto;padding-bottom:96px}
+  .frame .scroll::-webkit-scrollbar{width:0}
+
+  /* Desktop frame for supervisor */
+  .desktop-frame{
+    width:min(100%,1100px);
+    background:#fff;color:var(--ink);
+    border-radius:18px;border:1px solid #1a2748;
+    box-shadow:var(--shadow-lg);overflow:hidden;
+    margin:0 auto;
+  }
+  .desktop-frame .tabbar{
+    background:#0a1733;color:#fff;height:42px;display:flex;align-items:center;gap:8px;padding:0 14px;font-size:12px;
+  }
+  .desktop-frame .tabbar .dot{width:10px;height:10px;border-radius:50%;background:#ff5f57}
+  .desktop-frame .tabbar .dot.y{background:#febc2e}
+  .desktop-frame .tabbar .dot.g{background:#28c840}
+  .desktop-frame .tabbar .url{margin-left:auto;background:#1a274d;padding:4px 10px;border-radius:6px;color:#9fb6d6}
+
+  /* =========================================================
+     Reusable in-frame components
+     ========================================================= */
+  .topbar{
+    background:var(--navy);color:#fff;padding:14px 18px 12px;
+    display:flex;align-items:center;gap:12px;
+  }
+  .topbar .back{
+    width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.12);
+    display:grid;place-items:center;font-size:18px;cursor:pointer;
+  }
+  .topbar .ttl{font-size:15px;font-weight:600;flex:1;line-height:1.2}
+  .topbar .ttl small{display:block;font-weight:400;color:#bcd1ee;font-size:11px;margin-top:2px}
+  .topbar .pill{font-size:10.5px;background:rgba(255,255,255,.16);padding:4px 9px;border-radius:999px;font-weight:600}
+
+  .pad{padding:16px}
+  .card{
+    background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:16px;margin-bottom:12px;
+  }
+  .card.tight{padding:12px}
+  .row{display:flex;align-items:center;gap:10px}
+  .row.between{justify-content:space-between}
+  .stack{display:flex;flex-direction:column;gap:10px}
+  .muted{color:var(--muted);font-size:12px}
+  .h-eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+  .h-title{font-size:18px;font-weight:700;color:var(--navy);margin:0 0 4px}
+  .h-sub{font-size:13px;color:var(--ink-2);margin:0}
+
+  /* Severity / state pills */
+  .sev{font-size:10.5px;font-weight:700;padding:4px 8px;border-radius:999px;color:#fff;letter-spacing:.04em}
+  .sev.critical{background:var(--red)}
+  .sev.high{background:var(--orange)}
+  .sev.medium{background:var(--yellow);color:#3a2900}
+  .sev.low{background:var(--green)}
+  .state{font-size:10.5px;font-weight:700;padding:4px 8px;border-radius:6px;background:var(--navy);color:#fff;letter-spacing:.04em}
+  .state.wait{background:#7a4f00;}
+  .state.pending{background:#5a2891}
+  .state.held{background:#7a1414}
+  .state.resolved{background:var(--green)}
+
+  /* Presence pill */
+  .presence{
+    display:inline-flex;align-items:center;gap:6px;
+    background:#e7f0fb;color:var(--navy);font-size:11px;font-weight:600;
+    padding:4px 8px 4px 4px;border-radius:999px;
+  }
+  .presence .av{width:18px;height:18px;border-radius:50%;background:var(--blue);color:#fff;
+    font-size:10px;display:grid;place-items:center;font-weight:700}
+
+  /* Buttons */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    height:48px;padding:0 18px;border-radius:12px;border:0;cursor:pointer;
+    font-weight:700;font-size:15px;font-family:var(--font);width:100%;
+  }
+  .btn.primary{background:var(--navy);color:#fff}
+  .btn.green{background:var(--green);color:#fff}
+  .btn.orange{background:var(--orange);color:#1a0f00}
+  .btn.red{background:var(--red);color:#fff}
+  .btn.blue{background:var(--blue);color:#fff}
+  .btn.ghost{background:#fff;color:var(--navy);border:1.5px solid var(--navy)}
+  .btn.sm{height:38px;font-size:13px;padding:0 12px}
+  .btn:active{transform:translateY(1px)}
+
+  /* Sticky safety footer (brief §5 Screen 4) */
+  .safety{
+    position:absolute;bottom:0;left:0;right:0;
+    background:#fff;border-top:1px solid var(--line);
+    padding:10px 12px env(safe-area-inset-bottom,12px);
+    display:grid;grid-template-columns:repeat(5,1fr);gap:6px;
+  }
+  .safety button{
+    background:#f4f6fa;border:0;border-radius:10px;height:54px;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    font-size:10px;font-weight:700;color:#1a2748;
+  }
+  .safety .ico{font-size:18px;line-height:1}
+  .safety .skip .ico{color:#666}
+  .safety .help .ico{color:var(--blue)}
+  .safety .flag .ico{color:var(--red)}
+  .safety .correct .ico{color:var(--orange)}
+  .safety .know .ico{color:var(--green)}
+
+  /* Sensor cards */
+  .sensor-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .sensor{background:#fff;border-radius:12px;padding:12px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .sensor .v{font-size:24px;font-weight:800;color:var(--ink)}
+  .sensor .u{font-size:11px;color:var(--muted);margin-left:3px;font-weight:600}
+  .sensor .lbl{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+  .sensor .bar{position:absolute;left:0;top:0;bottom:0;width:5px}
+  .sensor.good .bar{background:var(--green)}
+  .sensor.warn .bar{background:var(--orange)}
+  .sensor.bad  .bar{background:var(--red)}
+  .sensor .trend{font-size:11px;margin-top:2px;color:var(--muted);display:flex;align-items:center;gap:4px}
+
+  /* Issue card */
+  .issue{background:#fff;border-radius:12px;padding:12px 12px 10px;box-shadow:var(--shadow);margin-bottom:10px;position:relative}
+  .issue .row1{display:flex;gap:8px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
+  .issue h4{margin:0;font-size:14px;color:var(--navy)}
+  .issue .meta{font-size:11px;color:var(--muted);display:flex;gap:10px;margin-top:6px;flex-wrap:wrap}
+
+  /* Mascot frame */
+  .mascot{
+    width:96px;height:96px;border-radius:50%;
+    background:linear-gradient(180deg,#005bbd 0%,#003a85 100%);
+    display:grid;place-items:center;flex-shrink:0;
+    box-shadow:inset 0 -8px 20px rgba(0,0,0,.18);
+  }
+  .mascot.lg{width:140px;height:140px}
+  .mascot svg{width:78%;height:78%}
+
+  /* Pictogram tile */
+  .tile-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .tile{
+    background:#fff;border-radius:12px;padding:12px 8px;text-align:center;
+    box-shadow:var(--shadow);font-size:12px;font-weight:600;color:var(--ink-2);
+    cursor:pointer;border:2px solid transparent;
+  }
+  .tile.sel{border-color:var(--navy);background:#eaf2ff}
+  .tile .pg{font-size:34px;margin-bottom:4px;display:block}
+
+  /* Threshold bar (Screen 3 worked example) */
+  .threshold{
+    position:relative;height:14px;border-radius:7px;
+    background:linear-gradient(90deg,var(--green) 0%,var(--green) 60%,var(--orange) 60%,var(--orange) 85%,var(--red) 85%);
+    margin:6px 0;
+  }
+  .threshold .pin{
+    position:absolute;top:-3px;width:3px;height:20px;background:#000;border-radius:2px;
+  }
+  .scale{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
+
+  /* Timeline */
+  .tl{list-style:none;padding:0;margin:0;position:relative}
+  .tl:before{content:'';position:absolute;left:14px;top:6px;bottom:6px;width:2px;background:var(--line)}
+  .tl li{padding:10px 0 10px 36px;position:relative}
+  .tl li:before{
+    content:'';position:absolute;left:8px;top:14px;width:14px;height:14px;border-radius:50%;
+    background:#fff;border:3px solid var(--blue);
+  }
+  .tl li.ok:before{border-color:var(--green)}
+  .tl li.warn:before{border-color:var(--orange)}
+  .tl li.fail:before{border-color:var(--red)}
+  .tl .ev{font-size:13px;font-weight:600;color:var(--navy)}
+  .tl .dt{font-size:11px;color:var(--muted);margin-top:2px}
+
+  /* Big countdown */
+  .countdown{
+    text-align:center;background:#fff;border-radius:16px;padding:22px;box-shadow:var(--shadow);
+  }
+  .countdown .ring{
+    width:170px;height:170px;border-radius:50%;margin:6px auto 12px;
+    background:conic-gradient(var(--green) 0 60%,#e6ecf2 60% 100%);
+    display:grid;place-items:center;
+  }
+  .countdown .ring .inner{width:138px;height:138px;border-radius:50%;background:#fff;display:grid;place-items:center}
+  .countdown .t{font-size:34px;font-weight:800;color:var(--navy);letter-spacing:.02em}
+  .countdown .lbl{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.1em}
+
+  /* Form-ish input */
+  .input{
+    width:100%;height:54px;border:1.5px solid var(--line);background:#fff;border-radius:12px;
+    padding:0 14px;font-size:16px;font-family:var(--font);color:var(--ink);
+  }
+  .input:focus{outline:none;border-color:var(--blue)}
+
+  /* Photo gate */
+  .photo-zone{
+    background:#fff;border:1.5px dashed #b8c2d4;border-radius:14px;padding:22px;text-align:center;
+  }
+  .photo-zone .cam{font-size:42px}
+
+  /* Filters */
+  .filters{display:flex;gap:6px;overflow:auto;padding-bottom:6px;margin-bottom:8px}
+  .filters .chip{
+    white-space:nowrap;background:#fff;border:1px solid var(--line);border-radius:999px;
+    padding:7px 12px;font-size:12px;font-weight:600;color:var(--ink-2);cursor:pointer;
+  }
+  .filters .chip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+  /* Section heading inside frame */
+  .section-h{
+    display:flex;align-items:center;justify-content:space-between;margin:14px 4px 8px;
+  }
+  .section-h h3{margin:0;color:var(--navy);font-size:14px;letter-spacing:.02em}
+  .section-h a{font-size:12px;color:var(--blue);text-decoration:none;font-weight:600}
+
+  /* Result chips for verification */
+  .reading-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .reading{background:#fff;border-radius:12px;padding:12px;box-shadow:var(--shadow);text-align:center}
+  .reading.before{border-top:4px solid var(--red)}
+  .reading.after{border-top:4px solid var(--green)}
+  .reading .v{font-size:22px;font-weight:800;color:var(--ink)}
+  .reading .l{font-size:10.5px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+
+  /* Desktop supervisor styles */
+  .ds-body{display:grid;grid-template-columns:240px 1fr;min-height:620px}
+  .ds-side{background:#fafbfd;border-right:1px solid var(--line);padding:18px 14px}
+  .ds-side h4{margin:0 0 8px;color:var(--navy);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+  .ds-side a{display:block;padding:8px 10px;color:var(--ink-2);text-decoration:none;border-radius:8px;font-size:13.5px}
+  .ds-side a.on{background:#e9f0fa;color:var(--navy);font-weight:700}
+  .ds-main{padding:18px 22px}
+  .ds-h{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:14px}
+  .ds-h h2{margin:0;color:var(--navy);font-size:22px}
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px}
+  .kpi .l{font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+  .kpi .v{font-size:26px;font-weight:800;color:var(--navy);margin-top:2px}
+  .kpi .d{font-size:11px;color:var(--muted);margin-top:2px}
+  .ds-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px}
+  .panel h3{margin:0 0 10px;font-size:14px;color:var(--navy)}
+  table.ops{width:100%;border-collapse:collapse;font-size:12.5px}
+  table.ops th,table.ops td{padding:8px 6px;text-align:left;border-bottom:1px solid var(--line)}
+  table.ops th{color:var(--muted);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+
+  /* Hide / show */
+  .screen{display:none}
+  .screen.on{display:block}
+
+  /* Two-col layout for screens on wide stages */
+  .screen-shell{display:flex;flex-wrap:wrap;gap:28px}
+  .screen-aside{
+    flex:1;min-width:260px;max-width:380px;color:#cfe0ff;font-size:13px;line-height:1.55
+  }
+  .screen-aside h3{color:#fff;font-size:15px;margin:0 0 8px}
+  .screen-aside .tag{
+    display:inline-block;font-size:10.5px;padding:3px 8px;border-radius:999px;
+    background:rgba(255,255,255,.08);color:#bcd1ee;margin-right:6px;margin-bottom:6px
+  }
+  .screen-aside ul{padding-left:18px;margin:6px 0}
+  .screen-aside li{margin-bottom:4px}
+
+  .legend{
+    margin-top:24px;padding:14px;background:rgba(255,255,255,.05);border-radius:10px;
+  }
+  .legend h4{margin:0 0 6px;color:#fff;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+  .legend code{background:rgba(255,255,255,.08);padding:1px 6px;border-radius:4px;color:#bcd1ee;font-size:11.5px}
+
+  /* Wait/idle state list inside Screen 7 */
+  .ulist{list-style:none;padding:0;margin:0}
+  .ulist li{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .ulist li:last-child{border-bottom:0}
+  .ulist .b{color:var(--blue);font-size:18px;line-height:1}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- ===================== Sidebar nav ===================== -->
+  <aside class="nav">
+    <h1>Digital Paani</h1>
+    <div class="sub">Operator & Supervisor · Prototype v3</div>
+
+    <div class="group">Operator (mobile)</div>
+    <a data-go="s1" class="active"><span class="n">01</span> Home Dashboard</a>
+    <a data-go="s2"><span class="n">02</span> Shared Issue Queue</a>
+    <a data-go="s3"><span class="n">03</span> Context Summary</a>
+    <a data-go="s4"><span class="n">04</span> Diagnostic Flow</a>
+    <a data-go="s5"><span class="n">05</span> Root Cause Confirm</a>
+    <a data-go="s6"><span class="n">06</span> Remediation Flow</a>
+    <a data-go="s7"><span class="n">07</span> Wait Timer</a>
+    <a data-go="s8"><span class="n">08</span> Photo Capture</a>
+    <a data-go="s9"><span class="n">09</span> Verification</a>
+    <a data-go="s10"><span class="n">10</span> Issue Close</a>
+
+    <div class="group">Supervisor</div>
+    <a data-go="s11"><span class="n">11</span> Dashboard (desktop)</a>
+    <a data-go="s12"><span class="n">12</span> Approval Flow</a>
+    <a data-go="s13"><span class="n">13</span> History / Timeline</a>
+    <a data-go="s14"><span class="n">14</span> Report Issue</a>
+
+    <div class="legend">
+      <h4>Worked Example</h4>
+      <div style="font-size:12px;color:#bcd1ee;line-height:1.5">
+        DT-001 <code>MBR Outlet Turbidity High</code> — flows through all operator screens.
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===================== Stage ===================== -->
+  <main class="stage" id="stage">
+
+    <!-- ============ SCREEN 1 — Home Dashboard ============ -->
+    <section class="screen on" id="s1">
+      <div class="screen-shell">
+        <div>
+          <h2 class="screen-title">01 · Home Dashboard</h2>
+          <div class="screen-sub">Operator intake · Glanceable plant health + urgent issues</div>
+          <div class="frame">
+            <div class="status-bar"><span>9:41</span><span>● ● ● 5G</span></div>
+
+            <div class="topbar">
+              <div class="back">≡</div>
+              <div class="ttl">Namaste, Ravi
+                <small>Tarn Taran STP · Plant healthy</small>
+              </div>
+              <span class="pill">3 alerts</span>
+            </div>
+
+            <div class="scroll">
+              <div class="pad">
+
+                <!-- Plant health header card -->
+                <div class="card">
+                  <div class="row between">
+                    <div>
+                      <div class="h-eyebrow">Plant Status</div>
+                      <div class="h-title">Operating · Normal</div>
+                      <div class="h-sub">Inlet 1,240 m³/h · Outlet 1,210 m³/h</div>
+                    </div>
+                    <div class="mascot"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="none" stroke="#fff" stroke-width="3"/><circle cx="22" cy="28" r="3.5" fill="#fff"/><circle cx="42" cy="28" r="3.5" fill="#fff"/><path d="M22 42 Q32 50 42 42" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></svg></div>
+                  </div>
+                </div>
+
+                <div class="section-h"><h3>Live Sensor Readings</h3><a>View all</a></div>
+                <div class="sensor-grid">
+                  <div class="sensor bad">
+                    <span class="bar"></span>
+                    <div class="lbl">DO · Aeration</div>
+                    <div><span class="v">2.1</span><span class="u">mg/L</span></div>
+                    <div class="trend">▼ Falling · 2 min ago</div>
+                  </div>
+                  <div class="sensor warn">
+                    <span class="bar"></span>
+                    <div class="lbl">TMP · MBR-1</div>
+                    <div><span class="v">38</span><span class="u">kPa</span></div>
+                    <div class="trend">▲ Rising · 12 sec ago</div>
+                  </div>
+                  <div class="sensor good">
+                    <span class="bar"></span>
+                    <div class="lbl">pH · Inlet</div>
+                    <div><span class="v">7.2</span></div>
+                    <div class="trend">→ Stable · 1 min ago</div>
+                  </div>
+                  <div class="sensor good">
+                    <span class="bar"></span>
+                    <div class="lbl">Flow · Outlet</div>
+                    <div><span class="v">1,210</span><span class="u">m³/h</span></div>
+                    <div class="trend">→ Stable · 8 sec ago</div>
+                  </div>
+                </div>
+
+                <div class="section-h"><h3>Urgent Issues</h3><a>Queue ›</a></div>
+
+                <div class="issue">
+                  <div class="row1">
+                    <span class="sev critical">CRITICAL</span>
+                    <span class="state">OPEN</span>
+                    <span style="margin-left:auto" class="muted">DT-001 · 12 min</span>
+                  </div>
+                  <h4>MBR-1 Outlet Turbidity High</h4>
+                  <div class="muted" style="margin-top:2px">MBR का पानी गंदा है · Quality alarm trigger ho sakta hai</div>
+                  <div style="margin-top:10px"><button class="btn primary">जाँच शुरू करें · Start Investigation</button></div>
+                </div>
+
+                <div class="issue">
+                  <div class="row1">
+                    <span class="sev high">HIGH</span>
+                    <span class="state wait">WAITING · 22:14</span>
+                    <span class="presence"><span class="av">A</span> Anita</span>
+                  </div>
+                  <h4>Aeration Tank · DO low</h4>
+                  <div class="muted">Settling timer running · 30 min</div>
+                </div>
+
+                <div class="issue">
+                  <div class="row1">
+                    <span class="sev medium">MEDIUM</span>
+                    <span class="state">OPEN</span>
+                    <span style="margin-left:auto" class="muted">SC-104 · 41 min</span>
+                  </div>
+                  <h4>Sludge Pump · Vibration</h4>
+                </div>
+
+                <div class="section-h"><h3>Quick Actions</h3></div>
+                <div class="tile-grid">
+                  <div class="tile"><span class="pg">📝</span>Report Issue</div>
+                  <div class="tile"><span class="pg">📋</span>Open Queue</div>
+                  <div class="tile"><span class="pg">📷</span>Scan QR</div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside class="screen-aside">
+          <h3>What this screen does</h3>
+          <span class="tag">Glanceable</span><span class="tag">Color-coded</span><span class="tag">Bilingual</span>
+          <ul>
+            <li>Plant status pill, alert count, mascot mood reflect overall health.</li>
+            <li>Sensor cards use a left-edge color bar — readable even at arm's length outdoors.</li>
+            <li>Urgent issue cards expose presence (who else is on it) before the operator commits.</li>
+            <li>Hindi-first primary CTA on the top issue; English subtitle for parity.</li>
+          </ul>
+          <div class="legend">
+            <h4>Maps to brief</h4>
+            <div style="font-size:12px;line-height:1.55">§5 Screen 1 · §6 Sensor Cards · §8 Mobile First, Glanceable</div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN 2 — Shared Queue ============ -->
+    <section class="screen" id="s2">
+      <div class="screen-shell">
+        <div>
+          <h2 class="screen-title">02 · Shared Issue Queue</h2>
+          <div class="screen-sub">All open work · Sorted by severity & age · Live presence</div>
+          <div class="frame">
+            <div class="status-bar"><span>9:41</span><span>● ● ● 5G</span></div>
+            <div class="topbar">
+              <div class="back">←</div>
+              <div class="ttl">Issue Queue<small>14 open · 3 critical</small></div>
+              <span class="pill">Live</span>
+            </div>
+
+            <div class="scroll"><div class="pad">
+              <div class="filters">
+                <div class="chip on">All</div>
+                <div class="chip">Critical</div>
+                <div class="chip">Waiting</div>
+                <div class="chip">Mine</div>
+                <div class="chip">Scheduled</div>
+                <div class="chip">Escalated</div>
+              </div>
+
+              <div class="issue">
+                <div class="row1">
+                  <span class="sev critical">CRITICAL</span>
+                  <span class="state">OPEN</span>
+                  <span style="margin-left:auto" class="muted">12 min · DT-001</span>
+                </div>
+                <h4>MBR-1 · Outlet Turbidity High</h4>
+                <div class="muted" style="font-size:11.5px;margin-top:2px">Root cause unknown · 4 step diagnostic</div>
+                <div class="meta">
+                  <span>📍 MBR Block</span>
+                  <span>⏱ Last activity 2m</span>
+                </div>
+              </div>
+
+              <div class="issue" style="border-left:4px solid var(--orange)">
+                <div class="row1">
+                  <span class="sev high">HIGH</span>
+                  <span class="state wait">WAITING · 22:14</span>
+                  <span class="presence"><span class="av">A</span> Anita is working</span>
+                </div>
+                <h4>Aeration · DO Low (2.1 mg/L)</h4>
+                <div class="muted" style="font-size:11.5px">Settling timer · 7m remaining</div>
+              </div>
+
+              <div class="issue">
+                <div class="row1">
+                  <span class="sev high">HIGH</span>
+                  <span class="state pending">PENDING_APPROVAL</span>
+                </div>
+                <h4>Blower-2 · Restart verified</h4>
+                <div class="muted" style="font-size:11.5px">Submitted by Rohan · awaiting supervisor</div>
+              </div>
+
+              <div class="issue">
+                <div class="row1">
+                  <span class="sev medium">MEDIUM</span>
+                  <span class="state">OPEN</span>
+                  <span style="margin-left:auto" class="muted">41 min</span>
+                </div>
+                <h4>Sludge Pump P-3 · Vibration</h4>
+              </div>
+
+              <div class="issue">
+                <div class="row1">
+                  <span class="sev medium">MEDIUM</span>
+                  <span class="state held">HELD_OPEN</span>
+                  <span class="presence"><span class="av">S</span> Supervisor</span>
+                </div>
+                <h4>Chlorine dosing · Manual override</h4>
+              </div>
+
+              <div class="issue">
+                <div class="row1">
+                  <span class="sev low">LOW</span>
+                  <span class="state resolved">RESOLVED</span>
+                </div>
+                <h4>Inlet flowmeter · cleaned</h4>
+                <div class="muted" style="font-size:11.5px">Closed 1h ago by Meena</div>
+              </div>
+            </div></div>
+          </div>
+        </div>
+        <aside class="screen-aside">
+          <h3>Shared, never locked</h3>
+          <ul>
+            <li>Anyone can see and claim, but active presence signals “someone is on it”.</li>
+            <li>WAIT items expose their countdown so others know when to check back.</li>
+            <li>Filters target the four states operators actually look for in the field.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN 3 — Context Summary ============ -->
+    <section class="screen" id="s3">
+      <div class="screen-shell">
+        <div>
+          <h2 class="screen-title">03 · Context Summary</h2>
+          <div class="screen-sub">Mandatory pre-flight · "What's happened, what's next?"</div>
+          <div class="frame">
+            <div class="status-bar"><span>9:41</span><span>● ● ● 5G</span></div>
+            <div class="topbar">
+              <div class="back">←</div>
+              <div class="ttl">DT-001 Context<small>MBR-1 · Outlet Turbidity High</small></div>
+              <span class="pill">CRITICAL</span>
+            </div>
+
+            <div class="scroll"><div class="pad">
+
+              <div class="card">
+                <div class="h-eyebrow">A · Current Status</div>
+                <div class="row between">
+                  <div>
+                    <div class="h-title" style="font-size:16px">Phase: Diagnostics</div>
+                    <div class="h-sub">State <span class="state">IN_PROGRESS</span> · Step 2 of 5</div>
+                  </div>
+                  <div class="mascot" style="width:64px;height:64px"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="none" stroke="#fff" stroke-width="3"/><circle cx="22" cy="28" r="3" fill="#fff"/><circle cx="42" cy="28" r="3" fill="#fff"/><path d="M24 42 Q32 46 40 42" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></svg></div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="h-eyebrow">B · Findings So Far</div>
+                <div class="h-title" style="font-size:16px">Suspected: Air Supply Restriction</div>
+                <div class="h-sub">Confidence <b style="color:var(--orange)">Medium</b> · 2/4 indicators match</div>
+              </div>
+
+              <div class="card">
+                <div class="h-eyebrow">C · Last Completed Step</div>
+                <div class="h-sub" style="font-size:13px;color:var(--ink-2)"><b>Checked aeration bubbles</b> — NO visible bubbling at zone 2.</div>
+                <div class="muted" style="margin-top:6px">By Anita · 9:32 AM · 9 min ago</div>
+              </div>
+
+              <div class="card" style="border-left:4px solid var(--red)">
+                <div class="h-eyebrow" style="color:var(--red)">D · Important Events</div>
+                <ul class="ulist">
+                  <li><span class="b">⚑</span>Step 1 skipped — sensor data not available.</li>
+                  <li><span class="b">📝</span>Supervisor note: "Confirm air line before opening tank."</li>
+                </ul>
+              </div>
+
+              <div class="card" style="background:#eaf2ff;border:1px solid #bcd1ee">
+                <div class="h-eyebrow">E · Next Action</div>
+                <div class="h-title" style="margin-bottom:10px">Continue diagnostic</div>
+                <button class="btn primary">Continue Step 2 of 5 →</button>
+              </div>
+
+            </div></div>
+          </div>
+        </div>
+        <aside class="screen-aside">
+          <h3>Why a forced summary?</h3>
+          <ul>
+            <li>Field hand-offs are common; nobody resumes work without context.</li>
+            <li>Five rigid blocks (A–E) match the brief so layout never drifts.</li>
+            <li>One big CTA at the bottom — never two competing next-actions.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN 4 — Diagnostic Flow ============ -->
+    <section class="screen" id="s4">
+      <div class="screen-shell">
+        <div>
+          <h2 class="screen-title">04 · Diagnostic Flow</h2>
+          <div class="screen-sub">One card at a time · WhatsApp + Duolingo + SOP · Sticky safety footer</div>
+          <div class="frame">
+            <div class="status-bar"><span>9:41</span><span>● ● ● 5G</span></div>
+            <div class="topbar">
+              <div class="back">←</div>
+              <div class="ttl">Diagnostic · DT-001<small>MBR-1 · Step 2 of 5 · 3:12 elapsed</small></div>
+              <span class="pill">CRITICAL</span>
+            </div>
+
+            <div class="scroll"><div class="pad">
+
+              <!-- Progress -->
+              <div style="display:flex;gap:5px;margin-bottom:14px">
+                <span style="flex:1;height:6px;border-radius:3px;background:var(--green)"></span>
+                <span style="flex:1;height:6px;border-radius:3px;background:var(--blue)"></span>
+                <span style="flex:1;height:6px;border-radius:3px;background:#dde3ed"></span>
+                <span style="flex:1;height:6px;border-radius:3px;background:#dde3ed"></span>
+                <span style="flex:1;height:6px;border-radius:3px;background:#dde3ed"></span>
+              </div>
+
+              <div class="card" style="text-align:center;padding:18px 14px">
+                <div class="mascot lg" style="margin:0 auto 10px"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="none" stroke="#fff" stroke-width="3"/><circle cx="22" cy="28" r="3" fill="#fff"/><circle cx="42" cy="28" r="3" fill="#fff"/><path d="M22 44 Q32 38 42 44" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="50" cy="22" r="3" fill="#FFA500"/></svg></div>
+                <div class="h-eyebrow">Question 2 / 5</div>
+                <div style="font-size:20px;font-weight:800;color:var(--navy);margin:4px 0 2px">Tank के ऊपर झाग दिख रहा है?</div>
+                <div class="muted">Is foam visible on top of the tank?</div>
+
+                <div class="tile-grid" style="margin:14px 0 6px">
+                  <div class="tile">
+                    <span class="pg" style="filter:grayscale(.1)">🥛</span>
+                    सफेद · White
+                  </div>
+                  <div class="tile sel">
+                    <span class="pg">🟫</span>
+                    भूरा · Brown
+                  </div>
+                  <div class="tile">
+                    <span class="pg">⬛</span>
+                    काला · Black
+                  </div>
+                </div>
+                <div class="muted" style="font-size:11px">ऐसा कुछ? Tap what matches.</div>
+
+                <div style="display:flex;gap:10px;margin-top:14px">
+                  <button class="btn green" style="flex:2">हाँ · Yes</button>
+                  <button class="btn ghost" style="flex:1">नहीं · No</button>
+                </div>
+
+                <div style="display:flex;justify-content:center;gap:14px;margin-top:14px;font-size:12px;color:var(--blue);font-weight:600">
+                  <span>🔊 Listen</span>
+                  <span>🌐 Bilingual</span>
+                  <span>⏱ Auto-advance 5s</span>
+                </div>
+              </div>
+
+            </div></div>
+
+            <!-- Sticky safety footer (5 actions) -->
+            <div class="safety">
+              <button class="skip"><span class="ico">⏭</span>Skip</button>
+              <button class="help"><span class="ico">?</span>Help</button>
+              <button class="flag"><span class="ico">⚑</span>Flag</button>
+              <button class="correct"><span class="ico">✎</span>Correct</button>
+              <button class="know"><span class="ico">✓</span>Know cause</button>
+            </div>
+          </div>
+        </div>
+        <aside class="screen-aside">
+          <h3>Core UX pattern</h3>
+          <ul>
+            <li>One card. No lists, no branches. The system decides the next step.</li>
+            <li>Pictograms-first; text is bilingual support, not the primary signal.</li>
+            <li>Sticky 5-button footer is always there — operators never feel trapped.</li>
+            <li>Listen / auto-advance / bilingual are visible affordances, not hidden menus.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN 5 — Root Cause Confirmation ============ -->
+    <section class="screen" id="s5">
+      <div class="screen-shell">
+        <div>
+          <h2 class="screen-title">05 · Root Cause Confirmation</h2>
+          <div class="screen-sub">Confirm before launching remediation</div>
+          <div class="frame">
+            <div class="status-bar"><span>9:41</span><span>● ● ● 5G</span></div>
+            <div class="topbar">
+              <div class="back">←</div>
+              <div class="ttl">Root cause<small>DT-001 · MBR-1</small></div>
+              <span class="pill">Step 5/5</span>
+            </div>
+            <div class="scroll"><div class="pad">
+
+              <div class="card" style="text-align:center">
+                <div class="mascot lg" style="margin:0 auto 12px"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="none" stroke="#fff" stroke-width="3"/><circle cx="22" cy="28" r="3" fill="#fff"/><circle cx="42" cy="28" r="3" fill="#fff"/><path d="M22 42 Q32 36 42 42" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></svg></div>
+                <div class="h-eyebrow">Likely Root Cause</div>
+                <div style="font-size:22px;font-weight:800;color:var(--navy);margin:4px 0">Diffuser Fouling</div>
+                <div class="muted">Confidence <b style="color:var(--green)">High</b> · 4 / 4 indicators</div>
+
+                <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                  <button class="btn green">✓ Confirm</button>
+                  <button class="btn orange">Not this</button>
+                  <button class="btn ghost">Other cause</button>
+                  <button class="btn blue">False alarm</button>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="h-eyebrow">Other candidates</div>
+                <ul class="ulist">
+                  <li><span class="b">🌀</span> Membrane fouling · 2/4 indicators</li>
+                  <li><span class="b">🛑</span> Blower stopped · ruled out (running)</li>
+                  <li><span class="b">📡</span> Sensor fault · ruled out (calibrated)</li>
+                </ul>
+              </div>
+
+            </div></div>
+          </div>
+        </div>
+        <aside class="screen-aside">
+          <h3>Four exits, not one</h3>
+          <ul>
+            <li>Confirm / Not this / Other / False alarm — the operator can always escape gracefully.</li>
+            <li>Indicators show <em>why</em> the system thinks this cause — builds trust.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN 6 — Remediation Flow ============ -->
+    <section class="screen" id="s6">
+      <div class="screen-shell">
+        <div>
+          <h2 class="screen-title">06 · Remediation Flow</h2>
+          <div class="screen-sub">Checklist + SOP · Action / Wait / Data / Verify cards</div>
+          <div class="frame">
+            <div class="status-bar"><span>9:41</span><span>● ● ● 5G</span></div>
+            <div class="topbar">
+              <div class="back">←</div>
+              <div class="ttl">Remediation<small>Diffuser Fouling · ~25 min · Supervisor approval needed</small></div>
+              <span class="pill">2 / 6</span>
+            </div>
+            <div class="scroll"><div class="pad">
+
+              <div style="background:#fff4d6;border:1px solid #f1d68a;padding:10px 12px;border-radius:10px;font-size:12.5px;color:#523c00;margin-bottom:10px">
+                ⚠ Safety: PPE required · Lock-out tag-out before opening tank.
+              </div>
+
+              <div class="card" style="text-align:center">
+                <div class="h-eyebrow">Action · Step 2 of 6</div>
+                <div style="font-size:62px;line-height:1">🧽</div>
+                <div style="font-size:18px;font-weight:800;color:var(--navy);margin:4px 0 2px">Clean diffuser stones</div>
+                <div class="muted">Use brush + 5% citric solution. Cover entire grid.</div>
+                <button class="btn green" style="margin-top:14px">हो गया · Done</button>
+                <div class="muted" style="margin-top:8px;font-size:11px">📷 Photo of cleaned grid required at Step 3</div>
+              </div>
+
+              <div class="card tight">
+                <div class="row between">
+                  <div class="h-eyebrow" style="margin:0">Progress</div>
+                  <div class="muted">2 / 6 steps</div>
+                </div>
+                <div style="display:flex;gap:5px;margin-top:8px">
+                  <span style="flex:1;height:6px;border-radius:3px;background:var(--green)"></span>
+                  <span style="flex:1;height:6px;border-radius:3px;background:var(--blue)"></span>
+                  <span style="flex:1;height:6px;border-radius:3px;background:#dde3ed"></span>
+                  <span style="flex:1;height:6px;border-radius:3px;background:#dde3ed"></span>
+                  <span style="flex:1;height:6px;border-radius:3px;background:#dde3ed"></span>
+                  <span style="flex:1;height:6px;border-radius:3px;background:#dde3ed"></span>
+                </div>
+              </div>
+
+            </div></div>
+
+            <div class="safety">
+              <button class="skip"><span class="ico">⏭</span>Skip</button>
+              <button class="help"><span class="ico">?</span>Help</button>
+              <button class="flag"><span class="ico">⚑</span>Flag</button>
+              <button class="correct"><span class="ico">✎</span>Correct</button>
+              <button class="know"><span class="ico">✓</span>Know cause</button>
+            </div>
+          </div>
+        </div>
+        <aside class="screen-aside">
+          <h3>Checklist > branching</h3>
+          <ul>
+            <li>Safety strip pinned at the top before any action card renders.</li>
+            <li>Step card uses the same one-card pattern as diagnostics — muscle memory.</li>
+            <li>Photo gates surface <em>before</em> they're required so operators aren't blocked later.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN 7 — Wait Timer ============ -->
+    <section class="screen" id="s7">
+      <div class="screen-shell">
+        <div>
+          <h2 class="screen-title">07 · Wait Timer</h2>
+          <div class="screen-sub">Industrial pause · Visible to whole team · Operator can work elsewhere</div>
+          <div class="frame">
+            <div class="status-bar"><span>9:41</span><span>● ● ● 5G</span></div>
+            <div class="topbar">
+              <div class="back">←</div>
+              <div class="ttl">Settling Wait<small>Step 4 of 6 · DT-001</small></div>
+              <span class="pill">WAITING</span>
+            </div>
+            <div class="scroll"><div class="pad">
+
+              <div class="countdown">
+                <div class="h-eyebrow">Time remaining</div>
+                <div class="ring"><div class="inner">
+                  <div>
+                    <div class="t">17:42</div>
+                    <div class="lbl">of 30:00</div>
+                  </div>
+                </div></div>
+                <div class="muted">30 मिनट बाद Turbidity फिर देखें</div>
+              </div>
+
+              <div class="card">
+                <div class="h-eyebrow">While you wait</div>
+                <ul class="ulist">
+                  <li><span class="b">📷</span> Take photo of cleaned diffuser grid</li>
+                  <li><span class="b">🔍</span> Check Blower-2 oil level (next on rota)</li>
+                  <li><span class="b">📋</span> Pick up another open issue from queue</li>
+                </ul>
+              </div>
+
+              <button class="btn primary">Check now (early)</button>
+              <div class="muted" style="text-align:center;margin-top:8px">Early check is logged in audit trail</div>
+
+            </div></div>
+          </div>
+        </div>
+        <aside class="screen-aside">
+          <h3>Idle time, used well</h3>
+          <ul>
+            <li>Ring + numeric countdown are scannable from a meter away.</li>
+            <li>"While you wait" prompts redirect operators to <em>other</em> work instead of idling.</li>
+            <li>Early-check is allowed but tagged — supervisor can audit later.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN 8 — Photo Capture ============ -->
+    <section class="screen" id="s8">
+      <div class="screen-shell">
+        <div>
+          <h2 class="screen-title">08 · Photo Capture</h2>
+          <div class="screen-sub">Offline-first evidence gate</div>
+          <div class="frame">
+            <div class="status-bar"><span>9:41</span><span>◐ Offline</span></div>
+            <div class="topbar">
+              <div class="back">←</div>
+              <div class="ttl">Photo evidence<small>Step 3 · Cleaned diffuser grid</small></div>
+              <span class="pill">REQUIRED</span>
+            </div>
+            <div class="scroll"><div class="pad">
+
+              <div class="photo-zone">
+                <div class="cam">📷</div>
+                <div style="font-weight:700;margin-top:6px;color:var(--navy)">Tap to take photo</div>
+                <div class="muted" style="margin-top:4px">Or upload from gallery</div>
+              </div>
+
+              <div class="card" style="margin-top:14px">
+                <div class="row between">
+                  <div>
+                    <div class="h-eyebrow">Uploaded</div>
+                    <div class="h-title" style="font-size:16px">2 / 3 photos</div>
+                  </div>
+                  <span class="presence" style="background:#fff4d6;color:#7a5a00">◐ Offline · will sync</span>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:10px">
+                  <div style="flex:1;aspect-ratio:1;background:linear-gradient(135deg,#7a8aa0,#4a5d7a);border-radius:8px"></div>
+                  <div style="flex:1;aspect-ratio:1;background:linear-gradient(135deg,#5e7090,#385072);border-radius:8px"></div>
+                  <div style="flex:1;aspect-ratio:1;background:#e6ecf2;border-radius:8px;display:grid;place-items:center;color:#94a4b8;font-size:24px">＋</div>
+                </div>
+              </div>
+
+              <button class="btn primary" style="margin-top:8px">Continue</button>
+              <button class="btn ghost" style="margin-top:8px">Skip (optional only)</button>
+
+            </div></div>
+          </div>
+        </div>
+        <aside class="screen-aside">
+          <h3>Offline-first by design</h3>
+          <ul>
+            <li>“Saved locally · will sync” is the default, not an error state.</li>
+            <li>Required vs. optional is shown in the top-right pill, not buried.</li>
+            <li>Thumbnail row gives operators confidence their photos are stored.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN 9 — Verification ============ -->
+    <section class="screen" id="s9">
+      <div class="screen-shell">
+        <div>
+          <h2 class="screen-title">09 · Verification</h2>
+          <div class="screen-sub">Did the fix actually work?</div>
+          <div class="frame">
+            <div class="status-bar"><span>9:41</span><span>● ● ● 5G</span></div>
+            <div class="topbar">
+              <div class="back">←</div>
+              <div class="ttl">Verify fix<small>DT-001 · Turbidity reading</small></div>
+              <span class="pill">FINAL</span>
+            </div>
+            <div class="scroll"><div class="pad">
+
+              <div class="card">
+                <div class="h-eyebrow">Threshold</div>
+                <div class="threshold"><span class="pin" style="left:18%"></span></div>
+                <div class="scale"><span>0 NTU</span><span>5</span><span>10</span></div>
+                <div class="muted" style="margin-top:4px">Target: &lt; 5 NTU</div>
+              </div>
+
+              <div class="reading-row">
+                <div class="reading before">
+                  <div class="l">Before</div>
+                  <div class="v">8.4</div>
+                  <div class="muted">NTU · 9:21 AM</div>
+                </div>
+                <div class="reading after">
+                  <div class="l">After</div>
+                  <div class="v">3.1</div>
+                  <div class="muted">NTU · just now</div>
+                </div>
+              </div>
+
+              <div class="card" style="text-align:center;background:#eaf8ea;border:1px solid #b9e2b9">
+                <div class="mascot" style="margin:0 auto 8px;background:linear-gradient(180deg,#00c853,#009a3a)"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="none" stroke="#fff" stroke-width="3"/><polygon points="22,26 22,22 26,22 26,26" fill="#fff"/><polygon points="38,26 38,22 42,22 42,26" fill="#fff"/><path d="M22 40 Q32 50 42 40" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></svg></div>
+                <div style="font-size:17px;font-weight:800;color:#1b6b1b">Reading within target</div>
+                <div class="muted">5.3 NTU drop · Fix is holding for 4 min</div>
+              </div>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <button class="btn green">✓ Pass</button>
+                <button class="btn red">✗ Fail</button>
+              </div>
+              <div class="muted" style="text-align:center;margin-top:8px">Pass → Supervisor approval · Fail → Escalate</div>
+
+            </div></div>
+          </div>
+        </div>
+        <aside class="screen-aside">
+          <h3>Before / After framing</h3>
+          <ul>
+            <li>Two reading cards make causality obvious without numeracy work.</li>
+            <li>Threshold bar gives non-technical operators a visual “green zone”.</li>
+            <li>Pass routes to approval automatically — the operator never picks the next state.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN 10 — Issue Close ============ -->
+    <section class="screen" id="s10">
+      <div class="screen-shell">
+        <div>
+          <h2 class="screen-title">10 · Issue Close</h2>
+          <div class="screen-sub">Summary + optional close reason + evidence</div>
+          <div class="frame">
+            <div class="status-bar"><span>9:41</span><span>● ● ● 5G</span></div>
+            <div class="topbar">
+              <div class="back">←</div>
+              <div class="ttl">Close issue<small>DT-001 · Resolved</small></div>
+              <span class="pill">SUMMARY</span>
+            </div>
+            <div class="scroll"><div class="pad">
+
+              <div class="card" style="text-align:center;padding:20px">
+                <div class="mascot lg" style="margin:0 auto 10px;background:linear-gradient(180deg,#ffba00,#e89500)"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="none" stroke="#fff" stroke-width="3"/><polygon points="20,26 26,18 26,30" fill="#fff"/><polygon points="44,26 38,18 38,30" fill="#fff"/><path d="M22 40 Q32 50 42 40" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></svg></div>
+                <div style="font-size:18px;font-weight:800;color:var(--navy)">बढ़िया! Issue resolved</div>
+                <div class="muted">Diffuser Fouling · 28 min total</div>
+              </div>
+
+              <div class="card">
+                <div class="h-eyebrow">Summary</div>
+                <ul class="ulist">
+                  <li><span class="b">⚠</span> What happened — MBR-1 turbidity rose to 8.4 NTU</li>
+                  <li><span class="b">🛠</span> What fixed it — Cleaned diffuser grid (citric)</li>
+                  <li><span class="b">👤</span> Who — Ravi (operator) · Anita (assist)</li>
+                  <li><span class="b">⏱</span> Total time — 28 min · 7 min wait</li>
+                </ul>
+              </div>
+
+              <div class="card">
+                <div class="h-eyebrow">Close reason</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
+                  <div class="tile sel">✓ Confirmed cause</div>
+                  <div class="tile">Other</div>
+                  <div class="tile">False alarm</div>
+                  <div class="tile">Not this</div>
+                </div>
+              </div>
+
+              <button class="btn green">Submit to Supervisor</button>
+              <button class="btn ghost" style="margin-top:8px">📷 Add photo of fix · 🎙 Voice note</button>
+
+            </div></div>
+          </div>
+        </div>
+        <aside class="screen-aside">
+          <h3>Closure as celebration</h3>
+          <ul>
+            <li>Mascot shifts to a celebrating mood — Duolingo-style positive close.</li>
+            <li>Four close-reasons cover real outcomes (incl. false alarm and disagreement).</li>
+            <li>Voice/photo are optional but visible — easier to add than to retro-fit.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN 11 — Supervisor Dashboard (desktop) ============ -->
+    <section class="screen" id="s11">
+        <h2 class="screen-title">11 · Supervisor Dashboard (Desktop)</h2>
+        <div class="screen-sub">Live operational command centre · Office-based supervisor</div>
+
+        <div class="desktop-frame">
+          <div class="tabbar">
+            <span class="dot"></span><span class="dot y"></span><span class="dot g"></span>
+            <span style="margin-left:14px">Digital Paani · Supervisor</span>
+            <span class="url">app.digitalpaani.com/supervisor</span>
+          </div>
+          <div class="ds-body">
+            <aside class="ds-side">
+              <h4>Plants</h4>
+              <a class="on">Tarn Taran STP</a>
+              <a>Sonepat STP</a>
+              <a>Manesar Industrial</a>
+              <h4 style="margin-top:18px">Views</h4>
+              <a class="on">Live</a>
+              <a>Approvals (3)</a>
+              <a>Held open (2)</a>
+              <a>Failed verifications</a>
+              <a>Audit log</a>
+            </aside>
+            <div class="ds-main">
+              <div class="ds-h">
+                <div>
+                  <h2>Tarn Taran STP · Live</h2>
+                  <div style="color:var(--muted);font-size:13px">14 open · 3 critical · 4 operators on shift</div>
+                </div>
+                <div style="display:flex;gap:8px">
+                  <button class="btn ghost sm" style="width:auto">Export</button>
+                  <button class="btn primary sm" style="width:auto">Broadcast note</button>
+                </div>
+              </div>
+
+              <div class="kpi-row">
+                <div class="kpi"><div class="l">Open</div><div class="v">14</div><div class="d">▲ 2 vs yesterday</div></div>
+                <div class="kpi"><div class="l">Awaiting approval</div><div class="v">3</div><div class="d">oldest 6 min</div></div>
+                <div class="kpi"><div class="l">Held open</div><div class="v">2</div><div class="d">manual remediation</div></div>
+                <div class="kpi"><div class="l">Avg time-to-close</div><div class="v">22m</div><div class="d">▼ 4m WoW</div></div>
+              </div>
+
+              <div class="ds-grid">
+                <div class="panel">
+                  <h3>Active operators</h3>
+                  <table class="ops">
+                    <thead><tr><th>Operator</th><th>Issue</th><th>Step</th><th>State</th><th>Updated</th></tr></thead>
+                    <tbody>
+                      <tr><td>Ravi K.</td><td>DT-001 · MBR-1 turbidity</td><td>Remediation 4/6</td><td><span class="state wait">WAITING</span></td><td>30s ago</td></tr>
+                      <tr><td>Anita P.</td><td>AT-209 · DO low</td><td>Diagnostic 3/5</td><td><span class="state">IN_PROGRESS</span></td><td>just now</td></tr>
+                      <tr><td>Meena S.</td><td>P-3 vibration</td><td>Photo capture</td><td><span class="state">IN_PROGRESS</span></td><td>2m ago</td></tr>
+                      <tr><td>Rohan T.</td><td>Blower-2 restart</td><td>Verified</td><td><span class="state pending">PENDING_APPROVAL</span></td><td>4m ago</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="panel">
+                  <h3>Approval queue</h3>
+                  <div class="issue" style="box-shadow:none;border:1px solid var(--line)">
+                    <div class="row1">
+                      <span class="sev high">HIGH</span>
+                      <span class="state pending">PENDING</span>
+                      <span style="margin-left:auto" class="muted">6 min</span>
+                    </div>
+                    <h4>Blower-2 restart · Rohan</h4>
+                    <div class="muted" style="font-size:11.5px">Verified DO 7.2 mg/L · photo attached</div>
+                    <div style="display:flex;gap:6px;margin-top:8px">
+                      <button class="btn green sm">Approve</button>
+                      <button class="btn red sm">Reject</button>
+                      <button class="btn blue sm">Reassign</button>
+                    </div>
+                  </div>
+                  <div class="issue" style="box-shadow:none;border:1px solid var(--line)">
+                    <div class="row1">
+                      <span class="sev medium">MED</span>
+                      <span class="state pending">PENDING</span>
+                      <span style="margin-left:auto" class="muted">12 min</span>
+                    </div>
+                    <h4>Chlorine dose change · Meena</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </section>
+
+    <!-- ============ SCREEN 12 — Approval Flow ============ -->
+    <section class="screen" id="s12">
+      <div class="screen-shell">
+        <div>
+          <h2 class="screen-title">12 · Approval Flow</h2>
+          <div class="screen-sub">Supervisor reviews operator's submission</div>
+          <div class="frame">
+            <div class="status-bar"><span>9:41</span><span>● ● ● 5G</span></div>
+            <div class="topbar">
+              <div class="back">←</div>
+              <div class="ttl">Approval<small>BLR-2 · Restart verified</small></div>
+              <span class="pill">PENDING</span>
+            </div>
+            <div class="scroll"><div class="pad">
+
+              <div class="card">
+                <div class="h-eyebrow">Issue</div>
+                <div class="h-title">Blower-2 restart</div>
+                <div class="row" style="margin-top:4px">
+                  <span class="sev high">HIGH</span>
+                  <span class="muted">·  6 min open · 11 min remediation</span>
+                </div>
+              </div>
+
+              <div class="card" style="border-left:4px solid var(--orange)">
+                <div class="h-eyebrow" style="color:var(--orange)">Risk reason</div>
+                <div class="h-sub">Restart involves overriding the safety interlock — supervisor sign-off required per SOP-22.</div>
+              </div>
+
+              <div class="card">
+                <div class="h-eyebrow">Operator</div>
+                <div class="row between">
+                  <div>
+                    <div class="h-title" style="font-size:16px">Rohan T.</div>
+                    <div class="muted">12 prior approvals · 100% pass</div>
+                  </div>
+                  <span class="presence"><span class="av">R</span> On shift</span>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="h-eyebrow">Evidence</div>
+                <div style="display:flex;gap:8px;margin-top:6px">
+                  <div style="flex:1;aspect-ratio:1;background:linear-gradient(135deg,#5b6a8a,#2d3e63);border-radius:8px"></div>
+                  <div style="flex:1;aspect-ratio:1;background:linear-gradient(135deg,#7a8aa0,#4a5d7a);border-radius:8px"></div>
+                  <div style="flex:1;aspect-ratio:1;background:linear-gradient(135deg,#94a4c0,#5e7090);border-radius:8px"></div>
+                </div>
+                <div class="muted" style="margin-top:8px">Last reading · DO <b style="color:var(--green)">7.2 mg/L</b> (target ≥ 6)</div>
+              </div>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <button class="btn green">✓ Approve</button>
+                <button class="btn red">✗ Reject</button>
+              </div>
+              <button class="btn blue" style="margin-top:8px">↻ Reassign to another operator</button>
+
+            </div></div>
+          </div>
+        </div>
+        <aside class="screen-aside">
+          <h3>Decisions in seconds</h3>
+          <ul>
+            <li>Risk reason and SOP link are surfaced first — supervisor knows <em>why</em> they're being asked.</li>
+            <li>Operator track-record contextualises trust.</li>
+            <li>Three exits — Approve / Reject / Reassign — match the brief exactly.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN 13 — History / Timeline ============ -->
+    <section class="screen" id="s13">
+      <div class="screen-shell">
+        <div>
+          <h2 class="screen-title">13 · Issue History / Timeline</h2>
+          <div class="screen-sub">Full audit log per issue · WhatsApp-like vertical flow</div>
+          <div class="frame">
+            <div class="status-bar"><span>9:41</span><span>● ● ● 5G</span></div>
+            <div class="topbar">
+              <div class="back">←</div>
+              <div class="ttl">DT-001 · History<small>MBR-1 Outlet Turbidity</small></div>
+              <span class="pill">RESOLVED</span>
+            </div>
+            <div class="scroll"><div class="pad">
+
+              <div class="card tight">
+                <ul class="tl">
+                  <li class="ok">
+                    <div class="ev">Issue opened (sensor)</div>
+                    <div class="dt">9:21 AM · Turbidity 8.4 NTU</div>
+                  </li>
+                  <li>
+                    <div class="ev">Anita claimed</div>
+                    <div class="dt">9:24 AM</div>
+                  </li>
+                  <li class="warn">
+                    <div class="ev">Step 1 skipped</div>
+                    <div class="dt">9:25 AM · Sensor data unavailable</div>
+                  </li>
+                  <li>
+                    <div class="ev">Diagnostic Q2 answered — Foam: brown</div>
+                    <div class="dt">9:28 AM · by Anita</div>
+                  </li>
+                  <li>
+                    <div class="ev">Root cause confirmed — Diffuser Fouling</div>
+                    <div class="dt">9:32 AM</div>
+                  </li>
+                  <li>
+                    <div class="ev">Remediation started</div>
+                    <div class="dt">9:33 AM · Hand-off to Ravi</div>
+                  </li>
+                  <li class="ok">
+                    <div class="ev">Photo uploaded · cleaned grid</div>
+                    <div class="dt">9:36 AM</div>
+                  </li>
+                  <li>
+                    <div class="ev">WAIT started · 30 min settling</div>
+                    <div class="dt">9:38 AM</div>
+                  </li>
+                  <li class="ok">
+                    <div class="ev">Verification PASSED · 3.1 NTU</div>
+                    <div class="dt">9:45 AM · early-checked</div>
+                  </li>
+                  <li class="ok">
+                    <div class="ev">Approved · Supervisor M. Khan</div>
+                    <div class="dt">9:49 AM</div>
+                  </li>
+                  <li class="ok">
+                    <div class="ev">Issue closed · Confirmed cause</div>
+                    <div class="dt">9:49 AM · total 28 min</div>
+                  </li>
+                </ul>
+              </div>
+
+            </div></div>
+          </div>
+        </div>
+        <aside class="screen-aside">
+          <h3>Audit trail, readable</h3>
+          <ul>
+            <li>Dot colour encodes outcome: blue = neutral, green = OK, orange = warn, red = fail.</li>
+            <li>Skips and early-checks are first-class events, not buried.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN 14 — Report Issue ============ -->
+    <section class="screen" id="s14">
+      <div class="screen-shell">
+        <div>
+          <h2 class="screen-title">14 · Report Issue</h2>
+          <div class="screen-sub">Operator-created issues (not sensor-triggered)</div>
+          <div class="frame">
+            <div class="status-bar"><span>9:41</span><span>● ● ● 5G</span></div>
+            <div class="topbar">
+              <div class="back">←</div>
+              <div class="ttl">Report new issue<small>Manual report · routes to queue</small></div>
+              <span class="pill">NEW</span>
+            </div>
+            <div class="scroll"><div class="pad">
+
+              <div class="card">
+                <div class="h-eyebrow">Equipment</div>
+                <input class="input" placeholder="Search equipment, or scan QR…" />
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+                  <span class="tile" style="padding:6px 10px;font-size:11px">Blower-2</span>
+                  <span class="tile sel" style="padding:6px 10px;font-size:11px">MBR-1</span>
+                  <span class="tile" style="padding:6px 10px;font-size:11px">Pump P-3</span>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="h-eyebrow">Problem type</div>
+                <div class="tile-grid">
+                  <div class="tile"><span class="pg">💧</span>Leak</div>
+                  <div class="tile sel"><span class="pg">📈</span>Reading high</div>
+                  <div class="tile"><span class="pg">🔊</span>Noise</div>
+                  <div class="tile"><span class="pg">🌫</span>Smell</div>
+                  <div class="tile"><span class="pg">🛑</span>Stopped</div>
+                  <div class="tile"><span class="pg">⚠</span>Other</div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="h-eyebrow">Add evidence (optional)</div>
+                <div style="display:flex;gap:8px">
+                  <button class="btn ghost" style="flex:1">📷 Photo</button>
+                  <button class="btn ghost" style="flex:1">🎙 Voice</button>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="h-eyebrow">Severity</div>
+                <div style="display:flex;gap:6px">
+                  <span class="sev critical" style="cursor:pointer">CRITICAL</span>
+                  <span class="sev high" style="cursor:pointer">HIGH</span>
+                  <span class="sev medium" style="cursor:pointer">MED</span>
+                  <span class="sev low" style="cursor:pointer;opacity:.5">LOW</span>
+                </div>
+              </div>
+
+              <button class="btn primary">Submit to queue</button>
+              <div class="muted" style="text-align:center;margin-top:8px">Will sync when online · saved locally now</div>
+
+            </div></div>
+          </div>
+        </div>
+        <aside class="screen-aside">
+          <h3>Manual entry, frictionless</h3>
+          <ul>
+            <li>Equipment chips remember recent picks — fewer keystrokes outdoors.</li>
+            <li>Problem categories use the pictogram library directly (brief §7).</li>
+            <li>Voice note is one tap — works when typing is impossible.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // Sidebar nav
+  const links = document.querySelectorAll('.nav a[data-go]');
+  const screens = document.querySelectorAll('.screen');
+  links.forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const id = a.dataset.go;
+      links.forEach(l => l.classList.toggle('active', l === a));
+      screens.forEach(s => s.classList.toggle('on', s.id === id));
+      document.getElementById('stage').scrollTo({top:0,behavior:'smooth'});
+    });
+  });
+
+  // Allow simple tile toggle as a tiny prototype delight
+  document.addEventListener('click', e => {
+    const tile = e.target.closest('.tile');
+    if (!tile) return;
+    const grid = tile.parentElement;
+    if (!grid || !grid.classList.contains('tile-grid')) return;
+    grid.querySelectorAll('.tile').forEach(t => t.classList.remove('sel'));
+    tile.classList.add('sel');
+  });
+</script>
+</body>
+</html>
