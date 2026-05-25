@@ -113,15 +113,22 @@
         <button onclick="goStep('equipment')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100 font-semibold">📦 Equipment Card · MBR-1</button>
       </nav>
 
-      <div class="mt-4 text-[11px] uppercase tracking-wider text-ink-500 font-semibold">DT-002 · DO Low · Flow 1</div>
+      <div class="mt-4 text-[11px] uppercase tracking-wider text-ink-500 font-semibold">DT-002 · DO Low · All flows</div>
       <nav class="mt-2 flex flex-col gap-1 text-xs">
-        <button onclick="goStep('preview')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">Plan · Sensor A + 6 causes</button>
-        <button onclick="goStep('dStep1')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">Step 1 · Blower ON check</button>
-        <button onclick="goStep('dStep2')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">Step 2 · Blower Performance</button>
-        <button onclick="goStep('blowerOk')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">Blower OK → next flow</button>
+        <button onclick="goStep('preview')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100 font-semibold">Plan · Sensor A + 6 causes</button>
+        <button onclick="goStep('dStep1')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">F1 Step 1 · Blower ON</button>
+        <button onclick="goStep('dStep2')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">F1 Step 2 · Blower Perf.</button>
+        <button onclick="goStep('blowerOk')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100 italic" style="color:#64748B">↳ Flow 1 ✓</button>
+        <button onclick="goStep('dStep3')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">F2 · Diffuser bubbling</button>
+        <button onclick="goStep('diffuserOk')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100 italic" style="color:#64748B">↳ Flow 2 ✓</button>
+        <button onclick="goStep('dStep4')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">F3 · DO Sensor verify</button>
+        <button onclick="goStep('sensorOk')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100 italic" style="color:#64748B">↳ Flow 3 ✓</button>
+        <button onclick="goStep('dStep5')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">F4 · SV-30 Sludge</button>
+        <button onclick="goStep('sludgeOk')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100 italic" style="color:#64748B">↳ Flow 4 ✓</button>
+        <button onclick="goStep('dStep6')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">F5 · Shock Load (COD)</button>
+        <button onclick="goStep('allClear')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100" style="color:#E85A45">⚠ All-clear · Escalate</button>
         <button onclick="goStep('fallback')" class="text-left px-3 py-2 rounded-lg hover:bg-slate-100">Fallback (no tools)</button>
       </nav>
-      <div class="mt-2 text-[10px] italic" style="color:#94A3B8">Flows 2-6 (Diffuser, Sensor, Sludge, Shock) — coming soon</div>
 
       <div class="mt-4 text-[11px] uppercase tracking-wider text-ink-500 font-semibold">Root Cause + Remediation</div>
       <nav class="mt-2 flex flex-col gap-1 text-xs">
@@ -1425,34 +1432,396 @@ const steps = {
   },
 
   blowerOk: {
-    n:2, label:'Blower ठीक है · अगला कारण',
+    n:2, label:'Flow 1 ✓ · अगला कारण',
     mascot:'thinking',
-    say:'Blower ठीक है। अब अगले कारण — diffuser और bubbling — पर जाते हैं।',
+    say:'Blower ठीक है। अब अगला कारण देखते हैं — Diffuser और bubbling।',
     render: () => `
       <div class="card p-5" style="background:linear-gradient(160deg,#FFFFFF,#DCFCE7);border:1.5px solid #51BD55">
         <div class="text-center py-2">
           <div class="text-4xl mb-2">✓</div>
-          <h2 class="hi-lg mt-1" style="color:#14532D">Blower ठीक है</h2>
-          <div class="text-sm mt-1" style="color:#15803D">यह कारण नहीं है</div>
+          <h2 class="hi-lg mt-1" style="color:#14532D">Flow 1 ख़त्म</h2>
+          <div class="text-sm mt-1" style="color:#15803D">Blower ठीक है — यह कारण नहीं है</div>
         </div>
-
         <div class="mt-4 p-3 rounded-2xl" style="background:#FFFFFF;border:1px solid #BBF7D0">
-          <div class="label-tiny mb-1" style="color:#15803D">अब अगला कारण देखें</div>
+          <div class="label-tiny mb-1" style="color:#15803D">अगला कारण</div>
           <div class="font-serif font-semibold text-sm">Diffuser bubbling / dead zones</div>
-          <div class="text-[11px] mt-1" style="color:#64748B">Cause 2 of 6 · Basic skill · कोई tool नहीं</div>
+          <div class="text-[11px] mt-1" style="color:#64748B">Cause 3 of 6 · Basic · कोई tool नहीं · 2 मिनट</div>
         </div>
+        <button onclick="goStep('dStep3')" class="btn-paani tap-scale mt-4">
+          <span>→</span> Flow 2 · Diffuser देखें
+        </button>
+        <button onclick="goStep('home')" class="mt-2 w-full py-2.5 text-xs font-serif font-semibold" style="color:#64748B">🏠 घर वापस</button>
+      </div>`
+  },
 
-        <div class="mt-4 p-3 rounded-2xl" style="background:#FFFBEB;border:1px solid #FCD34D">
-          <div class="text-[11px] font-serif" style="color:#92400E">
-            <strong>नोट:</strong> Flow 2 (Diffuser bubbling) अभी build नहीं हुआ है। Product team अगला flow design कर रही है।
+  /* ============ FLOW 2: Diffuser bubbling / Dead zones (TERMINAL escalate) ============ */
+  dStep3: {
+    n:3, label:'Step 3 · Diffuser bubbling',
+    mascot:'curious',
+    say:'Tank के ऊपर देखिए — बुलबुले हर जगह बराबर हैं या कुछ जगह नहीं हैं?',
+    render: () => stepHead(3, 6, 'OBSERVATION') + `
+      <div class="card p-3 mb-2" style="background:#EFF6FF;border:1px solid #BFDBFE">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="chip" style="background:#FFFFFF;color:#1E40AF">🟢 Basic skill</span>
+          <span class="chip" style="background:#FFFFFF;color:#1E40AF">🔧 कोई tool नहीं</span>
+          <span class="chip" style="background:#FFFFFF;color:#1E40AF">⏱ 2 मिनट</span>
+        </div>
+      </div>
+      <div class="card p-4">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-xl">💨</span>
+          <div class="label-tiny" style="color:#3B82F6">Flow 2 / 5 · Cause 3 of 6</div>
+        </div>
+        <div class="hi-lg leading-tight mb-1">Tank surface पर<br/>bubbling एक समान है?</div>
+        <div class="text-[11px] mt-1 font-serif italic" style="color:#94A3B8">EN: Is the aeration even across the tank surface?</div>
+
+        <!-- Visual comparison: even vs dead zones -->
+        <div class="mt-4 grid grid-cols-2 gap-2">
+          <div class="rounded-2xl p-3 text-center" style="background:#DCFCE7;border:1.5px solid #51BD55">
+            <svg viewBox="0 0 100 60" class="w-full h-16">
+              <rect x="5" y="20" width="90" height="35" rx="3" fill="#7DD3FC" stroke="#0284C7" stroke-width="1.5"/>
+              <circle cx="15" cy="18" r="3" fill="#FFFFFF" opacity=".9"/>
+              <circle cx="28" cy="20" r="3" fill="#FFFFFF" opacity=".9"/>
+              <circle cx="42" cy="18" r="3" fill="#FFFFFF" opacity=".9"/>
+              <circle cx="55" cy="20" r="3" fill="#FFFFFF" opacity=".9"/>
+              <circle cx="68" cy="18" r="3" fill="#FFFFFF" opacity=".9"/>
+              <circle cx="82" cy="20" r="3" fill="#FFFFFF" opacity=".9"/>
+              <circle cx="20" cy="14" r="2" fill="#FFFFFF" opacity=".7"/>
+              <circle cx="48" cy="13" r="2" fill="#FFFFFF" opacity=".7"/>
+              <circle cx="75" cy="14" r="2" fill="#FFFFFF" opacity=".7"/>
+            </svg>
+            <div class="text-[11px] mt-1 font-serif font-bold" style="color:#15803D">✓ एक समान</div>
+            <div class="text-[9px]" style="color:#15803D">हर जगह bubbles</div>
+          </div>
+          <div class="rounded-2xl p-3 text-center" style="background:#FEF2F2;border:1.5px solid #E85A45">
+            <svg viewBox="0 0 100 60" class="w-full h-16">
+              <rect x="5" y="20" width="90" height="35" rx="3" fill="#7DD3FC" stroke="#0284C7" stroke-width="1.5"/>
+              <circle cx="15" cy="18" r="3" fill="#FFFFFF" opacity=".9"/>
+              <circle cx="28" cy="20" r="3" fill="#FFFFFF" opacity=".9"/>
+              <rect x="38" y="22" width="20" height="30" fill="#7F1D1D" opacity=".25" rx="2"/>
+              <text x="48" y="40" text-anchor="middle" font-size="6" fill="#7F1D1D" font-weight="700">DEAD</text>
+              <circle cx="68" cy="18" r="3" fill="#FFFFFF" opacity=".9"/>
+              <circle cx="82" cy="20" r="3" fill="#FFFFFF" opacity=".9"/>
+            </svg>
+            <div class="text-[11px] mt-1 font-serif font-bold" style="color:#7F1D1D">⚠ Dead zones</div>
+            <div class="text-[9px]" style="color:#7F1D1D">कुछ जगह bubbles नहीं</div>
           </div>
         </div>
 
-        <button onclick="showToast('Flow 2 coming soon...')" class="btn-paani tap-scale mt-4" style="background:linear-gradient(140deg,#3B82F6,#1E40AF)">
-          <span>→</span> Flow 2 पर जाएँ (placeholder)
+        <div class="mt-4 p-3 rounded-2xl flex gap-2.5" style="background:#F5F9FF">
+          <span class="text-lg flex-shrink-0">👂</span>
+          <div class="text-[11px] font-serif" style="color:#334155">
+            <strong>पहचानें:</strong> Tank के चारों कोनों तक चलकर देखें। अगर कहीं भी पानी शांत है (no bubbles), तो diffuser में blockage है।
+          </div>
+          ${soundBtn('Tank के चारों कोनों तक देखें। पानी कहीं भी शांत हो तो diffuser में blockage है।')}
+        </div>
+
+        <div class="mt-4">
+          <div class="label-tiny mb-2">क्या bubbling एक समान है?</div>
+          ${yesNoBig("goStep('diffuserOk')", "terminate('diffuser_dead_zones',0.75,'Dead zones in aeration — diffuser में blockage है। Supervisor की मदद चाहिए — यह specialist work है।')")}
+        </div>
+        ${stepFooterBtns()}
+      </div>`
+  },
+
+  diffuserOk: {
+    n:3, label:'Flow 2 ✓ · अगला कारण',
+    mascot:'thinking',
+    say:'Diffuser ठीक है। अब DO sensor की verify करते हैं।',
+    render: () => `
+      <div class="card p-5" style="background:linear-gradient(160deg,#FFFFFF,#DCFCE7);border:1.5px solid #51BD55">
+        <div class="text-center py-2">
+          <div class="text-4xl mb-2">✓</div>
+          <h2 class="hi-lg mt-1" style="color:#14532D">Flow 2 ख़त्म</h2>
+          <div class="text-sm mt-1" style="color:#15803D">Diffuser ठीक है — bubbling एक समान</div>
+        </div>
+        <div class="mt-4 p-3 rounded-2xl" style="background:#FFFFFF;border:1px solid #BBF7D0">
+          <div class="label-tiny mb-1" style="color:#15803D">अगला कारण</div>
+          <div class="font-serif font-semibold text-sm">DO sensor verify करें</div>
+          <div class="text-[11px] mt-1" style="color:#64748B">Cause 4 of 6 · Intermediate · Manual DO kit चाहिए · 5 मिनट</div>
+        </div>
+        <button onclick="goStep('dStep4')" class="btn-paani tap-scale mt-4">→ Flow 3 · Sensor verify</button>
+        <button onclick="goStep('home')" class="mt-2 w-full py-2.5 text-xs font-serif font-semibold" style="color:#64748B">🏠 घर वापस</button>
+      </div>`
+  },
+
+  /* ============ FLOW 3: DO sensor verify (manual DO kit) ============ */
+  dStep4: {
+    n:4, label:'Step 4 · DO Sensor verify',
+    mascot:'thinking',
+    say:'Manual DO kit से reading लीजिए और sensor से compare करें।',
+    render: () => stepHead(4, 6, 'INSTRUMENT_READING') + `
+      <div class="card p-3 mb-2" style="background:#FFFBEB;border:1px solid #FCD34D">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="chip" style="background:#FFFFFF;color:#92400E">🟡 Intermediate skill</span>
+          <span class="chip" style="background:#FFFFFF;color:#92400E">🔧 3 tools</span>
+          <span class="chip" style="background:#FFFFFF;color:#92400E">⏱ 5 मिनट</span>
+        </div>
+        <div class="text-[10px] mt-2" style="color:#92400E">Tools चाहिए: Manual DO kit · साफ़ पानी · Tissue paper</div>
+        <button onclick="goStep('fallback')" class="mt-2 text-[10px] font-bold px-2 py-1 rounded-full" style="background:#FFFFFF;color:#92400E;border:1px solid #FCD34D">Tools नहीं हैं → Skip करें</button>
+      </div>
+
+      <div class="card p-4">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-xl">📟</span>
+          <div class="label-tiny" style="color:#92400E">Flow 3 / 5 · Cause 4 of 6</div>
+        </div>
+        <div class="hi-lg leading-tight mb-1">Manual DO reading<br/>लीजिए</div>
+        <div class="text-[11px] mt-1 font-serif italic" style="color:#94A3B8">EN: Take a manual DO reading at the same point as the sensor</div>
+
+        <!-- Sensor vs manual -->
+        <div class="mt-4 grid grid-cols-2 gap-2">
+          <div class="rounded-2xl p-3" style="background:#FEF2F2;border:1px solid #FCA5A5">
+            <div class="label-tiny" style="color:#7F1D1D">Sensor (अभी)</div>
+            <div class="font-serif text-2xl font-bold mt-0.5" style="color:#E85A45">0.8</div>
+            <div class="text-[10px]" style="color:#7F1D1D">mg/L</div>
+          </div>
+          <div class="rounded-2xl p-3" style="background:#F5F9FF;border:1px solid #BFDBFE">
+            <div class="label-tiny" style="color:#1E40AF">Manual reading</div>
+            <div class="flex items-stretch gap-1 mt-1">
+              <input id="manDoIn" type="number" step="0.1" placeholder="?" inputmode="decimal"
+                class="flex-1 px-2 py-1 rounded-xl font-serif text-2xl font-bold"
+                style="background:#FFFFFF;border:1.5px solid #BFDBFE;color:#0F172A;outline:none;width:60px"/>
+            </div>
+            <div class="text-[10px] mt-1" style="color:#1E40AF">mg/L</div>
+          </div>
+        </div>
+
+        <div class="mt-4 p-3 rounded-2xl flex gap-2.5" style="background:#F5F9FF">
+          <span class="text-lg flex-shrink-0">👂</span>
+          <div class="text-[11px] font-serif" style="color:#334155">
+            <strong>पहचानें:</strong> अगर manual reading sensor से बहुत अलग है (फ़र्क़ 0.5 से ज़्यादा), तो sensor खराब है — calibration नहीं हुई।
+          </div>
+          ${soundBtn('अगर manual और sensor reading में बहुत फ़र्क़ है, तो sensor खराब है।')}
+        </div>
+
+        <button onclick="submitManDo()" class="btn-paani tap-scale mt-4"><span>✓</span> आगे बढ़ें</button>
+        ${stepFooterBtns()}
+      </div>`,
+    onShow: () => {
+      window.submitManDo = () => {
+        const v = parseFloat(document.getElementById('manDoIn').value);
+        if (isNaN(v)) { showToast('Reading भरें'); return; }
+        const sensor = 0.8;
+        const diff = Math.abs(v - sensor);
+        if (diff > 0.5) terminate('do_sensor_failure', 0.7, 'Manual DO reading ' + v.toFixed(1) + ' mg/L is far from sensor ' + sensor + ' mg/L — sensor calibration या membrane खराब है।');
+        else goStep('sensorOk');
+      };
+    }
+  },
+
+  sensorOk: {
+    n:4, label:'Flow 3 ✓ · अगला कारण',
+    mascot:'thinking',
+    say:'Sensor ठीक है। अब sludge देखते हैं।',
+    render: () => `
+      <div class="card p-5" style="background:linear-gradient(160deg,#FFFFFF,#DCFCE7);border:1.5px solid #51BD55">
+        <div class="text-center py-2">
+          <div class="text-4xl mb-2">✓</div>
+          <h2 class="hi-lg mt-1" style="color:#14532D">Flow 3 ख़त्म</h2>
+          <div class="text-sm mt-1" style="color:#15803D">Sensor ठीक है — reading सही है</div>
+        </div>
+        <div class="mt-4 p-3 rounded-2xl" style="background:#FFFFFF;border:1px solid #BBF7D0">
+          <div class="label-tiny mb-1" style="color:#15803D">अगला कारण</div>
+          <div class="font-serif font-semibold text-sm">Sludge bulking (SV-30)</div>
+          <div class="text-[11px] mt-1" style="color:#64748B">Cause 5 of 6 · Intermediate · SV-30 kit + MLSS · 30+ मिनट</div>
+        </div>
+        <button onclick="goStep('dStep5')" class="btn-paani tap-scale mt-4">→ Flow 4 · SV-30 test</button>
+        <button onclick="goStep('home')" class="mt-2 w-full py-2.5 text-xs font-serif font-semibold" style="color:#64748B">🏠 घर वापस</button>
+      </div>`
+  },
+
+  /* ============ FLOW 4: Sludge bulking (SV-30 + MLSS) ============ */
+  dStep5: {
+    n:5, label:'Step 5 · SV-30 Sludge',
+    mascot:'thinking',
+    say:'SV-30 settling test कीजिए। 30 मिनट बाद reading लीजिए और लिखिए।',
+    render: () => stepHead(5, 6, 'INSTRUMENT_READING') + `
+      <div class="card p-3 mb-2" style="background:#FFFBEB;border:1px solid #FCD34D">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="chip" style="background:#FFFFFF;color:#92400E">🟡 Intermediate skill</span>
+          <span class="chip" style="background:#FFFFFF;color:#92400E">🔧 2 tools</span>
+          <span class="chip" style="background:#FFFFFF;color:#92400E">⏱ 30+ मिनट</span>
+        </div>
+        <div class="text-[10px] mt-2" style="color:#92400E">Tools चाहिए: SV-30 kit (1L measuring cylinder) · MLSS system</div>
+        <button onclick="goStep('fallback')" class="mt-2 text-[10px] font-bold px-2 py-1 rounded-full" style="background:#FFFFFF;color:#92400E;border:1px solid #FCD34D">Tools नहीं हैं → Skip करें</button>
+      </div>
+
+      <div class="card p-4">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-xl">🧪</span>
+          <div class="label-tiny" style="color:#92400E">Flow 4 / 5 · Cause 5 of 6</div>
+        </div>
+        <div class="hi-lg leading-tight mb-1">SV-30 reading<br/>लिखिए</div>
+        <div class="text-[11px] mt-1 font-serif italic" style="color:#94A3B8">EN: Enter the SV-30 settled sludge volume after 30 minutes</div>
+
+        <div class="mt-4 p-3 rounded-3xl" style="background:#F5F9FF;border:1px solid #E2E8F0">
+          <div class="flex items-center justify-between mb-2">
+            <div class="label-tiny">SV-30 (30-min settled volume)</div>
+            <span class="text-[10px]" style="color:#64748B">सामान्य: &lt; 350 mL/L</span>
+          </div>
+          <div class="flex items-stretch gap-2">
+            <input id="svIn" type="number" step="1" placeholder="280" inputmode="decimal"
+              class="flex-1 px-4 py-3 rounded-2xl font-serif text-2xl font-semibold"
+              style="background:#FFFFFF;border:1.5px solid #BFDBFE;outline:none"/>
+            <div class="flex items-center px-4 rounded-2xl font-serif font-semibold text-sm" style="background:#DBEAFE;color:#1E40AF">mL/L</div>
+          </div>
+        </div>
+
+        <div class="mt-4 p-3 rounded-2xl flex gap-2.5" style="background:#F5F9FF">
+          <span class="text-lg flex-shrink-0">👂</span>
+          <div class="text-[11px] font-serif" style="color:#334155">
+            <strong>पहचानें:</strong> 1L sample 30 मिनट तक settle होने दें। अगर settled sludge 350 mL से ज़्यादा है, तो bulking है — sludge ठीक से settle नहीं हो रहा।
+          </div>
+          ${soundBtn('SV-30 अगर 350 से ज़्यादा हो तो sludge bulking है।')}
+        </div>
+
+        <button onclick="submitSv()" class="btn-paani tap-scale mt-4"><span>✓</span> आगे बढ़ें</button>
+        ${stepFooterBtns()}
+      </div>`,
+    onShow: () => {
+      window.submitSv = () => {
+        const v = parseFloat(document.getElementById('svIn').value);
+        if (isNaN(v)) { showToast('Reading भरें'); return; }
+        if (v > 350) terminate('sludge_bulking', 0.65, 'SV-30 = ' + v + ' mL/L — sludge ठीक से settle नहीं हो रहा। यह filamentous bulking है, oxygen demand को बढ़ा रहा है।');
+        else goStep('sludgeOk');
+      };
+    }
+  },
+
+  sludgeOk: {
+    n:5, label:'Flow 4 ✓ · अगला कारण',
+    mascot:'thinking',
+    say:'Sludge ठीक से settle हो रहा है। अब last cause — shock load।',
+    render: () => `
+      <div class="card p-5" style="background:linear-gradient(160deg,#FFFFFF,#DCFCE7);border:1.5px solid #51BD55">
+        <div class="text-center py-2">
+          <div class="text-4xl mb-2">✓</div>
+          <h2 class="hi-lg mt-1" style="color:#14532D">Flow 4 ख़त्म</h2>
+          <div class="text-sm mt-1" style="color:#15803D">Sludge bulking नहीं है</div>
+        </div>
+        <div class="mt-4 p-3 rounded-2xl" style="background:#FFFFFF;border:1px solid #BBF7D0">
+          <div class="label-tiny mb-1" style="color:#15803D">आख़िरी कारण</div>
+          <div class="font-serif font-semibold text-sm">High shock load (Inlet)</div>
+          <div class="text-[11px] mt-1" style="color:#64748B">Cause 6 of 6 · COD kit चाहिए (अभी available नहीं)</div>
+        </div>
+        <button onclick="goStep('dStep6')" class="btn-paani tap-scale mt-4">→ Flow 5 · Shock Load</button>
+        <button onclick="goStep('home')" class="mt-2 w-full py-2.5 text-xs font-serif font-semibold" style="color:#64748B">🏠 घर वापस</button>
+      </div>`
+  },
+
+  /* ============ FLOW 5: High shock load (COD kit unavailable) ============ */
+  dStep6: {
+    n:6, label:'Step 6 · Shock Load',
+    mascot:'concerned',
+    say:'COD kit इस site पर available नहीं है। Inlet को visually देखकर judge करते हैं।',
+    render: () => stepHead(6, 6, 'OBSERVATION') + `
+      <!-- Tools unavailable warning -->
+      <div class="card p-3 mb-2" style="background:#FEF2F2;border:1.5px solid #E85A45">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="chip" style="background:#FFFFFF;color:#7F1D1D">🟢 Basic skill</span>
+          <span class="chip" style="background:#FFFFFF;color:#7F1D1D">🔴 COD kit नहीं</span>
+          <span class="chip" style="background:#FFFFFF;color:#7F1D1D">⏱ 3 मिनट</span>
+        </div>
+        <div class="text-[10px] mt-2 font-semibold" style="color:#7F1D1D">⚠ COD kit इस site पर available नहीं है। Visual inspection से check करें।</div>
+      </div>
+
+      <div class="card p-4">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-xl">🌊</span>
+          <div class="label-tiny" style="color:#E85A45">Flow 5 / 5 · Cause 6 of 6</div>
+        </div>
+        <div class="hi-lg leading-tight mb-1">Inlet पर पानी<br/>कैसा दिख रहा है?</div>
+        <div class="text-[11px] mt-1 font-serif italic" style="color:#94A3B8">EN: Visually inspect the inlet for shock load signs</div>
+
+        <!-- Visual indicators to check -->
+        <div class="mt-4 space-y-2">
+          <div class="p-3 rounded-2xl flex items-center gap-3" style="background:#F5F9FF;border:1px solid #E2E8F0">
+            <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style="background:#FFFFFF;border:1px solid #E2E8F0">🎨</div>
+            <div class="flex-1">
+              <div class="text-xs font-serif font-bold">पानी का रंग</div>
+              <div class="text-[10px]" style="color:#64748B">सामान्य grey-brown vs बहुत dark/black</div>
+            </div>
+          </div>
+          <div class="p-3 rounded-2xl flex items-center gap-3" style="background:#F5F9FF;border:1px solid #E2E8F0">
+            <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style="background:#FFFFFF;border:1px solid #E2E8F0">👃</div>
+            <div class="flex-1">
+              <div class="text-xs font-serif font-bold">बदबू</div>
+              <div class="text-[10px]" style="color:#64748B">अचानक तेज़ chemical smell?</div>
+            </div>
+          </div>
+          <div class="p-3 rounded-2xl flex items-center gap-3" style="background:#F5F9FF;border:1px solid #E2E8F0">
+            <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style="background:#FFFFFF;border:1px solid #E2E8F0">🌫️</div>
+            <div class="flex-1">
+              <div class="text-xs font-serif font-bold">झाग / Foam</div>
+              <div class="text-[10px]" style="color:#64748B">अचानक बहुत झाग?</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 p-3 rounded-2xl flex gap-2.5" style="background:#FFFBEB;border:1px solid #FCD34D">
+          <span class="text-lg flex-shrink-0">👂</span>
+          <div class="text-[11px] font-serif" style="color:#92400E">
+            <strong>पहचानें:</strong> Industrial discharge या heavy organic load से shock आ सकता है। अगर तीनों में से कोई भी abnormal है, तो shock load है।
+          </div>
+          ${soundBtn('अगर पानी dark है, तेज़ बदबू है, या बहुत झाग है — तो shock load है।')}
+        </div>
+
+        <div class="mt-4">
+          <div class="label-tiny mb-2">क्या तीनों सामान्य हैं?</div>
+          ${yesNoBig("goStep('allClear')", "terminate('high_shock_load',0.5,'Inlet पर visual signs of shock load — पानी dark, बदबू, या foam। COD kit होती तो pakka होता। Action: nutrient dose + flow reduce।')")}
+        </div>
+        ${stepFooterBtns()}
+      </div>`
+  },
+
+  /* ============ END STATE: all 6 causes checked, none confirmed ============ */
+  allClear: {
+    n:0, label:'सभी कारण check किए · Escalate',
+    mascot:'concerned',
+    say:'सब 6 कारण देखे, पर कुछ भी clear नहीं मिला। Supervisor को बुलाते हैं।',
+    render: () => `
+      <div class="card p-5" style="background:linear-gradient(160deg,#FFFFFF,#FEF2F2);border:1.5px solid #E85A45">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="w-10 h-10 rounded-full flex items-center justify-center text-lg" style="background:#E85A45;color:#FFFFFF">?</span>
+          <div>
+            <div class="label-tiny" style="color:#E85A45">कोई कारण नहीं मिला</div>
+            <div class="text-[11px]" style="color:#64748B">सब 6 कारण check किए</div>
+          </div>
+        </div>
+        <h2 class="hi-lg mt-2 flex items-start gap-1">
+          <span>Supervisor को बुलाएँ</span>
+          ${soundBtn('सभी 6 कारण check किए लेकिन कुछ clear नहीं मिला। Supervisor को मदद के लिए बुलाते हैं।')}
+        </h2>
+        <div class="text-xs mt-1" style="color:#64748B">आपने अच्छा काम किया · पूरी information supervisor को मिलेगी</div>
+
+        <!-- Summary of checks done -->
+        <div class="mt-4 p-3 rounded-2xl" style="background:#FFFFFF;border:1px solid #FCA5A5">
+          <div class="label-tiny mb-2" style="color:#E85A45">✓ क्या-क्या check किया</div>
+          <div class="space-y-1.5 text-[11px]">
+            <div class="flex items-center gap-2"><span style="color:#51BD55">✓</span> Blower चालू है, performance भी ठीक</div>
+            <div class="flex items-center gap-2"><span style="color:#51BD55">✓</span> Diffuser bubbling एक समान</div>
+            <div class="flex items-center gap-2"><span style="color:#51BD55">✓</span> Sensor reading verified manually</div>
+            <div class="flex items-center gap-2"><span style="color:#51BD55">✓</span> SV-30 normal — sludge bulking नहीं</div>
+            <div class="flex items-center gap-2"><span style="color:#51BD55">✓</span> Inlet visually सामान्य</div>
+          </div>
+        </div>
+
+        <div class="mt-3 p-3 rounded-2xl" style="background:#FEF2F2;border:1px solid #FCA5A5">
+          <div class="flex items-start gap-2.5">
+            <span class="text-xl">📞</span>
+            <div class="flex-1">
+              <div class="font-serif font-semibold text-sm" style="color:#7F1D1D">अगला कदम</div>
+              <div class="text-[11px] mt-0.5" style="color:#7F1D1D">Supervisor को सब checks की summary भेजी जाएगी · Site engineer भी आ सकते हैं</div>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="callSupervisor();setTimeout(()=>{window.ackContext={title:'Supervisor को भेज दिया',message:'सब 6 checks की summary supervisor को मिल गई।',who:'Ashok Kumar',role:'Shift Supervisor',detail:'All 6 causes inconclusive · Need expert assessment',nextStep:'home',nextLabel:'घर वापस जाएँ'};goStep('acknowledged')},1200)" class="btn-paani tap-scale mt-4" style="background:linear-gradient(140deg,#E85A45,#7F1D1D)">
+          <span>📞</span> Supervisor + Site engineer बुलाएँ
         </button>
-        <button onclick="goStep('home')" class="mt-2 w-full py-2.5 text-xs font-serif font-semibold" style="color:#64748B">
-          🏠 घर वापस जाएँ
+        <button onclick="goStep('preview')" class="mt-2 w-full py-3 rounded-2xl text-sm font-serif font-semibold tap-scale" style="background:#F5F9FF;color:#1E40AF;border:1.5px solid #BFDBFE">
+          🔄 फिर से जाँच शुरू करें
         </button>
       </div>`
   },
@@ -1703,7 +2072,7 @@ const steps = {
     render: () => {
       const rc = window.identifiedRC || {};
       const isResolved = rc.id === 'dirty_probe';
-      const isEscalate = rc.id === 'septic_anaerobic';
+      const isEscalate = rc.id === 'septic_anaerobic' || rc.id === 'diffuser_dead_zones';
       return `
         <div class="card p-5" style="background:${isResolved?'linear-gradient(160deg,#FFFFFF,#DCFCE7)':isEscalate?'linear-gradient(160deg,#FFFFFF,#FEF2F2)':'linear-gradient(160deg,#FFFFFF,#EFF6FF)'};border:1.5px solid ${isResolved?'#51BD55':isEscalate?'#E85A45':'#BFDBFE'}">
           <div class="flex items-center gap-2 mb-2">
