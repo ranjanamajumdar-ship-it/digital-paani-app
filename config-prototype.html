@@ -1,1637 +1,1153 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Digital Paani — Config Prototype</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Paani — Config</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..900;1,14..32,300..900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --ink-900:#0F172A;--ink-700:#334155;--ink-500:#64748B;--ink-300:#CBD5E1;--ink-100:#F1F5F9;
-  --white:#FFFFFF;
+  --white:#FFFFFF;--bg:#E8EDF2;
   --red:#DC2626;--red-bg:#FEF2F2;--red-border:#FECACA;
   --orange:#EA580C;--orange-bg:#FFF7ED;--orange-border:#FED7AA;
   --amber:#D97706;--amber-bg:#FFFBEB;--amber-border:#FDE68A;
   --green:#16A34A;--green-bg:#F0FDF4;--green-border:#BBF7D0;
   --blue:#2563EB;--blue-bg:#EFF6FF;--blue-border:#BFDBFE;
-  --radius-sm:6px;--radius:10px;--radius-lg:14px;--radius-xl:20px;
-  --shadow-sm:0 1px 2px rgba(15,23,42,.05);
+  --radius:10px;--radius-lg:14px;--radius-xl:20px;
   --shadow:0 1px 3px rgba(15,23,42,.07),0 4px 16px rgba(15,23,42,.07);
   --shadow-lg:0 8px 32px rgba(15,23,42,.13);
 }
-html,body{height:100%;font-family:'Inter',sans-serif;font-size:14px;color:var(--ink-900);background:#E8EDF2;line-height:1.5}
-button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
-input,select,textarea{font-family:inherit;font-size:14px;color:inherit}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink-900);font-size:14px;line-height:1.5;min-height:100vh}
 
-/* ── LAYOUT ── */
-.shell{display:flex;height:100vh;overflow:hidden}
-.sidebar{width:220px;flex-shrink:0;background:var(--ink-900);display:flex;flex-direction:column;overflow-y:auto}
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{height:52px;background:var(--white);border-bottom:1px solid var(--ink-300);display:flex;align-items:center;padding:0 20px;gap:0;flex-shrink:0;position:relative}
-.content{flex:1;overflow-y:auto;padding:24px}
+/* TOPBAR */
+#topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;height:52px;background:var(--white);border-bottom:1px solid var(--ink-300);padding:0 20px;gap:0}
+#logo{display:flex;align-items:center;gap:9px;flex-shrink:0;margin-right:24px}
+#logo .mark{background:var(--ink-900);color:#fff;font-size:12px;font-weight:700;border-radius:7px;padding:4px 8px;letter-spacing:.5px}
+#logo .name{font-weight:600;font-size:15px;color:var(--ink-900)}
+#tabs{display:flex;align-items:center;gap:2px;flex:1}
+.tab-btn{display:flex;align-items:center;gap:6px;padding:0 14px;height:52px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:500;color:var(--ink-500);position:relative;transition:color .15s;white-space:nowrap}
+.tab-btn .badge{background:var(--ink-100);color:var(--ink-500);font-size:11px;font-weight:600;border-radius:20px;padding:1px 7px;line-height:18px}
+.tab-btn.active{color:var(--ink-900);font-weight:600}
+.tab-btn.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2.5px;background:var(--ink-900);border-radius:2px 2px 0 0}
+.tab-btn.active .badge{background:var(--ink-900);color:#fff}
+#topbar-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.btn-primary{background:var(--ink-900);color:#fff;border:none;border-radius:var(--radius);padding:0 14px;height:34px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .15s;white-space:nowrap}
+.btn-primary:hover{opacity:.88}
+.btn-secondary{background:var(--white);color:var(--ink-700);border:1px solid var(--ink-300);border-radius:var(--radius);padding:0 12px;height:32px;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;transition:background .15s;white-space:nowrap}
+.btn-secondary:hover{background:var(--ink-100)}
+.btn-ghost{background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;color:var(--ink-500);padding:0 8px;height:32px;border-radius:var(--radius);transition:background .15s}
+.btn-ghost:hover{background:var(--ink-100)}
 
-/* ── SIDEBAR ── */
-.sb-logo{padding:18px 16px 12px;display:flex;align-items:center;gap:10px}
-.sb-logo-mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#38BDF8,#0EA5E9);display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff}
-.sb-logo-text{font-size:13px;font-weight:700;color:#fff}
-.sb-logo-sub{font-size:10px;color:rgba(255,255,255,.45);font-weight:400}
-.sb-section{padding:4px 8px;margin-top:8px}
-.sb-section-label{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.35);padding:6px 8px}
-.sb-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--radius-sm);color:rgba(255,255,255,.6);font-size:13px;font-weight:500;transition:all .15s;cursor:pointer;border:none;background:none;width:100%;text-align:left}
-.sb-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9)}
-.sb-item.active{background:rgba(255,255,255,.12);color:#fff}
-.sb-item svg{flex-shrink:0;opacity:.7}
-.sb-item.active svg{opacity:1}
+/* CONTENT */
+#content{padding:24px 20px;max-width:1200px;margin:0 auto}
 
-/* ── TOP TABS ── */
-.section-tabs{display:flex;align-items:stretch;height:100%;gap:0}
-.section-tab{padding:0 20px;font-size:13px;font-weight:500;color:var(--ink-500);border-bottom:2px solid transparent;display:flex;align-items:center;gap:7px;cursor:pointer;transition:all .15s;border-radius:0;background:none;border:none;border-bottom:2px solid transparent}
-.section-tab:hover{color:var(--ink-900)}
-.section-tab.active{color:var(--ink-900);font-weight:600;border-bottom:2px solid var(--ink-900)}
-.tab-count{background:var(--ink-100);color:var(--ink-500);font-size:11px;font-weight:600;padding:1px 6px;border-radius:20px}
-.section-tab.active .tab-count{background:var(--ink-900);color:#fff}
-.topbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
-
-/* ── BUTTONS ── */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:7px 14px;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;border:none;white-space:nowrap}
-.btn:active{transform:scale(.98)}
-.btn-primary{background:var(--ink-900);color:#fff}
-.btn-primary:hover{background:#1e293b}
-.btn-ghost{background:var(--ink-100);color:var(--ink-900)}
-.btn-ghost:hover{background:var(--ink-300)}
-.btn-outline{background:transparent;color:var(--ink-700);border:1px solid var(--ink-300)}
-.btn-outline:hover{background:var(--ink-100)}
-.btn-danger{background:var(--red);color:#fff}
-.btn-sm{padding:5px 10px;font-size:12px}
-.btn-xs{padding:3px 8px;font-size:11px;border-radius:6px}
-
-/* ── FILTERS ── */
+/* FILTER BAR */
 .filter-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.filter-select{appearance:none;background:var(--white);border:1px solid var(--ink-300);border-radius:var(--radius);padding:6px 28px 6px 10px;font-size:12px;font-weight:500;color:var(--ink-700);cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;transition:border-color .15s}
-.filter-select:focus{outline:none;border-color:var(--ink-900)}
-.filter-active{border-color:var(--ink-900);background-color:#f8f9fc;font-weight:600;color:var(--ink-900)}
-.filter-chip{display:inline-flex;align-items:center;gap:5px;background:var(--ink-900);color:#fff;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
-.filter-chip button{color:rgba(255,255,255,.7);font-size:14px;line-height:1}
-.filter-chip button:hover{color:#fff}
-.search-bar{flex:1;min-width:200px;max-width:340px;position:relative}
-.search-bar input{width:100%;border:1px solid var(--ink-300);border-radius:var(--radius);padding:7px 10px 7px 32px;font-size:13px;background:var(--white);transition:border-color .15s}
-.search-bar input:focus{outline:none;border-color:var(--ink-900)}
-.search-bar svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--ink-500);pointer-events:none}
-.more-filters-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;border:1px solid var(--ink-300);border-radius:var(--radius);font-size:12px;font-weight:500;color:var(--ink-700);background:var(--white);cursor:pointer;transition:all .15s}
-.more-filters-btn:hover{background:var(--ink-100)}
+.search-wrap{position:relative;flex:0 0 240px}
+.search-wrap input{width:100%;height:34px;border:1px solid var(--ink-300);border-radius:var(--radius);padding:0 10px 0 32px;font-family:inherit;font-size:13px;color:var(--ink-900);background:var(--white);outline:none;transition:border-color .15s}
+.search-wrap input:focus{border-color:var(--blue)}
+.search-wrap .icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--ink-500);font-size:14px}
+.filter-select{height:34px;border:1px solid var(--ink-300);border-radius:var(--radius);padding:0 28px 0 10px;font-family:inherit;font-size:13px;color:var(--ink-700);background:var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 8px center;appearance:none;outline:none;cursor:pointer;transition:border-color .15s}
+.filter-select:focus{border-color:var(--blue)}
+.active-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{display:inline-flex;align-items:center;gap:5px;background:var(--ink-100);border:1px solid var(--ink-300);border-radius:20px;padding:3px 10px;font-size:12.5px;font-weight:500;color:var(--ink-700)}
+.chip .chip-x{cursor:pointer;color:var(--ink-500);font-size:13px;line-height:1;margin-left:2px}
+.chip .chip-x:hover{color:var(--red)}
 
-/* ── CARDS ── */
-.card{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden}
-.card-header{padding:16px 18px 12px;display:flex;align-items:flex-start;gap:12px}
-.card-body{padding:0 18px 16px}
+/* PLANTS LIST */
+.plant-list{display:flex;flex-direction:column;gap:8px}
+.plant-row{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);display:flex;align-items:center;overflow:hidden;transition:box-shadow .15s;border-left:4px solid transparent}
+.plant-row:hover{box-shadow:var(--shadow-lg)}
+.plant-row.sev-red{border-left-color:var(--red)}
+.plant-row.sev-orange{border-left-color:var(--orange)}
+.plant-row.sev-amber{border-left-color:var(--amber)}
+.plant-row.sev-green{border-left-color:var(--green)}
+.plant-main{flex:1;padding:14px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.plant-info{flex:1;min-width:180px}
+.plant-name{font-weight:700;font-size:15px;color:var(--ink-900)}
+.plant-meta{font-size:12.5px;color:var(--ink-500);margin-top:2px}
+.plant-badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.sev-badge{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:2px 9px;font-size:12px;font-weight:600}
+.sev-badge.red{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+.sev-badge.orange{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-border)}
+.sev-badge.amber{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+.sev-badge.green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.warn-badge{display:inline-flex;align-items:center;gap:4px;background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border);border-radius:20px;padding:2px 9px;font-size:12px;font-weight:600}
+.plant-insights-count{font-size:12.5px;color:var(--ink-500);white-space:nowrap}
+.plant-actions{display:flex;align-items:center;gap:6px;padding:0 14px;flex-shrink:0}
+.action-link{background:none;border:none;color:var(--blue);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;padding:6px 10px;border-radius:var(--radius);transition:background .15s;white-space:nowrap}
+.action-link:hover{background:var(--blue-bg)}
+.action-btn{background:var(--white);border:1px solid var(--ink-300);color:var(--ink-700);font-family:inherit;font-size:12.5px;font-weight:500;cursor:pointer;padding:5px 10px;border-radius:var(--radius);transition:background .15s;white-space:nowrap}
+.action-btn:hover{background:var(--ink-100)}
 
-/* ── PLANTS GRID ── */
-.plants-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-.plant-card{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;cursor:pointer;transition:box-shadow .2s}
-.plant-card:hover{box-shadow:var(--shadow-lg)}
-.plant-severity-bar{height:3px;display:flex;gap:2px}
-.plant-severity-bar .seg{height:100%;border-radius:1px}
-.plant-card-body{padding:16px}
-.plant-name{font-size:16px;font-weight:700;margin-bottom:2px}
-.plant-meta{font-size:12px;color:var(--ink-500)}
-.plant-badges{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
-.plant-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
-.plant-badge.incident{background:var(--red-bg);color:var(--red)}
-.plant-badge.issue{background:var(--orange-bg);color:var(--orange)}
-.plant-badge.warning{background:var(--amber-bg);color:var(--amber)}
-.plant-badge.clear{background:var(--green-bg);color:var(--green)}
-.plant-actions{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--ink-100)}
-.plant-action-btn{flex:1;padding:8px;border-radius:var(--radius);font-size:12px;font-weight:600;border:1px solid var(--ink-300);background:transparent;color:var(--ink-700);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s}
-.plant-action-btn:hover{background:var(--ink-100)}
-.plant-action-btn.primary{background:var(--ink-900);color:#fff;border-color:var(--ink-900)}
-.plant-action-btn.primary:hover{background:#1e293b}
-
-/* ── INSIGHTS TABLE ── */
-.insights-table{width:100%;border-collapse:collapse;font-size:13px}
-.insights-table th{text-align:left;padding:8px 12px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-500);border-bottom:1px solid var(--ink-300);background:var(--ink-100);position:sticky;top:0;z-index:1}
-.insights-table td{padding:10px 12px;border-bottom:1px solid #F1F5F9;vertical-align:middle}
-.insights-table tr:last-child td{border-bottom:none}
-.insights-table tr:hover td{background:#FAFBFC}
-.insights-table tr.severity-incident{border-left:3px solid var(--red)}
-.insights-table tr.severity-issue{border-left:3px solid var(--orange)}
-.insights-table tr.severity-warning{border-left:3px solid var(--amber)}
-.insights-table tr.severity-resolved td{opacity:.6}
-.insights-table tr.severity-resolved{border-left:3px solid transparent}
-.table-wrapper{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden}
-.table-header{padding:14px 16px;border-bottom:1px solid var(--ink-100);display:flex;align-items:center;justify-content:space-between}
-.table-title{font-size:13px;font-weight:600;color:var(--ink-500)}
-
-/* ── CHIPS ── */
-.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600}
-.chip-incident{background:var(--red-bg);color:var(--red)}
-.chip-issue{background:var(--orange-bg);color:var(--orange)}
-.chip-warning{background:var(--amber-bg);color:var(--amber)}
-.chip-resolved{background:var(--ink-100);color:var(--ink-500)}
-.chip-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.chip-incident .chip-dot{background:var(--red)}
-.chip-issue .chip-dot{background:var(--orange)}
-.chip-warning .chip-dot{background:var(--amber)}
-.chip-resolved .chip-dot{background:var(--ink-300)}
-
-/* ── STATUS ── */
-.status-active{font-size:12px;color:var(--ink-700)}
-.status-resolved{font-size:12px;color:var(--ink-500)}
-
-/* ── USER AVATARS ── */
-.avatar-stack{display:flex;gap:-4px}
-.avatar{width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;border:2px solid var(--white);flex-shrink:0}
-.avatar-add{background:var(--ink-100);color:var(--ink-500);border:1px dashed var(--ink-300)}
-
-/* ── TOGGLE ── */
-.toggle{position:relative;width:36px;height:20px;display:inline-block;flex-shrink:0}
+/* INSIGHTS TABLE */
+.insights-wrap{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden}
+.insights-table{width:100%;border-collapse:collapse}
+.insights-table thead th{background:var(--ink-100);padding:10px 12px;text-align:left;font-size:11.5px;font-weight:600;color:var(--ink-500);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;border-bottom:1px solid var(--ink-300)}
+.insights-table thead th:first-child{width:36px}
+.insights-table tbody tr{border-left:4px solid transparent;transition:background .12s;cursor:pointer;border-bottom:1px solid var(--ink-100)}
+.insights-table tbody tr:last-child{border-bottom:none}
+.insights-table tbody tr:hover{background:var(--ink-100)}
+.insights-table tbody tr.sev-red{border-left-color:var(--red)}
+.insights-table tbody tr.sev-orange{border-left-color:var(--orange)}
+.insights-table tbody tr.sev-amber{border-left-color:var(--amber)}
+.insights-table tbody tr.resolved{opacity:.65}
+.insights-table td{padding:10px 12px;vertical-align:middle}
+.insight-name{font-weight:600;font-size:13.5px;color:var(--ink-900)}
+.insight-sensor{font-size:12px;color:var(--ink-500);margin-top:2px}
+.insight-plant{font-size:13px;color:var(--ink-700)}
+.insight-equip{font-size:12px;color:var(--ink-500);margin-top:1px}
+.type-chip{display:inline-block;border-radius:20px;padding:2px 9px;font-size:12px;font-weight:600}
+.type-chip.incident{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+.type-chip.issue{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-border)}
+.type-chip.warning{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+.avatars{display:flex;align-items:center}
+.av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border:2px solid #fff;margin-left:-6px;flex-shrink:0}
+.av:first-child{margin-left:0}
+.add-user-btn{display:inline-flex;align-items:center;gap:4px;border:1.5px dashed var(--ink-300);border-radius:20px;padding:2px 9px;font-size:12px;color:var(--ink-500);cursor:pointer;background:none;font-family:inherit;transition:border-color .15s}
+.add-user-btn:hover{border-color:var(--blue);color:var(--blue)}
+.status-dot{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:var(--ink-700)}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot.red{background:var(--red)}.dot.orange{background:var(--orange)}.dot.amber{background:var(--amber)}.dot.green{background:var(--green)}.dot.grey{background:var(--ink-300)}
+.toggle{position:relative;width:32px;height:18px;flex-shrink:0}
 .toggle input{opacity:0;width:0;height:0}
-.toggle-track{position:absolute;inset:0;background:var(--ink-300);border-radius:20px;transition:background .2s;cursor:pointer}
-.toggle input:checked+.toggle-track{background:var(--ink-900)}
-.toggle-thumb{position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .2s;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.2)}
-.toggle input:checked~.toggle-thumb{transform:translateX(16px)}
+.toggle-slider{position:absolute;inset:0;background:var(--ink-300);border-radius:20px;cursor:pointer;transition:background .15s}
+.toggle-slider::after{content:'';position:absolute;left:2px;top:2px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform .15s}
+.toggle input:checked+.toggle-slider{background:var(--ink-900)}
+.toggle input:checked+.toggle-slider::after{transform:translateX(14px)}
+.no-users-badge{display:inline-flex;align-items:center;gap:3px;background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);border-radius:20px;padding:1px 7px;font-size:11px;font-weight:600;margin-left:6px}
+.fix-link{color:var(--blue);font-size:11px;font-weight:500;cursor:pointer;margin-left:4px;text-decoration:underline}
+.chevron-cell{color:var(--ink-300);font-size:16px;text-align:right;width:20px}
 
-/* ── CHECKBOX ── */
-.checkbox{width:16px;height:16px;border:1.5px solid var(--ink-300);border-radius:4px;cursor:pointer;appearance:none;background:var(--white);transition:all .15s;flex-shrink:0;display:grid;place-items:center}
-.checkbox:checked{background:var(--ink-900);border-color:var(--ink-900)}
-.checkbox:checked::after{content:'';width:9px;height:6px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px);display:block}
+/* BULK BAR */
+#bulk-bar{position:fixed;bottom:0;left:0;right:0;background:var(--ink-900);color:#fff;z-index:200;transform:translateY(100%);transition:transform .2s;padding:12px 24px}
+#bulk-bar.visible{transform:translateY(0)}
+.bulk-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.bulk-row+.bulk-row{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.12)}
+.bulk-label{font-size:12.5px;color:rgba(255,255,255,.6);white-space:nowrap}
+.group-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:4px 10px 4px 6px;font-size:12.5px;font-weight:500;cursor:pointer;transition:background .15s}
+.group-chip:hover{background:rgba(255,255,255,.2)}
+.group-chip .mini-avs{display:flex}
+.group-chip .mini-av{width:18px;height:18px;border-radius:50%;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--ink-900);margin-left:-4px}
+.group-chip .mini-av:first-child{margin-left:0}
+.new-group-btn{display:inline-flex;align-items:center;gap:4px;border:1.5px dashed rgba(255,255,255,.3);border-radius:20px;padding:4px 10px;font-size:12px;color:rgba(255,255,255,.6);cursor:pointer;background:none;font-family:inherit;transition:border-color .15s}
+.new-group-btn:hover{border-color:rgba(255,255,255,.7);color:#fff}
+.bulk-count{font-size:13px;font-weight:600;white-space:nowrap}
+.bulk-action-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:var(--radius);padding:5px 12px;font-family:inherit;font-size:12.5px;font-weight:500;cursor:pointer;transition:background .15s}
+.bulk-action-btn:hover{background:rgba(255,255,255,.2)}
+.bulk-clear{background:none;border:none;color:rgba(255,255,255,.5);font-family:inherit;font-size:12.5px;cursor:pointer;padding:5px 8px}
+.bulk-clear:hover{color:#fff}
 
-/* ── BULK ACTION BAR ── */
-.bulk-bar{position:fixed;bottom:0;left:220px;right:0;background:var(--ink-900);color:#fff;padding:0;display:flex;flex-direction:column;z-index:40;transform:translateY(100%);transition:transform .25s cubic-bezier(.4,0,.2,1)}
-.bulk-bar.visible{transform:translateY(0)}
-.bulk-bar-groups{padding:8px 20px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.bulk-bar-groups-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.4);white-space:nowrap}
-.bulk-bar-main{padding:10px 20px;display:flex;align-items:center;gap:12px}
-.bulk-count{font-size:13px;font-weight:600}
-.bulk-actions{display:flex;gap:8px;margin-left:auto}
-.bulk-btn{padding:6px 14px;border-radius:var(--radius);font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.2);color:#fff;background:rgba(255,255,255,.1);cursor:pointer;transition:all .15s}
-.bulk-btn:hover{background:rgba(255,255,255,.2)}
-.bulk-btn.danger{border-color:rgba(220,38,38,.5);background:rgba(220,38,38,.2);color:#FCA5A5}
-.group-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.2);color:#fff;background:rgba(255,255,255,.08);cursor:pointer;transition:all .15s;white-space:nowrap}
-.group-chip:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.4)}
-.group-chip .gc-avatars{display:flex;gap:-2px}
-.group-chip .gc-avatar{width:16px;height:16px;border-radius:50%;font-size:7px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid var(--ink-900)}
-
-/* ── MODAL OVERLAY ── */
-.overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);backdrop-filter:blur(3px);z-index:50;display:none;place-items:center}
-.overlay.open{display:grid}
-.modal{background:var(--white);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);width:100%;max-width:600px;max-height:88vh;overflow-y:auto;position:relative}
-.modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--ink-100);display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;background:var(--white);z-index:1;border-radius:var(--radius-xl) var(--radius-xl) 0 0}
-.modal-title{font-size:17px;font-weight:700}
-.modal-sub{font-size:12px;color:var(--ink-500);margin-top:2px}
-.modal-close{width:28px;height:28px;border-radius:50%;background:var(--ink-100);display:grid;place-items:center;cursor:pointer;flex-shrink:0;font-size:16px;color:var(--ink-500);border:none;transition:background .15s}
-.modal-close:hover{background:var(--ink-300)}
-.modal-body{padding:20px 24px}
-.modal-footer{padding:16px 24px;border-top:1px solid var(--ink-100);display:flex;align-items:center;justify-content:space-between;position:sticky;bottom:0;background:var(--white);border-radius:0 0 var(--radius-xl) var(--radius-xl)}
-
-/* ── WIZARD STEPS ── */
-.wizard-steps{display:flex;align-items:center;gap:0;margin-bottom:24px}
-.wizard-step{display:flex;align-items:center;gap:8px;flex:1}
-.wizard-step-num{width:28px;height:28px;border-radius:50%;border:2px solid var(--ink-300);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--ink-500);flex-shrink:0;transition:all .2s;background:var(--white)}
-.wizard-step.done .wizard-step-num{background:var(--green);border-color:var(--green);color:#fff}
-.wizard-step.active .wizard-step-num{background:var(--ink-900);border-color:var(--ink-900);color:#fff}
-.wizard-step-label{font-size:12px;font-weight:600;color:var(--ink-500)}
-.wizard-step.active .wizard-step-label{color:var(--ink-900)}
-.wizard-step.done .wizard-step-label{color:var(--green)}
-.wizard-connector{flex:1;height:1px;background:var(--ink-300);margin:0 8px}
-.wizard-connector.done{background:var(--green)}
-
-/* ── ESCALATION TIMELINE ── */
-.esc-timeline{display:flex;flex-direction:column;gap:0}
-.esc-step{display:flex;gap:14px;align-items:flex-start}
-.esc-spine{display:flex;flex-direction:column;align-items:center;gap:0;flex-shrink:0}
-.esc-node{width:32px;height:32px;border-radius:50%;border:2px solid var(--ink-300);background:var(--white);display:grid;place-items:center;font-size:14px;flex-shrink:0;position:relative;z-index:1}
-.esc-node.immediate{border-color:var(--ink-900);background:var(--ink-900);color:#fff}
-.esc-node.delayed{border-color:var(--amber);background:var(--amber-bg);color:var(--amber)}
-.esc-node.add{border-style:dashed;border-color:var(--ink-300);color:var(--ink-300);cursor:pointer}
-.esc-node.add:hover{border-color:var(--ink-900);color:var(--ink-900);background:var(--ink-100)}
-.esc-line{width:2px;flex:1;min-height:16px;background:var(--ink-300);margin:2px 0}
-.esc-content{flex:1;padding-bottom:20px}
-.esc-time-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-500);margin-bottom:6px;display:flex;align-items:center;gap:6px}
-.esc-card{background:var(--ink-100);border-radius:var(--radius);padding:12px 14px;display:flex;flex-direction:column;gap:8px}
-.esc-users{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.esc-user-chip{display:inline-flex;align-items:center;gap:6px;background:var(--white);border:1px solid var(--ink-300);border-radius:20px;padding:3px 10px 3px 5px;font-size:12px;font-weight:500}
-.esc-user-chip .avatar{width:20px;height:20px;font-size:8px;border:none}
-.esc-channels{display:flex;gap:6px;flex-wrap:wrap}
-.esc-channel{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
-.esc-channel.wa{background:#dcfce7;color:#15803d}
-.esc-channel.sms{background:var(--blue-bg);color:var(--blue)}
-.esc-channel.call{background:var(--ink-100);color:var(--ink-700)}
-.esc-channel.email{background:var(--amber-bg);color:var(--amber)}
-.esc-edit-link{font-size:11px;color:var(--blue);cursor:pointer;text-decoration:none;margin-top:2px;display:inline-block}
-.esc-edit-link:hover{text-decoration:underline}
-
-/* ── TIME PICKER ── */
-.time-picker{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
-.time-option{padding:8px 16px;border-radius:var(--radius);border:1.5px solid var(--ink-300);font-size:13px;font-weight:600;color:var(--ink-700);cursor:pointer;transition:all .15s;background:var(--white)}
-.time-option:hover{border-color:var(--ink-900);color:var(--ink-900)}
-.time-option.selected{background:var(--ink-900);border-color:var(--ink-900);color:#fff}
-.custom-time{display:flex;gap:8px;align-items:center}
-.custom-time input{width:70px;border:1.5px solid var(--ink-300);border-radius:var(--radius);padding:7px 10px;font-size:14px;font-weight:600;text-align:center}
-.custom-time input:focus{outline:none;border-color:var(--ink-900)}
-.custom-time-unit{font-size:12px;color:var(--ink-500)}
-
-/* ── USER SEARCH ── */
-.user-search{position:relative;margin-bottom:12px}
-.user-search input{width:100%;border:1.5px solid var(--ink-300);border-radius:var(--radius);padding:9px 12px 9px 34px;font-size:13px}
-.user-search input:focus{outline:none;border-color:var(--ink-900)}
-.user-search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--ink-500)}
-.user-results{background:var(--white);border:1px solid var(--ink-300);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-top:4px}
-.user-result-item{padding:10px 12px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;transition:background .1s;border-bottom:1px solid var(--ink-100)}
-.user-result-item:last-child{border-bottom:none}
-.user-result-item:hover{background:var(--ink-100)}
-.user-result-name{font-size:13px;font-weight:600}
-.user-result-meta{font-size:11px;color:var(--ink-500);margin-top:2px}
-.user-result-escalations{font-size:11px;color:var(--ink-700);background:var(--ink-100);border-radius:4px;padding:3px 7px;margin-top:4px;display:inline-flex;align-items:center;gap:4px}
-.user-selected-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;min-height:10px}
-.user-selected-chip{display:inline-flex;align-items:center;gap:6px;background:var(--ink-900);color:#fff;border-radius:20px;padding:4px 10px 4px 6px;font-size:12px;font-weight:500}
-.user-selected-chip button{color:rgba(255,255,255,.6);font-size:16px;line-height:1;margin-left:2px}
-.user-selected-chip button:hover{color:#fff}
-
-/* ── HELPER BOX ── */
-.helper-box{background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:var(--radius);padding:12px 14px;font-size:12px;color:var(--ink-700);line-height:1.6;margin-bottom:12px}
-.helper-box strong{color:var(--blue);font-weight:700}
-.helper-box .helper-row{display:flex;align-items:flex-start;gap:8px;padding:4px 0;border-bottom:1px solid var(--blue-border)}
-.helper-box .helper-row:last-child{border-bottom:none;padding-bottom:0}
-.helper-box .helper-plant{font-weight:600;min-width:110px}
-.helper-box .helper-details{color:var(--ink-500)}
-
-/* ── COMPLETION STATUS ── */
-.completion-ring{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600}
-.completion-ring.complete{color:var(--green)}
-.completion-ring.partial{color:var(--amber)}
-.completion-ring.empty{color:var(--red)}
-.fix-link{font-size:11px;color:var(--blue);cursor:pointer;text-decoration:underline;margin-left:4px}
-
-/* ── PLAYBOOK ── */
-.playbook-row{display:flex;align-items:baseline;gap:6px;padding:6px 0;border-bottom:1px solid var(--ink-100);font-size:13px;flex-wrap:wrap}
-.playbook-row:last-child{border-bottom:none}
-.playbook-when{color:var(--ink-500);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;min-width:80px}
-.playbook-token{display:inline-flex;align-items:center;gap:4px;background:var(--ink-100);border-radius:6px;padding:2px 8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all .15s}
-.playbook-token:hover{border-color:var(--ink-900);background:var(--white)}
-.playbook-then{color:var(--ink-500);font-size:12px}
-
-/* ── DEFAULT RULES ── */
-.default-rule{background:var(--ink-100);border-radius:var(--radius);margin-bottom:8px;overflow:hidden}
-.default-rule-header{padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:13px;font-weight:600}
-.default-rule-header:hover{background:#E2E8F0}
-.default-rule-body{padding:8px 14px 12px;border-top:1px solid var(--ink-300);display:none}
-.default-rule-body.open{display:block}
-.inherit-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;background:var(--green-bg);color:var(--green)}
-.override-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;background:var(--amber-bg);color:var(--amber)}
-
-/* ── TOAST ── */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ink-900);color:#fff;padding:11px 18px;border-radius:var(--radius);font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px;z-index:9999;box-shadow:var(--shadow-lg);transition:transform .3s cubic-bezier(.4,0,.2,1);white-space:nowrap;max-width:90vw}
-.toast.visible{transform:translateX(-50%) translateY(0)}
-.toast-undo{color:#93C5FD;cursor:pointer;text-decoration:underline;font-weight:600}
-
-/* ── DRAWER ── */
-.drawer-overlay{position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:40;display:none}
-.drawer-overlay.open{display:block}
-.drawer{position:fixed;top:0;right:0;bottom:0;width:380px;background:var(--white);box-shadow:var(--shadow-lg);z-index:41;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);overflow-y:auto;display:flex;flex-direction:column}
+/* DRAWER */
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.25);z-index:300;opacity:0;pointer-events:none;transition:opacity .2s}
+.overlay.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:480px;background:var(--white);box-shadow:var(--shadow-lg);z-index:301;transform:translateX(100%);transition:transform .22s cubic-bezier(.32,.72,0,1);display:flex;flex-direction:column}
 .drawer.open{transform:translateX(0)}
-.drawer-header{padding:18px 20px;border-bottom:1px solid var(--ink-100);display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;background:var(--white);z-index:1}
-.drawer-body{padding:20px;flex:1;overflow-y:auto}
-.drawer-footer{padding:14px 20px;border-top:1px solid var(--ink-100);display:flex;gap:8px;position:sticky;bottom:0;background:var(--white)}
+.drawer.narrow{width:440px}
+.drawer-header{padding:18px 20px 14px;border-bottom:1px solid var(--ink-100);flex-shrink:0;position:relative}
+.drawer-title{font-size:16px;font-weight:700;color:var(--ink-900)}
+.drawer-sub{font-size:12.5px;color:var(--ink-500);margin-top:3px}
+.drawer-close{position:absolute;top:14px;right:16px;background:none;border:none;font-size:20px;color:var(--ink-500);cursor:pointer;line-height:1;padding:4px;border-radius:6px;transition:background .15s}
+.drawer-close:hover{background:var(--ink-100)}
+.drawer-tabs{display:flex;gap:0;border-bottom:1px solid var(--ink-100);padding:0 20px;flex-shrink:0}
+.drawer-tab{padding:10px 14px;font-size:13px;font-weight:500;color:var(--ink-500);cursor:pointer;position:relative;border:none;background:none;font-family:inherit;transition:color .15s}
+.drawer-tab.active{color:var(--ink-900);font-weight:600}
+.drawer-tab.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:var(--ink-900);border-radius:2px 2px 0 0}
+.drawer-body{flex:1;overflow-y:auto;padding:20px}
+.drawer-section{margin-bottom:20px}
+.drawer-section-title{font-size:11.5px;font-weight:600;color:var(--ink-500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.condition-box{background:var(--ink-100);border-radius:var(--radius);padding:12px 14px;font-size:13px;color:var(--ink-700);line-height:1.7}
+.condition-box b{color:var(--ink-900)}
+.reading-row{display:flex;align-items:center;gap:10px;background:var(--ink-100);border-radius:var(--radius);padding:10px 14px;font-size:13px;color:var(--ink-700);flex-wrap:wrap}
+.reading-val{font-weight:700;font-size:15px;color:var(--ink-900)}
+.inh-badge{display:inline-flex;align-items:center;gap:5px;background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:600;cursor:pointer}
+.inh-badge.custom{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-border)}
 
-/* ── MISC ── */
-.label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-500);margin-bottom:6px;display:block}
-.form-input{width:100%;border:1.5px solid var(--ink-300);border-radius:var(--radius);padding:8px 12px;font-size:13px;transition:border-color .15s}
-.form-input:focus{outline:none;border-color:var(--ink-900)}
-.section-title{font-size:20px;font-weight:700;margin-bottom:4px}
-.section-sub{font-size:13px;color:var(--ink-500);margin-bottom:20px}
-.empty-state{text-align:center;padding:48px 24px;color:var(--ink-500)}
-.empty-state svg{margin:0 auto 12px;opacity:.3}
-.empty-state h3{font-size:15px;font-weight:600;color:var(--ink-700);margin-bottom:4px}
-.empty-state p{font-size:13px}
-.divider{height:1px;background:var(--ink-100);margin:16px 0}
-.permission-warning{background:#FFF7ED;border:1px solid var(--orange-border);border-radius:var(--radius);padding:10px 12px;font-size:12px;color:var(--orange);display:flex;align-items:flex-start;gap:8px;margin-top:6px}
-.permission-warning .perm-actions{display:flex;gap:8px;margin-top:6px}
-.permission-warning button{font-size:11px;font-weight:600;padding:3px 8px;border-radius:5px;cursor:pointer;border:1px solid var(--orange-border);background:transparent;color:var(--orange)}
-.permission-warning button.resolve{background:var(--orange);color:#fff;border-color:var(--orange)}
+/* ESCALATION TIMELINE */
+.esc-timeline{display:flex;flex-direction:column}
+.esc-step{display:flex;gap:12px;position:relative;padding-bottom:12px}
+.esc-step:not(:first-child)::before{content:'';position:absolute;left:13px;top:-12px;height:12px;width:2px;background:var(--ink-300)}
+.esc-dot{width:26px;height:26px;border-radius:50%;background:var(--ink-900);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px}
+.esc-content{flex:1;background:var(--ink-100);border-radius:var(--radius);padding:12px 14px}
+.esc-time{font-size:12px;font-weight:600;color:var(--ink-500);margin-bottom:6px}
+.esc-users{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:6px}
+.esc-channels{display:flex;gap:5px;flex-wrap:wrap}
+.channel-pill{background:var(--white);border:1px solid var(--ink-300);border-radius:20px;padding:2px 8px;font-size:11.5px;font-weight:500;color:var(--ink-700)}
+.add-step-btn{display:inline-flex;align-items:center;gap:5px;border:1.5px dashed var(--ink-300);border-radius:var(--radius);padding:8px 14px;font-size:13px;color:var(--ink-500);cursor:pointer;background:none;font-family:inherit;width:100%;justify-content:center;transition:border-color .15s;margin-top:4px}
+.add-step-btn:hover{border-color:var(--blue);color:var(--blue)}
 
-/* ── RESPONSIVE ── */
-@media(max-width:768px){
-  .sidebar{display:none}
-  .bulk-bar{left:0}
-  .plants-grid{grid-template-columns:1fr}
-}
+/* HISTORY */
+.history-list{display:flex;flex-direction:column;gap:10px}
+.history-item{display:flex;gap:10px;padding:12px 14px;background:var(--ink-100);border-radius:var(--radius);font-size:13px;color:var(--ink-700)}
+.history-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:5px}
+.history-dot.active{background:var(--red)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:400;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.open{opacity:1;pointer-events:auto}
+.modal{background:var(--white);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);width:640px;max-width:calc(100vw - 40px);max-height:calc(100vh - 60px);display:flex;flex-direction:column;transform:translateY(16px) scale(.98);transition:transform .22s;position:relative}
+.modal-overlay.open .modal{transform:none}
+.modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--ink-100);flex-shrink:0}
+.modal-title{font-size:17px;font-weight:700;color:var(--ink-900)}
+.modal-close{position:absolute;top:16px;right:18px;background:none;border:none;font-size:22px;color:var(--ink-500);cursor:pointer;line-height:1;padding:4px;border-radius:6px}
+.modal-close:hover{background:var(--ink-100)}
+.modal-body{flex:1;overflow-y:auto;padding:20px 24px}
+.modal-footer{padding:14px 24px;border-top:1px solid var(--ink-100);display:flex;align-items:center;gap:10px;flex-shrink:0;background:var(--ink-100);border-radius:0 0 var(--radius-xl) var(--radius-xl)}
+.wizard-summary{flex:1;font-size:12.5px;color:var(--ink-700);font-style:italic}
+
+/* FORM */
+.form-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.form-group{display:flex;flex-direction:column;gap:5px;flex:1;min-width:160px}
+.form-group.full{flex:1 1 100%}
+label.form-label{font-size:12.5px;font-weight:600;color:var(--ink-700)}
+.form-input,.form-select{height:36px;border:1px solid var(--ink-300);border-radius:var(--radius);padding:0 10px;font-family:inherit;font-size:13.5px;color:var(--ink-900);background:var(--white);outline:none;transition:border-color .15s;width:100%}
+.form-input:focus,.form-select:focus{border-color:var(--blue)}
+.form-select{padding-right:28px;background:var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 8px center;appearance:none}
+.or-divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--ink-500);font-size:12px}
+.or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--ink-300)}
+.template-preview{background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:var(--radius);padding:14px 16px;margin-top:10px}
+.template-preview .tp-title{font-size:12px;font-weight:600;color:var(--blue);margin-bottom:6px}
+.template-preview .tp-row{font-size:13px;color:var(--ink-700);line-height:1.9}
+.template-preview .tp-row span{font-weight:600;color:var(--ink-900)}
+
+/* WIZARD STEPS */
+.step-indicator{display:flex;align-items:center;gap:0;margin-bottom:20px}
+.step-dot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;flex-shrink:0;border:2px solid var(--ink-300);color:var(--ink-500);transition:all .2s}
+.step-dot.active{background:var(--ink-900);border-color:var(--ink-900);color:#fff}
+.step-dot.done{background:var(--green);border-color:var(--green);color:#fff}
+.step-line{flex:1;height:2px;background:var(--ink-300)}
+.step-line.done{background:var(--green)}
+.step-panel{display:none}
+.step-panel.active{display:block}
+
+/* ASSIGN WIZARD */
+.user-search-wrap{position:relative}
+.user-results{position:absolute;top:100%;left:0;right:0;background:var(--white);border:1px solid var(--ink-300);border-radius:var(--radius);box-shadow:var(--shadow-lg);z-index:10;max-height:200px;overflow-y:auto;display:none}
+.user-results.open{display:block}
+.user-result{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;transition:background .12s}
+.user-result:hover{background:var(--ink-100)}
+.user-result .ur-name{font-size:13px;font-weight:600;color:var(--ink-900)}
+.user-result .ur-sub{font-size:12px;color:var(--ink-500)}
+.selected-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;min-height:20px}
+.user-chip{display:inline-flex;align-items:center;gap:6px;background:var(--ink-100);border:1px solid var(--ink-300);border-radius:20px;padding:4px 10px 4px 6px;font-size:13px;font-weight:500;color:var(--ink-700)}
+.user-chip .uc-x{cursor:pointer;color:var(--ink-500);font-size:14px;line-height:1}
+.user-chip .uc-x:hover{color:var(--red)}
+.save-group-section{margin-top:14px;border:1px solid var(--ink-300);border-radius:var(--radius);overflow:hidden}
+.save-group-toggle{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;font-size:13px;color:var(--ink-700);background:var(--ink-100)}
+.save-group-body{padding:12px;border-top:1px solid var(--ink-300);display:none}
+.save-group-body.open{display:block}
+.timing-presets{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.timing-btn{padding:7px 14px;border:1.5px solid var(--ink-300);border-radius:var(--radius);font-family:inherit;font-size:13px;font-weight:500;color:var(--ink-700);background:var(--white);cursor:pointer;transition:all .15s}
+.timing-btn.active{background:var(--ink-900);color:#fff;border-color:var(--ink-900)}
+.timing-btn:hover:not(.active){background:var(--ink-100)}
+.custom-time{display:none;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.custom-time.visible{display:flex}
+.custom-time input{width:70px;height:34px;border:1px solid var(--ink-300);border-radius:var(--radius);padding:0 10px;font-family:inherit;font-size:13px;text-align:center;outline:none}
+.custom-time input:focus{border-color:var(--blue)}
+.channel-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.channel-card{border:2px solid var(--ink-300);border-radius:var(--radius);padding:14px;cursor:pointer;transition:all .15s;background:var(--white)}
+.channel-card.active{border-color:var(--ink-900);background:var(--ink-100)}
+.channel-card .cc-icon{font-size:22px;margin-bottom:6px}
+.channel-card .cc-name{font-size:13.5px;font-weight:600;color:var(--ink-900)}
+.channel-textarea{width:100%;margin-top:8px;min-height:64px;border:1px solid var(--ink-300);border-radius:var(--radius);padding:8px 10px;font-family:inherit;font-size:12.5px;color:var(--ink-700);resize:vertical;outline:none}
+.channel-textarea:focus{border-color:var(--blue)}
+
+/* TEMPLATES */
+.templates-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:800px){.templates-grid{grid-template-columns:repeat(2,1fr)}}
+.template-card{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:16px;display:flex;flex-direction:column;gap:8px;transition:box-shadow .15s}
+.template-card:hover{box-shadow:var(--shadow-lg)}
+.tc-icon{font-size:24px}
+.tc-equip{font-size:11.5px;font-weight:600;color:var(--ink-500);text-transform:uppercase;letter-spacing:.4px}
+.tc-name{font-size:14px;font-weight:700;color:var(--ink-900)}
+.tc-trigger{font-size:12.5px;color:var(--ink-500)}
+.tc-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px}
+.tc-used{font-size:12px;color:var(--ink-500)}
+.tc-actions{display:flex;gap:6px;margin-top:4px}
+.use-template-btn{flex:1;background:var(--ink-900);color:#fff;border:none;border-radius:var(--radius);padding:7px;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;transition:opacity .15s}
+.use-template-btn:hover{opacity:.85}
+.preview-link{font-size:12px;color:var(--blue);cursor:pointer;background:none;border:none;font-family:inherit;padding:0;text-decoration:underline}
+
+/* PLANT DEFAULTS */
+.pd-section{border:1px solid var(--ink-300);border-radius:var(--radius);margin-bottom:10px;overflow:hidden}
+.pd-section-header{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:var(--ink-100);user-select:none}
+.pd-section-header:hover{background:#E2E8F0}
+.pd-section-title{flex:1;font-size:13.5px;font-weight:600;color:var(--ink-900)}
+.pd-caret{font-size:11px;color:var(--ink-500);transition:transform .2s}
+.pd-caret.open{transform:rotate(90deg)}
+.pd-section-body{padding:14px;border-top:1px solid var(--ink-300);display:none}
+.pd-section-body.open{display:block}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink-900);color:#fff;border-radius:var(--radius);padding:10px 18px;font-size:13.5px;font-weight:500;z-index:999;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* PANELS */
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.section-title{font-size:20px;font-weight:700;color:var(--ink-900)}
+.section-count{font-size:14px;color:var(--ink-500)}
 </style>
 </head>
 <body>
 
-<div class="shell">
+<!-- TOPBAR -->
+<header id="topbar">
+  <div id="logo">
+    <span class="mark">DP</span>
+    <span class="name">Digital Paani</span>
+  </div>
+  <nav id="tabs">
+    <button class="tab-btn active" data-tab="plants">Plants <span class="badge">5</span></button>
+    <button class="tab-btn" data-tab="insights">Insights <span class="badge">18</span></button>
+    <button class="tab-btn" data-tab="templates">Templates <span class="badge">12</span></button>
+  </nav>
+  <div id="topbar-right">
+    <button class="btn-primary" id="add-insight-btn">+ Add insight</button>
+  </div>
+</header>
 
-  <!-- ── SIDEBAR ── -->
-  <aside class="sidebar">
-    <div class="sb-logo">
-      <div class="sb-logo-mark">DP</div>
-      <div>
-        <div class="sb-logo-text">Digital Paani</div>
-        <div class="sb-logo-sub">SCADA Platform</div>
-      </div>
+<!-- CONTENT -->
+<main id="content">
+
+  <!-- PLANTS TAB -->
+  <div class="tab-panel active" id="tab-plants">
+    <div class="filter-bar">
+      <div class="search-wrap"><span class="icon">🔍</span><input type="text" placeholder="Search plants..." id="plant-search"></div>
+      <select class="filter-select" id="plant-location-filter"><option value="">Location</option><option>Mumbai</option><option>Thane</option><option>Navi Mumbai</option></select>
+      <select class="filter-select" id="plant-severity-filter"><option value="">Severity</option><option>Incident</option><option>Issue</option><option>Warning</option><option>All clear</option></select>
+      <select class="filter-select" id="plant-config-filter"><option value="">Config status</option><option>Configured</option><option>Not configured</option></select>
     </div>
+    <div class="plant-list" id="plant-list"></div>
+  </div>
 
-    <div class="sb-section">
-      <div class="sb-section-label">Operations</div>
-      <button class="sb-item" onclick="alert('SCADA dashboard — out of scope for this prototype')">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        Dashboard
-      </button>
-      <button class="sb-item" onclick="alert('Issues — out of scope')">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
-        Issues
-      </button>
-      <button class="sb-item" onclick="alert('Tasks — out of scope')">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-        Tasks
-      </button>
-    </div>
-
-    <div class="sb-section">
-      <div class="sb-section-label">Configuration</div>
-      <button class="sb-item active" onclick="showSection('plants')">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        Plants &amp; Insights
-      </button>
-      <button class="sb-item" onclick="alert('Users — out of scope')">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-        Users
-      </button>
-      <button class="sb-item" onclick="alert('Digest templates — out of scope')">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        Digests
-      </button>
-    </div>
-  </aside>
-
-  <!-- ── MAIN ── -->
-  <div class="main">
-    <!-- top bar -->
-    <div class="topbar">
-      <div class="section-tabs">
-        <button class="section-tab active" id="tab-plants" onclick="switchTab('plants')">
-          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-          Plants
-          <span class="tab-count">5</span>
-        </button>
-        <button class="section-tab" id="tab-insights" onclick="switchTab('insights')">
-          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
-          Insights
-          <span class="tab-count">18</span>
-        </button>
-      </div>
-      <div class="topbar-actions">
-        <button class="btn btn-primary" id="main-cta" onclick="handleCTA()">
-          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add insight
-        </button>
-      </div>
-    </div>
-
-    <!-- ── PLANTS PANEL ── -->
-    <div id="panel-plants" class="content">
-      <div class="section-title">Plants</div>
-      <div class="section-sub">Configuration layer · sorted by severity</div>
-
-      <!-- Plants filters (no Plant filter) -->
-      <div class="filter-bar">
-        <div class="search-bar">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-          <input type="text" placeholder="Search plants..." oninput="filterPlants(this.value)">
-        </div>
-        <select class="filter-select" onchange="applyPlantFilter('location',this)">
-          <option value="">Location · All</option>
-          <option>Mumbai</option>
-          <option>Thane</option>
-          <option>Navi Mumbai</option>
-        </select>
-        <select class="filter-select" onchange="applyPlantFilter('severity',this)">
-          <option value="">Severity · All</option>
-          <option>Has incidents</option>
-          <option>Has issues</option>
-          <option>All clear</option>
-        </select>
-        <select class="filter-select" onchange="applyPlantFilter('status',this)">
-          <option value="">Config · All</option>
-          <option>Fully configured</option>
-          <option>Needs attention</option>
-        </select>
-      </div>
-
-      <div class="plants-grid" id="plants-grid">
-        <!-- cards injected by JS -->
-      </div>
-    </div>
-
-    <!-- ── INSIGHTS PANEL ── -->
-    <div id="panel-insights" class="content" style="display:none;padding-bottom:80px">
-      <div class="section-title">Insights</div>
-      <div class="section-sub">18 of 18 · across 5 plants</div>
-
-      <!-- Insights filters -->
-      <div class="filter-bar">
-        <div class="search-bar">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-          <input type="text" placeholder="Search insights, sensors, equipment..." oninput="filterInsights(this.value)">
-        </div>
-        <select class="filter-select" id="f-plant" onchange="applyInsightFilter()">
-          <option value="">Plant · All</option>
-          <option>Andheri Plant</option>
-          <option>Bandra Plant</option>
-          <option>Powai Plant</option>
-          <option>Thane Plant</option>
-          <option>Vashi Plant</option>
-        </select>
-        <select class="filter-select" id="f-type" onchange="applyInsightFilter()">
-          <option value="">Type · All</option>
-          <option>Incident</option>
-          <option>Issue</option>
-          <option>Warning</option>
-        </select>
-        <select class="filter-select" id="f-status" onchange="applyInsightFilter()">
-          <option value="">Status · All</option>
-          <option>Active</option>
-          <option>Resolved</option>
-        </select>
-        <button class="more-filters-btn" onclick="openMoreFilters()">
-          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
-          More filters
-        </button>
-        <div id="active-filter-chips" style="display:flex;gap:6px;flex-wrap:wrap"></div>
-      </div>
-
-      <div class="table-wrapper">
-        <div class="table-header">
-          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:500;color:var(--ink-500)">
-            <input type="checkbox" class="checkbox" id="select-all" onchange="toggleSelectAll(this.checked)">
-            Select all
-          </label>
-          <span class="table-title" id="insights-count">18 insights</span>
-        </div>
-        <div style="overflow-x:auto">
-          <table class="insights-table" id="insights-table">
-            <thead>
-              <tr>
-                <th style="width:28px"></th>
-                <th>Insight</th>
-                <th>Plant · Equipment</th>
-                <th>Type</th>
-                <th>Users</th>
-                <th>Status</th>
-                <th style="width:60px">On</th>
-              </tr>
-            </thead>
-            <tbody id="insights-tbody">
-            </tbody>
-          </table>
+  <!-- INSIGHTS TAB -->
+  <div class="tab-panel" id="tab-insights">
+    <div class="filter-bar">
+      <div class="search-wrap" style="flex:0 0 280px"><span class="icon">🔍</span><input type="text" placeholder="Search insights, sensors, equipment..." id="insight-search"></div>
+      <select class="filter-select" id="ins-plant-filter"><option value="">Plant</option><option>Andheri Plant</option><option>Bandra Plant</option><option>Powai Plant</option><option>Thane Plant</option></select>
+      <select class="filter-select" id="ins-type-filter"><option value="">Type</option><option>Incident</option><option>Issue</option><option>Warning</option></select>
+      <select class="filter-select" id="ins-state-filter"><option value="">State</option><option>Active</option><option>Resolved</option><option>Acknowledged</option></select>
+      <select class="filter-select"><option value="">Equipment</option><option>Aerator</option><option>Pump</option><option>Blower</option><option>Tank</option></select>
+      <select class="filter-select"><option value="">User</option><option>Raj Kumar</option><option>Priya Sharma</option><option>Ananya M</option><option>Meera Rao</option></select>
+      <div style="position:relative">
+        <button class="btn-secondary" id="more-filters-btn">More filters ▾</button>
+        <div id="more-filters-panel" style="display:none;position:absolute;top:38px;right:0;background:var(--white);border:1px solid var(--ink-300);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);padding:14px;width:220px;z-index:50">
+          <div style="margin-bottom:10px"><label class="form-label" style="display:block;margin-bottom:4px">Channel</label><select class="form-select"><option value="">Any</option><option>WhatsApp</option><option>SMS</option><option>Call</option></select></div>
+          <div style="margin-bottom:10px"><label class="form-label" style="display:block;margin-bottom:4px">Escalation Time</label><select class="form-select"><option value="">Any</option><option>Immediate</option><option>+10 min</option><option>+30 min</option></select></div>
+          <div><label class="form-label" style="display:block;margin-bottom:4px">Repeats</label><select class="form-select"><option value="">Any</option><option>Yes</option><option>No</option></select></div>
         </div>
       </div>
+    </div>
+    <div class="active-chips" id="insight-chips"></div>
+    <div class="insights-wrap">
+      <table class="insights-table">
+        <thead><tr>
+          <th><input type="checkbox" id="select-all-cb" style="cursor:pointer"></th>
+          <th>INSIGHT</th><th>PLANT · EQUIPMENT</th><th>TYPE</th><th>USERS</th><th>STATUS</th><th>ON</th><th></th>
+        </tr></thead>
+        <tbody id="insights-tbody"></tbody>
+      </table>
     </div>
   </div>
-</div>
 
-<!-- ── BULK ACTION BAR ── -->
-<div class="bulk-bar" id="bulk-bar">
-  <!-- Saved groups row -->
-  <div class="bulk-bar-groups">
-    <span class="bulk-bar-groups-label">Quick assign group →</span>
-    <button class="group-chip" onclick="assignGroup('Andheri Day Shift',['RK','PS','AM'])">
-      <div class="gc-avatars">
-        <div class="gc-avatar" style="background:#DBEAFE;color:#1D4ED8">RK</div>
-        <div class="gc-avatar" style="background:#FCE7F3;color:#BE185D;margin-left:-4px">PS</div>
-        <div class="gc-avatar" style="background:#D1FAE5;color:#065F46;margin-left:-4px">AM</div>
-      </div>
-      Andheri Day Shift
-    </button>
-    <button class="group-chip" onclick="assignGroup('Bandra Ops Team',['MR','SS'])">
-      <div class="gc-avatars">
-        <div class="gc-avatar" style="background:#FEF3C7;color:#92400E">MR</div>
-        <div class="gc-avatar" style="background:#D1FAE5;color:#065F46;margin-left:-4px">SS</div>
-      </div>
-      Bandra Ops Team
-    </button>
-    <button class="group-chip" onclick="assignGroup('Regional Managers',['RK','MR'])">
-      <div class="gc-avatars">
-        <div class="gc-avatar" style="background:#DBEAFE;color:#1D4ED8">RK</div>
-        <div class="gc-avatar" style="background:#FEF3C7;color:#92400E;margin-left:-4px">MR</div>
-      </div>
-      Regional Managers
-    </button>
-    <button class="group-chip" style="border-style:dashed;opacity:.6" onclick="openAddUserModal()">+ New group</button>
+  <!-- TEMPLATES TAB -->
+  <div class="tab-panel" id="tab-templates">
+    <div class="section-header">
+      <span class="section-title">Insight Templates</span>
+      <span class="section-count">12 templates</span>
+      <div style="flex:1"></div>
+      <button class="btn-primary">+ New template</button>
+    </div>
+    <div class="filter-bar" style="margin-bottom:18px">
+      <select class="filter-select"><option value="">Equipment type</option><option>Tank</option><option>Blower</option><option>Pump</option><option>Valve</option></select>
+      <select class="filter-select"><option value="">Severity</option><option>Incident</option><option>Issue</option><option>Warning</option></select>
+      <div class="search-wrap"><span class="icon">🔍</span><input type="text" placeholder="Search templates..."></div>
+    </div>
+    <div class="templates-grid" id="templates-grid"></div>
   </div>
-  <!-- Main actions row -->
-  <div class="bulk-bar-main">
+
+</main>
+
+<!-- BULK ACTION BAR -->
+<div id="bulk-bar">
+  <div class="bulk-row">
+    <span class="bulk-label">Quick assign group →</span>
+    <span id="bulk-groups"></span>
+    <button class="new-group-btn">+ New group</button>
+  </div>
+  <div class="bulk-row">
     <span class="bulk-count" id="bulk-count-label">0 selected</span>
-    <div class="bulk-actions">
-      <button class="bulk-btn" onclick="openAddUserModal()">+ Add user</button>
-      <button class="bulk-btn" onclick="bulkToggle(true)">Enable</button>
-      <button class="bulk-btn" onclick="bulkToggle(false)">Disable</button>
-      <button class="bulk-btn danger" onclick="showToast('Changes cleared','')">Clear</button>
+    <button class="bulk-action-btn" id="bulk-add-user">+ Add user</button>
+    <button class="bulk-action-btn" id="bulk-enable">Enable</button>
+    <button class="bulk-action-btn" id="bulk-disable">Disable</button>
+    <button class="bulk-clear" id="bulk-clear">Clear ×</button>
+  </div>
+</div>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay"></div>
+
+<!-- INSIGHT DETAIL DRAWER -->
+<div class="drawer" id="insight-drawer">
+  <div class="drawer-header">
+    <div id="dr-name" class="drawer-title"></div>
+    <div id="dr-meta" class="drawer-sub"></div>
+    <button class="drawer-close" id="insight-drawer-close">×</button>
+  </div>
+  <div class="drawer-tabs">
+    <button class="drawer-tab active" data-dtab="overview">Overview</button>
+    <button class="drawer-tab" data-dtab="escalation">Escalation</button>
+    <button class="drawer-tab" data-dtab="history">History</button>
+  </div>
+  <div class="drawer-body">
+    <div class="step-panel active" id="dtab-overview">
+      <div class="drawer-section">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span id="dr-status-badge" class="sev-badge"></span>
+          <div style="display:flex;align-items:center;gap:6px;margin-left:auto">
+            <label class="toggle"><input type="checkbox" id="dr-toggle" checked><span class="toggle-slider"></span></label>
+            <span style="font-size:12.5px;color:var(--ink-500)">Enabled</span>
+          </div>
+        </div>
+      </div>
+      <div class="drawer-section">
+        <div class="drawer-section-title">Condition</div>
+        <div class="condition-box" id="dr-condition"></div>
+        <button class="btn-ghost" style="margin-top:8px;font-size:12.5px">Edit conditions</button>
+      </div>
+      <div class="drawer-section">
+        <div class="drawer-section-title">Current Reading</div>
+        <div class="reading-row" id="dr-reading"></div>
+      </div>
+      <div class="drawer-section">
+        <div class="drawer-section-title">Description</div>
+        <div id="dr-desc" style="font-size:13.5px;color:var(--ink-700);line-height:1.6"></div>
+      </div>
+    </div>
+    <div class="step-panel" id="dtab-escalation">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <span class="inh-badge" id="dr-inh-badge">⬆ Inheriting plant defaults</span>
+        <button class="btn-ghost" style="font-size:12px" id="dr-override-btn">Override</button>
+      </div>
+      <div class="drawer-section-title">Playbook</div>
+      <div id="dr-playbook" style="background:var(--ink-100);border-radius:var(--radius);padding:10px 14px;font-size:12.5px;color:var(--ink-700);margin-bottom:16px;line-height:1.8"></div>
+      <div class="esc-timeline" id="dr-esc-timeline"></div>
+      <button class="add-step-btn" id="dr-add-step">+ Add escalation step</button>
+    </div>
+    <div class="step-panel" id="dtab-history">
+      <div class="history-list" id="dr-history"></div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     MODAL: Assign Users (multi-step)
-════════════════════════════════════════ -->
-<div class="overlay" id="modal-assign">
+<!-- PLANT DEFAULTS DRAWER -->
+<div class="drawer narrow" id="plant-drawer">
+  <div class="drawer-header">
+    <div class="drawer-title" id="pd-title"></div>
+    <div class="drawer-sub">Applied to all new insights at this plant. Existing insights not affected.</div>
+    <button class="drawer-close" id="plant-drawer-close">×</button>
+  </div>
+  <div class="drawer-body"><div id="pd-sections"></div></div>
+  <div style="padding:14px 20px;border-top:1px solid var(--ink-100);display:flex;gap:10px;flex-shrink:0">
+    <button class="btn-secondary" id="pd-cancel">Cancel</button>
+    <button class="btn-primary" id="pd-save">Save defaults</button>
+  </div>
+</div>
+
+<!-- ADD INSIGHT MODAL -->
+<div class="modal-overlay" id="add-insight-modal">
   <div class="modal">
     <div class="modal-header">
-      <div>
-        <div class="modal-title">Assign users</div>
-        <div class="modal-sub" id="assign-subtitle">Add users to selected insights</div>
+      <div class="modal-title">Add Insight</div>
+      <button class="modal-close" id="add-insight-close">×</button>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:14px">
+        <div class="step-dot active" id="ai-dot-1">1</div>
+        <div class="step-line" id="ai-line-1"></div>
+        <div class="step-dot" id="ai-dot-2">2</div>
+        <div class="step-line" id="ai-line-2"></div>
+        <div class="step-dot" id="ai-dot-3">3</div>
       </div>
-      <button class="modal-close" onclick="closeModal('modal-assign')">✕</button>
+      <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11.5px;color:var(--ink-500)"><span>Basics</span><span>Trigger Logic</span><span>Escalation</span></div>
     </div>
     <div class="modal-body">
-      <!-- Wizard steps -->
-      <div class="wizard-steps">
-        <div class="wizard-step active" id="wstep-1">
-          <div class="wizard-step-num">1</div>
-          <div class="wizard-step-label">Users</div>
+      <div class="step-panel active" id="ai-step-1">
+        <div class="form-row"><div class="form-group full"><label class="form-label">Plant *</label><select class="form-select" id="ai-plant"><option value="">Select plant</option><option>Andheri Plant</option><option>Bandra Plant</option><option>Powai Plant</option><option>Thane Plant</option><option>Vashi Plant</option></select></div></div>
+        <div class="form-row"><div class="form-group full"><label class="form-label">Insight name</label><input class="form-input" id="ai-name" placeholder="e.g. DO drop in aeration tank"></div></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Equipment type</label><select class="form-select" id="ai-equip-type"><option value="">Select type</option><option>Tank</option><option>Blower</option><option>Pump</option><option>Valve</option></select></div>
+          <div class="form-group"><label class="form-label">Specific equipment</label><select class="form-select" id="ai-equip"><option value="">Select equipment</option></select></div>
         </div>
-        <div class="wizard-connector" id="wconn-1"></div>
-        <div class="wizard-step" id="wstep-2">
-          <div class="wizard-step-num">2</div>
-          <div class="wizard-step-label">Timing</div>
-        </div>
-        <div class="wizard-connector" id="wconn-2"></div>
-        <div class="wizard-step" id="wstep-3">
-          <div class="wizard-step-num">3</div>
-          <div class="wizard-step-label">Channels</div>
-        </div>
-      </div>
-
-      <!-- Step 1: Users -->
-      <div id="wizard-step-1">
-        <div class="label">Who should be notified?</div>
-        <p style="font-size:12px;color:var(--ink-500);margin-bottom:10px">Search and add as many users as you need.</p>
-
-        <div class="user-search">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-          <input type="text" placeholder="Type a name, role, or saved group..." oninput="searchUsers(this.value)" id="user-search-input">
-        </div>
-
-        <div class="user-selected-chips" id="selected-user-chips"></div>
-
-        <div id="user-search-results" style="display:none"></div>
-
-        <!-- Save as group -->
-        <div id="save-group-section" style="display:none;margin-bottom:12px">
-          <button onclick="toggleSaveGroup()" id="save-group-toggle" style="font-size:12px;font-weight:600;color:var(--blue);display:flex;align-items:center;gap:5px;padding:0;background:none;border:1px solid var(--blue-border);border-radius:var(--radius);padding:7px 12px;width:100%;justify-content:flex-start;background:var(--blue-bg)">
-            <span id="save-group-icon">+</span> Save these users as a reusable group
-          </button>
-          <div id="save-group-form" style="display:none;margin-top:8px;padding:12px;background:var(--ink-100);border-radius:var(--radius)">
-            <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;cursor:pointer;margin-bottom:8px">
-              <input type="checkbox" class="checkbox" id="save-group-check" onchange="toggleGroupNameInput(this.checked)">
-              Save selection as a group
-            </label>
-            <input type="text" class="form-input" id="group-name-input" placeholder="Group name (e.g. Andheri Day Shift)" style="display:none;margin-bottom:6px">
-            <p style="font-size:11px;color:var(--ink-500)">Pick this group from the search next time.</p>
-          </div>
-        </div>
-
-        <!-- Helper: escalation summary for selected users -->
-        <div id="user-helper-box" style="display:none" class="helper-box">
-          <div style="font-weight:700;color:var(--blue);margin-bottom:6px">Current escalation setup for selected users</div>
-          <div id="user-helper-content"></div>
+        <div class="form-row"><div class="form-group"><label class="form-label">Severity</label><select class="form-select" id="ai-severity"><option value="">Select</option><option>Incident</option><option>Issue</option><option>Warning</option></select></div></div>
+        <div class="or-divider">OR pick a template</div>
+        <div class="form-row"><div class="form-group full"><label class="form-label">Template</label><select class="form-select" id="ai-template"><option value="">Select template</option></select></div></div>
+        <div id="ai-template-preview" style="display:none" class="template-preview">
+          <div class="tp-title">Template Preview</div>
+          <div class="tp-row" id="ai-tp-content"></div>
+          <button class="btn-primary" style="margin-top:10px;height:30px;font-size:12.5px" id="ai-apply-tmpl">Apply template →</button>
         </div>
       </div>
-
-      <!-- Step 2: Timing -->
-      <div id="wizard-step-2" style="display:none">
-        <div class="label">When should they be notified?</div>
-        <p style="font-size:12px;color:var(--ink-500);margin-bottom:12px">Pick a moment in the escalation timeline.</p>
-
-        <div class="time-picker">
-          <button class="time-option selected" id="time-immediately" onclick="selectTime('immediately',this)">
-            ⚡ Immediately<br><span style="font-size:10px;font-weight:400;opacity:.7">When opens</span>
-          </button>
-          <button class="time-option" id="time-10" onclick="selectTime('10',this)">
-            +10 min<br><span style="font-size:10px;font-weight:400;opacity:.7">If no response</span>
-          </button>
-          <button class="time-option" id="time-30" onclick="selectTime('30',this)">
-            +30 min<br><span style="font-size:10px;font-weight:400;opacity:.7">If still open</span>
-          </button>
-          <button class="time-option" id="time-1h" onclick="selectTime('60',this)">
-            +1 hr<br><span style="font-size:10px;font-weight:400;opacity:.7">If unresolved</span>
-          </button>
-          <button class="time-option" id="time-custom" onclick="selectTime('custom',this)">
-            ⚙ Custom<br><span style="font-size:10px;font-weight:400;opacity:.7">Set delay</span>
-          </button>
+      <div class="step-panel" id="ai-step-2">
+        <div class="drawer-section-title" style="margin-bottom:12px">Opens When</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Sensor</label><select class="form-select"><option>DO-101</option><option>PH-505</option><option>TURB-O</option><option>AMP-B2</option></select></div>
+          <div class="form-group"><label class="form-label">Operator</label><select class="form-select"><option>≥</option><option>≤</option><option>&gt;</option><option>&lt;</option></select></div>
+          <div class="form-group"><label class="form-label">Value</label><input class="form-input" placeholder="e.g. 2.0"></div>
+          <div class="form-group"><label class="form-label">For (min)</label><input class="form-input" placeholder="5"></div>
         </div>
-
-        <div id="custom-time-input" style="display:none">
-          <div class="label">Custom delay after insight opens</div>
-          <div class="custom-time">
-            <input type="number" class="form-input" style="width:70px" placeholder="0" id="custom-hours" min="0" max="48">
-            <span class="custom-time-unit">hours</span>
-            <input type="number" class="form-input" style="width:70px" placeholder="0" id="custom-minutes" min="0" max="59">
-            <span class="custom-time-unit">minutes</span>
-          </div>
-          <p style="font-size:11px;color:var(--ink-500);margin-top:6px">Or after previous escalation step with no response.</p>
+        <button class="btn-ghost" style="margin-bottom:14px;font-size:12.5px">+ Add condition (AND/OR)</button>
+        <div class="drawer-section-title" style="margin-bottom:12px">Closes When</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Sensor</label><select class="form-select"><option>DO-101</option><option>PH-505</option></select></div>
+          <div class="form-group"><label class="form-label">Operator</label><select class="form-select"><option>&gt;</option><option>≥</option><option>≤</option></select></div>
+          <div class="form-group"><label class="form-label">Value</label><input class="form-input" placeholder="e.g. 2.5"></div>
+          <div class="form-group"><label class="form-label">For (min)</label><input class="form-input" placeholder="10"></div>
         </div>
+        <div class="form-row"><div class="form-group"><label class="form-label">Auto-resolve after (hours)</label><input class="form-input" placeholder="e.g. 24"></div></div>
       </div>
-
-      <!-- Step 3: Channels -->
-      <div id="wizard-step-3" style="display:none">
-        <div class="label">How should they be notified?</div>
-        <p style="font-size:12px;color:var(--ink-500);margin-bottom:14px">Click a channel to toggle it on. Enabled channels will show a message editor.</p>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-          <div class="channel-card" id="ch-wa" onclick="toggleChannel('wa')" style="border:2px solid var(--ink-900);border-radius:var(--radius);padding:14px;cursor:pointer;background:var(--ink-900);color:#fff;transition:all .15s">
-            <div style="font-weight:700;font-size:14px">WA WhatsApp</div>
-            <div style="font-size:11px;opacity:.7;margin-top:2px">ON</div>
-          </div>
-          <div class="channel-card" id="ch-sms" onclick="toggleChannel('sms')" style="border:2px solid var(--ink-300);border-radius:var(--radius);padding:14px;cursor:pointer;background:var(--white);transition:all .15s">
-            <div style="font-weight:700;font-size:14px;color:var(--ink-700)">SMS</div>
-            <div style="font-size:11px;color:var(--ink-500);margin-top:2px">OFF</div>
-          </div>
-          <div class="channel-card" id="ch-call" onclick="toggleChannel('call')" style="border:2px solid var(--ink-300);border-radius:var(--radius);padding:14px;cursor:pointer;background:var(--white);transition:all .15s">
-            <div style="font-weight:700;font-size:14px;color:var(--ink-700)">📞 Call</div>
-            <div style="font-size:11px;color:var(--ink-500);margin-top:2px">OFF</div>
-          </div>
-          <div class="channel-card" id="ch-email" onclick="toggleChannel('email')" style="border:2px solid var(--ink-300);border-radius:var(--radius);padding:14px;cursor:pointer;background:var(--white);transition:all .15s">
-            <div style="font-weight:700;font-size:14px;color:var(--ink-700)">✉ Email</div>
-            <div style="font-size:11px;color:var(--ink-500);margin-top:2px">OFF</div>
-          </div>
+      <div class="step-panel" id="ai-step-3">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+          <span class="inh-badge">⬆ Inheriting Andheri Plant defaults for Incident</span>
+          <button class="btn-ghost" style="font-size:12px">Customize</button>
         </div>
-
-        <div id="wa-message-editor" style="margin-top:8px">
-          <div class="label">WhatsApp message template</div>
-          <textarea class="form-input" rows="3" style="resize:vertical">Hi {{user}}, {{insight}} at {{plant}}. Sensor {{sensor}} = {{value}}. Please acknowledge.</textarea>
-          <div style="display:flex;gap:8px;margin-top:6px;align-items:center">
-            <button class="btn btn-ghost btn-sm">Send test</button>
-            <span style="font-size:11px;color:var(--ink-500)">Sent via WhatsApp Business</span>
-          </div>
+        <div class="esc-timeline" id="ai-esc-timeline">
+          <div class="esc-step"><div class="esc-dot">⚡</div><div class="esc-content"><div class="esc-time">Immediately</div><div class="esc-users"><span class="av" style="background:#DBEAFE;color:#1D4ED8">RK</span><span class="av" style="background:#FCE7F3;color:#BE185D">PS</span></div><div class="esc-channels"><span class="channel-pill">WhatsApp</span><span class="channel-pill">Call</span></div></div></div>
+          <div class="esc-step"><div class="esc-dot" style="background:var(--ink-500)">2</div><div class="esc-content"><div class="esc-time">+10 min if no response</div><div class="esc-users"><span class="av" style="background:#D1FAE5;color:#065F46">AM</span></div><div class="esc-channels"><span class="channel-pill">SMS</span></div></div></div>
         </div>
+        <button class="add-step-btn" id="ai-add-step">+ Add escalation step</button>
       </div>
     </div>
-
     <div class="modal-footer">
-      <div id="wizard-summary" style="font-size:12px;color:var(--ink-500)">Pick at least one user to continue</div>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-ghost" onclick="wizardBack()" id="wizard-back-btn" style="display:none">Back</button>
-        <button class="btn btn-ghost" onclick="closeModal('modal-assign')">Cancel</button>
-        <button class="btn btn-primary" id="wizard-next-btn" onclick="wizardNext()" disabled>Next</button>
-      </div>
+      <span class="wizard-summary" id="ai-summary">Fill in the details above</span>
+      <button class="btn-secondary" id="ai-back" style="display:none">Back</button>
+      <button class="btn-secondary" id="ai-cancel">Cancel</button>
+      <button class="btn-primary" id="ai-next">Next →</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     DRAWER: Escalation Timeline (per insight)
-════════════════════════════════════════ -->
-<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
-<div class="drawer" id="drawer-esc">
-  <div class="drawer-header">
-    <div>
-      <div style="font-size:16px;font-weight:700" id="drawer-insight-name">DO drop in aeration tank</div>
-      <div style="font-size:12px;color:var(--ink-500)" id="drawer-insight-meta">Andheri Plant · Aerator A-1 · Incident</div>
+<!-- ASSIGN USERS MODAL -->
+<div class="modal-overlay" id="assign-modal">
+  <div class="modal" style="width:560px">
+    <div class="modal-header">
+      <div class="modal-title">Assign Users</div>
+      <button class="modal-close" id="assign-close">×</button>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:14px">
+        <div class="step-dot active" id="au-dot-1">1</div>
+        <div class="step-line" id="au-line-1"></div>
+        <div class="step-dot" id="au-dot-2">2</div>
+        <div class="step-line" id="au-line-2"></div>
+        <div class="step-dot" id="au-dot-3">3</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11.5px;color:var(--ink-500)"><span>Users</span><span>Timing</span><span>Channels</span></div>
     </div>
-    <button class="modal-close" onclick="closeDrawer()">✕</button>
-  </div>
-  <div class="drawer-body">
-
-    <!-- Inheritance badge -->
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding:10px 12px;background:var(--green-bg);border-radius:var(--radius);border:1px solid var(--green-border)">
-      <span style="font-size:18px">⬇</span>
-      <div>
-        <div style="font-size:12px;font-weight:700;color:var(--green)">Inheriting plant defaults</div>
-        <div style="font-size:11px;color:var(--ink-500)">Set under Andheri Plant → Incident defaults</div>
+    <div class="modal-body">
+      <div class="step-panel active" id="au-step-1">
+        <div class="user-search-wrap">
+          <input class="form-input" id="user-search-input" placeholder="Type a name, role, or saved group..." autocomplete="off">
+          <div class="user-results" id="user-results"></div>
+        </div>
+        <div class="selected-chips" id="selected-user-chips"></div>
+        <div class="save-group-section" id="save-group-section" style="display:none">
+          <div class="save-group-toggle" id="sg-toggle">
+            <span>💾</span><span>Save these users as a reusable group</span>
+            <span style="margin-left:auto" id="sg-caret">▶</span>
+          </div>
+          <div class="save-group-body" id="sg-body">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:8px;cursor:pointer"><input type="checkbox" id="sg-check"> Save selection as a group</label>
+            <input class="form-input" id="sg-name" placeholder="Group name" style="display:none">
+          </div>
+        </div>
       </div>
-      <button class="btn btn-xs btn-outline" style="margin-left:auto" onclick="overrideInheritance()">Override</button>
+      <div class="step-panel" id="au-step-2">
+        <div style="font-size:13.5px;color:var(--ink-700);margin-bottom:4px">When should this user be notified?</div>
+        <div class="timing-presets">
+          <button class="timing-btn active">Immediately</button>
+          <button class="timing-btn">+10 min</button>
+          <button class="timing-btn">+30 min</button>
+          <button class="timing-btn">+1 hr</button>
+          <button class="timing-btn" id="custom-timing-btn">Custom</button>
+        </div>
+        <div class="custom-time" id="custom-time-row">
+          <input type="number" placeholder="Hrs" min="0"> <span style="color:var(--ink-500)">h</span>
+          <input type="number" placeholder="Min" min="0" max="59"> <span style="color:var(--ink-500)">m</span>
+        </div>
+      </div>
+      <div class="step-panel" id="au-step-3">
+        <div style="font-size:13.5px;color:var(--ink-700);margin-bottom:10px">Select notification channels</div>
+        <div class="channel-cards">
+          <div class="channel-card active" data-channel="WhatsApp">
+            <div class="cc-icon">💬</div><div class="cc-name">WhatsApp</div>
+            <textarea class="channel-textarea" placeholder="Message template...">Insight alert: {{insight_name}} at {{plant}} — {{status}}</textarea>
+          </div>
+          <div class="channel-card" data-channel="SMS"><div class="cc-icon">📱</div><div class="cc-name">SMS</div></div>
+          <div class="channel-card" data-channel="Call"><div class="cc-icon">📞</div><div class="cc-name">Call</div></div>
+          <div class="channel-card" data-channel="Email"><div class="cc-icon">✉️</div><div class="cc-name">Email</div></div>
+        </div>
+      </div>
     </div>
-
-    <!-- Playbook summary -->
-    <div style="margin-bottom:20px">
-      <div class="label">Playbook</div>
-      <div style="background:var(--ink-100);border-radius:var(--radius);padding:12px 14px">
-        <div class="playbook-row">
-          <span class="playbook-when">When opens</span>
-          <span class="playbook-then">→ Notify</span>
-          <span class="playbook-token" onclick="openAddUserModal()">RK PS</span>
-          <span class="playbook-then">via</span>
-          <span class="playbook-token">WhatsApp · Call</span>
-        </div>
-        <div class="playbook-row">
-          <span class="playbook-when">+10 min</span>
-          <span class="playbook-then">→ Escalate to</span>
-          <span class="playbook-token" onclick="openAddUserModal()">AM</span>
-          <span class="playbook-then">via</span>
-          <span class="playbook-token">SMS</span>
-        </div>
-        <div class="playbook-row">
-          <span class="playbook-when">+30 min</span>
-          <span class="playbook-then">→ Escalate to</span>
-          <span class="playbook-token" style="border:1px dashed var(--ink-300);color:var(--ink-500)" onclick="openAddUserModal()">+ Add user</span>
-        </div>
-      </div>
+    <div class="modal-footer">
+      <span class="wizard-summary" id="au-summary">Select users above</span>
+      <button class="btn-secondary" id="au-back" style="display:none">Back</button>
+      <button class="btn-secondary" id="au-cancel">Cancel</button>
+      <button class="btn-primary" id="au-next">Next →</button>
     </div>
-
-    <!-- Escalation Timeline -->
-    <div class="label">Escalation timeline</div>
-    <div class="esc-timeline">
-
-      <!-- Step: Immediately -->
-      <div class="esc-step">
-        <div class="esc-spine">
-          <div class="esc-node immediate">⚡</div>
-          <div class="esc-line"></div>
-        </div>
-        <div class="esc-content">
-          <div class="esc-time-label">
-            Immediately
-            <span style="background:var(--ink-900);color:#fff;font-size:9px;padding:1px 6px;border-radius:10px">When opens</span>
-          </div>
-          <div class="esc-card">
-            <div class="esc-users">
-              <div class="esc-user-chip">
-                <div class="avatar" style="background:#DBEAFE;color:#1D4ED8">RK</div>
-                Raj Kumar
-              </div>
-              <div class="esc-user-chip">
-                <div class="avatar" style="background:#FCE7F3;color:#BE185D">PS</div>
-                Priya Singh
-              </div>
-              <button class="btn btn-xs btn-outline" onclick="openAddUserModal()">+ Add</button>
-            </div>
-            <div class="esc-channels">
-              <span class="esc-channel wa">WA WhatsApp</span>
-              <span class="esc-channel call">📞 Call</span>
-            </div>
-            <a class="esc-edit-link" onclick="openAddUserModal()">Edit users · Edit channels · Edit message →</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step: +10 min -->
-      <div class="esc-step">
-        <div class="esc-spine">
-          <div class="esc-node delayed">⏱</div>
-          <div class="esc-line"></div>
-        </div>
-        <div class="esc-content">
-          <div class="esc-time-label">
-            <button class="time-option" style="padding:3px 10px;font-size:11px" onclick="editStepTime(this)">+10 min</button>
-            <span>if no response</span>
-          </div>
-          <div class="esc-card">
-            <div class="esc-users">
-              <div class="esc-user-chip">
-                <div class="avatar" style="background:#D1FAE5;color:#065F46">AM</div>
-                Anil Mehta
-              </div>
-              <button class="btn btn-xs btn-outline" onclick="openAddUserModal()">+ Add</button>
-            </div>
-            <div class="esc-channels">
-              <span class="esc-channel sms">SMS</span>
-            </div>
-            <a class="esc-edit-link" onclick="openAddUserModal()">Edit →</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step: +30 min -->
-      <div class="esc-step">
-        <div class="esc-spine">
-          <div class="esc-node delayed">⏱</div>
-          <div class="esc-line" style="min-height:8px"></div>
-        </div>
-        <div class="esc-content">
-          <div class="esc-time-label">
-            <button class="time-option" style="padding:3px 10px;font-size:11px" onclick="editStepTime(this)">+30 min</button>
-            <span>if still open</span>
-          </div>
-          <div class="esc-card">
-            <div class="esc-users">
-              <button class="btn btn-xs btn-outline" onclick="openAddUserModal()">+ Add user</button>
-            </div>
-            <div style="font-size:11px;color:var(--ink-500)">No users assigned to this step yet.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Add step -->
-      <div class="esc-step">
-        <div class="esc-spine">
-          <div class="esc-node add" onclick="addEscalationStep(this)">+</div>
-        </div>
-        <div class="esc-content" style="padding-bottom:0">
-          <button style="font-size:12px;color:var(--ink-500);padding:6px 0;display:flex;align-items:center;gap:6px;cursor:pointer;background:none;border:none" onclick="addEscalationStep(null)">
-            + Add escalation step
-          </button>
-        </div>
-      </div>
-
-    </div>
-  </div>
-  <div class="drawer-footer">
-    <button class="btn btn-ghost" onclick="closeDrawer()">Cancel</button>
-    <button class="btn btn-primary" onclick="saveDrawer()">Save escalation</button>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     DRAWER: Plant Defaults (per plant)
-════════════════════════════════════════ -->
-<div class="drawer" id="drawer-defaults" style="width:440px">
-  <div class="drawer-header">
-    <div>
-      <div style="font-size:16px;font-weight:700" id="defaults-plant-name">Andheri Plant — Default Escalations</div>
-      <div style="font-size:12px;color:var(--ink-500)">Applied to all new insights at this plant</div>
-    </div>
-    <button class="modal-close" onclick="closeDefaultsDrawer()">✕</button>
-  </div>
-  <div class="drawer-body">
-    <p style="font-size:12px;color:var(--ink-500);margin-bottom:16px;line-height:1.6">
-      These are the default escalation rules for new insights. Individual insights can override these settings at any time.
-    </p>
-
-    <!-- Incident defaults -->
-    <div class="default-rule">
-      <div class="default-rule-header" onclick="toggleDefaultRule('incident')">
-        <div style="display:flex;align-items:center;gap:8px">
-          <span class="chip chip-incident"><span class="chip-dot"></span>Incident</span>
-          <span style="font-size:11px;color:var(--ink-500)">3 escalation steps</span>
-        </div>
-        <svg id="arr-incident" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="transition:transform .2s;transform:rotate(180deg)"><path d="M6 9l6 6 6-6"/></svg>
-      </div>
-      <div class="default-rule-body open" id="body-incident">
-        <div class="esc-timeline" style="margin-top:8px">
-          <div class="esc-step">
-            <div class="esc-spine"><div class="esc-node immediate" style="width:24px;height:24px;font-size:11px">⚡</div><div class="esc-line"></div></div>
-            <div class="esc-content">
-              <div class="esc-time-label" style="font-size:10px">Immediately</div>
-              <div class="esc-card" style="padding:8px 10px">
-                <div class="esc-users" style="gap:4px">
-                  <div class="esc-user-chip" style="font-size:11px">
-                    <div class="avatar" style="width:18px;height:18px;font-size:7px;background:#DBEAFE;color:#1D4ED8">PM</div>
-                    Plant Manager
-                  </div>
-                </div>
-                <div class="esc-channels" style="gap:4px"><span class="esc-channel wa" style="font-size:10px">WhatsApp</span><span class="esc-channel call" style="font-size:10px">Call</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="esc-step">
-            <div class="esc-spine"><div class="esc-node delayed" style="width:24px;height:24px;font-size:11px">⏱</div><div class="esc-line"></div></div>
-            <div class="esc-content">
-              <div class="esc-time-label" style="font-size:10px"><button class="time-option" style="padding:2px 8px;font-size:10px" onclick="editStepTime(this)">+10 min</button></div>
-              <div class="esc-card" style="padding:8px 10px">
-                <div class="esc-users" style="gap:4px">
-                  <div class="esc-user-chip" style="font-size:11px">
-                    <div class="avatar" style="width:18px;height:18px;font-size:7px;background:#D1FAE5;color:#065F46">SS</div>
-                    Shift Supervisor
-                  </div>
-                </div>
-                <div class="esc-channels" style="gap:4px"><span class="esc-channel sms" style="font-size:10px">SMS</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="esc-step">
-            <div class="esc-spine"><div class="esc-node delayed" style="width:24px;height:24px;font-size:11px">⏱</div></div>
-            <div class="esc-content" style="padding-bottom:0">
-              <div class="esc-time-label" style="font-size:10px"><button class="time-option" style="padding:2px 8px;font-size:10px" onclick="editStepTime(this)">+30 min</button></div>
-              <div class="esc-card" style="padding:8px 10px">
-                <div class="esc-users" style="gap:4px">
-                  <div class="esc-user-chip" style="font-size:11px">
-                    <div class="avatar" style="width:18px;height:18px;font-size:7px;background:#FCE7F3;color:#BE185D">RH</div>
-                    Regional Head
-                  </div>
-                </div>
-                <div class="esc-channels" style="gap:4px"><span class="esc-channel call" style="font-size:10px">Call</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <button class="btn btn-xs btn-outline" style="margin-top:10px" onclick="openAddUserModal()">+ Add step</button>
-        <button class="btn btn-xs btn-ghost" style="margin-top:10px;margin-left:6px" onclick="openAddUserModal()">Edit users</button>
-      </div>
-    </div>
-
-    <!-- Issue defaults -->
-    <div class="default-rule">
-      <div class="default-rule-header" onclick="toggleDefaultRule('issue')">
-        <div style="display:flex;align-items:center;gap:8px">
-          <span class="chip chip-issue"><span class="chip-dot"></span>Issue</span>
-          <span style="font-size:11px;color:var(--ink-500)">2 escalation steps</span>
-        </div>
-        <svg id="arr-issue" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="transition:transform .2s"><path d="M6 9l6 6 6-6"/></svg>
-      </div>
-      <div class="default-rule-body" id="body-issue">
-        <div style="font-size:12px;color:var(--ink-500);margin-top:8px">
-          <div class="playbook-row"><span class="playbook-when">Immediately</span><span class="playbook-then">→ Operator · WhatsApp</span></div>
-          <div class="playbook-row"><span class="playbook-when">+30 min</span><span class="playbook-then">→ Plant Manager · SMS</span></div>
-        </div>
-        <button class="btn btn-xs btn-outline" style="margin-top:10px" onclick="openAddUserModal()">Edit</button>
-      </div>
-    </div>
-
-    <!-- Warning defaults -->
-    <div class="default-rule">
-      <div class="default-rule-header" onclick="toggleDefaultRule('warning')">
-        <div style="display:flex;align-items:center;gap:8px">
-          <span class="chip chip-warning"><span class="chip-dot"></span>Warning</span>
-          <span style="font-size:11px;color:var(--ink-500)">1 escalation step</span>
-        </div>
-        <svg id="arr-warning" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="transition:transform .2s"><path d="M6 9l6 6 6-6"/></svg>
-      </div>
-      <div class="default-rule-body" id="body-warning">
-        <div style="font-size:12px;color:var(--ink-500);margin-top:8px">
-          <div class="playbook-row"><span class="playbook-when">Immediately</span><span class="playbook-then">→ Operator · WhatsApp</span></div>
-        </div>
-        <button class="btn btn-xs btn-outline" style="margin-top:10px" onclick="openAddUserModal()">Edit</button>
-      </div>
-    </div>
-
-  </div>
-  <div class="drawer-footer">
-    <button class="btn btn-ghost" onclick="closeDefaultsDrawer()">Cancel</button>
-    <button class="btn btn-primary" onclick="saveDefaultsDrawer()">Save defaults</button>
-  </div>
-</div>
-
-<!-- ── TOAST ── -->
-<div class="toast" id="toast">
-  <span id="toast-msg"></span>
-  <span class="toast-undo" id="toast-undo" onclick="hideToast()" style="display:none">Undo</span>
-</div>
+<!-- TOAST -->
+<div id="toast"><span id="toast-msg"></span></div>
 
 <script>
-// ══════════════════════════════════
-// DATA
-// ══════════════════════════════════
-const PLANTS = [
-  {
-    id:'andheri',name:'Andheri Plant',location:'Mumbai',mld:25,
-    badges:[{type:'incident',label:'2 incident'},{type:'issue',label:'1 issue'}],
-    bar:[{color:'#DC2626',w:40},{color:'#EA580C',w:20},{color:'#E2E8F0',w:40}],
-    activeInsights:4,configured:true,
-  },
-  {
-    id:'bandra',name:'Bandra Plant',location:'Mumbai',mld:18,
-    badges:[{type:'issue',label:'2 issue'}],
-    bar:[{color:'#EA580C',w:40},{color:'#E2E8F0',w:60}],
-    activeInsights:5,configured:true,
-  },
-  {
-    id:'powai',name:'Powai Plant',location:'Mumbai',mld:12,
-    badges:[{type:'warning',label:'2 warning'}],
-    bar:[{color:'#D97706',w:30},{color:'#E2E8F0',w:70}],
-    activeInsights:4,configured:false,
-  },
-  {
-    id:'thane',name:'Thane Plant',location:'Thane',mld:30,
-    badges:[{type:'warning',label:'1 warning'}],
-    bar:[{color:'#D97706',w:15},{color:'#E2E8F0',w:85}],
-    activeInsights:3,configured:true,
-  },
-  {
-    id:'vashi',name:'Vashi Plant',location:'Navi Mumbai',mld:20,
-    badges:[{type:'clear',label:'all clear'}],
-    bar:[{color:'#16A34A',w:100}],
-    activeInsights:2,configured:false,
-  },
+// ===== DATA =====
+const PLANTS=[
+  {id:'andheri',name:'Andheri Plant',location:'Mumbai',mld:25,active:4,sev:'red',badges:[{cls:'red',label:'2 incident'},{cls:'orange',label:'1 issue'}],configured:true},
+  {id:'bandra',name:'Bandra Plant',location:'Mumbai',mld:18,active:5,sev:'orange',badges:[{cls:'orange',label:'2 issue'}],configured:true},
+  {id:'powai',name:'Powai Plant',location:'Mumbai',mld:12,active:4,sev:'amber',badges:[{cls:'amber',label:'2 warning'}],configured:false},
+  {id:'thane',name:'Thane Plant',location:'Thane',mld:30,active:3,sev:'amber',badges:[{cls:'amber',label:'1 warning'}],configured:true},
+  {id:'vashi',name:'Vashi Plant',location:'Navi Mumbai',mld:20,active:2,sev:'green',badges:[{cls:'green',label:'all clear'}],configured:false},
+];
+const AVC={RK:['#DBEAFE','#1D4ED8'],PS:['#FCE7F3','#BE185D'],AM:['#D1FAE5','#065F46'],MR:['#FEF3C7','#92400E'],SS:['#D1FAE5','#065F46'],O:['#E0E7FF','#4338CA']};
+const ALL_USERS=[
+  {id:'RK',name:'Raj Kumar',role:'Plant Manager',plant:'Andheri Plant'},
+  {id:'PS',name:'Priya Sharma',role:'Shift Supervisor',plant:'Andheri Plant'},
+  {id:'AM',name:'Ananya M',role:'Operator',plant:'Andheri Plant'},
+  {id:'MR',name:'Meera Rao',role:'Ops Lead',plant:'Bandra Plant'},
+  {id:'SS',name:'Suresh S',role:'Operator',plant:'Bandra Plant'},
+  {id:'O',name:'Omar',role:'Engineer',plant:'Powai Plant'},
+];
+const GROUPS=[
+  {id:'andheri-day',name:'Andheri Day Shift',plantId:'andheri',users:['RK','PS','AM']},
+  {id:'bandra-ops',name:'Bandra Ops Team',plantId:'bandra',users:['MR','SS']},
+  {id:'all-mgr',name:'All Plants Manager',plantId:null,users:['RK','MR']},
+];
+const INSIGHTS=[
+  {id:1,name:'DO drop in aeration tank',sensor:'DO-101 · < 2.0 mg/L',plant:'Andheri Plant',plantId:'andheri',equip:'Aerator A-1',type:'incident',users:['RK','PS'],status:'Active · 2h 14m',statusType:'active',on:true,opens:'DO-101 ≥ 2.0 mg/L for 5 min',closes:'DO-101 > 2.5 mg/L for 10 min',reading:'1.8 mg/L',desc:'Monitors dissolved oxygen in the aeration tank. Low DO leads to poor biological treatment efficiency.'},
+  {id:2,name:'Inlet pump vibration high',sensor:'VIB-203 · > 8 mm/s',plant:'Andheri Plant',plantId:'andheri',equip:'Pump P-3',type:'incident',users:['RK'],status:'Active · 47m',statusType:'active',on:true,opens:'VIB-203 ≥ 8 mm/s for 3 min',closes:'VIB-203 < 6 mm/s for 5 min',reading:'9.2 mm/s',desc:'High vibration on the inlet pump may indicate bearing failure or cavitation.'},
+  {id:3,name:'pH out of range',sensor:'PH-505 · 5.5–9.0',plant:'Andheri Plant',plantId:'andheri',equip:'Equalization tank',type:'issue',users:['AM'],status:'Active · 1h 02m',statusType:'active',on:true,opens:'PH-505 outside 5.5–9.0 for 10 min',closes:'PH-505 within 6.0–8.5 for 15 min',reading:'5.2',desc:'pH outside range can disrupt biological treatment and violates discharge norms.'},
+  {id:4,name:'Blower load high',sensor:'AMP-B2 · > 80 A',plant:'Bandra Plant',plantId:'bandra',equip:'Blower B-2',type:'issue',users:['MR'],status:'Active · 3h 11m',statusType:'active',on:true,opens:'AMP-B2 > 80 A for 5 min',closes:'AMP-B2 < 75 A for 10 min',reading:'83 A',desc:'Excessive blower amperage indicates overload risk and potential motor damage.'},
+  {id:5,name:'MLSS below target',sensor:'MLSS-1 · > 2500 mg/L',plant:'Bandra Plant',plantId:'bandra',equip:'Aeration tank',type:'issue',users:[],status:'Active · 4h',statusType:'active',on:true,opens:'MLSS-1 < 2500 mg/L for 30 min',closes:'MLSS-1 > 2800 mg/L for 30 min',reading:'2100 mg/L',desc:'Low MLSS reduces biological treatment capacity. Check sludge wasting rates.'},
+  {id:6,name:'Effluent turbidity rising',sensor:'TURB-O · > 5 NTU',plant:'Powai Plant',plantId:'powai',equip:'Outlet',type:'warning',users:['O'],status:'Active · 30m',statusType:'active',on:true,opens:'TURB-O > 5 NTU for 5 min',closes:'TURB-O ≤ 3 NTU for 10 min',reading:'6.1 NTU',desc:'Rising effluent turbidity may indicate filter breakthrough or sludge carryover.'},
+  {id:7,name:'Sludge pump runtime over limit',sensor:'RT-SP · > 8 hrs/day',plant:'Powai Plant',plantId:'powai',equip:'Sludge pump',type:'warning',users:[],status:'Active · 1h 20m',statusType:'active',on:true,opens:'RT-SP > 8 hrs in 24h window',closes:'New day cycle begins',reading:'8.4 hrs today',desc:'Pump running over daily runtime limit may cause early wear.'},
+  {id:8,name:'Chlorine dosing low',sensor:'CL-1 · < 0.5 mg/L',plant:'Thane Plant',plantId:'thane',equip:'Cl₂ doser',type:'warning',users:['MR'],status:'Acknowledged · 5h ago',statusType:'acknowledged',on:true,opens:'CL-1 < 0.5 mg/L for 10 min',closes:'CL-1 > 0.8 mg/L for 5 min',reading:'0.3 mg/L',desc:'Low chlorine dosing risks inadequate disinfection of treated effluent.'},
+  {id:9,name:'Conveyor belt speed deviation',sensor:'SPD-C · nominal ±15%',plant:'Bandra Plant',plantId:'bandra',equip:'Conveyor',type:'warning',users:['RK'],status:'Resolved · 1h ago',statusType:'resolved',on:true,opens:'SPD-C deviates >15% from nominal',closes:'SPD-C within ±10% for 5 min',reading:'Nominal',desc:'Speed deviation in sludge conveyor may lead to overflow or jamming.'},
+  {id:10,name:'Feed water pH out of range',sensor:'PH-IN · 6.5–8.5',plant:'Thane Plant',plantId:'thane',equip:'Inlet tank',type:'warning',users:['SS'],status:'Active · 22m',statusType:'active',on:true,opens:'PH-IN outside 6.5–8.5 for 5 min',closes:'PH-IN within 6.8–8.2 for 10 min',reading:'8.7',desc:'Inlet feed water pH out of range may damage biological media.'},
+];
+const TEMPLATES=[
+  {id:1,icon:'🫧',equip:'Tank',name:'DO Threshold Alert',trigger:'DO sensor drops below set threshold',sev:'incident',plants:3},
+  {id:2,icon:'🧪',equip:'Tank',name:'pH Out of Range',trigger:'pH goes outside 6.5–9.0 range',sev:'issue',plants:5},
+  {id:3,icon:'💧',equip:'Tank',name:'Turbidity Spike',trigger:'NTU exceeds limit',sev:'warning',plants:2},
+  {id:4,icon:'💨',equip:'Blower',name:'Blower Load High',trigger:'Amperage exceeds rated load',sev:'issue',plants:4},
+  {id:5,icon:'⏱',equip:'Blower',name:'Blower Runtime Exceeded',trigger:'Runtime exceeds daily limit',sev:'warning',plants:3},
+  {id:6,icon:'🔧',equip:'Pump',name:'Pump Vibration High',trigger:'Vibration > 8 mm/s',sev:'incident',plants:2},
+  {id:7,icon:'🚱',equip:'Pump',name:'Pump Dry Run',trigger:'No flow detected during operation',sev:'incident',plants:1},
+  {id:8,icon:'🚰',equip:'Valve',name:'Valve Stuck Open',trigger:'Valve position unchanged for >30 min',sev:'issue',plants:2},
+  {id:9,icon:'🌊',equip:'Tank',name:'Inlet Flow Low',trigger:'Inlet flow drops below minimum',sev:'warning',plants:3},
+  {id:10,icon:'🧫',equip:'Tank',name:'MLSS Below Target',trigger:'Mixed liquor suspended solids below threshold',sev:'issue',plants:4},
+  {id:11,icon:'🟡',equip:'Valve',name:'Chlorine Dosing Low',trigger:'Chlorine dosing rate drops',sev:'issue',plants:3},
+  {id:12,icon:'⚙️',equip:'Pump',name:'Sludge Pump Overtime',trigger:'Pump runtime exceeds 8 hrs/day',sev:'warning',plants:2},
 ];
 
-const INSIGHTS = [
-  {id:1,name:'DO drop in aeration tank',sensor:'DO-101 · < 2.0 mg/L',plant:'Andheri Plant',equip:'Aerator A-1',type:'incident',status:'active',statusLabel:'Active · 2h 14m',users:[{initials:'RK',bg:'#DBEAFE',color:'#1D4ED8'},{initials:'PS',bg:'#FCE7F3',color:'#BE185D'}],on:true,complete:true},
-  {id:2,name:'Inlet pump vibration high',sensor:'VIB-203 · > 8 mm/s',plant:'Andheri Plant',equip:'Pump P-3',type:'incident',status:'active',statusLabel:'Active · 47m',users:[{initials:'RK',bg:'#DBEAFE',color:'#1D4ED8'}],on:true,complete:true},
-  {id:3,name:'pH out of range',sensor:'PH-505 · 5.5–9.0',plant:'Andheri Plant',equip:'Equalization tank',type:'issue',status:'active',statusLabel:'Active · 1h 02m',users:[{initials:'AM',bg:'#D1FAE5',color:'#065F46'}],on:true,complete:true},
-  {id:4,name:'Blower load high',sensor:'AMP-B2 · > 80 A',plant:'Bandra Plant',equip:'Blower B-2',type:'issue',status:'active',statusLabel:'Active · 3h 11m',users:[{initials:'MR',bg:'#FEF3C7',color:'#92400E'}],on:true,complete:true},
-  {id:5,name:'MLSS below target',sensor:'MLSS-1 · > 2500 mg/L',plant:'Bandra Plant',equip:'Aeration tank',type:'issue',status:'active',statusLabel:'Active · 4h',users:[],on:true,complete:false},
-  {id:6,name:'Effluent turbidity rising',sensor:'TURB-O · > 5 NTU',plant:'Powai Plant',equip:'Outlet',type:'warning',status:'active',statusLabel:'Active · 30m',users:[{initials:'O',bg:'#E0E7FF',color:'#4338CA'}],on:true,complete:true},
-  {id:7,name:'Sludge pump runtime over limit',sensor:'RT-SP · > 8 hrs/day',plant:'Powai Plant',equip:'Sludge pump',type:'warning',status:'active',statusLabel:'Active · 1h 20m',users:[],on:true,complete:false},
-  {id:8,name:'Chlorine dosing low',sensor:'CL-1 · < 0.5 mg/L',plant:'Thane Plant',equip:'Cl₂ doser',type:'warning',status:'resolved',statusLabel:'Acknowledged · 5h ago',users:[{initials:'MR',bg:'#FEF3C7',color:'#92400E'}],on:true,complete:true},
-  {id:9,name:'Conveyor belt speed deviation',sensor:'SPD-C · nominal ±15%',plant:'Bandra Plant',equip:'Conveyor',type:'warning',status:'resolved',statusLabel:'Resolved · 1h ago',users:[{initials:'RK',bg:'#DBEAFE',color:'#1D4ED8'}],on:true,complete:true},
-  {id:10,name:'Feed water pH out of range',sensor:'PH-IN · 6.5–8.5',plant:'Thane Plant',equip:'Inlet tank',type:'warning',status:'active',statusLabel:'Active · 22m',users:[{initials:'SS',bg:'#D1FAE5',color:'#065F46'}],on:true,complete:true},
-];
+// ===== STATE =====
+const selectedInsights=new Set();
+let plantFilter='';
+let toastTimer=null;
+let aiStep=1,auStep=1;
+let selectedUsers=[];
+let selectedTiming='Immediately';
+let activeChannels=new Set(['WhatsApp']);
 
-const USERS_DB = [
-  {id:'rk',name:'Raj Kumar',role:'Plant Manager',initials:'RK',bg:'#DBEAFE',color:'#1D4ED8',
-   escalations:[{plant:'Andheri Plant',insights:5,timing:'Immediately',channels:'WhatsApp · Call'},{plant:'Bandra Plant',insights:2,timing:'+30 min',channels:'SMS'}]},
-  {id:'ps',name:'Priya Singh',role:'Shift Supervisor',initials:'PS',bg:'#FCE7F3',color:'#BE185D',
-   escalations:[{plant:'Andheri Plant',insights:3,timing:'Immediately',channels:'WhatsApp'}]},
-  {id:'am',name:'Anil Mehta',role:'Operator',initials:'AM',bg:'#D1FAE5',color:'#065F46',
-   escalations:[{plant:'Andheri Plant',insights:2,timing:'+10 min',channels:'SMS'},{plant:'Powai Plant',insights:1,timing:'Immediately',channels:'WhatsApp'}]},
-  {id:'mr',name:'Meera Rao',role:'Regional Head',initials:'MR',bg:'#FEF3C7',color:'#92400E',
-   escalations:[{plant:'Bandra Plant',insights:8,timing:'+30 min',channels:'Call'},{plant:'Thane Plant',insights:3,timing:'Immediately',channels:'WhatsApp · SMS'}]},
-  {id:'ss',name:'Suresh Shah',role:'Operator',initials:'SS',bg:'#D1FAE5',color:'#065F46',
-   escalations:[{plant:'Thane Plant',insights:4,timing:'Immediately',channels:'WhatsApp'}]},
-];
-
-// ══════════════════════════════════
-// STATE
-// ══════════════════════════════════
-let currentTab = 'plants';
-let selectedInsights = new Set();
-let selectedUsers = [];
-let wizardStep = 1;
-let selectedTime = 'immediately';
-let channels = {wa:true,sms:false,call:false,email:false};
-let insightData = [...INSIGHTS];
-
-// ══════════════════════════════════
-// INIT
-// ══════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
-  renderPlants(PLANTS);
-  renderInsights(insightData);
-});
-
-// ══════════════════════════════════
-// TAB SWITCHING
-// ══════════════════════════════════
-function switchTab(tab) {
-  currentTab = tab;
-  document.getElementById('panel-plants').style.display = tab === 'plants' ? 'block' : 'none';
-  document.getElementById('panel-insights').style.display = tab === 'insights' ? 'block' : 'none';
-  document.getElementById('tab-plants').classList.toggle('active', tab === 'plants');
-  document.getElementById('tab-insights').classList.toggle('active', tab === 'insights');
-  document.getElementById('main-cta').textContent = tab === 'plants' ? '⚙ Manage defaults' : '+ Add insight';
+// ===== HELPERS =====
+function av(id){const c=AVC[id]||['#E5E7EB','#374151'];return`<span class="av" style="background:${c[0]};color:${c[1]}">${id}</span>`;}
+function miniAv(id){const c=AVC[id]||['#E5E7EB','#374151'];return`<span class="mini-av" style="background:${c[0]};color:${c[1]}">${id}</span>`;}
+function showToast(msg){
+  if(toastTimer)clearTimeout(toastTimer);
+  document.getElementById('toast-msg').textContent=msg;
+  const t=document.getElementById('toast');
+  t.classList.add('show');
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
 }
-
-function handleCTA() {
-  if (currentTab === 'plants') {
-    showToast('Select a plant card to configure defaults', '');
-  } else {
-    showToast('Add insight form — coming in full implementation', '');
-  }
+function openDrawer(id){
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById(id).classList.add('open');
 }
+function closeDrawer(id){
+  document.getElementById(id).classList.remove('open');
+  if(!document.querySelector('.drawer.open'))document.getElementById('overlay').classList.remove('open');
+}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
 
-function showSection(s) { /* already handled by switchTab */ }
-
-// ══════════════════════════════════
-// PLANTS
-// ══════════════════════════════════
-function renderPlants(plants) {
-  const grid = document.getElementById('plants-grid');
-  grid.innerHTML = plants.map(p => `
-    <div class="plant-card" id="plant-${p.id}">
-      <div class="plant-severity-bar">
-        ${p.bar.map(s => `<div class="seg" style="background:${s.color};flex:${s.w}"></div>`).join('')}
-      </div>
-      <div class="plant-card-body">
-        <div class="plant-name">${p.name}</div>
-        <div class="plant-meta">${p.location} · ${p.mld} MLD · ${p.activeInsights} active insights</div>
-        <div class="plant-badges">
-          ${p.badges.map(b => `<span class="plant-badge ${b.type}"><span style="width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block"></span>${b.label}</span>`).join('')}
+// ===== RENDER PLANTS =====
+function renderPlants(){
+  const search=document.getElementById('plant-search').value.toLowerCase();
+  const loc=document.getElementById('plant-location-filter').value;
+  const sev=document.getElementById('plant-severity-filter').value.toLowerCase();
+  const cfg=document.getElementById('plant-config-filter').value;
+  const filtered=PLANTS.filter(p=>{
+    if(search&&!p.name.toLowerCase().includes(search)&&!p.location.toLowerCase().includes(search))return false;
+    if(loc&&p.location!==loc)return false;
+    if(cfg==='Configured'&&!p.configured)return false;
+    if(cfg==='Not configured'&&p.configured)return false;
+    if(sev){if(sev==='all clear'&&p.sev!=='green')return false;if(sev==='incident'&&p.sev!=='red')return false;if(sev==='issue'&&p.sev!=='orange')return false;if(sev==='warning'&&p.sev!=='amber')return false;}
+    return true;
+  });
+  document.getElementById('plant-list').innerHTML=filtered.map(p=>`
+    <div class="plant-row sev-${p.sev}">
+      <div class="plant-main">
+        <div class="plant-info">
+          <div class="plant-name">${p.name}</div>
+          <div class="plant-meta">${p.location} · ${p.mld} MLD</div>
         </div>
-        ${!p.configured ? `<div style="font-size:11px;color:var(--amber);display:flex;align-items:center;gap:5px;margin-top:6px">⚠ Escalation defaults not configured <a class="fix-link" onclick="openDefaultsDrawer('${p.id}')">Set up →</a></div>` : ''}
+        <div class="plant-badges">
+          ${p.badges.map(b=>`<span class="sev-badge ${b.cls}">${b.label}</span>`).join('')}
+          ${!p.configured?'<span class="warn-badge">⚠ Defaults not set</span>':''}
+        </div>
+        <div class="plant-insights-count">${p.active} active insights</div>
       </div>
       <div class="plant-actions">
-        <button class="plant-action-btn primary" onclick="switchTab('insights');applyInsightFilterByPlant('${p.name}')">View insights</button>
-        <button class="plant-action-btn" onclick="openDefaultsDrawer('${p.id}')">⚡ Escalations</button>
-        <button class="plant-action-btn" onclick="showToast('Digest configuration — coming soon','')">✉ Digests</button>
+        <button class="action-link" onclick="viewPlantInsights('${p.id}')">View insights →</button>
+        <button class="action-btn" onclick="openPlantDrawer('${p.id}')">⚡ Escalations</button>
+        <button class="action-btn">✉ Digests</button>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-function filterPlants(query) {
-  const q = query.toLowerCase();
-  const filtered = PLANTS.filter(p =>
-    p.name.toLowerCase().includes(q) || p.location.toLowerCase().includes(q)
-  );
-  renderPlants(filtered);
+// ===== RENDER INSIGHTS =====
+function renderInsights(){
+  const search=document.getElementById('insight-search').value.toLowerCase();
+  const pf=document.getElementById('ins-plant-filter').value;
+  const tf=document.getElementById('ins-type-filter').value.toLowerCase();
+  const sf=document.getElementById('ins-state-filter').value;
+  const filtered=INSIGHTS.filter(i=>{
+    if(search&&!i.name.toLowerCase().includes(search)&&!i.sensor.toLowerCase().includes(search)&&!i.equip.toLowerCase().includes(search))return false;
+    if(pf&&i.plant!==pf)return false;
+    if(tf&&i.type!==tf)return false;
+    if(sf&&i.statusType.toLowerCase()!==sf.toLowerCase())return false;
+    if(plantFilter&&i.plantId!==plantFilter)return false;
+    return true;
+  });
+  const sc={incident:'sev-red',issue:'sev-orange',warning:'sev-amber'};
+  const dc={active:'red',acknowledged:'amber',resolved:'grey'};
+  document.getElementById('insights-tbody').innerHTML=filtered.map(i=>{
+    const noUsers=i.users.length===0;
+    const usersHtml=noUsers?`<button class="add-user-btn" onclick="event.stopPropagation();openAssignModal()">+ Add</button>`:i.users.map(u=>av(u)).join('');
+    return`<tr class="${sc[i.type]||''} ${i.statusType==='resolved'?'resolved':''}" data-id="${i.id}">
+      <td onclick="event.stopPropagation()"><input type="checkbox" class="row-cb" data-id="${i.id}" ${selectedInsights.has(i.id)?'checked':''} style="cursor:pointer"></td>
+      <td><div class="insight-name">${i.name}${noUsers?`<span class="no-users-badge">⚠ no users</span><span class="fix-link" onclick="event.stopPropagation();openAssignModal()">Fix →</span>`:''}</div><div class="insight-sensor">${i.sensor}</div></td>
+      <td><div class="insight-plant">${i.plant}</div><div class="insight-equip">${i.equip}</div></td>
+      <td><span class="type-chip ${i.type}">${i.type.charAt(0).toUpperCase()+i.type.slice(1)}</span></td>
+      <td><div class="avatars">${usersHtml}</div></td>
+      <td><div class="status-dot"><span class="dot ${dc[i.statusType]||'grey'}"></span>${i.status}</div></td>
+      <td onclick="event.stopPropagation()"><label class="toggle"><input type="checkbox" class="ins-toggle" data-id="${i.id}" ${i.on?'checked':''}><span class="toggle-slider"></span></label></td>
+      <td class="chevron-cell">›</td>
+    </tr>`;
+  }).join('');
+  // bind row clicks
+  document.querySelectorAll('#insights-tbody tr').forEach(row=>{
+    row.addEventListener('click',e=>{
+      if(e.target.closest('td:first-child')||e.target.closest('td:nth-child(7)'))return;
+      openInsightDrawer(+row.dataset.id);
+    });
+  });
+  // bind checkboxes
+  document.querySelectorAll('.row-cb').forEach(cb=>{
+    cb.addEventListener('change',()=>{
+      const id=+cb.dataset.id;
+      if(cb.checked)selectedInsights.add(id);else selectedInsights.delete(id);
+      updateBulkBar();
+    });
+  });
+  // bind toggles
+  document.querySelectorAll('.ins-toggle').forEach(t=>{
+    t.addEventListener('change',()=>{
+      const i=INSIGHTS.find(x=>x.id===+t.dataset.id);
+      if(i)i.on=t.checked;
+      showToast(`✓ Insight ${t.checked?'enabled':'disabled'}`);
+    });
+  });
 }
 
-function applyPlantFilter(type, sel) {
-  const val = sel.value;
-  if (val) sel.classList.add('filter-active');
-  else sel.classList.remove('filter-active');
+function renderInsightChips(){
+  const chips=[];
+  const pf=document.getElementById('ins-plant-filter').value;
+  if(pf)chips.push({label:`Plant: ${pf}`,cb:()=>{document.getElementById('ins-plant-filter').value='';renderInsights();renderInsightChips();}});
+  if(plantFilter){const p=PLANTS.find(x=>x.id===plantFilter);if(p)chips.push({label:`Plant: ${p.name}`,cb:()=>{plantFilter='';renderInsights();renderInsightChips();}});}
+  document.getElementById('insight-chips').innerHTML=chips.map((c,i)=>`<span class="chip">${c.label}<span class="chip-x" data-i="${i}">×</span></span>`).join('');
+  document.querySelectorAll('#insight-chips .chip-x').forEach(x=>x.addEventListener('click',()=>chips[+x.dataset.i].cb()));
 }
 
-function applyInsightFilterByPlant(plantName) {
-  const sel = document.getElementById('f-plant');
-  sel.value = plantName;
-  sel.classList.add('filter-active');
-  applyInsightFilter();
+// ===== RENDER TEMPLATES =====
+function renderTemplates(){
+  const tmplSel=document.getElementById('ai-template');
+  tmplSel.innerHTML='<option value="">Select template</option>'+TEMPLATES.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
+  document.getElementById('templates-grid').innerHTML=TEMPLATES.map(t=>`
+    <div class="template-card">
+      <div class="tc-icon">${t.icon}</div>
+      <div class="tc-equip">${t.equip}</div>
+      <div class="tc-name">${t.name}</div>
+      <div class="tc-trigger">${t.trigger}</div>
+      <div class="tc-footer"><span class="type-chip ${t.sev}">${t.sev.charAt(0).toUpperCase()+t.sev.slice(1)}</span><span class="tc-used">Used in ${t.plants} plant${t.plants!==1?'s':''}</span></div>
+      <div class="tc-actions"><button class="use-template-btn" onclick="useTemplate(${t.id})">Use template</button><button class="preview-link">Preview</button></div>
+    </div>`).join('');
 }
 
-// ══════════════════════════════════
-// INSIGHTS TABLE
-// ══════════════════════════════════
-function renderInsights(data) {
-  const tbody = document.getElementById('insights-tbody');
-  tbody.innerHTML = data.map(ins => `
-    <tr class="severity-${ins.status === 'resolved' ? 'resolved' : ins.type}" id="row-${ins.id}">
-      <td><input type="checkbox" class="checkbox" data-id="${ins.id}" onchange="toggleInsightSelect(${ins.id},this.checked)"></td>
-      <td>
-        <div style="font-weight:600;font-size:13px;display:flex;align-items:center;gap:6px">
-          ${ins.name}
-          ${!ins.complete ? `<span style="font-size:10px;color:var(--red);background:var(--red-bg);padding:1px 6px;border-radius:10px;font-weight:600">⚠ incomplete</span>` : ''}
-        </div>
-        <div style="font-size:11px;color:var(--ink-500);margin-top:1px">${ins.sensor}</div>
-        ${!ins.complete ? `<a class="fix-link" onclick="openAddUserModal()">Add user →</a>` : ''}
-      </td>
-      <td>
-        <div style="font-size:13px;font-weight:500">${ins.plant}</div>
-        <div style="font-size:11px;color:var(--ink-500)">${ins.equip}</div>
-      </td>
-      <td><span class="chip chip-${ins.type}"><span class="chip-dot"></span>${cap(ins.type)}</span></td>
-      <td>
-        <div style="display:flex;gap:3px;align-items:center;flex-wrap:wrap">
-          ${ins.users.map(u => `<div class="avatar" style="background:${u.bg};color:${u.color}">${u.initials}</div>`).join('')}
-          ${ins.users.length === 0 ? `<button class="btn btn-xs" style="border:1px dashed var(--ink-300);color:var(--ink-500);background:transparent" onclick="openAddUserModal()">+ Add</button>` : `<button class="btn btn-xs btn-outline" onclick="openAddUserModal()" title="Edit users">✎</button>`}
-        </div>
-      </td>
-      <td>
-        <div class="${ins.status === 'active' ? 'status-active' : 'status-resolved'}" style="display:flex;align-items:center;gap:5px">
-          <span style="width:7px;height:7px;border-radius:50%;background:${ins.status === 'active' ? 'var(--green)' : 'var(--ink-300)'};flex-shrink:0"></span>
-          ${ins.statusLabel}
-        </div>
-      </td>
-      <td>
-        <label class="toggle" title="Toggle insight on/off">
-          <input type="checkbox" ${ins.on ? 'checked' : ''} onchange="toggleInsight(${ins.id},this.checked)">
-          <div class="toggle-track"></div>
-          <div class="toggle-thumb"></div>
-        </label>
-      </td>
-    </tr>
-    <!-- Expandable escalation row (hidden by default) -->
-    <tr id="esc-row-${ins.id}" style="display:none;background:var(--ink-100)">
-      <td colspan="7" style="padding:12px 16px">
-        <div style="font-size:12px;color:var(--ink-500)">Escalation detail — click row to expand</div>
-      </td>
-    </tr>
-  `).join('');
-  document.getElementById('insights-count').textContent = `${data.length} insights`;
+// ===== TAB SWITCHING =====
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+  });
+});
+function switchToTab(name){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+name));
+}
+function viewPlantInsights(id){plantFilter=id;switchToTab('insights');renderInsights();renderInsightChips();}
+
+// ===== INSIGHT DRAWER =====
+function openInsightDrawer(id){
+  const i=INSIGHTS.find(x=>x.id===id);if(!i)return;
+  document.getElementById('dr-name').textContent=i.name;
+  document.getElementById('dr-meta').textContent=`${i.plant} · ${i.equip}`;
+  const sb=document.getElementById('dr-status-badge');
+  sb.textContent=i.status;
+  const scls={incident:'red',issue:'orange',warning:'amber'};
+  sb.className='sev-badge '+(scls[i.type]||'green');
+  document.getElementById('dr-toggle').checked=i.on;
+  document.getElementById('dr-condition').innerHTML=`<b>Opens when:</b> ${i.opens}<br><b>Closes when:</b> ${i.closes}`;
+  document.getElementById('dr-reading').innerHTML=`<span>Sensor: <b>${i.sensor.split('·')[0].trim()}</b></span><span style="margin-left:auto"><span class="reading-val">${i.reading}</span></span><span style="color:var(--ink-500);font-size:12px">Updated 2 min ago</span>`;
+  document.getElementById('dr-desc').textContent=i.desc;
+  const steps=[
+    {time:'Immediately',users:i.users.length?i.users:['RK'],channels:['WhatsApp','Call']},
+    {time:'+10 min if no response',users:['AM'],channels:['SMS']},
+  ];
+  renderEscTimeline('dr-esc-timeline',steps);
+  document.getElementById('dr-playbook').innerHTML=`When opens → Notify ${steps[0].users.join(', ')} via ${steps[0].channels.join(' · ')}<br>+10 min → Escalate to ${steps[1].users.join(', ')} via ${steps[1].channels.join(' · ')}`;
+  document.getElementById('dr-history').innerHTML=`
+    <div class="history-item"><div class="history-dot active"></div><div><b>Currently active</b>${i.statusType==='active'?' · opened '+i.status.replace('Active · ',''):''}${i.statusType==='resolved'?' · '+i.status.replace('Resolved · ',''):''}${i.statusType==='acknowledged'?' · '+i.status.replace('Acknowledged · ',''):''}</div></div>
+    <div class="history-item"><div class="history-dot"></div><div><b>Resolved</b> · yesterday · 45 min duration · by Raj Kumar</div></div>
+    <div class="history-item"><div class="history-dot"></div><div><b>Resolved</b> · 3 days ago · 2h 10m duration · auto-resolved</div></div>`;
+  setDrawerTab('overview');
+  openDrawer('insight-drawer');
 }
 
-function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+function setDrawerTab(name){
+  document.querySelectorAll('.drawer-tab').forEach(t=>t.classList.toggle('active',t.dataset.dtab===name));
+  document.querySelectorAll('#insight-drawer .step-panel').forEach(p=>p.classList.toggle('active',p.id==='dtab-'+name));
+}
+document.querySelectorAll('.drawer-tab').forEach(t=>t.addEventListener('click',()=>setDrawerTab(t.dataset.dtab)));
 
-function toggleInsight(id, on) {
-  const ins = insightData.find(i => i.id === id);
-  if (ins) ins.on = on;
-  showToast(`${on ? 'Enabled' : 'Disabled'} — ${insightData.find(i=>i.id===id)?.name}`, 'Undo');
+document.getElementById('dr-override-btn').addEventListener('click',()=>{
+  const b=document.getElementById('dr-inh-badge');
+  if(b.classList.contains('custom')){b.classList.remove('custom');b.textContent='⬆ Inheriting plant defaults';}
+  else{b.classList.add('custom');b.textContent='✎ Custom escalation';showToast('Escalation set to custom mode');}
+});
+
+document.getElementById('dr-add-step').addEventListener('click',()=>addEscStep('dr-esc-timeline'));
+
+function renderEscTimeline(id,steps){
+  const el=document.getElementById(id);if(!el)return;
+  el.innerHTML=steps.map((s,idx)=>`
+    <div class="esc-step">
+      <div class="esc-dot" style="${idx>0?'background:var(--ink-500)':''}">${idx===0?'⚡':idx+1}</div>
+      <div class="esc-content">
+        <div class="esc-time">${s.time}</div>
+        <div class="esc-users">${s.users.map(u=>av(u)).join('')}</div>
+        <div class="esc-channels">${s.channels.map(c=>`<span class="channel-pill">${c}</span>`).join('')}</div>
+      </div>
+    </div>`).join('');
 }
 
-function toggleInsightSelect(id, checked) {
-  if (checked) selectedInsights.add(id);
-  else selectedInsights.delete(id);
-  updateBulkBar();
+function addEscStep(containerId){
+  const el=document.getElementById(containerId);if(!el)return;
+  const n=el.querySelectorAll('.esc-step').length;
+  const div=document.createElement('div');
+  div.className='esc-step';
+  div.innerHTML=`<div class="esc-dot" style="background:var(--ink-500)">${n+1}</div><div class="esc-content"><div class="esc-time"><input style="width:100%;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--ink-500);outline:none" placeholder="e.g. +60 min if still open"></div><button class="add-user-btn" style="margin-top:6px" onclick="openAssignModal()">+ Add user</button></div>`;
+  el.appendChild(div);
 }
 
-function toggleSelectAll(checked) {
-  document.querySelectorAll('#insights-tbody .checkbox').forEach(cb => {
-    cb.checked = checked;
-    const id = parseInt(cb.dataset.id);
-    if (checked) selectedInsights.add(id);
-    else selectedInsights.delete(id);
+// ===== PLANT DEFAULTS DRAWER =====
+const PD={
+  incident:[{time:'Immediately',users:['RK'],note:'Plant Manager',ch:['WhatsApp','Call']},{time:'+10 min',users:['PS'],note:'Shift Supervisor',ch:['SMS']},{time:'+30 min',users:['MR'],note:'Regional Head',ch:['Call']}],
+  issue:[{time:'Immediately',users:['AM'],note:'Operator',ch:['WhatsApp']},{time:'+30 min',users:['RK'],note:'Plant Manager',ch:['SMS']}],
+  warning:[{time:'Immediately',users:['AM'],note:'Operator',ch:['WhatsApp']}],
+};
+function openPlantDrawer(plantId){
+  const p=PLANTS.find(x=>x.id===plantId);
+  document.getElementById('pd-title').textContent=`${p.name} — Default Escalations`;
+  document.getElementById('pd-sections').innerHTML=['incident','issue','warning'].map((type,i)=>{
+    const steps=PD[type];
+    const cls={incident:'red',issue:'orange',warning:'amber'}[type];
+    return`<div class="pd-section">
+      <div class="pd-section-header" onclick="this.nextElementSibling.classList.toggle('open');this.querySelector('.pd-caret').classList.toggle('open')">
+        <span class="sev-badge ${cls}" style="font-size:12px">${type.charAt(0).toUpperCase()+type.slice(1)}</span>
+        <span class="pd-section-title">${steps.length} escalation step${steps.length!==1?'s':''}</span>
+        <span class="pd-caret${i===0?' open':''}">▶</span>
+      </div>
+      <div class="pd-section-body${i===0?' open':''}">
+        <div class="esc-timeline">${steps.map((s,idx)=>`<div class="esc-step"><div class="esc-dot" style="${idx>0?'background:var(--ink-500)':''}">${idx===0?'⚡':idx+1}</div><div class="esc-content"><div class="esc-time">${s.time}</div><div class="esc-users">${s.users.map(u=>av(u)).join('')}</div><div style="font-size:12px;color:var(--ink-500);margin:2px 0">${s.note}</div><div class="esc-channels">${s.ch.map(c=>`<span class="channel-pill">${c}</span>`).join('')}</div></div></div>`).join('')}</div>
+        <button class="add-step-btn" style="margin-top:4px">+ Add step</button>
+      </div>
+    </div>`;
+  }).join('');
+  openDrawer('plant-drawer');
+}
+document.getElementById('pd-cancel').addEventListener('click',()=>closeDrawer('plant-drawer'));
+document.getElementById('pd-save').addEventListener('click',()=>{closeDrawer('plant-drawer');showToast('✓ Plant defaults saved');});
+
+// ===== OVERLAY & DRAWER CLOSE =====
+document.getElementById('insight-drawer-close').addEventListener('click',()=>closeDrawer('insight-drawer'));
+document.getElementById('plant-drawer-close').addEventListener('click',()=>closeDrawer('plant-drawer'));
+document.getElementById('overlay').addEventListener('click',()=>{
+  document.querySelectorAll('.drawer.open').forEach(d=>d.classList.remove('open'));
+  document.getElementById('overlay').classList.remove('open');
+});
+
+// ===== BULK =====
+document.getElementById('select-all-cb').addEventListener('change',function(){
+  document.querySelectorAll('.row-cb').forEach(cb=>{
+    cb.checked=this.checked;
+    if(this.checked)selectedInsights.add(+cb.dataset.id);else selectedInsights.delete(+cb.dataset.id);
   });
   updateBulkBar();
-}
-
-function updateBulkBar() {
-  const bar = document.getElementById('bulk-bar');
-  const n = selectedInsights.size;
-  document.getElementById('bulk-count-label').textContent = `${n} selected`;
-  if (n > 0) bar.classList.add('visible');
-  else bar.classList.remove('visible');
-}
-
-function bulkToggle(on) {
-  selectedInsights.forEach(id => {
-    const ins = insightData.find(i => i.id === id);
-    if (ins) ins.on = on;
-  });
-  renderInsights(insightData);
-  showToast(`${on ? 'Enabled' : 'Disabled'} ${selectedInsights.size} insights`, 'Undo');
+});
+document.getElementById('bulk-clear').addEventListener('click',()=>{
   selectedInsights.clear();
+  document.querySelectorAll('.row-cb').forEach(cb=>cb.checked=false);
+  document.getElementById('select-all-cb').checked=false;
   updateBulkBar();
-  document.getElementById('select-all').checked = false;
+});
+document.getElementById('bulk-enable').addEventListener('click',()=>showToast(`✓ ${selectedInsights.size} insight(s) enabled`));
+document.getElementById('bulk-disable').addEventListener('click',()=>showToast(`✓ ${selectedInsights.size} insight(s) disabled`));
+document.getElementById('bulk-add-user').addEventListener('click',openAssignModal);
+
+function updateBulkBar(){
+  document.getElementById('bulk-bar').classList.toggle('visible',selectedInsights.size>0);
+  document.getElementById('bulk-count-label').textContent=`${selectedInsights.size} selected`;
+  renderBulkGroups();
 }
 
-function applyInsightFilter() {
-  const plant = document.getElementById('f-plant').value;
-  const type = document.getElementById('f-type').value.toLowerCase();
-  const status = document.getElementById('f-status').value.toLowerCase();
+function renderBulkGroups(){
+  const plantIds=new Set([...selectedInsights].map(id=>INSIGHTS.find(i=>i.id===id)).filter(Boolean).map(i=>i.plantId));
+  const relevant=GROUPS.filter(g=>g.plantId===null||plantIds.has(g.plantId));
+  document.getElementById('bulk-groups').innerHTML=relevant.map(g=>`<span class="group-chip" onclick="assignGroup('${g.id}')"><span class="mini-avs">${g.users.map(u=>miniAv(u)).join('')}</span>${g.name}</span>`).join('');
+}
+function assignGroup(id){const g=GROUPS.find(x=>x.id===id);showToast(`✓ ${g.name} assigned to ${selectedInsights.size} insight(s)`);}
 
-  ['f-plant','f-type','f-status'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el.value) el.classList.add('filter-active');
-    else el.classList.remove('filter-active');
+// ===== ADD INSIGHT MODAL =====
+document.getElementById('add-insight-btn').addEventListener('click',()=>{aiStep=1;resetAiSteps();openModal('add-insight-modal');});
+document.getElementById('add-insight-close').addEventListener('click',()=>closeModal('add-insight-modal'));
+document.getElementById('ai-cancel').addEventListener('click',()=>closeModal('add-insight-modal'));
+
+const equipMap={Tank:['Aerator A-1','Equalization tank','Aeration tank','Outlet','Inlet tank'],Blower:['Blower B-1','Blower B-2'],Pump:['Pump P-1','Pump P-2','Pump P-3','Sludge pump'],Valve:['Valve V-1','Valve V-2','Cl₂ doser']};
+
+document.getElementById('ai-equip-type').addEventListener('change',function(){
+  const opts=equipMap[this.value]||[];
+  document.getElementById('ai-equip').innerHTML='<option value="">Select equipment</option>'+opts.map(e=>`<option>${e}</option>`).join('');
+  updateAiSummary();
+});
+['ai-plant','ai-severity'].forEach(id=>document.getElementById(id).addEventListener('change',updateAiSummary));
+document.getElementById('ai-name').addEventListener('input',updateAiSummary);
+
+document.getElementById('ai-template').addEventListener('change',function(){
+  const t=TEMPLATES.find(x=>x.id===+this.value);
+  const preview=document.getElementById('ai-template-preview');
+  if(!t){preview.style.display='none';return;}
+  preview.style.display='block';
+  document.getElementById('ai-tp-content').innerHTML=`<span>Template:</span> ${t.name}<br><span>Equipment:</span> ${t.equip}<br><span>Trigger:</span> ${t.trigger}<br><span>Channels:</span> WhatsApp + Call (default)<br><span>Used:</span> ${t.plants} times across plants`;
+});
+
+document.getElementById('ai-apply-tmpl').addEventListener('click',()=>{
+  const t=TEMPLATES.find(x=>x.id===+document.getElementById('ai-template').value);
+  if(!t)return;
+  document.getElementById('ai-equip-type').value=t.equip;
+  document.getElementById('ai-equip').innerHTML='<option value="">Select equipment</option>'+(equipMap[t.equip]||[]).map(e=>`<option>${e}</option>`).join('');
+  document.getElementById('ai-severity').value=t.sev.charAt(0).toUpperCase()+t.sev.slice(1);
+  document.getElementById('ai-name').value=t.name;
+  updateAiSummary();showToast('✓ Template applied');
+});
+
+document.getElementById('ai-add-step').addEventListener('click',()=>addEscStep('ai-esc-timeline'));
+
+function updateAiSummary(){
+  const plant=document.getElementById('ai-plant').value||'–';
+  const name=document.getElementById('ai-name').value||'–';
+  const sev=document.getElementById('ai-severity').value||'–';
+  document.getElementById('ai-summary').textContent=`${plant} · ${name} · ${sev}`;
+}
+
+function resetAiSteps(){
+  aiStep=1;
+  for(let i=1;i<=3;i++){
+    document.getElementById('ai-step-'+i).classList.toggle('active',i===1);
+    const d=document.getElementById('ai-dot-'+i);
+    d.className='step-dot'+(i===1?' active':'');
+  }
+  for(let i=1;i<=2;i++)document.getElementById('ai-line-'+i).className='step-line';
+  document.getElementById('ai-back').style.display='none';
+  document.getElementById('ai-next').textContent='Next →';
+  document.getElementById('ai-template-preview').style.display='none';
+}
+
+document.getElementById('ai-next').addEventListener('click',()=>{
+  if(aiStep===3){closeModal('add-insight-modal');showToast('✓ Insight created successfully');return;}
+  document.getElementById('ai-step-'+aiStep).classList.remove('active');
+  document.getElementById('ai-dot-'+aiStep).className='step-dot done';
+  document.getElementById('ai-line-'+aiStep).className='step-line done';
+  aiStep++;
+  document.getElementById('ai-step-'+aiStep).classList.add('active');
+  document.getElementById('ai-dot-'+aiStep).className='step-dot active';
+  document.getElementById('ai-back').style.display='';
+  document.getElementById('ai-next').textContent=aiStep===3?'Save insight →':'Next →';
+});
+document.getElementById('ai-back').addEventListener('click',()=>{
+  if(aiStep===1)return;
+  document.getElementById('ai-step-'+aiStep).classList.remove('active');
+  document.getElementById('ai-dot-'+aiStep).className='step-dot';
+  aiStep--;
+  document.getElementById('ai-step-'+aiStep).classList.add('active');
+  document.getElementById('ai-dot-'+aiStep).className='step-dot active';
+  document.getElementById('ai-line-'+aiStep).className='step-line';
+  document.getElementById('ai-back').style.display=aiStep===1?'none':'';
+  document.getElementById('ai-next').textContent='Next →';
+});
+
+function useTemplate(id){
+  aiStep=1;resetAiSteps();openModal('add-insight-modal');
+  setTimeout(()=>{
+    document.getElementById('ai-template').value=id;
+    document.getElementById('ai-template').dispatchEvent(new Event('change'));
+  },80);
+}
+
+// ===== ASSIGN USERS MODAL =====
+function openAssignModal(){auStep=1;resetAuSteps();selectedUsers=[];activeChannels=new Set(['WhatsApp']);renderSelectedUsers();updateAuSummary();openModal('assign-modal');}
+document.getElementById('assign-close').addEventListener('click',()=>closeModal('assign-modal'));
+document.getElementById('au-cancel').addEventListener('click',()=>closeModal('assign-modal'));
+
+document.getElementById('user-search-input').addEventListener('input',function(){
+  const q=this.value.toLowerCase();
+  const res=document.getElementById('user-results');
+  if(!q){res.classList.remove('open');return;}
+  const found=ALL_USERS.filter(u=>(u.name.toLowerCase().includes(q)||u.role.toLowerCase().includes(q))&&!selectedUsers.find(s=>s.id===u.id));
+  if(!found.length){res.classList.remove('open');return;}
+  res.innerHTML=found.map(u=>`<div class="user-result" data-uid="${u.id}"><span class="av" style="background:${AVC[u.id][0]};color:${AVC[u.id][1]}">${u.id}</span><div><div class="ur-name">${u.name}</div><div class="ur-sub">${u.role} · ${u.plant}</div></div></div>`).join('');
+  res.classList.add('open');
+  res.querySelectorAll('.user-result').forEach(r=>r.addEventListener('click',()=>{
+    const u=ALL_USERS.find(x=>x.id===r.dataset.uid);
+    if(u&&!selectedUsers.find(s=>s.id===u.id)){selectedUsers.push(u);renderSelectedUsers();updateAuSummary();}
+    document.getElementById('user-search-input').value='';
+    res.classList.remove('open');
+  }));
+});
+
+function renderSelectedUsers(){
+  document.getElementById('selected-user-chips').innerHTML=selectedUsers.map(u=>`<span class="user-chip"><span class="av" style="background:${AVC[u.id][0]};color:${AVC[u.id][1]}">${u.id}</span>${u.name}<span class="uc-x" data-uid="${u.id}">×</span></span>`).join('');
+  document.querySelectorAll('.uc-x').forEach(x=>x.addEventListener('click',()=>{selectedUsers=selectedUsers.filter(u=>u.id!==x.dataset.uid);renderSelectedUsers();updateAuSummary();}));
+  document.getElementById('save-group-section').style.display=selectedUsers.length>=2?'block':'none';
+}
+
+document.getElementById('sg-toggle').addEventListener('click',()=>{
+  const b=document.getElementById('sg-body');b.classList.toggle('open');
+  document.getElementById('sg-caret').textContent=b.classList.contains('open')?'▼':'▶';
+});
+document.getElementById('sg-check').addEventListener('change',function(){document.getElementById('sg-name').style.display=this.checked?'block':'none';});
+
+document.querySelectorAll('.timing-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.timing-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedTiming=btn.textContent.trim();
+    document.getElementById('custom-time-row').classList.toggle('visible',btn.id==='custom-timing-btn');
+    updateAuSummary();
   });
+});
 
-  const filtered = INSIGHTS.filter(ins => {
-    return (!plant || ins.plant === plant) &&
-           (!type || ins.type === type) &&
-           (!status || ins.status === status);
+document.querySelectorAll('.channel-card').forEach(card=>{
+  card.addEventListener('click',()=>{
+    card.classList.toggle('active');
+    const ch=card.dataset.channel;
+    if(card.classList.contains('active'))activeChannels.add(ch);else activeChannels.delete(ch);
+    updateAuSummary();
   });
-  insightData = filtered;
-  renderInsights(filtered);
+});
 
-  // chips
-  const chipContainer = document.getElementById('active-filter-chips');
-  chipContainer.innerHTML = '';
-  if (plant) chipContainer.innerHTML += `<div class="filter-chip">Plant: ${plant}<button onclick="clearFilter('f-plant')">×</button></div>`;
-  if (type) chipContainer.innerHTML += `<div class="filter-chip">Type: ${cap(type)}<button onclick="clearFilter('f-type')">×</button></div>`;
-  if (status) chipContainer.innerHTML += `<div class="filter-chip">Status: ${cap(status)}<button onclick="clearFilter('f-status')">×</button></div>`;
+function updateAuSummary(){
+  const names=selectedUsers.map(u=>u.name).join(', ')||'–';
+  const ch=[...activeChannels].join(' · ')||'–';
+  document.getElementById('au-summary').textContent=`${names} → ${selectedTiming} → ${ch} → ${selectedInsights.size||1} insight(s)`;
 }
 
-function clearFilter(id) {
-  document.getElementById(id).value = '';
-  document.getElementById(id).classList.remove('filter-active');
-  applyInsightFilter();
-}
-
-function filterInsights(query) {
-  const q = query.toLowerCase();
-  const filtered = INSIGHTS.filter(ins =>
-    ins.name.toLowerCase().includes(q) ||
-    ins.plant.toLowerCase().includes(q) ||
-    ins.equip.toLowerCase().includes(q) ||
-    ins.sensor.toLowerCase().includes(q)
-  );
-  insightData = filtered;
-  renderInsights(filtered);
-}
-
-function openMoreFilters() {
-  showToast('Advanced filters: Equipment, Channel, Escalation Time, Repeats — coming in full build', '');
-}
-
-// ══════════════════════════════════
-// MODAL: ASSIGN USERS WIZARD
-// ══════════════════════════════════
-function openAddUserModal() {
-  wizardStep = 1;
-  selectedUsers = [];
-  channels = {wa:true,sms:false,call:false,email:false};
-  selectedTime = 'immediately';
-  resetWizard();
-  document.getElementById('modal-assign').classList.add('open');
-}
-
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-  selectedUsers = [];
-  renderSelectedChips();
-}
-
-function resetWizard() {
-  showWizardStep(1);
-  updateWizardStep(1,'active');
-  updateWizardStep(2,'');
-  updateWizardStep(3,'');
-  document.getElementById('wconn-1').classList.remove('done');
-  document.getElementById('wconn-2').classList.remove('done');
-  document.getElementById('wizard-back-btn').style.display = 'none';
-  document.getElementById('wizard-next-btn').textContent = 'Next';
-  document.getElementById('wizard-next-btn').disabled = true;
-  document.getElementById('wizard-summary').textContent = 'Pick at least one user to continue';
-  document.getElementById('user-search-input').value = '';
-  document.getElementById('user-search-results').style.display = 'none';
-  document.getElementById('user-helper-box').style.display = 'none';
-  renderSelectedChips();
-  resetTimeOptions();
-}
-
-function showWizardStep(n) {
-  [1,2,3].forEach(i => {
-    document.getElementById(`wizard-step-${i}`).style.display = i === n ? 'block' : 'none';
-  });
-}
-
-function updateWizardStep(n, state) {
-  const el = document.getElementById(`wstep-${n}`);
-  el.className = `wizard-step ${state}`;
-}
-
-function wizardNext() {
-  if (wizardStep === 1) {
-    if (selectedUsers.length === 0) return;
-    wizardStep = 2;
-    updateWizardStep(1,'done');
-    updateWizardStep(2,'active');
-    document.getElementById('wconn-1').classList.add('done');
-    showWizardStep(2);
-    document.getElementById('wizard-back-btn').style.display = 'inline-flex';
-    document.getElementById('wizard-next-btn').disabled = false;
-    updateSummary();
-  } else if (wizardStep === 2) {
-    wizardStep = 3;
-    updateWizardStep(2,'done');
-    updateWizardStep(3,'active');
-    document.getElementById('wconn-2').classList.add('done');
-    showWizardStep(3);
-    document.getElementById('wizard-next-btn').textContent = 'Assign';
-    updateSummary();
-  } else if (wizardStep === 3) {
-    // Complete
-    const n = selectedInsights.size || 1;
-    const names = selectedUsers.map(u => u.name).join(', ');
-    const timeLabel = selectedTime === 'immediately' ? 'immediately' :
-                      selectedTime === 'custom' ? `+${document.getElementById('custom-hours').value||0}h ${document.getElementById('custom-minutes').value||0}m` :
-                      `+${selectedTime} min`;
-    closeModal('modal-assign');
-    showToast(`✓ ${names} assigned to ${n} insight${n>1?'s':''} · ${timeLabel} · WhatsApp`, 'Undo');
-    selectedInsights.clear();
-    updateBulkBar();
+function resetAuSteps(){
+  auStep=1;
+  for(let i=1;i<=3;i++){
+    document.getElementById('au-step-'+i).classList.toggle('active',i===1);
+    document.getElementById('au-dot-'+i).className='step-dot'+(i===1?' active':'');
   }
+  for(let i=1;i<=2;i++)document.getElementById('au-line-'+i).className='step-line';
+  document.getElementById('au-back').style.display='none';
+  document.getElementById('au-next').textContent='Next →';
 }
 
-function wizardBack() {
-  if (wizardStep === 2) {
-    wizardStep = 1;
-    updateWizardStep(1,'active');
-    updateWizardStep(2,'');
-    document.getElementById('wconn-1').classList.remove('done');
-    showWizardStep(1);
-    document.getElementById('wizard-back-btn').style.display = 'none';
-    document.getElementById('wizard-next-btn').textContent = 'Next';
-    document.getElementById('wizard-next-btn').disabled = selectedUsers.length === 0;
-  } else if (wizardStep === 3) {
-    wizardStep = 2;
-    updateWizardStep(2,'active');
-    updateWizardStep(3,'');
-    document.getElementById('wconn-2').classList.remove('done');
-    showWizardStep(2);
-    document.getElementById('wizard-next-btn').textContent = 'Next';
-  }
-}
+document.getElementById('au-next').addEventListener('click',()=>{
+  if(auStep===3){closeModal('assign-modal');showToast(`✓ Users assigned to ${selectedInsights.size||1} insight(s)`);return;}
+  document.getElementById('au-step-'+auStep).classList.remove('active');
+  document.getElementById('au-dot-'+auStep).className='step-dot done';
+  document.getElementById('au-line-'+auStep).className='step-line done';
+  auStep++;
+  document.getElementById('au-step-'+auStep).classList.add('active');
+  document.getElementById('au-dot-'+auStep).className='step-dot active';
+  document.getElementById('au-back').style.display='';
+  document.getElementById('au-next').textContent=auStep===3?'Assign →':'Next →';
+});
+document.getElementById('au-back').addEventListener('click',()=>{
+  if(auStep===1)return;
+  document.getElementById('au-step-'+auStep).classList.remove('active');
+  document.getElementById('au-dot-'+auStep).className='step-dot';
+  auStep--;
+  document.getElementById('au-step-'+auStep).classList.add('active');
+  document.getElementById('au-dot-'+auStep).className='step-dot active';
+  document.getElementById('au-line-'+auStep).className='step-line';
+  document.getElementById('au-back').style.display=auStep===1?'none':'';
+  document.getElementById('au-next').textContent='Next →';
+});
 
-function updateSummary() {
-  const names = selectedUsers.map(u => u.initials).join(', ') || '—';
-  const timeLabel = selectedTime === 'immediately' ? 'immediately' :
-                    selectedTime === 'custom' ? 'custom time' :
-                    `+${selectedTime} min`;
-  const ch = Object.entries(channels).filter(([,v])=>v).map(([k])=>k.toUpperCase()).join(' · ') || '—';
-  const n = selectedInsights.size || 1;
-  document.getElementById('wizard-summary').textContent =
-    wizardStep === 1 ? `${selectedUsers.length} user${selectedUsers.length!==1?'s':''} selected` :
-    wizardStep === 2 ? `${names} · ${timeLabel}` :
-    `${names} · ${timeLabel} · ${ch} → ${n} insight${n>1?'s':''}`;
-}
+// ===== MORE FILTERS =====
+document.getElementById('more-filters-btn').addEventListener('click',e=>{
+  e.stopPropagation();
+  const p=document.getElementById('more-filters-panel');
+  p.style.display=p.style.display==='none'?'block':'none';
+});
+document.addEventListener('click',()=>{document.getElementById('more-filters-panel').style.display='none';});
+document.getElementById('more-filters-panel').addEventListener('click',e=>e.stopPropagation());
 
-// User search
-function searchUsers(query) {
-  const q = query.toLowerCase().trim();
-  const container = document.getElementById('user-search-results');
-  if (!q) { container.style.display = 'none'; return; }
-  const results = USERS_DB.filter(u =>
-    u.name.toLowerCase().includes(q) || u.role.toLowerCase().includes(q)
-  ).filter(u => !selectedUsers.find(s => s.id === u.id));
+// ===== FILTER WIRING =====
+['plant-search','plant-location-filter','plant-severity-filter','plant-config-filter'].forEach(id=>{
+  const el=document.getElementById(id);
+  el.addEventListener('input',renderPlants);el.addEventListener('change',renderPlants);
+});
+['insight-search','ins-plant-filter','ins-type-filter','ins-state-filter'].forEach(id=>{
+  const el=document.getElementById(id);if(!el)return;
+  el.addEventListener('input',()=>{renderInsights();renderInsightChips();});
+  el.addEventListener('change',()=>{renderInsights();renderInsightChips();});
+});
 
-  if (results.length === 0) {
-    container.style.display = 'block';
-    container.innerHTML = '<div class="user-results"><div style="padding:12px;font-size:12px;color:var(--ink-500)">No users found</div></div>';
-    return;
-  }
+// ===== MODAL OVERLAY CLICK =====
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeModal(o.id);}));
 
-  container.style.display = 'block';
-  container.innerHTML = `<div class="user-results">${results.map(u => `
-    <div class="user-result-item" onclick="selectUser('${u.id}')">
-      <div class="avatar" style="background:${u.bg};color:${u.color};width:32px;height:32px;font-size:11px;flex-shrink:0">${u.initials}</div>
-      <div style="flex:1">
-        <div class="user-result-name">${u.name}</div>
-        <div class="user-result-meta">${u.role}</div>
-        ${u.escalations.length > 0 ? `
-          <div class="user-result-escalations">
-            📋 Already on: ${u.escalations.map(e => `${e.plant} (${e.insights} insights, ${e.timing})`).join(' · ')}
-          </div>
-        ` : ''}
-      </div>
-    </div>
-  `).join('')}</div>`;
-}
-
-function selectUser(id) {
-  const u = USERS_DB.find(u => u.id === id);
-  if (!u || selectedUsers.find(s => s.id === id)) return;
-  selectedUsers.push(u);
-  renderSelectedChips();
-  document.getElementById('user-search-input').value = '';
-  document.getElementById('user-search-results').style.display = 'none';
-  document.getElementById('wizard-next-btn').disabled = false;
-  updateHelperBox();
-  updateSummary();
-
-  // Permission check demo
-  if (id === 'mr') {
-    setTimeout(() => {
-      const chipContainer = document.getElementById('selected-user-chips');
-      const warning = document.createElement('div');
-      warning.className = 'permission-warning';
-      warning.style.width = '100%';
-      warning.innerHTML = `
-        <span>⚠</span>
-        <div>
-          <strong>Meera Rao</strong> doesn't have access to <strong>Powai Plant</strong>
-          <div class="perm-actions">
-            <button class="resolve" onclick="this.closest('.permission-warning').remove();showToast('Access granted to Meera Rao for Powai Plant','')">Grant access</button>
-            <button onclick="removeUser('mr');this.closest('.permission-warning').remove()">Remove from insight</button>
-          </div>
-        </div>
-      `;
-      chipContainer.after(warning);
-    }, 300);
-  }
-}
-
-function removeUser(id) {
-  selectedUsers = selectedUsers.filter(u => u.id !== id);
-  renderSelectedChips();
-  if (selectedUsers.length === 0) {
-    document.getElementById('wizard-next-btn').disabled = true;
-    document.getElementById('user-helper-box').style.display = 'none';
-  }
-  updateHelperBox();
-  updateSummary();
-}
-
-function renderSelectedChips() {
-  const container = document.getElementById('selected-user-chips');
-  container.innerHTML = selectedUsers.map(u => `
-    <div class="user-selected-chip">
-      <div class="avatar" style="background:${u.bg};color:${u.color};width:20px;height:20px;font-size:8px;border:none">${u.initials}</div>
-      ${u.name}
-      <button onclick="removeUser('${u.id}')">×</button>
-    </div>
-  `).join('');
-  // show save-group only when ≥2 users selected
-  const sgSection = document.getElementById('save-group-section');
-  if (sgSection) sgSection.style.display = selectedUsers.length >= 2 ? 'block' : 'none';
-  if (selectedUsers.length < 2) {
-    document.getElementById('save-group-form').style.display = 'none';
-    document.getElementById('save-group-icon').textContent = '+';
-  }
-}
-
-function toggleSaveGroup() {
-  const form = document.getElementById('save-group-form');
-  const icon = document.getElementById('save-group-icon');
-  const open = form.style.display === 'none';
-  form.style.display = open ? 'block' : 'none';
-  icon.textContent = open ? '−' : '+';
-}
-
-function toggleGroupNameInput(checked) {
-  const inp = document.getElementById('group-name-input');
-  inp.style.display = checked ? 'block' : 'none';
-  if (checked) inp.focus();
-}
-
-function assignGroup(groupName, initials) {
-  const n = selectedInsights.size || 1;
-  showToast(`✓ "${groupName}" assigned to ${n} insight${n>1?'s':''} · immediately · WhatsApp`, 'Undo');
-  selectedInsights.clear();
-  updateBulkBar();
-  document.querySelectorAll('#insights-tbody .checkbox').forEach(cb => cb.checked = false);
-  document.getElementById('select-all').checked = false;
-}
-
-function updateHelperBox() {
-  const box = document.getElementById('user-helper-box');
-  const content = document.getElementById('user-helper-content');
-  if (selectedUsers.length === 0) { box.style.display = 'none'; return; }
-
-  const rows = selectedUsers.flatMap(u =>
-    u.escalations.map(e => ({user:u.name, ...e}))
-  );
-
-  if (rows.length === 0) { box.style.display = 'none'; return; }
-
-  box.style.display = 'block';
-  content.innerHTML = rows.map(r => `
-    <div class="helper-row">
-      <div style="font-size:11px">
-        <strong>${r.user}</strong> · ${r.plant} · ${r.insights} insights · <span style="color:var(--ink-900);font-weight:600">${r.timing}</span> · ${r.channels}
-      </div>
-    </div>
-  `).join('');
-}
-
-// Timing
-function selectTime(val, btn) {
-  selectedTime = val;
-  document.querySelectorAll('.time-option').forEach(b => b.classList.remove('selected'));
-  if (btn) btn.classList.add('selected');
-  document.getElementById('custom-time-input').style.display = val === 'custom' ? 'block' : 'none';
-  updateSummary();
-}
-
-function resetTimeOptions() {
-  document.querySelectorAll('.time-option').forEach(b => b.classList.remove('selected'));
-  document.getElementById('time-immediately').classList.add('selected');
-  document.getElementById('custom-time-input').style.display = 'none';
-}
-
-// Channels
-function toggleChannel(ch) {
-  channels[ch] = !channels[ch];
-  const el = document.getElementById(`ch-${ch}`);
-  if (channels[ch]) {
-    el.style.background = 'var(--ink-900)';
-    el.style.borderColor = 'var(--ink-900)';
-    el.style.color = '#fff';
-    el.querySelector('div:last-child').textContent = 'ON';
-  } else {
-    el.style.background = 'var(--white)';
-    el.style.borderColor = 'var(--ink-300)';
-    el.style.color = 'var(--ink-700)';
-    el.querySelector('div:last-child').textContent = 'OFF';
-    el.querySelector('div:last-child').style.color = 'var(--ink-500)';
-  }
-  document.getElementById('wa-message-editor').style.display = channels.wa ? 'block' : 'none';
-  updateSummary();
-}
-
-// ══════════════════════════════════
-// DRAWER: ESCALATION
-// ══════════════════════════════════
-function openEscDrawer(insightId) {
-  const ins = INSIGHTS.find(i => i.id === insightId) || INSIGHTS[0];
-  document.getElementById('drawer-insight-name').textContent = ins.name;
-  document.getElementById('drawer-insight-meta').textContent = `${ins.plant} · ${ins.equip} · ${cap(ins.type)}`;
-  document.getElementById('drawer-overlay').classList.add('open');
-  document.getElementById('drawer-esc').classList.add('open');
-}
-
-function closeDrawer() {
-  document.getElementById('drawer-overlay').classList.remove('open');
-  document.getElementById('drawer-esc').classList.remove('open');
-  document.getElementById('drawer-defaults').classList.remove('open');
-}
-
-function saveDrawer() {
-  closeDrawer();
-  showToast('Escalation saved', 'Undo');
-}
-
-function overrideInheritance() {
-  const badge = document.querySelector('#drawer-esc .drawer-body > div:first-child');
-  badge.style.background = 'var(--amber-bg)';
-  badge.style.borderColor = 'var(--amber-border)';
-  badge.querySelector('div:first-child').style.fontSize = '18px';
-  badge.querySelector('div:nth-child(2) div:first-child').style.color = 'var(--amber)';
-  badge.querySelector('div:nth-child(2) div:first-child').textContent = 'Custom escalation';
-  badge.querySelector('div:nth-child(2) div:last-child').textContent = 'Overrides plant defaults for this insight';
-  badge.querySelector('button').textContent = 'Reset to defaults';
-  badge.querySelector('button').onclick = () => { location.reload(); };
-  showToast('Now editing custom escalation for this insight', '');
-}
-
-function addEscalationStep(node) {
-  showToast('New escalation step added — set timing and add users', '');
-}
-
-function editStepTime(btn) {
-  const current = btn.textContent.trim();
-  const newTime = prompt(`Change timing (current: ${current})\nExamples: +5 min, +45 min, +2 hr`, current);
-  if (newTime) { btn.textContent = newTime; showToast('Timing updated', ''); }
-}
-
-// ══════════════════════════════════
-// DRAWER: PLANT DEFAULTS
-// ══════════════════════════════════
-function openDefaultsDrawer(plantId) {
-  const plant = PLANTS.find(p => p.id === plantId);
-  document.getElementById('defaults-plant-name').textContent = `${plant.name} — Default Escalations`;
-  document.getElementById('drawer-overlay').classList.add('open');
-  document.getElementById('drawer-defaults').classList.add('open');
-}
-
-function closeDefaultsDrawer() {
-  document.getElementById('drawer-overlay').classList.remove('open');
-  document.getElementById('drawer-defaults').classList.remove('open');
-}
-
-function saveDefaultsDrawer() {
-  closeDefaultsDrawer();
-  showToast('Default escalation rules saved for this plant', '');
-}
-
-function toggleDefaultRule(type) {
-  const body = document.getElementById(`body-${type}`);
-  const arr = document.getElementById(`arr-${type}`);
-  const isOpen = body.classList.toggle('open');
-  arr.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
-}
-
-// ══════════════════════════════════
-// TOAST
-// ══════════════════════════════════
-let toastTimer;
-function showToast(msg, undoLabel) {
-  clearTimeout(toastTimer);
-  document.getElementById('toast-msg').textContent = msg;
-  const undoEl = document.getElementById('toast-undo');
-  undoEl.textContent = undoLabel;
-  undoEl.style.display = undoLabel ? 'inline' : 'none';
-  const toast = document.getElementById('toast');
-  toast.classList.add('visible');
-  toastTimer = setTimeout(() => toast.classList.remove('visible'), 3200);
-}
-
-function hideToast() {
-  document.getElementById('toast').classList.remove('visible');
-}
+// ===== INIT =====
+renderPlants();
+renderInsights();
+renderTemplates();
 </script>
 </body>
 </html>
